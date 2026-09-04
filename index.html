@@ -116,7 +116,18 @@
     display:flex;align-items:center;justify-content:space-between;
     padding:14px 28px;max-width:1180px;margin:0 auto;
   }
-  .nav-logo{height:34px;width:auto;display:block;filter:drop-shadow(0 2px 10px rgba(0,0,0,0.4));}
+  .nav-logo{
+    height:34px;
+    width:auto;
+    display:block;
+    filter:drop-shadow(0 2px 8px var(--shadow-pop));
+    transition: filter 0.25s ease;
+  }
+  .logo-dark{display:block;}
+  .logo-light{display:none;}
+  [data-theme="light"] .logo-dark{display:none;}
+  [data-theme="light"] .logo-light{display:block;}
+
   .nav-links{display:flex;gap:34px;list-style:none;}
   .nav-links a{
     font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:0.12em;
@@ -174,7 +185,30 @@
     100%{left:120%;}
   }
   .hero-inner{position:relative;z-index:2;padding:80px 0 70px;width:100%;}
-  .hero-logo{width:min(440px,78vw);max-height:110px;object-fit:contain;display:block;margin-bottom:28px;filter:drop-shadow(0 12px 30px rgba(0,0,0,0.6));}
+  .hero-logo-wrap{margin-bottom:28px;}
+  .hero-logo{
+    width:min(440px,78vw);
+    max-height:110px;
+    object-fit:contain;
+    filter:drop-shadow(0 8px 24px var(--shadow-pop));
+    transition: filter 0.25s ease;
+  }
+  .logo-dark{display:block !important;}
+  .logo-light{display:none !important;}
+  [data-theme="light"] .logo-dark{display:none !important;}
+  [data-theme="light"] .logo-light{display:block !important;}
+
+  .foot-logo{
+    height:38px;
+    width:auto;
+    object-fit:contain;
+    filter:drop-shadow(0 2px 8px var(--shadow-pop));
+  }
+  .foot-grid{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:32px 0 24px;border-bottom:1px solid var(--line);flex-wrap:wrap;}
+  .foot-links{display:flex;gap:24px;list-style:none;}
+  .foot-links a{font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);transition:color .2s;}
+  .foot-links a:hover{color:var(--green);}
+  .foot-copy{display:flex;justify-content:space-between;padding:24px 0 32px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted);flex-wrap:wrap;gap:12px;}
   .eyebrow{
     font-family:'IBM Plex Mono',monospace;font-size:12.5px;letter-spacing:0.22em;
     color:var(--green);text-transform:uppercase;margin-bottom:18px;display:flex;align-items:center;gap:10px;
@@ -608,7 +642,8 @@
 <header>
   <nav>
     <a href="#" class="nav-brand">
-      <img src="assets/trieye-logo.jpg" alt="Trieye" class="nav-logo">
+      <img src="assets/trieye-logo-dark.png" alt="Trieye" class="nav-logo logo-dark">
+      <img src="assets/trieye-logo-light.png" alt="Trieye" class="nav-logo logo-light">
     </a>
     <ul class="nav-links" id="navLinks">
       <li><a href="#services">Services</a></li>
@@ -630,7 +665,10 @@
 <section class="hero">
   <div class="sweep" aria-hidden="true"></div>
   <div class="wrap hero-inner">
-    <img src="assets/trieye-logo.jpg" alt="Trieye — Detail, Precision, Protection" class="hero-logo">
+    <div class="hero-logo-wrap">
+      <img src="assets/trieye-logo-dark.png" alt="Trieye — Detail, Precision, Protection" class="hero-logo logo-dark">
+      <img src="assets/trieye-logo-light.png" alt="Trieye — Detail, Precision, Protection" class="hero-logo logo-light">
+    </div>
     <div class="eyebrow">Chennai · Car &amp; Bike Wash Studio</div>
     <h1>Your car doesn't get <em>washed</em> here.<br>It gets detailed.</h1>
     <p>Foam wash, rubbing polish and deep interior cleaning for hatchbacks, sedans and SUVs — done with the same precision every single time.</p>
@@ -932,7 +970,10 @@
 
 <footer>
   <div class="wrap foot-grid">
-    <img src="assets/trieye-logo.jpg" alt="Trieye" class="foot-logo">
+    <div class="foot-brand">
+      <img src="assets/trieye-logo-dark.png" alt="Trieye" class="foot-logo logo-dark">
+      <img src="assets/trieye-logo-light.png" alt="Trieye" class="foot-logo logo-light">
+    </div>
     <ul class="foot-links">
       <li><a href="#services">Services</a></li>
       <li><a href="#booking">Booking</a></li>

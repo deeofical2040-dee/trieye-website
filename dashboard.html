@@ -28,6 +28,7 @@
       --muted: #8e8e99;
       --red: #ef4444;
       --red-dim: rgba(239, 68, 68, 0.15);
+      --shadow-pop: rgba(0, 0, 0, 0.45);
     }
 
     [data-theme="light"] {
@@ -51,6 +52,7 @@
       --muted: #6c757d;
       --red: #dc2626;
       --red-dim: rgba(220, 38, 38, 0.12);
+      --shadow-pop: rgba(0, 0, 0, 0.08);
     }
 
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -84,8 +86,13 @@
       height: 32px;
       width: auto;
       object-fit: contain;
-      filter: drop-shadow(0 2px 8px rgba(0,0,0,0.5));
+      filter: drop-shadow(0 2px 8px var(--shadow-pop, rgba(0,0,0,0.4)));
+      transition: filter 0.25s ease;
     }
+    .logo-dark { display: block !important; }
+    .logo-light { display: none !important; }
+    [data-theme="light"] .logo-dark { display: none !important; }
+    [data-theme="light"] .logo-light { display: block !important; }
     .brand-title {
       font-family: 'Oswald', sans-serif;
       font-size: 1.35rem;
@@ -635,7 +642,8 @@
 
   <header class="topbar">
     <div class="brand-group">
-      <img src="assets/trieye-logo.jpg" alt="Trieye Studio" class="brand-logo" onerror="this.style.display='none'">
+      <img src="assets/trieye-logo-dark.png" alt="Trieye Studio" class="brand-logo logo-dark" onerror="this.style.display='none'">
+      <img src="assets/trieye-logo-light.png" alt="Trieye Studio" class="brand-logo logo-light" onerror="this.style.display='none'">
       <div class="brand-title">
         Trieye Studio <span class="brand-badge">ADMIN CONSOLE</span>
       </div>
