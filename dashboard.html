@@ -30,6 +30,29 @@
       --red-dim: rgba(239, 68, 68, 0.15);
     }
 
+    [data-theme="light"] {
+      --bg: #f8f9fa;
+      --bg-panel: #ffffff;
+      --bg-panel-2: #f1f3f5;
+      --bg-panel-3: #e9ecef;
+      --line: #dee2e6;
+      --line-subtle: #e9ecef;
+      --pink: #ee2f76;
+      --pink-dim: rgba(238, 47, 118, 0.12);
+      --pink-glow: rgba(238, 47, 118, 0.25);
+      --green: #689f0e;
+      --green-dim: rgba(166, 211, 49, 0.22);
+      --green-glow: rgba(166, 211, 49, 0.25);
+      --blue: #0284c7;
+      --blue-dim: rgba(2, 132, 199, 0.12);
+      --amber: #d97706;
+      --amber-dim: rgba(217, 119, 6, 0.12);
+      --white: #1a1a1d;
+      --muted: #6c757d;
+      --red: #dc2626;
+      --red-dim: rgba(220, 38, 38, 0.12);
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
       background: var(--bg);
@@ -38,6 +61,7 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      transition: background-color 0.25s ease, color 0.25s ease;
     }
 
     header.topbar {
@@ -621,6 +645,10 @@
       <div class="live-status-pill">
         <span class="pulse-dot"></span> 4 BAYS ONLINE
       </div>
+      <button class="btn" id="dashThemeToggleBtn" title="Toggle Dark / Light Theme" style="cursor:pointer;">
+        <span id="dashThemeIcon">☀️</span>
+        <span id="dashThemeLabel">Light Mode</span>
+      </button>
       <a href="index.html" class="btn" title="View Customer Website">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
         Customer Portal
@@ -1260,6 +1288,36 @@
       return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
 
+    // Theme Switcher for Dashboard
+    const THEME_KEY = 'trieye_theme';
+    const dashThemeToggleBtn = document.getElementById('dashThemeToggleBtn');
+    const dashThemeIcon = document.getElementById('dashThemeIcon');
+    const dashThemeLabel = document.getElementById('dashThemeLabel');
+
+    function applyDashboardTheme(theme) {
+      if (theme === 'light') {
+        document.documentElement.setAttribute('data-theme', 'light');
+        if (dashThemeIcon) dashThemeIcon.innerText = '🌙';
+        if (dashThemeLabel) dashThemeLabel.innerText = 'Dark Mode';
+      } else {
+        document.documentElement.removeAttribute('data-theme');
+        if (dashThemeIcon) dashThemeIcon.innerText = '☀️';
+        if (dashThemeLabel) dashThemeLabel.innerText = 'Light Mode';
+      }
+      localStorage.setItem(THEME_KEY, theme);
+    }
+
+    const savedTheme = localStorage.getItem(THEME_KEY) || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+    applyDashboardTheme(savedTheme);
+
+    if (dashThemeToggleBtn) {
+      dashThemeToggleBtn.addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+        const target = current === 'light' ? 'dark' : 'light';
+        applyDashboardTheme(target);
+      });
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
       initializeData();
       renderQueue();
@@ -1269,6 +1327,9 @@
       window.addEventListener('storage', (e) => {
         if (e.key === BOOKINGS_KEY) {
           renderQueue();
+        }
+        if (e.key === THEME_KEY) {
+          applyDashboardTheme(e.newValue);
         }
       });
     });

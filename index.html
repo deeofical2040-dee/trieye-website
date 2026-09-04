@@ -11,15 +11,42 @@
     --bg:#0a0a0b;
     --bg-panel:#131315;
     --bg-panel-2:#1a1a1d;
+    --bg-panel-3:#242429;
     --line:#2a2a2e;
     --pink:#ee2f76;
     --pink-dim:#ee2f7622;
     --green:#a6d331;
     --green-dim:#a6d33122;
     --white:#f3f3f0;
+    --text-primary:#f3f3f0;
     --muted:#8d8d92;
     --red:#ff4d4d;
+    --hero-radial-1: rgba(166,211,49,0.10);
+    --hero-radial-2: rgba(238,47,118,0.12);
+    --grid-line: rgba(255,255,255,0.025);
+    --shadow-pop: rgba(0,0,0,0.5);
   }
+
+  [data-theme="light"] {
+    --bg:#f8f9fa;
+    --bg-panel:#ffffff;
+    --bg-panel-2:#f1f3f5;
+    --bg-panel-3:#e9ecef;
+    --line:#dee2e6;
+    --pink:#ee2f76;
+    --pink-dim:#ee2f7618;
+    --green:#689f0e;
+    --green-dim:#a6d33130;
+    --white:#1a1a1d;
+    --text-primary:#1a1a1d;
+    --muted:#6c757d;
+    --red:#dc2626;
+    --hero-radial-1: rgba(166,211,49,0.18);
+    --hero-radial-2: rgba(238,47,118,0.15);
+    --grid-line: rgba(0,0,0,0.035);
+    --shadow-pop: rgba(0,0,0,0.08);
+  }
+
   *{margin:0;padding:0;box-sizing:border-box;}
   html{scroll-behavior:smooth;}
   body{
@@ -28,6 +55,7 @@
     font-family:'Inter',sans-serif;
     line-height:1.5;
     overflow-x:hidden;
+    transition: background-color 0.25s ease, color 0.25s ease;
   }
   h1,h2,h3,.display{
     font-family:'Oswald',sans-serif;
@@ -38,6 +66,34 @@
   a{color:inherit;text-decoration:none;}
   .wrap{max-width:1180px;margin:0 auto;padding:0 28px;}
   ::selection{background:var(--pink);color:#000;}
+
+  /* Theme Toggle Button */
+  .theme-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: var(--bg-panel-2);
+    border: 1px solid var(--line);
+    color: var(--white);
+    padding: 7px 11px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    user-select: none;
+  }
+  .theme-toggle-btn:hover {
+    border-color: var(--pink);
+    color: var(--pink);
+    transform: translateY(-1px);
+  }
+  .theme-toggle-btn svg {
+    width: 14px;
+    height: 14px;
+  }
 
   /* focus visibility */
   a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible{
@@ -561,6 +617,10 @@
       <li><a href="#contact">Contact</a></li>
     </ul>
     <div class="nav-actions">
+      <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Dark / Light Theme" aria-label="Toggle Theme">
+        <span id="themeIcon">☀️</span>
+        <span id="themeLabel">Light</span>
+      </button>
       <a href="#booking" class="nav-cta">Book a slot</a>
       <button class="burger" id="burgerBtn" aria-label="Toggle navigation">☰</button>
     </div>
@@ -1188,6 +1248,38 @@
       nextjsModalBody.prepend(errItem);
     }
   });
+
+  // Theme Switcher (Dark / Light)
+  const THEME_KEY = 'trieye_theme';
+  const themeToggleBtn = document.getElementById('themeToggleBtn');
+  const themeIcon = document.getElementById('themeIcon');
+  const themeLabel = document.getElementById('themeLabel');
+
+  function applyTheme(theme) {
+    if (theme === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+      if (themeIcon) themeIcon.innerText = '🌙';
+      if (themeLabel) themeLabel.innerText = 'Dark';
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+      if (themeIcon) themeIcon.innerText = '☀️';
+      if (themeLabel) themeLabel.innerText = 'Light';
+    }
+    localStorage.setItem(THEME_KEY, theme);
+  }
+
+  // Load saved theme or match system preference
+  const savedTheme = localStorage.getItem(THEME_KEY) || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+  applyTheme(savedTheme);
+
+  if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+      const target = current === 'light' ? 'dark' : 'light';
+      applyTheme(target);
+      showToast(`Switched to ${target.charAt(0).toUpperCase() + target.slice(1)} Mode`);
+    });
+  }
 </script>
 
 </body>
