@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Trieye — Detail · Precision · Protection</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0b;
+    --bg-panel:#131315;
+    --bg-panel-2:#1a1a1d;
+    --line:#2a2a2e;
+    --pink:#ee2f76;
+    --pink-dim:#ee2f7622;
+    --green:#a6d331;
+    --green-dim:#a6d33122;
+    --white:#f3f3f0;
+    --muted:#8d8d92;
+    --red:#ff4d4d;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--bg);
+    color:var(--white);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.display{
+    font-family:'Oswald',sans-serif;
+    text-transform:uppercase;
+    letter-spacing:0.02em;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+  a{color:inherit;text-decoration:none;}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px;}
+  ::selection{background:var(--pink);color:#000;}
+
+  /* focus visibility */
+  a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible{
+    outline:2px solid var(--green);
+    outline-offset:3px;
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important;}
+  }
+
+  /* ---------- NAV ---------- */
+  header{
+    position:sticky;top:0;z-index:50;
+    background:rgba(10,10,11,0.88);
+    backdrop-filter:blur(10px);
+    border-bottom:1px solid var(--line);
+  }
+  nav{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 28px;max-width:1180px;margin:0 auto;
+  }
+  .nav-logo{height:30px;display:block;filter:drop-shadow(0 0 14px rgba(238,47,118,0.15));}
+  .nav-links{display:flex;gap:34px;list-style:none;}
+  .nav-links a{
+    font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:0.12em;
+    text-transform:uppercase;color:var(--muted);transition:color .2s;
+  }
+  .nav-links a:hover{color:var(--green);}
+  .nav-cta{
+    display:flex;align-items:center;gap:8px;
+    font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:0.08em;
+    text-transform:uppercase;background:var(--green);color:#0a0a0b;
+    padding:9px 18px;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);
+    font-weight:600;transition:transform .2s, box-shadow .2s;
+  }
+  .nav-cta:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(166,211,49,0.25);}
+  .burger{display:none;background:none;border:none;color:var(--white);font-size:22px;}
+
+  @media (max-width:860px){
+    .nav-links{display:none;}
+    .burger{display:block;}
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    min-height:88vh;
+    display:flex;align-items:center;
+    background:
+      radial-gradient(ellipse 900px 500px at 82% 18%, rgba(166,211,49,0.10), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 8% 85%, rgba(238,47,118,0.12), transparent 60%),
+      var(--bg);
+    overflow:hidden;
+    border-bottom:1px solid var(--line);
+  }
+  .hero::before{
+    /* precision grid, subtle */
+    content:"";
+    position:absolute;inset:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size:56px 56px;
+    mask-image:radial-gradient(ellipse 70% 60% at 60% 40%, black, transparent 80%);
+    pointer-events:none;
+  }
+  .sweep{
+    position:absolute;top:0;left:-30%;width:26%;height:100%;
+    background:linear-gradient(100deg, transparent, rgba(255,255,255,0.06), transparent);
+    transform:skewX(-16deg);
+    animation:sweep 5.5s ease-in-out infinite;
+    pointer-events:none;
+  }
+  @keyframes sweep{
+    0%{left:-30%;}
+    38%{left:120%;}
+    100%{left:120%;}
+  }
+  .hero-inner{position:relative;z-index:2;padding:80px 0 70px;width:100%;}
+  .hero-logo{width:min(480px,72vw);display:block;margin-bottom:26px;filter:drop-shadow(0 10px 40px rgba(0,0,0,0.5));}
+  .eyebrow{
+    font-family:'IBM Plex Mono',monospace;font-size:12.5px;letter-spacing:0.22em;
+    color:var(--green);text-transform:uppercase;margin-bottom:18px;display:flex;align-items:center;gap:10px;
+  }
+  .eyebrow::before{content:"";width:22px;height:1px;background:var(--green);}
+  .hero h1{
+    font-size:clamp(30px,5vw,52px);
+    line-height:1.08;max-width:760px;margin-bottom:20px;font-weight:600;
+  }
+  .hero h1 em{font-style:normal;color:var(--pink);}
+  .hero p{
+    font-size:16.5px;color:var(--muted);max-width:520px;margin-bottom:34px;
+  }
+  .hero-ctas{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:46px;}
+  .btn{
+    font-family:'Oswald',sans-serif;font-size:14px;letter-spacing:0.08em;text-transform:uppercase;
+    padding:14px 26px;font-weight:600;
+    clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);
+    transition:transform .2s, box-shadow .2s, background .2s;
+    display:inline-flex;align-items:center;gap:10px;
+    border:none;cursor:pointer;
+  }
+  .btn-primary{background:var(--pink);color:#fff;}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(238,47,118,0.3);}
+  .btn-outline{background:transparent;color:var(--white);border:1px solid var(--line);clip-path:none;padding:13px 25px;}
+  .btn-outline:hover{border-color:var(--green);color:var(--green);}
+
+  .hero-stats{
+    display:flex;gap:0;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:26px;max-width:640px;
+  }
+  .hero-stats div{padding-right:36px;margin-right:36px;border-right:1px solid var(--line);}
+  .hero-stats div:last-child{border-right:none;}
+  .hero-stats .num{font-family:'Oswald',sans-serif;font-size:26px;color:var(--green);font-weight:600;}
+  .hero-stats .lbl{font-size:11.5px;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase;margin-top:2px;}
+
+  /* ---------- SECTION HEADS ---------- */
+  section{padding:88px 0;}
+  .sec-head{margin-bottom:48px;max-width:640px;}
+  .sec-tag{
+    font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.2em;
+    color:var(--pink);text-transform:uppercase;margin-bottom:12px;
+  }
+  .sec-head h2{font-size:clamp(26px,3.4vw,38px);font-weight:600;}
+  .sec-head p{color:var(--muted);margin-top:12px;font-size:15px;}
+
+  /* ---------- PILLARS ---------- */
+  .pillars{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg-panel);}
+  .pillars .wrap{
+    display:grid;grid-template-columns:repeat(3,1fr);
+  }
+  .pillar{
+    padding:44px 30px;border-right:1px solid var(--line);
+  }
+  .pillar:last-child{border-right:none;}
+  .pillar .n{font-family:'IBM Plex Mono',monospace;color:var(--muted);font-size:12px;margin-bottom:14px;}
+  .pillar h3{font-size:19px;margin-bottom:10px;font-weight:600;}
+  .pillar h3 span{color:var(--green);}
+  .pillar p{color:var(--muted);font-size:14px;}
+  @media (max-width:760px){
+    .pillars .wrap{grid-template-columns:1fr;}
+    .pillar{border-right:none;border-bottom:1px solid var(--line);}
+    .pillar:last-child{border-bottom:none;}
+  }
+
+  /* ---------- SPEC SHEET / PRICING ---------- */
+  .spec-table{border:1px solid var(--line);background:var(--bg-panel);}
+  .spec-row{
+    display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;
+    border-bottom:1px solid var(--line);align-items:center;
+  }
+  .spec-row:last-child{border-bottom:none;}
+  .spec-row.head{background:var(--bg-panel-2);}
+  .spec-row.head .cell{
+    font-family:'IBM Plex Mono',monospace;font-size:11.5px;letter-spacing:0.1em;
+    text-transform:uppercase;color:var(--muted);
+  }
+  .cell{padding:20px 22px;border-right:1px solid var(--line);}
+  .cell:last-child{border-right:none;}
+  .veh-cell{display:flex;align-items:center;gap:16px;}
+  .veh-icon{
+    width:52px;height:52px;flex-shrink:0;border-radius:6px;
+    background:var(--bg);display:flex;align-items:center;justify-content:center;
+    border:1px solid var(--line);
+  }
+  .veh-icon svg{width:32px;height:32px;stroke:var(--green);}
+  .veh-name{font-family:'Oswald',sans-serif;font-size:16px;font-weight:600;letter-spacing:0.03em;}
+  .price{font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:500;}
+  .price.hi{color:var(--red);}
+  .price-lbl{display:block;font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-top:3px;font-family:'Inter',sans-serif;}
+  @media (max-width:760px){
+    .spec-row{grid-template-columns:1fr;}
+    .cell{border-right:none;border-bottom:1px solid var(--line);}
+    .spec-row.head{display:none;}
+    .cell::before{content:attr(data-label);display:block;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:6px;}
+    .veh-cell::before{display:none;}
+  }
+  .pricing-note{margin-top:18px;color:var(--muted);font-size:13px;display:flex;align-items:center;gap:8px;}
+  .pricing-note::before{content:"";width:8px;height:8px;background:var(--pink);flex-shrink:0;}
+
+  /* ---------- BOOKING ---------- */
+  .booking{background:var(--bg-panel);border-top:1px solid var(--line);border-bottom:1px solid var(--line);}
+  .booking-grid{display:grid;grid-template-columns:1fr 1.3fr;gap:60px;align-items:start;}
+  @media (max-width:900px){.booking-grid{grid-template-columns:1fr;}}
+  .booking-copy .sec-tag{color:var(--green);}
+  .booking-copy ul{margin-top:24px;list-style:none;}
+  .booking-copy li{
+    display:flex;gap:14px;padding:14px 0;border-top:1px solid var(--line);font-size:14.5px;color:var(--muted);
+  }
+  .booking-copy li:last-child{border-bottom:1px solid var(--line);}
+  .booking-copy li b{color:var(--white);font-weight:600;}
+  .booking-copy li .idx{font-family:'IBM Plex Mono',monospace;color:var(--pink);flex-shrink:0;}
+
+  .book-form{
+    background:var(--bg);border:1px solid var(--line);padding:32px;
+  }
+  .form-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+  @media (max-width:520px){.form-row{grid-template-columns:1fr;}}
+  .field label{
+    display:block;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.08em;
+    text-transform:uppercase;color:var(--muted);margin-bottom:8px;
+  }
+  .field select, .field input{
+    width:100%;background:var(--bg-panel-2);border:1px solid var(--line);color:var(--white);
+    padding:12px 14px;font-family:'Inter',sans-serif;font-size:14px;
+  }
+  .field select:focus, .field input:focus{border-color:var(--green);}
+  .slots{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px;}
+  @media (max-width:520px){.slots{grid-template-columns:repeat(3,1fr);}}
+  .slot{
+    background:var(--bg-panel-2);border:1px solid var(--line);color:var(--muted);
+    padding:9px 4px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;text-align:center;cursor:pointer;transition:all .15s;
+  }
+  .slot:hover{border-color:var(--green);color:var(--white);}
+  .slot.taken{opacity:0.3;cursor:not-allowed;text-decoration:line-through;}
+  .slot.active{background:var(--green);color:#0a0a0b;border-color:var(--green);font-weight:600;}
+  .book-submit{width:100%;margin-top:24px;justify-content:center;}
+  .form-note{margin-top:14px;font-size:12px;color:var(--muted);text-align:center;}
+
+  /* ---------- GALLERY ---------- */
+  .gallery-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+  @media (max-width:960px){.gallery-grid{grid-template-columns:repeat(2,1fr);}}
+  @media (max-width:540px){.gallery-grid{grid-template-columns:1fr;}}
+  .g-card{
+    aspect-ratio:1/1;position:relative;overflow:hidden;border:1px solid var(--line);
+    border-radius:8px;background:var(--bg-panel);
+    transition:all 0.25s cubic-bezier(0.16, 1, 0.3, 1);cursor:pointer;
+  }
+  .g-card:hover{transform:translateY(-4px);border-color:#3a3a40;box-shadow:0 12px 28px rgba(0,0,0,0.6);}
+  .g-card img{
+    width:100%;height:100%;object-fit:cover;display:block;
+    transition:transform 0.4s ease;
+  }
+  .g-card:hover img{transform:scale(1.06);}
+  .g-card .g-overlay{
+    position:absolute;inset:0;background:linear-gradient(to top, rgba(10,10,11,0.88) 0%, transparent 55%);
+    display:flex;flex-direction:column;justify-content:flex-end;padding:16px;
+  }
+  .g-card .g-tag{
+    font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;
+    color:var(--green);margin-bottom:4px;font-weight:500;
+  }
+  .g-card .g-lbl{
+    font-family:'Oswald',sans-serif;font-size:15px;letter-spacing:0.04em;text-transform:uppercase;
+    color:var(--white);font-weight:600;line-height:1.2;
+  }
+
+  /* ---------- TESTIMONIALS ---------- */
+  .testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--line);border:1px solid var(--line);}
+  @media (max-width:860px){.testi-grid{grid-template-columns:1fr;}}
+  .testi{background:var(--bg);padding:30px;}
+  .testi .stars{color:var(--green);font-size:13px;margin-bottom:14px;letter-spacing:2px;}
+  .testi p{color:var(--white);font-size:14.5px;margin-bottom:18px;}
+  .testi .who{font-family:'Oswald',sans-serif;font-size:13px;color:var(--muted);letter-spacing:0.05em;text-transform:uppercase;}
+
+  /* ---------- CONTACT ---------- */
+  .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:60px;}
+  @media (max-width:860px){.contact-grid{grid-template-columns:1fr;}}
+  .map-box{
+    aspect-ratio:4/3;background:
+      repeating-linear-gradient(45deg, #1a1a1d, #1a1a1d 10px, #161618 10px, #161618 20px);
+    border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--muted);
+    font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;
+  }
+  .contact-list{list-style:none;}
+  .contact-list li{
+    display:flex;gap:16px;padding:20px 0;border-top:1px solid var(--line);
+  }
+  .contact-list li:last-child{border-bottom:1px solid var(--line);}
+  .contact-list .ic{
+    width:38px;height:38px;flex-shrink:0;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;
+  }
+  .contact-list .ic svg{width:18px;height:18px;stroke:var(--pink);}
+  .contact-list .k{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;}
+  .contact-list .v{font-size:15px;}
+  .contact-ctas{display:flex;gap:14px;margin-top:28px;flex-wrap:wrap;}
+
+  /* ---------- TOAST ---------- */
+  .toast{
+    position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(140%);
+    background:var(--green);color:#0a0a0b;padding:14px 26px;font-family:'Oswald',sans-serif;
+    font-size:14px;letter-spacing:0.05em;text-transform:uppercase;font-weight:700;
+    clip-path:polygon(12px 0,100% 0,calc(100% - 12px) 100%,0 100%);
+    transition:transform .35s cubic-bezier(0.16, 1, 0.3, 1);z-index:200;
+    box-shadow:0 8px 30px var(--green-dim);display:flex;align-items:center;gap:10px;
+  }
+  .toast.show{transform:translateX(-50%) translateY(0);}
+
+  /* ---------- CONFIRMATION MODAL ---------- */
+  .modal-backdrop{
+    position:fixed;inset:0;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);
+    z-index:300;display:flex;align-items:center;justify-content:center;padding:20px;
+    opacity:0;pointer-events:none;transition:opacity 0.25s ease;
+  }
+  .modal-backdrop.open{opacity:1;pointer-events:auto;}
+  .modal-box{
+    background:var(--bg-panel);border:1px solid var(--line);border-radius:8px;
+    max-width:480px;width:100%;padding:32px;position:relative;
+    box-shadow:0 20px 60px rgba(0,0,0,0.8), 0 0 30px var(--green-dim);
+    transform:translateY(20px);transition:transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .modal-backdrop.open .modal-box{transform:translateY(0);}
+  .modal-close{
+    position:absolute;top:18px;right:18px;background:none;border:none;
+    color:var(--muted);font-size:24px;cursor:pointer;line-height:1;
+  }
+  .modal-close:hover{color:var(--white);}
+  .modal-badge{
+    display:inline-flex;align-items:center;gap:6px;background:var(--green-dim);
+    color:var(--green);border:1px solid var(--green);border-radius:4px;
+    padding:4px 10px;font-family:'IBM Plex Mono',monospace;font-size:11px;
+    letter-spacing:0.1em;text-transform:uppercase;margin-bottom:14px;font-weight:600;
+  }
+  .modal-summary{
+    background:var(--bg);border:1px solid var(--line);border-radius:6px;
+    padding:16px;margin:20px 0;font-family:'IBM Plex Mono',monospace;font-size:13px;
+  }
+  .summary-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);}
+  .summary-row:last-child{border-bottom:none;}
+  .summary-row .label{color:var(--muted);}
+  .summary-row .val{color:var(--white);font-weight:600;}
+
+  /* ---------- OWNER DASHBOARD DRAWER ---------- */
+  .btn-owner-trigger{
+    background:transparent;border:1px solid var(--line);
+    color:var(--muted);font-family:'IBM Plex Mono',monospace;
+    font-size:11px;padding:7px 12px;cursor:pointer;
+    border-radius:4px;transition:all 0.2s;
+  }
+  .btn-owner-trigger:hover{border-color:var(--pink);color:var(--pink);}
+  .drawer-backdrop{
+    position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);
+    z-index:400;opacity:0;pointer-events:none;transition:opacity 0.25s ease;
+  }
+  .drawer-backdrop.open{opacity:1;pointer-events:auto;}
+  .drawer{
+    position:fixed;top:0;right:0;height:100%;width:min(440px,92vw);
+    background:var(--bg-panel);border-left:1px solid var(--line);
+    z-index:401;transform:translateX(100%);transition:transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    display:flex;flex-direction:column;padding:28px 24px;box-shadow:-10px 0 40px rgba(0,0,0,0.8);
+  }
+  .drawer.open{transform:translateX(0);}
+  .drawer-head{display:flex;justify-content:space-between;align-items:center;padding-bottom:18px;border-bottom:1px solid var(--line);}
+  .drawer-body{flex:1;overflow-y:auto;padding:20px 0;}
+  .booking-card{
+    background:var(--bg);border:1px solid var(--line);border-radius:6px;
+    padding:16px;margin-bottom:12px;transition:all 0.2s;
+  }
+  .booking-card:hover{border-color:#3a3a40;}
+  .bc-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+  .bc-slot{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:13px;font-weight:600;}
+  .bc-status{font-size:10.5px;padding:3px 8px;border-radius:3px;text-transform:uppercase;font-family:'IBM Plex Mono',monospace;}
+  .status-confirmed{background:var(--green-dim);color:var(--green);border:1px solid var(--green);}
+  .status-done{background:rgba(255,255,255,0.06);color:var(--muted);}
+  .bc-details{font-size:13.5px;color:var(--white);margin-bottom:4px;}
+  .bc-phone{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);}
+</style>
+</head>
+<body>
+
+<header>
+  <nav>
+    <a href="#" class="nav-brand">
+      <img src="assets/trieye-logo.jpg" alt="Trieye" class="nav-logo">
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#services">Services</a></li>
+      <li><a href="#booking">Booking</a></li>
+      <li><a href="#gallery">Gallery</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="btn-owner-trigger" id="btnOwnerDrawer" title="View Studio Bookings">⚡ Owner View</button>
+      <a href="#booking" class="nav-cta">Book a slot</a>
+      <button class="burger" id="burgerBtn" aria-label="Toggle navigation">☰</button>
+    </div>
+  </nav>
+</header>
+
+<section class="hero">
+  <div class="sweep" aria-hidden="true"></div>
+  <div class="wrap hero-inner">
+    <img src="assets/trieye-logo.jpg" alt="Trieye — Detail, Precision, Protection" class="hero-logo">
+    <div class="eyebrow">Chennai · Car &amp; Bike Wash Studio</div>
+    <h1>Your car doesn't get <em>washed</em> here.<br>It gets detailed.</h1>
+    <p>Foam wash, rubbing polish and deep interior cleaning for hatchbacks, sedans and SUVs — done with the same precision every single time.</p>
+    <div class="hero-ctas">
+      <a href="#booking" class="btn btn-primary">Book your slot →</a>
+      <a href="#services" class="btn btn-outline">See pricing</a>
+    </div>
+    <div class="hero-stats">
+      <div><div class="num">3</div><div class="lbl">Vehicle classes</div></div>
+      <div><div class="num">9</div><div class="lbl">Service tiers</div></div>
+      <div><div class="num">7am–9pm</div><div class="lbl">Open daily</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="pillars">
+  <div class="wrap">
+    <div class="pillar">
+      <div class="n">01 / DETAIL</div>
+      <h3>Every <span>panel</span>, every time</h3>
+      <p>Foam wash and interior work follow the same checklist on every car — nothing skipped because the queue is long.</p>
+    </div>
+    <div class="pillar">
+      <div class="n">02 / PRECISION</div>
+      <h3>Priced by <span>vehicle class</span></h3>
+      <p>Hatchback, sedan or SUV — the right products and time are budgeted per class, not guessed.</p>
+    </div>
+    <div class="pillar">
+      <div class="n">03 / PROTECTION</div>
+      <h3>Polish that <span>holds</span></h3>
+      <p>Rubbing and polish stages are built to protect the paint between visits, not just shine for a day.</p>
+    </div>
+  </div>
+</section>
+
+<section id="services">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-tag">// Services &amp; pricing</div>
+      <h2>Pick your vehicle class</h2>
+      <p>Three service tiers, three vehicle classes. Rates shown are current studio pricing.</p>
+    </div>
+
+    <div class="spec-table">
+      <div class="spec-row head">
+        <div class="cell">Vehicle</div>
+        <div class="cell">Foam Wash</div>
+        <div class="cell">Rubbing Polish</div>
+        <div class="cell">Interior Deep Cleaning</div>
+      </div>
+
+      <div class="spec-row">
+        <div class="cell veh-cell">
+          <div class="veh-icon" data-veh="Hatchback" title="Click to pop foam bubbles!">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13l1.5-4.5A2 2 0 0 1 6.4 7h11.2a2 2 0 0 1 1.9 1.5L21 13"/><rect x="2" y="13" width="20" height="5" rx="1"/><circle cx="7" cy="18.5" r="1.6"/><circle cx="17" cy="18.5" r="1.6"/></svg>
+          </div>
+          <span class="veh-name">Hatchback</span>
+        </div>
+        <div class="cell" data-label="Foam Wash"><span class="price mono">₹599</span><span class="price-lbl">per wash</span></div>
+        <div class="cell" data-label="Rubbing Polish"><span class="price mono">₹2,999</span><span class="price-lbl">per visit</span></div>
+        <div class="cell" data-label="Interior Deep Cleaning"><span class="price mono hi">₹1,699</span><span class="price-lbl">per visit</span></div>
+      </div>
+
+      <div class="spec-row">
+        <div class="cell veh-cell">
+          <div class="veh-icon" data-veh="Sedan" title="Click to pop foam bubbles!">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 13l2-5A2 2 0 0 1 6.3 6.7h4.4l2 2.3h4.1a2 2 0 0 1 1.9 1.4l1.3 2.6"/><rect x="1.5" y="13" width="21" height="5" rx="1"/><circle cx="7" cy="18.5" r="1.6"/><circle cx="17" cy="18.5" r="1.6"/></svg>
+          </div>
+          <span class="veh-name">Sedan</span>
+        </div>
+        <div class="cell" data-label="Foam Wash"><span class="price mono">₹699</span><span class="price-lbl">per wash</span></div>
+        <div class="cell" data-label="Rubbing Polish"><span class="price mono">₹3,499</span><span class="price-lbl">per visit</span></div>
+        <div class="cell" data-label="Interior Deep Cleaning"><span class="price mono hi">₹2,299</span><span class="price-lbl">per visit</span></div>
+      </div>
+
+      <div class="spec-row">
+        <div class="cell veh-cell">
+          <div class="veh-icon" data-veh="SUV" title="Click to pop foam bubbles!">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13l1.8-5.2A2.2 2.2 0 0 1 5.9 6.3h3.5l2.3 2.4h4.6a2.2 2.2 0 0 1 2 1.3l1.7 3"/><rect x="1" y="13" width="22" height="5.5" rx="1"/><circle cx="6.8" cy="18.8" r="1.8"/><circle cx="17.2" cy="18.8" r="1.8"/></svg>
+          </div>
+          <span class="veh-name">SUV</span>
+        </div>
+        <div class="cell" data-label="Foam Wash"><span class="price mono">₹799</span><span class="price-lbl">per wash</span></div>
+        <div class="cell" data-label="Rubbing Polish"><span class="price mono">₹4,499</span><span class="price-lbl">per visit</span></div>
+        <div class="cell" data-label="Interior Deep Cleaning"><span class="price mono hi">₹2,999</span><span class="price-lbl">per visit</span></div>
+      </div>
+
+      <div class="spec-row">
+        <div class="cell veh-cell">
+          <div class="veh-icon" data-veh="Bike" title="Click to pop foam bubbles!">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg>
+          </div>
+          <span class="veh-name">Superbike / Bike</span>
+        </div>
+        <div class="cell" data-label="Foam Wash"><span class="price mono">₹299</span><span class="price-lbl">per wash</span></div>
+        <div class="cell" data-label="Rubbing Polish"><span class="price mono">₹1,499</span><span class="price-lbl">per visit</span></div>
+        <div class="cell" data-label="Interior Deep Cleaning"><span class="price mono">₹799</span><span class="price-lbl">chain &amp; deep clean</span></div>
+      </div>
+    </div>
+    <div class="pricing-note">
+      Two-wheeler foam wash &amp; Teflon/ceramic coatings available in-studio — select "Bike" in the booking form.
+    </div>
+  </div>
+</section>
+
+<section class="booking" id="booking">
+  <div class="wrap booking-grid">
+    <div class="booking-copy">
+      <div class="sec-tag">// Instant slot reservation</div>
+      <h2>No more waiting in the bay queue</h2>
+      <p style="color:var(--muted);margin-top:12px;font-size:15px;">Reserve your wash time online and drive straight into detailing bay #1.</p>
+      <ul>
+        <li><span class="idx">01</span><span><b>Pick your class &amp; service</b> — hatchback, sedan, SUV or bike, with transparent pricing.</span></li>
+        <li><span class="idx">02</span><span><b>Choose an open slot</b> — real-time time slots updated live for today &amp; upcoming dates.</span></li>
+        <li><span class="idx">03</span><span><b>Instant confirmation</b> — immediate booking reference with direct WhatsApp reminder.</span></li>
+      </ul>
+    </div>
+
+    <form class="book-form" id="bookForm">
+      <div class="form-row">
+        <div class="field">
+          <label for="vt">Vehicle type</label>
+          <select id="vt" required>
+            <option value="Hatchback">Hatchback (₹599+)</option>
+            <option value="Sedan">Sedan (₹699+)</option>
+            <option value="SUV">SUV (₹799+)</option>
+            <option value="Bike">Superbike / Bike (₹299+)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="svc">Service Package</label>
+          <select id="svc" required>
+            <option value="Foam Wash">Foam Wash</option>
+            <option value="Rubbing Polish">Rubbing Polish</option>
+            <option value="Interior Deep Cleaning">Interior Deep Cleaning</option>
+            <option value="Full Detail Combo">Full Detail Combo (Wash + Polish + Interior)</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label for="cname">Your Name</label>
+          <input type="text" id="cname" placeholder="e.g. Deepak R" required>
+        </div>
+        <div class="field">
+          <label for="ph">Phone Number (WhatsApp)</label>
+          <input type="tel" id="ph" placeholder="e.g. 9876543210" pattern="[0-9]{10}" required>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="field">
+          <label for="dt">Date</label>
+          <input type="date" id="dt" required>
+        </div>
+        <div class="field">
+          <label for="vnum">Vehicle Reg Number (Optional)</label>
+          <input type="text" id="vnum" placeholder="TN 01 AB 1234">
+        </div>
+      </div>
+      
+      <div class="field slot-picker-wrap">
+        <div class="slot-header">
+          <label style="margin-bottom:0;">Available Time Slots</label>
+          <div class="slot-status-legend">
+            <span class="legend-item"><span class="dot avail"></span> Available</span>
+            <span class="legend-item"><span class="dot booked"></span> Booked</span>
+            <span class="legend-item"><span class="dot sel"></span> Selected</span>
+          </div>
+        </div>
+        <div class="slots" id="slotGrid">
+          <div class="slot" data-slot="09:00 AM">9:00a</div>
+          <div class="slot taken" data-slot="10:00 AM">10:00a</div>
+          <div class="slot active" data-slot="11:00 AM">11:00a</div>
+          <div class="slot" data-slot="12:00 PM">12:00p</div>
+          <div class="slot" data-slot="01:00 PM">1:00p</div>
+          <div class="slot taken" data-slot="02:00 PM">2:00p</div>
+          <div class="slot" data-slot="03:00 PM">3:00p</div>
+          <div class="slot" data-slot="04:00 PM">4:00p</div>
+          <div class="slot" data-slot="05:00 PM">5:00p</div>
+          <div class="slot" data-slot="06:00 PM">6:00p</div>
+          <div class="slot" data-slot="07:00 PM">7:00p</div>
+          <div class="slot taken" data-slot="08:00 PM">8:00p</div>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary book-submit" id="btnSubmitBooking">Confirm &amp; Lock Slot</button>
+      <div class="form-note">⚡ Real-time booking with WhatsApp confirmation dispatch.</div>
+    </form>
+  </div>
+</section>
+
+<section id="gallery">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-tag">// Studio Craftsmanship</div>
+      <h2>The work speaks for itself</h2>
+      <p>Precision before/after transformations from our Chennai detailing studio.</p>
+    </div>
+    <div class="gallery-grid">
+      <div class="g-card">
+        <img src="assets/foam-wash.jpg" alt="Snow Foam Wash detailing before and after" loading="lazy">
+        <div class="g-overlay">
+          <div class="g-tag">01 / Exterior Wash</div>
+          <div class="g-lbl">Snow Foam Pre-Wash &amp; Decon</div>
+        </div>
+      </div>
+      <div class="g-card">
+        <img src="assets/rubbing-polish.jpg" alt="Dual action paint rubbing polish correction" loading="lazy">
+        <div class="g-overlay">
+          <div class="g-tag">02 / Paint Correction</div>
+          <div class="g-lbl">Dual-Action Rubbing Polish</div>
+        </div>
+      </div>
+      <div class="g-card">
+        <img src="assets/interior-clean.jpg" alt="Car interior deep steam extraction cleaning" loading="lazy">
+        <div class="g-overlay">
+          <div class="g-tag">03 / Interior Spa</div>
+          <div class="g-lbl">Steam Extraction &amp; Leather Feed</div>
+        </div>
+      </div>
+      <div class="g-card">
+        <img src="assets/ceramic-coating.jpg" alt="Hydrophobic ceramic coating water beading" loading="lazy">
+        <div class="g-overlay">
+          <div class="g-tag">04 / Protection</div>
+          <div class="g-lbl">Hydrophobic Ceramic Shield</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-tag">// Verified Customer Feedback</div>
+      <h2>Trusted across Chennai</h2>
+    </div>
+    <div class="testi-grid">
+      <div class="testi">
+        <div>
+          <div class="stars">★★★★★</div>
+          <p>"Booked the 11:00 AM slot online from OMR. Drove straight into the bay with zero waiting time. Foam wash finish was absolutely spotless."</p>
+        </div>
+        <div class="who">Karthik S. <span>Hyundai i20 · Foam Wash</span></div>
+      </div>
+      <div class="testi">
+        <div>
+          <div class="stars">★★★★★</div>
+          <p>"Interior deep clean removed tough coffee stains and water marks I thought were permanent. The leather seats look and smell brand new."</p>
+        </div>
+        <div class="who">Priya R. <span>Honda City · Interior Deep Clean</span></div>
+      </div>
+      <div class="testi">
+        <div>
+          <div class="stars">★★★★★</div>
+          <p>"Rubbing polish on my Harrier held up brilliantly through monsoon rains. Excellent swirl removal and deep gloss reflection."</p>
+        </div>
+        <div class="who">Vignesh M. <span>Tata Harrier · Rubbing Polish</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact">
+  <div class="wrap contact-grid">
+    <div class="map-box">
+      <div class="map-box-pin">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+      </div>
+      <h4>Trieye Detail Studio</h4>
+      <p>Chennai, Tamil Nadu 600096</p>
+      <a href="https://maps.google.com" target="_blank" class="btn btn-outline" style="margin-top:14px;padding:8px 16px;font-size:12px;">Open in Google Maps ↗</a>
+    </div>
+    <div>
+      <div class="sec-head" style="margin-bottom:24px;">
+        <div class="sec-tag">// Visit our studio</div>
+        <h2>Find us &amp; reach us</h2>
+      </div>
+      <ul class="contact-list">
+        <li>
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div>
+          <div><div class="k">Location</div><div class="v">Trieye Detail Studio, Chennai, Tamil Nadu</div></div>
+        </li>
+        <li>
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .3 2 .7 3a2 2 0 0 1-.4 2.1L8 10.3a16 16 0 0 0 6 6l1.5-1.4a2 2 0 0 1 2.1-.4c1 .4 2 .6 3 .7a2 2 0 0 1 1.7 2Z"/></svg></div>
+          <div><div class="k">Direct Hotline</div><div class="v">+91 98400 12345 / +91 98400 67890</div></div>
+        </li>
+        <li>
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m3 6 9 6 9-6"/></svg></div>
+          <div><div class="k">Working Hours</div><div class="v">Monday – Sunday, 7:00 AM – 9:00 PM</div></div>
+        </li>
+      </ul>
+      <div class="contact-ctas">
+        <a href="https://wa.me/919840012345?text=Hi%20Trieye%20Studio,%20I%20would%20like%20to%20inquire%20about%20detailing" target="_blank" class="btn btn-primary">WhatsApp Studio</a>
+        <a href="tel:+919840012345" class="btn btn-outline">Call Detailing Bay</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap foot-grid">
+    <img src="assets/trieye-logo.jpg" alt="Trieye" class="foot-logo">
+    <ul class="foot-links">
+      <li><a href="#services">Services</a></li>
+      <li><a href="#booking">Booking</a></li>
+      <li><a href="#gallery">Gallery</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </div>
+  <div class="wrap foot-copy">
+    <div>© 2026 Trieye Detail Studio. All rights reserved. Detail · Precision · Protection.</div>
+    <div>Chennai, Tamil Nadu · Open daily 7:00 AM – 9:00 PM</div>
+  </div>
+</footer>
+
+<div class="toast" id="toast">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0a0a0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+  <span id="toastMsg">Slot Confirmed — WhatsApp confirmation dispatched!</span>
+</div>
+
+<!-- BOOKING CONFIRMATION MODAL -->
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal-box">
+    <button class="modal-close" id="modalCloseBtn">&times;</button>
+    <div class="modal-badge">✓ Booking Confirmed</div>
+    <h3 style="font-size:24px;margin-bottom:6px;">Bay Reserved Successfully</h3>
+    <p style="color:var(--muted);font-size:14px;">Your wash slot is locked in our studio calendar.</p>
+    
+    <div class="modal-summary" id="modalSummary">
+      <!-- Injected via JS -->
+    </div>
+
+    <div style="display:flex;gap:12px;">
+      <a href="#" id="modalWhatsAppBtn" target="_blank" class="btn btn-primary" style="flex:1;justify-content:center;">Send on WhatsApp</a>
+      <button class="btn btn-outline" id="modalDoneBtn">Done</button>
+    </div>
+  </div>
+</div>
+
+<!-- OWNER DASHBOARD DRAWER -->
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+<div class="drawer" id="ownerDrawer">
+  <div class="drawer-head">
+    <div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--pink);text-transform:uppercase;">Owner Control</div>
+      <h3 style="font-size:20px;">Today's Bay Queue</h3>
+    </div>
+    <button class="modal-close" id="drawerCloseBtn" style="position:static;">&times;</button>
+  </div>
+  <div class="drawer-body" id="drawerList">
+    <!-- Populated by JS -->
+  </div>
+  <div style="border-top:1px solid var(--line);padding-top:16px;">
+    <button class="btn btn-outline" id="btnExportBookings" style="width:100%;justify-content:center;font-size:12px;">Export Today's Queue (JSON)</button>
+  </div>
+</div>
+
+<script>
+  // Set default date to today
+  const dtInput = document.getElementById('dt');
+  const todayStr = new Date().toISOString().split('T')[0];
+  if (dtInput) {
+    dtInput.value = todayStr;
+    dtInput.min = todayStr;
+  }
+
+  // Mobile navigation toggle
+  const burgerBtn = document.getElementById('burgerBtn');
+  const navLinks = document.getElementById('navLinks');
+  if (burgerBtn && navLinks) {
+    burgerBtn.addEventListener('click', () => {
+      navLinks.classList.toggle('open');
+    });
+    document.querySelectorAll('.nav-links a').forEach(a => {
+      a.addEventListener('click', () => navLinks.classList.remove('open'));
+    });
+  }
+
+  // Interactive Foam Bubbles on Vehicle Icons
+  function createFoamBubbles(x, y) {
+    const bubbleCount = 14;
+    for (let i = 0; i < bubbleCount; i++) {
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      const size = Math.floor(Math.random() * 28) + 12;
+      bubble.style.width = size + 'px';
+      bubble.style.height = size + 'px';
+      bubble.style.left = (x - size / 2) + 'px';
+      bubble.style.top = (y - size / 2) + 'px';
+      
+      const dx = (Math.random() - 0.5) * 120 + 'px';
+      const rise = (Math.random() * 100 + 80) + 'px';
+      const dur = (Math.random() * 0.5 + 0.9) + 's';
+      const scale = (Math.random() * 0.5 + 0.8);
+      
+      bubble.style.setProperty('--dx', dx);
+      bubble.style.setProperty('--rise', rise);
+      bubble.style.setProperty('--dur', dur);
+      bubble.style.setProperty('--scale', scale);
+      
+      document.body.appendChild(bubble);
+      setTimeout(() => bubble.remove(), 1400);
+    }
+  }
+
+  document.querySelectorAll('.veh-icon').forEach(icon => {
+    icon.addEventListener('click', (e) => {
+      const rect = icon.getBoundingClientRect();
+      createFoamBubbles(rect.left + rect.width / 2, rect.top + rect.height / 2);
+      const veh = icon.getAttribute('data-veh');
+      if (veh) {
+        const vtSelect = document.getElementById('vt');
+        if (vtSelect) vtSelect.value = veh;
+        const bookingSec = document.getElementById('booking');
+        if (bookingSec) bookingSec.scrollIntoView({ behavior: 'smooth' });
+      }
+    });
+  });
+
+  // Slot Selection
+  let selectedSlot = '11:00 AM';
+  document.querySelectorAll('.slot:not(.taken)').forEach(el => {
+    el.addEventListener('click', () => {
+      document.querySelectorAll('.slot').forEach(s => s.classList.remove('active'));
+      el.classList.add('active');
+      selectedSlot = el.getAttribute('data-slot') || el.innerText;
+    });
+  });
+
+  // Local Storage Bookings Store
+  const INITIAL_BOOKINGS = [
+    { id: 'TRI-8821', name: 'Rohan Verma', phone: '98401 23456', veh: 'Sedan', service: 'Rubbing Polish', slot: '10:00 AM', date: todayStr, status: 'In Progress' },
+    { id: 'TRI-8822', name: 'Ananya Iyer', phone: '98402 34567', veh: 'SUV', service: 'Full Detail Combo', slot: '02:00 PM', date: todayStr, status: 'Confirmed' },
+    { id: 'TRI-8823', name: 'Siddharth M', phone: '98403 45678', veh: 'Bike', service: 'Foam Wash', slot: '08:00 PM', date: todayStr, status: 'Confirmed' }
+  ];
+
+  function getBookings() {
+    const data = localStorage.getItem('trieye_bookings');
+    return data ? JSON.parse(data) : INITIAL_BOOKINGS;
+  }
+
+  function saveBooking(item) {
+    const list = getBookings();
+    list.unshift(item);
+    localStorage.setItem('trieye_bookings', JSON.stringify(list));
+    renderOwnerDrawer();
+  }
+
+  // Toast Function
+  const toast = document.getElementById('toast');
+  const toastMsg = document.getElementById('toastMsg');
+  function showToast(msg) {
+    if (toastMsg) toastMsg.innerText = msg;
+    if (toast) {
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 3000);
+    }
+  }
+
+  // Modal Functionality
+  const modal = document.getElementById('modalBackdrop');
+  const modalSummary = document.getElementById('modalSummary');
+  const modalWhatsAppBtn = document.getElementById('modalWhatsAppBtn');
+  const modalCloseBtn = document.getElementById('modalCloseBtn');
+  const modalDoneBtn = document.getElementById('modalDoneBtn');
+  if (modalCloseBtn) modalCloseBtn.addEventListener('click', () => modal.classList.remove('open'));
+  if (modalDoneBtn) modalDoneBtn.addEventListener('click', () => modal.classList.remove('open'));
+
+  // Booking Form Submission
+  const bookForm = document.getElementById('bookForm');
+  if (bookForm) {
+    bookForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = (document.getElementById('cname') ? document.getElementById('cname').value.trim() : '') || 'Customer';
+      const phone = (document.getElementById('ph') ? document.getElementById('ph').value.trim() : '') || '9840000000';
+      const veh = (document.getElementById('vt') ? document.getElementById('vt').value : 'Car');
+      const svc = (document.getElementById('svc') ? document.getElementById('svc').value : 'Foam Wash');
+      const date = (document.getElementById('dt') ? document.getElementById('dt').value : todayStr);
+      const vnum = (document.getElementById('vnum') ? document.getElementById('vnum').value.trim() : '') || 'Standard';
+      const bookingId = 'TRI-' + Math.floor(1000 + Math.random() * 9000);
+
+      const newBooking = { id: bookingId, name, phone, veh, service: svc, slot: selectedSlot, date, status: 'Confirmed' };
+      saveBooking(newBooking);
+
+      // Populate Modal
+      if (modalSummary) {
+        modalSummary.innerHTML = `
+          <div class="summary-row"><span class="label">Booking Ref:</span><span class="val" style="color:var(--pink);">${bookingId}</span></div>
+          <div class="summary-row"><span class="label">Customer:</span><span class="val">${name}</span></div>
+          <div class="summary-row"><span class="label">Vehicle Class:</span><span class="val">${veh} (${vnum})</span></div>
+          <div class="summary-row"><span class="label">Package:</span><span class="val">${svc}</span></div>
+          <div class="summary-row"><span class="label">Date &amp; Time:</span><span class="val" style="color:var(--green);">${date} at ${selectedSlot}</span></div>
+        `;
+      }
+
+      if (modalWhatsAppBtn) {
+        const waText = encodeURIComponent(`Hi Trieye Studio, I have booked slot ${bookingId} for ${name} (${veh} - ${svc}) on ${date} at ${selectedSlot}. Please confirm!`);
+        modalWhatsAppBtn.href = `https://wa.me/919840012345?text=${waText}`;
+      }
+
+      if (modal) modal.classList.add('open');
+      showToast(`Slot ${selectedSlot} Locked! Ref: ${bookingId}`);
+    });
+  }
+
+  // Owner Dashboard Drawer
+  const drawerBackdrop = document.getElementById('drawerBackdrop');
+  const ownerDrawer = document.getElementById('ownerDrawer');
+  const btnOwnerDrawer = document.getElementById('btnOwnerDrawer');
+  const drawerCloseBtn = document.getElementById('drawerCloseBtn');
+  const drawerList = document.getElementById('drawerList');
+
+  function openDrawer() {
+    renderOwnerDrawer();
+    if (drawerBackdrop) drawerBackdrop.classList.add('open');
+    if (ownerDrawer) ownerDrawer.classList.add('open');
+  }
+  function closeDrawer() {
+    if (drawerBackdrop) drawerBackdrop.classList.remove('open');
+    if (ownerDrawer) ownerDrawer.classList.remove('open');
+  }
+
+  if (btnOwnerDrawer) btnOwnerDrawer.addEventListener('click', openDrawer);
+  if (drawerBackdrop) drawerBackdrop.addEventListener('click', closeDrawer);
+  if (drawerCloseBtn) drawerCloseBtn.addEventListener('click', closeDrawer);
+
+  function renderOwnerDrawer() {
+    if (!drawerList) return;
+    const list = getBookings();
+    if (list.length === 0) {
+      drawerList.innerHTML = `<div style="color:var(--muted);text-align:center;padding:30px;">No bookings recorded yet.</div>`;
+      return;
+    }
+    drawerList.innerHTML = list.map(b => `
+      <div class="booking-card">
+        <div class="bc-header">
+          <span class="bc-slot">⚡ ${b.slot} · ${b.date}</span>
+          <span class="bc-status ${b.status === 'Confirmed' ? 'status-confirmed' : 'status-done'}">${b.status}</span>
+        </div>
+        <div class="bc-details"><b>${b.name}</b> — ${b.veh} (${b.service})</div>
+        <div class="bc-phone">Ref: ${b.id} | Ph: ${b.phone}</div>
+      </div>
+    `).join('');
+  }
+
+  // Export Bookings
+  const btnExport = document.getElementById('btnExportBookings');
+  if (btnExport) {
+    btnExport.addEventListener('click', () => {
+      const list = getBookings();
+      const blob = new Blob([JSON.stringify(list, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `trieye_bookings_${todayStr}.json`;
+      a.click();
+      showToast('Queue exported successfully!');
+    });
+  }
+</script>
+
+</body>
+</html>
