@@ -360,40 +360,7 @@
   .summary-row .label{color:var(--muted);}
   .summary-row .val{color:var(--white);font-weight:600;}
 
-  /* ---------- OWNER DASHBOARD DRAWER ---------- */
-  .btn-owner-trigger{
-    background:transparent;border:1px solid var(--line);
-    color:var(--muted);font-family:'IBM Plex Mono',monospace;
-    font-size:11px;padding:7px 12px;cursor:pointer;
-    border-radius:4px;transition:all 0.2s;
-  }
-  .btn-owner-trigger:hover{border-color:var(--pink);color:var(--pink);}
-  .drawer-backdrop{
-    position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);
-    z-index:400;opacity:0;pointer-events:none;transition:opacity 0.25s ease;
-  }
-  .drawer-backdrop.open{opacity:1;pointer-events:auto;}
-  .drawer{
-    position:fixed;top:0;right:0;height:100%;width:min(440px,92vw);
-    background:var(--bg-panel);border-left:1px solid var(--line);
-    z-index:401;transform:translateX(100%);transition:transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-    display:flex;flex-direction:column;padding:28px 24px;box-shadow:-10px 0 40px rgba(0,0,0,0.8);
-  }
-  .drawer.open{transform:translateX(0);}
-  .drawer-head{display:flex;justify-content:space-between;align-items:center;padding-bottom:18px;border-bottom:1px solid var(--line);}
-  .drawer-body{flex:1;overflow-y:auto;padding:20px 0;}
-  .booking-card{
-    background:var(--bg);border:1px solid var(--line);border-radius:6px;
-    padding:16px;margin-bottom:12px;transition:all 0.2s;
-  }
-  .booking-card:hover{border-color:#3a3a40;}
-  .bc-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
-  .bc-slot{font-family:'IBM Plex Mono',monospace;color:var(--green);font-size:13px;font-weight:600;}
-  .bc-status{font-size:10.5px;padding:3px 8px;border-radius:3px;text-transform:uppercase;font-family:'IBM Plex Mono',monospace;}
-  .status-confirmed{background:var(--green-dim);color:var(--green);border:1px solid var(--green);}
-  .status-done{background:rgba(255,255,255,0.06);color:var(--muted);}
-  .bc-details{font-size:13.5px;color:var(--white);margin-bottom:4px;}
-  .bc-phone{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);}
+
 </style>
 </head>
 <body>
@@ -410,7 +377,6 @@
       <li><a href="#contact">Contact</a></li>
     </ul>
     <div class="nav-actions">
-      <a href="dashboard.html" class="btn-owner-trigger" style="text-decoration:none;" title="Open Owner Operations Command Hub">⚡ Owner Dashboard</a>
       <a href="#booking" class="nav-cta">Book a slot</a>
       <button class="burger" id="burgerBtn" aria-label="Toggle navigation">☰</button>
     </div>
@@ -760,23 +726,7 @@
   </div>
 </div>
 
-<!-- OWNER DASHBOARD DRAWER -->
-<div class="drawer-backdrop" id="drawerBackdrop"></div>
-<div class="drawer" id="ownerDrawer">
-  <div class="drawer-head">
-    <div>
-      <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--pink);text-transform:uppercase;">Owner Control</div>
-      <h3 style="font-size:20px;">Today's Bay Queue</h3>
-    </div>
-    <button class="modal-close" id="drawerCloseBtn" style="position:static;">&times;</button>
-  </div>
-  <div class="drawer-body" id="drawerList">
-    <!-- Populated by JS -->
-  </div>
-  <div style="border-top:1px solid var(--line);padding-top:16px;">
-    <button class="btn btn-outline" id="btnExportBookings" style="width:100%;justify-content:center;font-size:12px;">Export Today's Queue (JSON)</button>
-  </div>
-</div>
+
 
 <script>
   // Set default date to today
@@ -866,7 +816,6 @@
     const list = getBookings();
     list.unshift(item);
     localStorage.setItem('trieye_bookings', JSON.stringify(list));
-    renderOwnerDrawer();
   }
 
   // Toast Function
@@ -923,61 +872,6 @@
 
       if (modal) modal.classList.add('open');
       showToast(`Slot ${selectedSlot} Locked! Ref: ${bookingId}`);
-    });
-  }
-
-  // Owner Dashboard Drawer
-  const drawerBackdrop = document.getElementById('drawerBackdrop');
-  const ownerDrawer = document.getElementById('ownerDrawer');
-  const btnOwnerDrawer = document.getElementById('btnOwnerDrawer');
-  const drawerCloseBtn = document.getElementById('drawerCloseBtn');
-  const drawerList = document.getElementById('drawerList');
-
-  function openDrawer() {
-    renderOwnerDrawer();
-    if (drawerBackdrop) drawerBackdrop.classList.add('open');
-    if (ownerDrawer) ownerDrawer.classList.add('open');
-  }
-  function closeDrawer() {
-    if (drawerBackdrop) drawerBackdrop.classList.remove('open');
-    if (ownerDrawer) ownerDrawer.classList.remove('open');
-  }
-
-  if (btnOwnerDrawer) btnOwnerDrawer.addEventListener('click', openDrawer);
-  if (drawerBackdrop) drawerBackdrop.addEventListener('click', closeDrawer);
-  if (drawerCloseBtn) drawerCloseBtn.addEventListener('click', closeDrawer);
-
-  function renderOwnerDrawer() {
-    if (!drawerList) return;
-    const list = getBookings();
-    if (list.length === 0) {
-      drawerList.innerHTML = `<div style="color:var(--muted);text-align:center;padding:30px;">No bookings recorded yet.</div>`;
-      return;
-    }
-    drawerList.innerHTML = list.map(b => `
-      <div class="booking-card">
-        <div class="bc-header">
-          <span class="bc-slot">⚡ ${b.slot} · ${b.date}</span>
-          <span class="bc-status ${b.status === 'Confirmed' ? 'status-confirmed' : 'status-done'}">${b.status}</span>
-        </div>
-        <div class="bc-details"><b>${b.name}</b> — ${b.veh} (${b.service})</div>
-        <div class="bc-phone">Ref: ${b.id} | Ph: ${b.phone}</div>
-      </div>
-    `).join('');
-  }
-
-  // Export Bookings
-  const btnExport = document.getElementById('btnExportBookings');
-  if (btnExport) {
-    btnExport.addEventListener('click', () => {
-      const list = getBookings();
-      const blob = new Blob([JSON.stringify(list, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `trieye_bookings_${todayStr}.json`;
-      a.click();
-      showToast('Queue exported successfully!');
     });
   }
 </script>
