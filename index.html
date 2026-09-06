@@ -67,32 +67,76 @@
   .wrap{max-width:1180px;margin:0 auto;padding:0 28px;}
   ::selection{background:var(--pink);color:#000;}
 
-  /* Theme Toggle Button */
+  /* Theme Toggle Pill Switch */
   .theme-toggle-btn {
+    position: relative;
+    width: 62px;
+    height: 32px;
+    border-radius: 9999px;
+    background: #1c1c1f;
+    border: 2px solid #2e2e34;
+    cursor: pointer;
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    gap: 6px;
-    background: var(--bg-panel-2);
-    border: 1px solid var(--line);
-    color: var(--white);
-    padding: 7px 11px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    user-select: none;
+    padding: 2px;
+    box-sizing: border-box;
+    transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    outline: none;
   }
   .theme-toggle-btn:hover {
     border-color: var(--pink);
-    color: var(--pink);
-    transform: translateY(-1px);
+    box-shadow: 0 0 12px rgba(238, 47, 118, 0.25);
   }
-  .theme-toggle-btn svg {
+  .theme-toggle-thumb {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateX(30px);
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+    color: #111111;
+  }
+  .theme-toggle-thumb svg {
     width: 14px;
     height: 14px;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    fill: none;
+    transition: opacity 0.2s ease, transform 0.3s ease;
+  }
+  .icon-moon {
+    display: block;
+  }
+  .icon-sun {
+    display: none;
+  }
+
+  /* Light Theme Pill State (Thumb slides to left/right accordingly) */
+  [data-theme="light"] .theme-toggle-btn {
+    background: #e9ecef;
+    border-color: #ced4da;
+  }
+  [data-theme="light"] .theme-toggle-btn:hover {
+    border-color: var(--pink);
+    box-shadow: 0 0 12px rgba(238, 47, 118, 0.2);
+  }
+  [data-theme="light"] .theme-toggle-thumb {
+    transform: translateX(0px);
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+    color: #111111;
+  }
+  [data-theme="light"] .icon-moon {
+    display: none;
+  }
+  [data-theme="light"] .icon-sun {
+    display: block;
   }
 
   /* focus visibility */
@@ -335,15 +379,82 @@
     padding:12px 14px;font-family:'Inter',sans-serif;font-size:14px;
   }
   .field select:focus, .field input:focus{border-color:var(--green);}
-  .slots{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:8px;}
-  @media (max-width:520px){.slots{grid-template-columns:repeat(3,1fr);}}
-  .slot{
-    background:var(--bg-panel-2);border:1px solid var(--line);color:var(--muted);
-    padding:9px 4px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;text-align:center;cursor:pointer;transition:all .15s;
+  /* Slot Picker & Legend */
+  .slot-picker-wrap { margin-top: 6px; }
+  .slot-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 8px;
   }
-  .slot:hover{border-color:var(--green);color:var(--white);}
-  .slot.taken{opacity:0.3;cursor:not-allowed;text-decoration:line-through;}
-  .slot.active{background:var(--green);color:#0a0a0b;border-color:var(--green);font-weight:600;}
+  .slot-status-legend {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--muted);
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .legend-item .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+  }
+  .legend-item .dot.avail { background: var(--green); box-shadow: 0 0 6px var(--green-glow); }
+  .legend-item .dot.blocked { background: var(--red); box-shadow: 0 0 6px var(--red-dim); }
+  .legend-item .dot.booked { background: var(--amber); box-shadow: 0 0 6px var(--amber-dim); }
+  .legend-item .dot.sel { background: var(--white); }
+
+  .slots{display:grid;grid-template-columns:repeat(auto-fill, minmax(130px, 1fr));gap:8px;margin-top:8px;}
+  @media (max-width:520px){.slots{grid-template-columns:repeat(2,1fr);}}
+  .slot{
+    background:var(--bg-panel-2);border:1px solid var(--line);color:var(--white);
+    padding:10px 8px;font-family:'IBM Plex Mono',monospace;font-size:12px;text-align:center;cursor:pointer;transition:all .15s;
+    border-radius: 4px;
+  }
+  .slot:hover{border-color:var(--green);color:var(--green);transform:translateY(-1px);}
+  .slot.blocked{
+    background: rgba(239, 68, 68, 0.08);
+    border-color: rgba(239, 68, 68, 0.35);
+    color: var(--red);
+    opacity: 0.6;
+    cursor: not-allowed;
+    text-decoration: line-through;
+  }
+  .slot.booked{
+    background: rgba(245, 158, 11, 0.08);
+    border-color: rgba(245, 158, 11, 0.35);
+    color: var(--amber);
+    opacity: 0.75;
+    cursor: not-allowed;
+  }
+  .slot.active{
+    background:var(--green) !important;
+    color:#0a0a0b !important;
+    border-color:var(--green) !important;
+    font-weight:700 !important;
+    box-shadow: 0 0 12px var(--green-glow);
+  }
+  .slots-day-blocked-banner {
+    grid-column: 1 / -1;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.4);
+    color: var(--red);
+    padding: 14px;
+    border-radius: 6px;
+    text-align: center;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+  }
   .book-submit{width:100%;margin-top:24px;justify-content:center;}
   .form-note{margin-top:14px;font-size:12px;color:var(--muted);text-align:center;}
 
@@ -636,6 +747,11 @@
     font-family: 'IBM Plex Mono', monospace;
   }
 </style>
+  <!-- Official Supabase JavaScript Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Trieye Supabase Config & Database Adapter -->
+  <script src="assets/supabase-config.js"></script>
+  <script src="assets/trieye-db.js"></script>
 </head>
 <body>
 
@@ -653,8 +769,20 @@
     </ul>
     <div class="nav-actions">
       <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Dark / Light Theme" aria-label="Toggle Theme">
-        <span id="themeIcon">☀️</span>
-        <span id="themeLabel">Light</span>
+        <div class="theme-toggle-thumb">
+          <!-- Sun Icon for Light Mode (Day) -->
+          <svg class="icon-sun" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="4"></circle>
+            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+          </svg>
+          <!-- Moon + Stars Icon for Dark Mode (Night) matching reference -->
+          <svg class="icon-moon" viewBox="0 0 24 24">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+            <!-- sparkle dots / stars -->
+            <circle cx="19" cy="5" r="1" fill="currentColor" stroke="none"></circle>
+            <circle cx="16" cy="3" r="0.75" fill="currentColor" stroke="none"></circle>
+          </svg>
+        </div>
       </button>
       <a href="#booking" class="nav-cta">Book a slot</a>
       <button class="burger" id="burgerBtn" aria-label="Toggle navigation">☰</button>
@@ -777,13 +905,13 @@
 <section class="booking" id="booking">
   <div class="wrap booking-grid">
     <div class="booking-copy">
-      <div class="sec-tag">// Instant slot reservation</div>
+      <div class="sec-tag">// Direct Instant Booking</div>
       <h2>No more waiting in the bay queue</h2>
-      <p style="color:var(--muted);margin-top:12px;font-size:15px;">Reserve your wash time online and drive straight into detailing bay #1.</p>
+      <p style="color:var(--muted);margin-top:12px;font-size:15px;">Book your detailing appointment online and drive straight into detailing bay #1.</p>
       <ul>
         <li><span class="idx">01</span><span><b>Pick your class &amp; service</b> — hatchback, sedan, SUV or bike, with transparent pricing.</span></li>
-        <li><span class="idx">02</span><span><b>Choose an open slot</b> — real-time time slots updated live for today &amp; upcoming dates.</span></li>
-        <li><span class="idx">03</span><span><b>Instant confirmation</b> — immediate booking reference with direct WhatsApp reminder.</span></li>
+        <li><span class="idx">02</span><span><b>Enter your details</b> — select your date, enter your vehicle info and mobile number.</span></li>
+        <li><span class="idx">03</span><span><b>Direct confirmation</b> — click Book Now for instant confirmation and WhatsApp dispatch.</span></li>
       </ul>
     </div>
 
@@ -824,37 +952,12 @@
           <input type="date" id="dt" required>
         </div>
         <div class="field">
-          <label for="vnum">Vehicle Reg Number (Optional)</label>
+          <label for="vnum">Vehicle No</label>
           <input type="text" id="vnum" placeholder="TN 01 AB 1234">
         </div>
       </div>
-      
-      <div class="field slot-picker-wrap">
-        <div class="slot-header">
-          <label style="margin-bottom:0;">Available Time Slots</label>
-          <div class="slot-status-legend">
-            <span class="legend-item"><span class="dot avail"></span> Available</span>
-            <span class="legend-item"><span class="dot booked"></span> Booked</span>
-            <span class="legend-item"><span class="dot sel"></span> Selected</span>
-          </div>
-        </div>
-        <div class="slots" id="slotGrid">
-          <div class="slot" data-slot="09:00 AM">9:00a</div>
-          <div class="slot taken" data-slot="10:00 AM">10:00a</div>
-          <div class="slot active" data-slot="11:00 AM">11:00a</div>
-          <div class="slot" data-slot="12:00 PM">12:00p</div>
-          <div class="slot" data-slot="01:00 PM">1:00p</div>
-          <div class="slot taken" data-slot="02:00 PM">2:00p</div>
-          <div class="slot" data-slot="03:00 PM">3:00p</div>
-          <div class="slot" data-slot="04:00 PM">4:00p</div>
-          <div class="slot" data-slot="05:00 PM">5:00p</div>
-          <div class="slot" data-slot="06:00 PM">6:00p</div>
-          <div class="slot" data-slot="07:00 PM">7:00p</div>
-          <div class="slot taken" data-slot="08:00 PM">8:00p</div>
-        </div>
-      </div>
-      <button type="submit" class="btn btn-primary book-submit" id="btnSubmitBooking">Confirm &amp; Lock Slot</button>
-      <div class="form-note">⚡ Real-time booking with WhatsApp confirmation dispatch.</div>
+      <button type="submit" class="btn btn-primary book-submit" id="btnSubmitBooking">Book Now →</button>
+      <div class="form-note">⚡ Direct instant booking with WhatsApp confirmation dispatch.</div>
     </form>
   </div>
 </section>
@@ -1075,32 +1178,102 @@
     });
   });
 
-  // Slot Selection
-  let selectedSlot = '11:00 AM';
-  document.querySelectorAll('.slot:not(.taken)').forEach(el => {
-    el.addEventListener('click', () => {
-      document.querySelectorAll('.slot').forEach(s => s.classList.remove('active'));
-      el.classList.add('active');
-      selectedSlot = el.getAttribute('data-slot') || el.innerText;
-    });
-  });
+  // Shared Slot Schedule Data Architecture
+  const SCHEDULE_KEY = 'trieye_custom_schedules';
+  const BLOCKED_SLOTS_KEY = 'trieye_blocked_slots';
 
-  // Local Storage Bookings Store
-  const INITIAL_BOOKINGS = [
-    { id: 'TRI-8821', name: 'Rohan Verma', phone: '98401 23456', veh: 'Sedan', service: 'Rubbing Polish', slot: '10:00 AM', date: todayStr, status: 'In Progress' },
-    { id: 'TRI-8822', name: 'Ananya Iyer', phone: '98402 34567', veh: 'SUV', service: 'Full Detail Combo', slot: '02:00 PM', date: todayStr, status: 'Confirmed' },
-    { id: 'TRI-8823', name: 'Siddharth M', phone: '98403 45678', veh: 'Bike', service: 'Foam Wash', slot: '08:00 PM', date: todayStr, status: 'Confirmed' }
+  const defaultStandardSlots = [
+    '09:00 AM - 11:00 AM',
+    '11:00 AM - 01:00 PM',
+    '01:30 PM - 03:30 PM',
+    '03:30 PM - 05:30 PM',
+    '05:30 PM - 07:30 PM',
+    '07:30 PM - 09:30 PM'
   ];
 
-  function getBookings() {
-    const data = localStorage.getItem('trieye_bookings');
-    return data ? JSON.parse(data) : INITIAL_BOOKINGS;
+  function escapeHtml(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
 
-  function saveBooking(item) {
-    const list = getBookings();
-    list.unshift(item);
-    localStorage.setItem('trieye_bookings', JSON.stringify(list));
+  // Local & Supabase Synchronized Data Layer
+  function getBookings() {
+    try {
+      return JSON.parse(localStorage.getItem('trieye_bookings')) || [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  async function saveBooking(item) {
+    if (window.TrieyeDB) {
+      await window.TrieyeDB.saveBooking(item);
+    } else {
+      const list = getBookings();
+      list.unshift(item);
+      localStorage.setItem('trieye_bookings', JSON.stringify(list));
+    }
+  }
+
+  function getAllSchedules() {
+    try {
+      return JSON.parse(localStorage.getItem(SCHEDULE_KEY)) || {};
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function getDaySchedule(dateStr) {
+    const all = getAllSchedules();
+    if (all[dateStr]) {
+      return all[dateStr];
+    }
+
+    // Default standard slots - all available by default
+    const initialSlots = defaultStandardSlots.map(s => ({
+      time: s,
+      status: 'available'
+    }));
+
+    const dayObj = {
+      date: dateStr,
+      isFullDayBlocked: false,
+      slots: initialSlots
+    };
+
+    all[dateStr] = dayObj;
+    localStorage.setItem(SCHEDULE_KEY, JSON.stringify(all));
+    return dayObj;
+  }
+
+  // Check if slot has active customer booking on this date
+  function getBookingForSlot(dateStr, slotTime) {
+    const bookings = getBookings();
+    return bookings.find(b => {
+      if (b.status === 'Cancelled' || b.status === 'CANCELLED') return false;
+      const isDateMatch = (b.date === dateStr) || 
+        (dateStr === todayStr && (b.date === 'Today' || (b.date && b.date.includes('Today'))));
+      if (!isDateMatch) return false;
+
+      const s1 = (b.slot || '').trim().toLowerCase();
+      const s2 = (slotTime || '').trim().toLowerCase();
+      return s1 === s2 || s2.startsWith(s1) || s1.startsWith(s2);
+    });
+  }
+
+  // Slot Selection State
+  let selectedSlot = '';
+
+  async function syncFromSupabase() {
+    if (window.TrieyeDB && window.TrieyeDB.isSupabaseReady()) {
+      try {
+        await Promise.all([
+          window.TrieyeDB.getServices()
+        ]);
+      } catch (e) {
+        console.warn('⚠️ [Trieye Supabase sync error]:', e);
+      }
+    }
   }
 
   // Toast Function
@@ -1123,40 +1296,105 @@
   if (modalCloseBtn) modalCloseBtn.addEventListener('click', () => modal.classList.remove('open'));
   if (modalDoneBtn) modalDoneBtn.addEventListener('click', () => modal.classList.remove('open'));
 
-  // Booking Form Submission
+  // Booking Form Submission via Secure Supabase RPC
   const bookForm = document.getElementById('bookForm');
   if (bookForm) {
-    bookForm.addEventListener('submit', (e) => {
+    bookForm.addEventListener('submit', async (e) => {
       e.preventDefault();
+
       const name = (document.getElementById('cname') ? document.getElementById('cname').value.trim() : '') || 'Customer';
-      const phone = (document.getElementById('ph') ? document.getElementById('ph').value.trim() : '') || '9840000000';
+      const phone = (document.getElementById('ph') ? document.getElementById('ph').value.trim() : '') || '';
       const veh = (document.getElementById('vt') ? document.getElementById('vt').value : 'Car');
       const svc = (document.getElementById('svc') ? document.getElementById('svc').value : 'Foam Wash');
       const date = (document.getElementById('dt') ? document.getElementById('dt').value : todayStr);
       const vnum = (document.getElementById('vnum') ? document.getElementById('vnum').value.trim() : '') || 'Standard';
-      const bookingId = 'TRI-' + Math.floor(1000 + Math.random() * 9000);
 
-      const newBooking = { id: bookingId, name, phone, veh, service: svc, slot: selectedSlot, date, status: 'Confirmed' };
-      saveBooking(newBooking);
-
-      // Populate Modal
-      if (modalSummary) {
-        modalSummary.innerHTML = `
-          <div class="summary-row"><span class="label">Booking Ref:</span><span class="val" style="color:var(--pink);">${bookingId}</span></div>
-          <div class="summary-row"><span class="label">Customer:</span><span class="val">${name}</span></div>
-          <div class="summary-row"><span class="label">Vehicle Class:</span><span class="val">${veh} (${vnum})</span></div>
-          <div class="summary-row"><span class="label">Package:</span><span class="val">${svc}</span></div>
-          <div class="summary-row"><span class="label">Date &amp; Time:</span><span class="val" style="color:var(--green);">${date} at ${selectedSlot}</span></div>
-        `;
+      if (!phone || phone.replace(/\D/g, '').length < 10) {
+        alert('Please enter a valid 10-digit mobile number.');
+        document.getElementById('ph')?.focus();
+        return;
       }
 
-      if (modalWhatsAppBtn) {
-        const waText = encodeURIComponent(`Hi Trieye Studio, I have booked slot ${bookingId} for ${name} (${veh} - ${svc}) on ${date} at ${selectedSlot}. Please confirm!`);
-        modalWhatsAppBtn.href = `https://wa.me/919840012345?text=${waText}`;
+      // Resolve dynamic pricing from shared services matrix
+      let price = 699;
+      try {
+        const svcs = JSON.parse(localStorage.getItem('trieye_services_matrix'));
+        if (svcs && svcs[svc] && svcs[svc].pricing && svcs[svc].pricing[veh]) {
+          price = svcs[svc].pricing[veh];
+        }
+      } catch (e) {}
+
+      // Disable submit button during request
+      const submitBtn = document.getElementById('btnSubmitBooking');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = 'Booking Appointment...';
       }
 
-      if (modal) modal.classList.add('open');
-      showToast(`Slot ${selectedSlot} Locked! Ref: ${bookingId}`);
+      try {
+        // Execute Secure PostgreSQL RPC (no slot / time parameter)
+        const result = await window.TrieyeDB.createOnlineBooking({
+          name: name,
+          phone: phone,
+          vehicleType: veh,
+          reg: vnum,
+          service: svc,
+          date: date,
+          price: price
+        });
+
+        if (result && result.success) {
+          const bookingRef = result.booking_ref || ('TRI-' + Math.floor(1000 + Math.random() * 9000));
+
+          // Populate Modal with server confirmed reference
+          if (modalSummary) {
+            modalSummary.innerHTML = `
+              <div class="summary-row"><span class="label">Booking Ref:</span><span class="val" style="color:var(--pink); font-weight:700;">${escapeHtml(bookingRef)}</span></div>
+              <div class="summary-row"><span class="label">Customer:</span><span class="val">${escapeHtml(name)}</span></div>
+              <div class="summary-row"><span class="label">Vehicle:</span><span class="val">${escapeHtml(veh)} (${escapeHtml(vnum)})</span></div>
+              <div class="summary-row"><span class="label">Package:</span><span class="val">${escapeHtml(svc)}</span></div>
+              <div class="summary-row"><span class="label">Booking Date:</span><span class="val" style="color:var(--green); font-weight:600;">${escapeHtml(date)} (Direct Entry)</span></div>
+              <div class="summary-row"><span class="label">Amount:</span><span class="val" style="color:var(--green); font-weight:700;">₹${price.toLocaleString()}</span></div>
+            `;
+          }
+
+          if (modalWhatsAppBtn) {
+            const waText = encodeURIComponent(`Hi Trieye Studio, I have confirmed online booking ${bookingRef} for ${name} (${veh} - ${svc}) on ${date}. Please confirm!`);
+            modalWhatsAppBtn.href = `https://wa.me/919840012345?text=${waText}`;
+          }
+
+          if (modal) modal.classList.add('open');
+          showToast(`Booking Confirmed! Ref: ${bookingRef}`);
+
+          // Reset form fields
+          if (document.getElementById('cname')) document.getElementById('cname').value = '';
+          if (document.getElementById('ph')) document.getElementById('ph').value = '';
+          if (document.getElementById('vnum')) document.getElementById('vnum').value = '';
+        } else {
+          // Show safe error returned by RPC or network handler
+          const errMsg = (result && result.error) || 'Could not complete booking. Please try again or contact the studio.';
+          alert(`⚠️ Booking Error: ${errMsg}`);
+          console.error('🚨 [Booking Failure Details]:', result);
+        }
+      } catch (err) {
+        console.error('🚨 [Unexpected Booking Exception]:', err);
+        alert('An unexpected error occurred while processing your booking. Please try again.');
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerText = 'Book Now →';
+        }
+      }
+    });
+  }
+
+  // Initial Supabase sync
+  syncFromSupabase();
+
+  // Establish Supabase Realtime Subscription
+  if (window.TrieyeDB) {
+    window.TrieyeDB.subscribeToChanges(() => {
+      syncFromSupabase();
     });
   }
 </script>
@@ -1293,18 +1531,12 @@
   // Theme Switcher (Dark / Light)
   const THEME_KEY = 'trieye_theme';
   const themeToggleBtn = document.getElementById('themeToggleBtn');
-  const themeIcon = document.getElementById('themeIcon');
-  const themeLabel = document.getElementById('themeLabel');
 
   function applyTheme(theme) {
     if (theme === 'light') {
       document.documentElement.setAttribute('data-theme', 'light');
-      if (themeIcon) themeIcon.innerText = '🌙';
-      if (themeLabel) themeLabel.innerText = 'Dark';
     } else {
       document.documentElement.removeAttribute('data-theme');
-      if (themeIcon) themeIcon.innerText = '☀️';
-      if (themeLabel) themeLabel.innerText = 'Light';
     }
     localStorage.setItem(THEME_KEY, theme);
   }

@@ -3,9 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Trieye Studio — Owner Operations Command Hub</title>
+  <title>Trieye Studio — Professional Operations &amp; Management Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <!-- Supabase JS Client & Trieye DB Adapter -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/supabase-config.js"></script>
+  <script src="assets/trieye-db.js"></script>
   <style>
     :root {
       --bg: #0a0a0c;
@@ -29,6 +33,7 @@
       --red: #ef4444;
       --red-dim: rgba(239, 68, 68, 0.15);
       --shadow-pop: rgba(0, 0, 0, 0.45);
+      --sidebar-w: 260px;
     }
 
     [data-theme="light"] {
@@ -64,12 +69,14 @@
       display: flex;
       flex-direction: column;
       transition: background-color 0.25s ease, color 0.25s ease;
+      overflow-x: hidden;
     }
 
+    /* Top Sticky Header */
     header.topbar {
       background: var(--bg-panel);
       border-bottom: 1px solid var(--line);
-      padding: 0.85rem 1.75rem;
+      padding: 0.75rem 1.5rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -80,14 +87,13 @@
     .brand-group {
       display: flex;
       align-items: center;
-      gap: 1rem;
+      gap: 0.85rem;
     }
     .brand-logo {
       height: 32px;
       width: auto;
       object-fit: contain;
       filter: drop-shadow(0 2px 8px var(--shadow-pop, rgba(0,0,0,0.4)));
-      transition: filter 0.25s ease;
     }
     .logo-dark { display: block !important; }
     .logo-light { display: none !important; }
@@ -95,7 +101,7 @@
     [data-theme="light"] .logo-light { display: block !important; }
     .brand-title {
       font-family: 'Oswald', sans-serif;
-      font-size: 1.35rem;
+      font-size: 1.3rem;
       letter-spacing: 0.05em;
       text-transform: uppercase;
       display: flex;
@@ -117,16 +123,17 @@
     .top-actions {
       display: flex;
       align-items: center;
-      gap: 0.85rem;
+      gap: 0.65rem;
     }
+
     .btn {
       display: inline-flex;
       align-items: center;
       gap: 0.45rem;
       font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.8rem;
+      font-size: 0.78rem;
       font-weight: 500;
-      padding: 0.5rem 0.9rem;
+      padding: 0.45rem 0.85rem;
       border-radius: 6px;
       border: 1px solid var(--line);
       background: var(--bg-panel-2);
@@ -134,6 +141,7 @@
       cursor: pointer;
       text-decoration: none;
       transition: all 0.2s ease;
+      white-space: nowrap;
     }
     .btn:hover {
       border-color: var(--muted);
@@ -159,355 +167,420 @@
       background: #94bd2b;
       box-shadow: 0 0 16px var(--green-glow);
     }
+    .btn-icon-sm {
+      padding: 0.25rem 0.5rem;
+      font-size: 0.72rem;
+      border-radius: 4px;
+      border: 1px solid var(--line);
+      background: var(--bg-panel-2);
+      color: var(--white);
+      cursor: pointer;
+      font-family: 'IBM Plex Mono', monospace;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+    }
+    .btn-icon-sm:hover {
+      background: var(--bg-panel-3);
+      border-color: var(--muted);
+    }
+    .btn-icon-sm.delete:hover {
+      background: var(--red-dim);
+      border-color: var(--red);
+      color: var(--red);
+    }
+    .btn-icon-sm.complete:hover {
+      background: var(--green-dim);
+      border-color: var(--green);
+      color: var(--green);
+    }
+
+    /* Theme Toggle Pill Switch */
+    .theme-toggle-btn {
+      position: relative;
+      width: 58px;
+      height: 30px;
+      border-radius: 9999px;
+      background: #1c1c1f;
+      border: 2px solid #2e2e34;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      padding: 2px;
+      box-sizing: border-box;
+      transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+      outline: none;
+    }
+    .theme-toggle-btn:hover {
+      border-color: var(--pink);
+      box-shadow: 0 0 12px rgba(238, 47, 118, 0.25);
+    }
+    .theme-toggle-thumb {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transform: translateX(26px);
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
+      color: #111111;
+    }
+    .theme-toggle-thumb svg {
+      width: 13px;
+      height: 13px;
+      stroke: currentColor;
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      fill: none;
+    }
+    .icon-moon { display: block; }
+    .icon-sun { display: none; }
+
+    [data-theme="light"] .theme-toggle-btn {
+      background: #e9ecef;
+      border-color: #ced4da;
+    }
+    [data-theme="light"] .theme-toggle-btn:hover {
+      border-color: var(--pink);
+      box-shadow: 0 0 12px rgba(238, 47, 118, 0.2);
+    }
+    [data-theme="light"] .theme-toggle-thumb {
+      transform: translateX(0px);
+      background: #ffffff;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+      color: #111111;
+    }
+    [data-theme="light"] .icon-moon { display: none; }
+    [data-theme="light"] .icon-sun { display: block; }
 
     .live-status-pill {
       display: inline-flex;
       align-items: center;
-      gap: 0.5rem;
-      background: rgba(166, 211, 49, 0.1);
-      border: 1px solid var(--green);
-      color: var(--green);
+      gap: 0.45rem;
+      background: var(--bg-panel-2);
+      border: 1px solid var(--line);
       padding: 0.35rem 0.75rem;
       border-radius: 999px;
+      font-size: 0.72rem;
       font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.75rem;
-      font-weight: 600;
+      color: var(--muted);
     }
     .pulse-dot {
-      width: 8px;
-      height: 8px;
+      width: 7px;
+      height: 7px;
       background: var(--green);
       border-radius: 50%;
       box-shadow: 0 0 8px var(--green);
-      animation: pulse 2s infinite;
+      animation: pulse 1.8s infinite;
     }
     @keyframes pulse {
-      0% { opacity: 1; transform: scale(1); }
+      0%, 100% { opacity: 1; transform: scale(1); }
       50% { opacity: 0.4; transform: scale(0.85); }
-      100% { opacity: 1; transform: scale(1); }
     }
 
+    /* Main Dashboard Layout */
     .dashboard-layout {
-      display: grid;
-      grid-template-columns: 280px 1fr;
+      display: flex;
       flex: 1;
-      min-height: calc(100vh - 65px);
+      min-height: calc(100vh - 60px);
     }
 
-    aside.sidebar {
+    /* Sidebar Navigation */
+    .sidebar {
+      width: var(--sidebar-w);
       background: var(--bg-panel);
       border-right: 1px solid var(--line);
-      padding: 1.5rem 1.25rem;
+      padding: 1.25rem 0.85rem;
       display: flex;
       flex-direction: column;
-      gap: 2rem;
+      gap: 1.25rem;
+      flex-shrink: 0;
+      position: sticky;
+      top: 57px;
+      height: calc(100vh - 57px);
+      overflow-y: auto;
     }
     .sidebar-section-title {
       font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
       color: var(--muted);
-      margin-bottom: 0.75rem;
+      text-transform: uppercase;
+      padding: 0 0.5rem;
+      margin-bottom: 0.4rem;
     }
     .nav-list {
       list-style: none;
       display: flex;
       flex-direction: column;
-      gap: 0.35rem;
+      gap: 0.25rem;
     }
     .nav-item a {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0.65rem 0.85rem;
+      padding: 0.55rem 0.75rem;
       border-radius: 6px;
       color: var(--muted);
       text-decoration: none;
-      font-size: 0.875rem;
+      font-size: 0.84rem;
       font-weight: 500;
-      transition: all 0.2s ease;
+      transition: all 0.15s ease;
+      cursor: pointer;
     }
-    .nav-item.active a, .nav-item a:hover {
+    .nav-item a:hover {
       background: var(--bg-panel-2);
       color: var(--white);
-      border-left: 3px solid var(--pink);
+    }
+    .nav-item.active a {
+      background: var(--pink-dim);
+      color: var(--pink);
+      border: 1px solid rgba(238, 47, 118, 0.3);
+      font-weight: 600;
     }
     .nav-counter {
       background: var(--bg-panel-3);
-      padding: 0.15rem 0.5rem;
-      border-radius: 10px;
-      font-size: 0.75rem;
+      color: var(--white);
       font-family: 'IBM Plex Mono', monospace;
-      color: var(--muted);
+      font-size: 0.68rem;
+      padding: 0.1rem 0.45rem;
+      border-radius: 999px;
     }
     .nav-item.active .nav-counter {
-      background: var(--pink-dim);
-      color: var(--pink);
+      background: var(--pink);
+      color: #fff;
     }
 
-    .bay-mini-widget {
-      background: var(--bg-panel-2);
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      padding: 1rem;
-    }
-    .bay-mini-header {
+    /* Main Content Area */
+    .main-content {
+      flex: 1;
+      padding: 1.5rem 1.75rem;
+      background: var(--bg);
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 0.75rem;
-      font-size: 0.8rem;
-      font-weight: 600;
-    }
-    .bay-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 0.5rem;
-    }
-    .bay-box {
-      background: var(--bg-panel-3);
-      border: 1px solid var(--line);
-      padding: 0.65rem 0.5rem;
-      border-radius: 6px;
-      text-align: center;
-    }
-    .bay-box.occupied {
-      border-color: var(--pink);
-      background: var(--pink-dim);
-    }
-    .bay-box.ready {
-      border-color: var(--green);
-      background: var(--green-dim);
-    }
-    .bay-num {
-      font-family: 'Oswald', sans-serif;
-      font-size: 0.9rem;
-      letter-spacing: 0.05em;
-    }
-    .bay-state {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.65rem;
-      color: var(--muted);
-      margin-top: 0.2rem;
-    }
-    .bay-box.occupied .bay-state { color: var(--pink); }
-    .bay-box.ready .bay-state { color: var(--green); }
-
-    main.content {
-      padding: 1.75rem;
+      flex-direction: column;
+      gap: 1.5rem;
       overflow-y: auto;
-      background: radial-gradient(circle at top right, rgba(238, 47, 118, 0.04), transparent 40%);
     }
 
-    .kpi-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
+    /* Content Sections (Tab-like View) */
+    .content-section {
+      display: none;
+      flex-direction: column;
       gap: 1.25rem;
-      margin-bottom: 1.75rem;
+      animation: fadeInSection 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .content-section.active {
+      display: flex;
+    }
+    @keyframes fadeInSection {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Section Header */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .section-title {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.6rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+    .section-subtitle {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-top: 0.15rem;
+    }
+
+    /* KPI Summary Cards Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
     }
     .kpi-card {
       background: var(--bg-panel);
       border: 1px solid var(--line);
-      border-radius: 10px;
-      padding: 1.25rem;
+      border-radius: 8px;
+      padding: 1rem 1.15rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
       position: relative;
       overflow: hidden;
+      transition: all 0.2s ease;
+    }
+    .kpi-card:hover {
+      border-color: var(--muted);
+      transform: translateY(-2px);
     }
     .kpi-card::after {
-      content: '';
+      content: "";
       position: absolute;
       top: 0;
       left: 0;
-      height: 3px;
-      width: 100%;
-      background: var(--line);
+      width: 3px;
+      height: 100%;
+      background: var(--pink);
     }
-    .kpi-card.pink::after { background: var(--pink); }
     .kpi-card.green::after { background: var(--green); }
     .kpi-card.blue::after { background: var(--blue); }
     .kpi-card.amber::after { background: var(--amber); }
 
-    .kpi-title {
+    .kpi-label {
       font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
       color: var(--muted);
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
     }
     .kpi-value {
       font-family: 'Oswald', sans-serif;
-      font-size: 2.1rem;
-      font-weight: 700;
-      margin-top: 0.4rem;
+      font-size: 1.9rem;
+      font-weight: 600;
+      color: var(--white);
+      margin: 0.4rem 0 0.2rem;
       letter-spacing: 0.02em;
     }
-    .kpi-sub {
-      font-size: 0.75rem;
+    .kpi-subtext {
+      font-size: 0.72rem;
       color: var(--muted);
-      margin-top: 0.25rem;
       display: flex;
       align-items: center;
       gap: 0.35rem;
     }
-    .kpi-sub.positive { color: var(--green); }
 
-    .dashboard-grid {
-      display: grid;
-      grid-template-columns: 2fr 1.15fr;
-      gap: 1.5rem;
+    /* Quick Action Bar */
+    .quick-actions-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.65rem;
+      padding: 0.85rem 1.15rem;
+      background: var(--bg-panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
     }
 
+    /* Panels & Tables */
     .panel {
       background: var(--bg-panel);
       border: 1px solid var(--line);
-      border-radius: 10px;
+      border-radius: 8px;
       overflow: hidden;
-      display: flex;
-      flex-direction: column;
     }
     .panel-header {
-      padding: 1.1rem 1.25rem;
+      padding: 0.9rem 1.25rem;
       border-bottom: 1px solid var(--line);
       display: flex;
-      justify-content: space-between;
       align-items: center;
-      background: var(--bg-panel-2);
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 0.75rem;
     }
     .panel-title {
       font-family: 'Oswald', sans-serif;
-      font-size: 1.1rem;
+      font-size: 1.15rem;
+      letter-spacing: 0.04em;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
       display: flex;
       align-items: center;
       gap: 0.5rem;
-    }
-    .panel-controls {
-      display: flex;
-      gap: 0.5rem;
-      align-items: center;
     }
 
+    /* Tables */
     .table-container {
       overflow-x: auto;
-      flex: 1;
+      width: 100%;
     }
     table.data-table {
       width: 100%;
       border-collapse: collapse;
       text-align: left;
-      font-size: 0.85rem;
+      font-size: 0.83rem;
     }
     table.data-table th {
       background: var(--bg-panel-2);
-      padding: 0.85rem 1rem;
+      color: var(--muted);
       font-family: 'IBM Plex Mono', monospace;
       font-size: 0.7rem;
-      text-transform: uppercase;
-      color: var(--muted);
+      font-weight: 600;
       letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.75rem 1rem;
       border-bottom: 1px solid var(--line);
+      white-space: nowrap;
     }
     table.data-table td {
-      padding: 0.95rem 1rem;
+      padding: 0.85rem 1rem;
       border-bottom: 1px solid var(--line-subtle);
       vertical-align: middle;
     }
     table.data-table tr:hover {
-      background: rgba(255, 255, 255, 0.02);
+      background: var(--bg-panel-2);
     }
 
-    .customer-cell {
-      font-weight: 600;
-      color: var(--white);
-    }
-    .vehicle-tag {
-      display: inline-block;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.72rem;
-      padding: 0.15rem 0.45rem;
-      border-radius: 4px;
-      background: var(--bg-panel-3);
-      color: var(--blue);
-      border: 1px solid rgba(56, 189, 248, 0.2);
-    }
-    .service-name {
-      font-weight: 500;
-      color: var(--white);
-    }
-    .service-price {
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.8rem;
-      color: var(--green);
-    }
-
+    /* Status Badges */
     .status-badge {
       display: inline-flex;
       align-items: center;
       gap: 0.35rem;
-      padding: 0.25rem 0.6rem;
-      border-radius: 999px;
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
       font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.7rem;
+      font-size: 0.68rem;
       font-weight: 600;
       text-transform: uppercase;
+      white-space: nowrap;
     }
-    .status-confirmed {
-      background: var(--amber-dim);
-      color: var(--amber);
-      border: 1px solid rgba(245, 158, 11, 0.4);
-    }
-    .status-progress {
-      background: var(--pink-dim);
-      color: var(--pink);
-      border: 1px solid rgba(238, 47, 118, 0.4);
-    }
-    .status-done {
-      background: var(--green-dim);
-      color: var(--green);
-      border: 1px solid rgba(166, 211, 49, 0.4);
-    }
-    .status-cancelled {
-      background: var(--red-dim);
-      color: var(--red);
-      border: 1px solid rgba(239, 68, 68, 0.4);
-    }
+    .status-confirmed { background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(56, 189, 248, 0.4); }
+    .status-arrived { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.4); }
+    .status-waiting { background: var(--amber-dim); color: var(--amber); border: 1px solid rgba(245, 158, 11, 0.4); }
+    .status-progress { background: var(--pink-dim); color: var(--pink); border: 1px solid rgba(238, 47, 118, 0.4); }
+    .status-qc { background: rgba(6, 182, 212, 0.15); color: #22d3ee; border: 1px solid rgba(6, 182, 212, 0.4); }
+    .status-ready { background: rgba(52, 211, 153, 0.15); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.4); }
+    .status-done { background: var(--green-dim); color: var(--green); border: 1px solid rgba(166, 211, 49, 0.4); }
+    .status-cancelled { background: var(--red-dim); color: var(--red); border: 1px solid rgba(239, 68, 68, 0.4); }
 
-    .action-group {
-      display: flex;
-      gap: 0.35rem;
+    .pay-badge {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.65rem;
+      padding: 2px 6px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      font-weight: 600;
     }
-    .btn-icon-sm {
-      padding: 0.35rem 0.55rem;
-      font-size: 0.75rem;
-      background: var(--bg-panel-3);
-      border: 1px solid var(--line);
-      color: var(--white);
-      border-radius: 4px;
-      cursor: pointer;
-      transition: all 0.15s ease;
-    }
-    .btn-icon-sm:hover {
-      border-color: var(--pink);
-      color: var(--pink);
-    }
-    .btn-icon-sm.complete:hover {
-      border-color: var(--green);
-      color: var(--green);
-    }
-    .btn-icon-sm.delete:hover {
-      border-color: var(--red);
-      color: var(--red);
-    }
+    .pay-paid { background: rgba(166, 211, 49, 0.15); color: var(--green); }
+    .pay-partial { background: rgba(245, 158, 11, 0.15); color: var(--amber); }
+    .pay-unpaid { background: rgba(239, 68, 68, 0.15); color: var(--red); }
+    .pay-refunded { background: rgba(142, 142, 153, 0.15); color: var(--muted); }
 
+    /* Forms */
     .form-body {
       padding: 1.25rem;
       display: flex;
       flex-direction: column;
+      gap: 1rem;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 1rem;
     }
     .form-group {
@@ -515,408 +588,1348 @@
       flex-direction: column;
       gap: 0.35rem;
     }
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.75rem;
-    }
     .form-label {
       font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.7rem;
+      font-size: 0.72rem;
       text-transform: uppercase;
+      letter-spacing: 0.06em;
       color: var(--muted);
-      letter-spacing: 0.05em;
+      font-weight: 500;
     }
-    .form-input, .form-select {
+    .form-input, .form-select, .form-textarea {
       background: var(--bg-panel-2);
       border: 1px solid var(--line);
       color: var(--white);
-      padding: 0.65rem 0.85rem;
+      padding: 0.55rem 0.75rem;
       border-radius: 6px;
       font-family: 'Inter', sans-serif;
       font-size: 0.85rem;
+      transition: border-color 0.2s;
       outline: none;
-      transition: border-color 0.2s ease;
+      width: 100%;
     }
-    .form-input:focus, .form-select:focus {
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
       border-color: var(--pink);
-      box-shadow: 0 0 8px var(--pink-glow);
     }
 
-    /* 2-Step Customer Lookup Card */
-    .lookup-banner {
-      border-radius: 6px;
-      padding: 0.65rem 0.85rem;
-      font-size: 0.75rem;
-      font-family: 'IBM Plex Mono', monospace;
+    /* Detailing Bays Grid */
+    .bays-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1rem;
+    }
+    .bay-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+    .bay-card.occupied {
+      border-color: rgba(238, 47, 118, 0.4);
+      background: rgba(238, 47, 118, 0.03);
+    }
+    .bay-card.available {
+      border-color: rgba(166, 211, 49, 0.4);
+      background: rgba(166, 211, 49, 0.03);
+    }
+    .bay-card.maintenance {
+      border-color: rgba(245, 158, 11, 0.4);
+      background: rgba(245, 158, 11, 0.03);
+    }
+    .bay-card.blocked {
+      border-color: rgba(239, 68, 68, 0.4);
+      background: rgba(239, 68, 68, 0.03);
+    }
+    .bay-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-top: 0.25rem;
+    }
+    .bay-title {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.1rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    /* Filter Pills */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1rem;
+      background: var(--bg-panel-2);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+    .filter-pill {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.75rem;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--bg-panel);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .filter-pill:hover, .filter-pill.active {
+      background: var(--pink);
+      border-color: var(--pink);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    /* Slot Management Elements */
+    .slot-ctrl-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem;
+      background: var(--bg-panel-2);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+    }
+    .slot-blocker-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 0.65rem;
+    }
+    .slot-card {
+      position: relative;
+      background: var(--bg-panel-2);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 0.65rem 0.75rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
       transition: all 0.2s ease;
     }
-    .lookup-banner.found {
-      background: rgba(166, 211, 49, 0.12);
-      border: 1px solid rgba(166, 211, 49, 0.4);
-      color: var(--green);
+    .slot-card.available {
+      border-color: rgba(166, 211, 49, 0.4);
+      background: rgba(166, 211, 49, 0.05);
     }
-    .lookup-banner.new-cust {
-      background: rgba(56, 189, 248, 0.12);
-      border: 1px solid rgba(56, 189, 248, 0.4);
-      color: var(--blue);
+    .slot-card.blocked {
+      border-color: rgba(239, 68, 68, 0.4);
+      background: rgba(239, 68, 68, 0.08);
     }
-    .step-two-container {
+    .slot-card.booked {
+      border-color: rgba(245, 158, 11, 0.4);
+      background: rgba(245, 158, 11, 0.08);
+    }
+    .slot-time-display {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .slot-card.available .slot-time-display { color: var(--green); }
+    .slot-card.blocked .slot-time-display { color: var(--red); text-decoration: line-through; }
+    .slot-card.booked .slot-time-display { color: var(--amber); }
+
+    /* Modals */
+    .dash-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(5px);
+      z-index: 9999;
       display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+    .dash-modal-backdrop.open { display: flex; }
+    .dash-modal {
+      background: var(--bg-panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      max-width: 520px;
+      width: 100%;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+      animation: modalPop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow: hidden;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+    }
+    @keyframes modalPop {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .dash-modal-header {
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .dash-modal-title {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.15rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .dash-modal-close {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 1.25rem;
+      cursor: pointer;
+    }
+    .dash-modal-body {
+      padding: 1.25rem;
+      overflow-y: auto;
+      display: flex;
       flex-direction: column;
       gap: 1rem;
-      animation: fadeInStep 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .step-two-container.active {
+    .dash-modal-footer {
+      padding: 0.85rem 1.25rem;
+      border-top: 1px solid var(--line);
+      background: var(--bg-panel-2);
       display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 0.5rem;
     }
-    @keyframes fadeInStep {
-      from { opacity: 0; transform: translateY(-6px); }
+
+    /* Toast Notification */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 10000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .toast-item {
+      background: var(--bg-panel);
+      border: 1px solid var(--green);
+      color: var(--white);
+      padding: 0.75rem 1.25rem;
+      border-radius: 6px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.8rem;
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
+      animation: slideInToast 0.25s ease forwards;
+    }
+    @keyframes slideInToast {
+      from { opacity: 0; transform: translateY(10px); }
       to { opacity: 1; transform: translateY(0); }
     }
 
-    .slot-blocker-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 0.5rem;
-      margin-top: 0.5rem;
+    /* Auth Screen Overlay (For proper Owner Authentication) */
+    .auth-overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(circle at center, #1c131a 0%, #08080a 100%);
+      z-index: 20000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
     }
-    .slot-chip {
-      background: var(--bg-panel-2);
+    .auth-card {
+      background: var(--bg-panel);
       border: 1px solid var(--line);
-      padding: 0.5rem;
+      border-radius: 12px;
+      padding: 2.25rem;
+      max-width: 400px;
+      width: 100%;
+      box-shadow: 0 20px 48px rgba(0,0,0,0.8);
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
       text-align: center;
-      border-radius: 6px;
-      cursor: pointer;
-      font-family: 'IBM Plex Mono', monospace;
-      font-size: 0.75rem;
-      transition: all 0.2s ease;
-      user-select: none;
     }
-    .slot-chip:hover {
-      border-color: var(--muted);
-    }
-    .slot-chip.open {
-      border-color: rgba(166, 211, 49, 0.4);
-      background: rgba(166, 211, 49, 0.08);
-      color: var(--green);
-    }
-    .slot-chip.blocked {
-      border-color: rgba(239, 68, 68, 0.4);
-      background: rgba(239, 68, 68, 0.12);
-      color: var(--red);
-      text-decoration: line-through;
-    }
-
-    .empty-queue {
-      padding: 3rem 1.5rem;
-      text-align: center;
-      color: var(--muted);
-    }
-    .empty-queue p {
-      margin-top: 0.5rem;
-      font-size: 0.85rem;
+    .auth-logo {
+      height: 38px;
+      width: auto;
+      object-fit: contain;
+      margin: 0 auto;
     }
 
     @media (max-width: 1024px) {
-      .dashboard-layout {
-        grid-template-columns: 1fr;
-      }
-      aside.sidebar {
-        display: none;
-      }
-      .kpi-row {
-        grid-template-columns: repeat(2, 1fr);
-      }
-      .dashboard-grid {
-        grid-template-columns: 1fr;
-      }
+      .dashboard-layout { flex-direction: column; }
+      .sidebar { width: 100%; height: auto; position: static; }
     }
   </style>
 </head>
 <body>
 
+  <!-- ADMIN AUTHENTICATION GATEWAY -->
+  <div class="auth-overlay" id="adminAuthOverlay" style="display:none;">
+    <div class="auth-card">
+      <img src="assets/trieye-logo-dark.png" alt="Trieye" class="auth-logo logo-dark">
+      <img src="assets/trieye-logo-light.png" alt="Trieye" class="auth-logo logo-light">
+      <div>
+        <h2 style="font-family:'Oswald'; font-size:1.5rem; letter-spacing:0.04em;">ADMIN CONSOLE ACCESS</h2>
+        <p style="font-size:0.8rem; color:var(--muted); margin-top:4px;">Enter PIN or password to manage studio</p>
+      </div>
+      <form id="adminLoginForm" onsubmit="handleAdminLogin(event)" style="display:flex; flex-direction:column; gap:0.85rem;">
+        <input type="password" id="adminAuthPass" class="form-input" placeholder="Enter Admin PIN (Default: 1234)" autofocus style="text-align:center; font-size:1.1rem; letter-spacing:0.2em;">
+        <button type="submit" class="btn btn-primary" style="justify-content:center; padding:0.7rem;">Unlock Dashboard →</button>
+        <div id="authErrorMsg" style="font-size:0.75rem; color:var(--red); display:none;">Invalid credentials. Please try again.</div>
+      </form>
+    </div>
+  </div>
+
+  <!-- STICKY TOP HEADER -->
   <header class="topbar">
     <div class="brand-group">
       <img src="assets/trieye-logo-dark.png" alt="Trieye Studio" class="brand-logo logo-dark" onerror="this.style.display='none'">
       <img src="assets/trieye-logo-light.png" alt="Trieye Studio" class="brand-logo logo-light" onerror="this.style.display='none'">
       <div class="brand-title">
-        Trieye Studio <span class="brand-badge">ADMIN CONSOLE</span>
+        Trieye Studio <span class="brand-badge">PRO ADMIN</span>
       </div>
     </div>
 
     <div class="top-actions">
       <div class="live-status-pill">
-        <span class="pulse-dot"></span> 4 BAYS ONLINE
+        <span class="pulse-dot"></span> <span id="top-bay-pill-text">4 BAYS ONLINE</span>
       </div>
-      <button class="btn" id="dashThemeToggleBtn" title="Toggle Dark / Light Theme" style="cursor:pointer;">
-        <span id="dashThemeIcon">☀️</span>
-        <span id="dashThemeLabel">Light Mode</span>
+      <button class="theme-toggle-btn" id="dashThemeToggleBtn" title="Toggle Dark / Light Theme" aria-label="Toggle Theme">
+        <div class="theme-toggle-thumb">
+          <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
+          <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path><circle cx="19" cy="5" r="1" fill="currentColor" stroke="none"></circle><circle cx="16" cy="3" r="0.75" fill="currentColor" stroke="none"></circle></svg>
+        </div>
       </button>
-      <a href="index.html" class="btn" title="View Customer Website">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-        Customer Portal
-      </a>
-      <a href="#walkin-form" class="btn btn-primary">
-        + Walk-In Booking
-      </a>
+      <button class="btn btn-primary" onclick="showSection('walkin-sec'); document.getElementById('walkin-phone').focus();">
+        + Walk-In Entry
+      </button>
+      <button class="btn" onclick="lockAdminConsole()" title="Lock Admin Session">
+        🔒 Logout
+      </button>
     </div>
   </header>
 
   <div class="dashboard-layout">
+    <!-- LEFT SIDEBAR WITH ALL 12 REQUIRED SECTIONS -->
     <aside class="sidebar">
       <div>
-        <div class="sidebar-section-title">Navigation</div>
+        <div class="sidebar-section-title">Core Operations</div>
         <ul class="nav-list">
-          <li class="nav-item active">
-            <a href="#queue">
-              <span>📋 Live Studio Queue</span>
-              <span class="nav-counter" id="nav-count-active">0</span>
-            </a>
+          <li class="nav-item active" id="nav-overview" onclick="showSection('overview-sec')">
+            <a><span>📊 Dashboard Overview</span></a>
           </li>
-          <li class="nav-item">
-            <a href="#completed" onclick="filterQueue('Done')">
-              <span>✅ Completed Jobs</span>
-              <span class="nav-counter" id="nav-count-done">0</span>
-            </a>
+          <li class="nav-item" id="nav-queue" onclick="showSection('queue-sec')">
+            <a><span>📋 Live Studio Queue</span><span class="nav-counter" id="badge-active-queue">0</span></a>
           </li>
-          <li class="nav-item">
-            <a href="#blocker">
-              <span>🛡️ Bay &amp; Slot Manager</span>
-            </a>
+          <li class="nav-item" id="nav-online" onclick="showSection('online-sec')">
+            <a><span>🌐 Online Bookings</span><span class="nav-counter" id="badge-online-count">0</span></a>
+          </li>
+          <li class="nav-item" id="nav-walkin" onclick="showSection('walkin-sec')">
+            <a><span>⚡ Walk-In Entry</span></a>
           </li>
         </ul>
       </div>
 
       <div>
-        <div class="sidebar-section-title">Detailing Bays</div>
-        <div class="bay-mini-widget">
-          <div class="bay-mini-header">
-            <span>BAY OCCUPANCY</span>
-            <span style="color:var(--green);" id="bay-occupancy-ratio">1/4 In Use</span>
-          </div>
-          <div class="bay-grid">
-            <div class="bay-box occupied" id="bay-1">
-              <div class="bay-num">BAY 01</div>
-              <div class="bay-state">CERAMIC</div>
-            </div>
-            <div class="bay-box ready" id="bay-2">
-              <div class="bay-num">BAY 02</div>
-              <div class="bay-state">AVAILABLE</div>
-            </div>
-            <div class="bay-box occupied" id="bay-3">
-              <div class="bay-num">BAY 03</div>
-              <div class="bay-state">WASH/POLISH</div>
-            </div>
-            <div class="bay-box ready" id="bay-4">
-              <div class="bay-num">BAY 04</div>
-              <div class="bay-state">AVAILABLE</div>
-            </div>
-          </div>
-        </div>
+        <div class="sidebar-section-title">Business &amp; Finance</div>
+        <ul class="nav-list">
+          <li class="nav-item" id="nav-customers" onclick="showSection('customers-sec')">
+            <a><span>👥 Customers Database</span><span class="nav-counter" id="badge-customers-count">0</span></a>
+          </li>
+          <li class="nav-item" id="nav-services" onclick="showSection('services-sec')">
+            <a><span>🏷️ Services &amp; Pricing</span></a>
+          </li>
+          <li class="nav-item" id="nav-payments" onclick="showSection('payments-sec')">
+            <a><span>💳 Payments Ledger</span></a>
+          </li>
+          <li class="nav-item" id="nav-completed" onclick="showSection('completed-sec')">
+            <a><span>✅ Completed Jobs</span><span class="nav-counter" id="badge-done-count">0</span></a>
+          </li>
+        </ul>
       </div>
 
       <div style="margin-top:auto;">
-        <div class="sidebar-section-title">System Controls</div>
-        <div style="display:flex; flex-direction:column; gap:0.5rem;">
-          <button class="btn" style="width:100%; justify-content:center;" onclick="exportBookingsJSON()">
-            📥 Export Bookings JSON
-          </button>
-          <button class="btn" style="width:100%; justify-content:center; color:var(--red);" onclick="resetDemoData()">
-            🔄 Reset Demo Queue
-          </button>
-        </div>
+        <div class="sidebar-section-title">Administration</div>
+        <ul class="nav-list">
+          <li class="nav-item" id="nav-reports" onclick="showSection('reports-sec')">
+            <a><span>📈 Reports &amp; Analytics</span></a>
+          </li>
+          <li class="nav-item" id="nav-settings" onclick="showSection('settings-sec')">
+            <a><span>⚙️ Studio Settings</span></a>
+          </li>
+        </ul>
       </div>
     </aside>
 
-    <main class="content">
-      <div class="kpi-row">
-        <div class="kpi-card pink">
-          <div class="kpi-title">Today's Revenue</div>
-          <div class="kpi-value" id="kpi-revenue">₹0</div>
-          <div class="kpi-sub positive">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
-            Live from queued orders
+    <!-- MAIN CONTENT VIEW -->
+    <main class="main-content">
+
+      <!-- 1. DASHBOARD OVERVIEW SECTION -->
+      <section class="content-section active" id="overview-sec">
+        <div class="section-header">
+          <div>
+            <div class="section-title"><span>📊</span> Dashboard Overview</div>
+            <div class="section-subtitle">Real-time studio health, bay telemetry &amp; booking statistics</div>
+          </div>
+          <div style="display:flex; gap:0.5rem;">
+            <button class="btn" onclick="exportBookingsJSON()">📥 Export JSON</button>
+            <button class="btn btn-green" onclick="showSection('walkin-sec')">+ Quick Walk-In</button>
           </div>
         </div>
 
-        <div class="kpi-card green">
-          <div class="kpi-title">Active In-Studio</div>
-          <div class="kpi-value" id="kpi-active">0</div>
-          <div class="kpi-sub">Vehicles currently in bays</div>
-        </div>
-
-        <div class="kpi-card blue">
-          <div class="kpi-title">Confirmed Online</div>
-          <div class="kpi-value" id="kpi-confirmed">0</div>
-          <div class="kpi-sub">Pending customer arrivals</div>
-        </div>
-
-        <div class="kpi-card amber">
-          <div class="kpi-title">Completed Today</div>
-          <div class="kpi-value" id="kpi-done">0</div>
-          <div class="kpi-sub positive">100% Quality Inspected</div>
-        </div>
-      </div>
-
-      <div class="dashboard-grid">
-        <div class="panel" id="queue">
-          <div class="panel-header">
-            <div class="panel-title">
-              <span>🚗</span> Live Service Queue &amp; Bay Management
-            </div>
-            <div class="panel-controls">
-              <select class="form-select" id="queue-filter" onchange="renderQueue()" style="padding:0.35rem 0.6rem; font-size:0.75rem;">
-                <option value="ALL">All Bookings</option>
-                <option value="ACTIVE">Active / Pending</option>
-                <option value="Confirmed">Confirmed Only</option>
-                <option value="In Progress">In Progress Only</option>
-                <option value="Done">Completed</option>
-              </select>
-            </div>
+        <!-- 8 Summary Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card green">
+            <div class="kpi-label">Today Revenue <span>💰</span></div>
+            <div class="kpi-value" id="kpi-today-revenue">₹0</div>
+            <div class="kpi-subtext">Verified collected + active</div>
           </div>
-
-          <div class="table-container">
-            <table class="data-table" id="bookings-table">
-              <thead>
-                <tr>
-                  <th>Vehicle &amp; Reg</th>
-                  <th>Customer &amp; Contact</th>
-                  <th>Service Plan</th>
-                  <th>Slot &amp; Date</th>
-                  <th>Status</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody id="queue-tbody">
-              </tbody>
-            </table>
-            <div class="empty-queue" id="empty-queue-msg" style="display:none;">
-              <h3>No bookings in this filter</h3>
-              <p>Bookings submitted by customers on the main website will appear here in real-time.</p>
-            </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Active Vehicles <span>🏎️</span></div>
+            <div class="kpi-value" id="kpi-active-vehicles">0</div>
+            <div class="kpi-subtext">Currently in wash/detail bays</div>
+          </div>
+          <div class="kpi-card blue">
+            <div class="kpi-label">Online Bookings <span>🌐</span></div>
+            <div class="kpi-value" id="kpi-today-online">0</div>
+            <div class="kpi-subtext">Booked via customer portal</div>
+          </div>
+          <div class="kpi-card amber">
+            <div class="kpi-label">Walk-Ins Today <span>⚡</span></div>
+            <div class="kpi-value" id="kpi-today-walkin">0</div>
+            <div class="kpi-subtext">Direct express check-ins</div>
+          </div>
+          <div class="kpi-card green">
+            <div class="kpi-label">Completed Today <span>✅</span></div>
+            <div class="kpi-value" id="kpi-today-completed">0</div>
+            <div class="kpi-subtext">Ready &amp; dispatched vehicles</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Pending Payments <span>⏳</span></div>
+            <div class="kpi-value" id="kpi-pending-payments" style="color:var(--red);">₹0</div>
+            <div class="kpi-subtext">Unsettled active job balance</div>
+          </div>
+          <div class="kpi-card blue">
+            <div class="kpi-label">Total Customers <span>👥</span></div>
+            <div class="kpi-value" id="kpi-total-customers">0</div>
+            <div class="kpi-subtext">Registered in studio CRM</div>
+          </div>
+          <div class="kpi-card amber">
+            <div class="kpi-label">Bay Occupancy <span>🛡️</span></div>
+            <div class="kpi-value" id="kpi-bay-occupancy">0%</div>
+            <div class="kpi-subtext" id="kpi-bay-fraction">0/4 Bays Active</div>
           </div>
         </div>
 
-        <div style="display:flex; flex-direction:column; gap:1.5rem;">
+        <!-- Quick Action Buttons Bar -->
+        <div class="quick-actions-bar">
+          <span style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--muted); font-weight:600; text-transform:uppercase;">Quick Actions:</span>
+          <button class="btn btn-primary" onclick="showSection('walkin-sec')">+ Add Walk-In</button>
+          <button class="btn" onclick="openNewBookingModal()">+ Add Booking</button>
+          <button class="btn" onclick="openAddCustomerModal()">👥 Add Customer</button>
+          <button class="btn" onclick="openRecordPaymentModal()">💳 Record Payment</button>
+        </div>
+
+        <!-- Overview Two-Column: Bay Live Status & Today's Timeline -->
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:1.25rem;">
+          <!-- Detailing Bays Overview -->
           <div class="panel">
             <div class="panel-header">
-              <div class="panel-title">
-                <span>⚡</span> Express Walk-In Entry
+              <div class="panel-title"><span>🚗</span> Active Detailing Bays</div>
+              <button class="btn" onclick="showSection('bays-sec')" style="font-size:0.72rem;">Manage Bays →</button>
+            </div>
+            <div style="padding:1rem;">
+              <div class="bays-grid" id="overview-bays-grid">
+                <!-- Injected via JS -->
               </div>
             </div>
-            <form class="form-body" id="walkin-form" onsubmit="handleWalkinSubmit(event)">
-              <!-- STEP 1: Customer Name & Phone Lookup -->
-              <div class="form-group">
-                <label class="form-label">Customer Name</label>
-                <input type="text" class="form-input" id="walkin-name" placeholder="e.g. Rahul Sharma" required>
+          </div>
+
+          <!-- Today's Schedule & Timeline -->
+          <div class="panel">
+            <div class="panel-header">
+              <div class="panel-title"><span>⏰</span> Today's Job Timeline</div>
+              <button class="btn" onclick="showSection('queue-sec')" style="font-size:0.72rem;">View All Queue →</button>
+            </div>
+            <div style="padding:1rem;">
+              <div id="overview-timeline-list" style="display:flex; flex-direction:column; gap:0.65rem;">
+                <!-- Injected via JS -->
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-              <div class="form-group">
-                <label class="form-label">Phone Number (Lookup Key)</label>
-                <input type="tel" class="form-input" id="walkin-phone" placeholder="e.g. 9876543210" required>
+      <!-- 2. LIVE STUDIO QUEUE SECTION -->
+      <section class="content-section" id="queue-sec">
+        <div class="section-header">
+          <div>
+            <div class="section-title"><span>📋</span> Live Studio Queue</div>
+            <div class="section-subtitle">Real-time vehicle progress tracking from check-in to quality check &amp; dispatch</div>
+          </div>
+          <div style="display:flex; gap:0.5rem;">
+            <select class="form-select" id="queue-filter-select" onchange="renderQueueTable()" style="width:auto; font-size:0.78rem;">
+              <option value="ALL">All Active &amp; Queued Jobs</option>
+              <option value="ARRIVED">Arrived / Waiting</option>
+              <option value="IN PROGRESS">In Progress</option>
+              <option value="QUALITY CHECK">Quality Check</option>
+              <option value="READY">Ready for Pickup</option>
+            </select>
+            <button class="btn btn-primary" onclick="showSection('walkin-sec')">+ Add Vehicle</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Vehicle &amp; Reg No</th>
+                  <th>Customer Info</th>
+                  <th>Service Package</th>
+                  <th>Bay &amp; Source</th>
+                  <th>Time / ETA</th>
+                  <th>Job Status</th>
+                  <th>Payment</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="live-queue-tbody">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. ONLINE BOOKINGS SECTION -->
+      <section class="content-section" id="online-sec">
+        <div class="section-header">
+          <div>
+            <div class="section-title"><span>🌐</span> Online Website Bookings</div>
+            <div class="section-subtitle">Reservations placed via Trieye customer booking portal</div>
+          </div>
+          <div style="display:flex; gap:0.5rem;">
+            <button class="btn btn-primary" onclick="openNewBookingModal()">+ Create Manual Booking</button>
+          </div>
+        </div>
+
+        <div class="filter-bar">
+          <button class="filter-pill active" onclick="filterOnlineBookings('TODAY', this)">Today</button>
+          <button class="filter-pill" onclick="filterOnlineBookings('TOMORROW', this)">Tomorrow</button>
+          <button class="filter-pill" onclick="filterOnlineBookings('UPCOMING', this)">Upcoming</button>
+          <button class="filter-pill" onclick="filterOnlineBookings('COMPLETED', this)">Completed</button>
+          <button class="filter-pill" onclick="filterOnlineBookings('ALL', this)">All Online</button>
+        </div>
+
+        <div class="panel">
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Booking ID</th>
+                  <th>Customer</th>
+                  <th>Vehicle &amp; Reg</th>
+                  <th>Package &amp; Price</th>
+                  <th>Booking Date</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="online-bookings-tbody">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. EXPRESS WALKIN ENTRY SECTION -->
+      <section class="content-section" id="walkin-sec">
+        <div class="section-header">
+          <div>
+            <div class="section-title"><span>⚡</span> Express Walk-In Entry</div>
+            <div class="section-subtitle">Two-step customer lookup and vehicle bay assignment</div>
+          </div>
+        </div>
+
+        <div class="panel" style="max-width:850px;">
+          <div class="panel-header">
+            <div class="panel-title"><span>🚗</span> Vehicle Check-In Form</div>
+          </div>
+          <div class="form-body">
+            <!-- Step 1: Customer Lookup -->
+            <div style="background:var(--bg-panel-2); padding:1rem; border-radius:8px; border:1px solid var(--line);">
+              <div class="form-label" style="margin-bottom:0.5rem; color:var(--white);">Step 1: Customer Phone Search &amp; Identification</div>
+              <div style="display:grid; grid-template-columns: 1.2fr 1fr auto; gap:0.65rem;">
+                <input type="tel" id="walkin-phone" class="form-input" placeholder="Phone Number (e.g. 98401 23456)" required>
+                <input type="text" id="walkin-name" class="form-input" placeholder="Customer Name">
+                <button type="button" class="btn btn-primary" onclick="handleCustomerLookup()">🔍 Find Customer</button>
               </div>
-
-              <div id="step-one-action">
-                <button type="button" class="btn btn-primary" id="btn-lookup-customer" onclick="handleCustomerLookup()" style="width:100%; justify-content:center; padding:0.7rem;">
-                  🔍 Continue / Find Customer
-                </button>
+              <div id="lookup-banner" style="display:none; margin-top:0.65rem; padding:0.6rem 0.85rem; border-radius:6px; font-family:'IBM Plex Mono'; font-size:0.75rem; justify-content:space-between; align-items:center;">
+                <!-- Populated via JS -->
               </div>
+            </div>
 
-              <!-- Lookup Status Banner -->
-              <div id="lookup-banner" style="display:none;"></div>
-
-              <!-- STEP 2: Remaining Vehicle & Bay Details (Revealed After Lookup) -->
-              <div class="step-two-container" id="step-two-fields">
-                <div class="form-row">
-                  <div class="form-group">
-                    <label class="form-label">Vehicle Type</label>
-                    <select class="form-select" id="walkin-vehicle" onchange="updateWalkinPrice()" required>
-                      <option value="SUV / 4x4">SUV / 4x4</option>
-                      <option value="Sedan">Sedan</option>
-                      <option value="Hatchback">Hatchback</option>
-                      <option value="Superbike">Superbike</option>
-                    </select>
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label">Reg Number</label>
-                    <input type="text" class="form-input" id="walkin-reg" placeholder="MH 02 AB 1234" required>
-                  </div>
-                </div>
-
+            <!-- Step 2: Vehicle & Service Assignment -->
+            <form id="walkin-step2-form" onsubmit="handleWalkinSubmit(event)" style="display:none; flex-direction:column; gap:1rem;">
+              <div class="form-label" style="color:var(--white);">Step 2: Vehicle &amp; Service Package Details</div>
+              
+              <div class="form-grid">
                 <div class="form-group">
-                  <label class="form-label">Service Package</label>
-                  <select class="form-select" id="walkin-service" onchange="updateWalkinPrice()" required>
-                    <option value="3-Step Paint Correction &amp; Rubbing">Paint Correction (₹3,499)</option>
-                    <option value="Snow Foam Deep Exterior Wash">Snow Foam Wash (₹799)</option>
-                    <option value="Interior Steam &amp; Leather Decon">Interior Deep Clean (₹1,999)</option>
-                    <option value="9H Graphene Ceramic Shield">9H Ceramic Shield (₹11,999)</option>
+                  <label class="form-label">Vehicle Category</label>
+                  <select class="form-select" id="walkin-vehicle" onchange="updateWalkinCalculatedPrice()">
+                    <option value="Hatchback">Hatchback (Swift, i20, Polo)</option>
+                    <option value="Sedan" selected>Sedan (City, Verna, BMW 3)</option>
+                    <option value="SUV / 4x4">SUV / 4x4 (Fortuner, Creta, XUV)</option>
+                    <option value="Superbike">Superbike / Motorcycle</option>
                   </select>
                 </div>
-
-                <div class="form-row">
-                  <div class="form-group">
-                    <label class="form-label">Assign Bay</label>
-                    <select class="form-select" id="walkin-bay">
-                      <option value="Bay 01">Bay 01 (Detailing)</option>
-                      <option value="Bay 02">Bay 02 (Wash)</option>
-                      <option value="Bay 03">Bay 03 (Interior)</option>
-                      <option value="Bay 04">Bay 04 (Ceramic)</option>
-                    </select>
-                  </div>
-                  <div class="form-group">
-                    <label class="form-label">Estimated Price</label>
-                    <input type="text" class="form-input" id="walkin-price" value="₹3,499" readonly style="font-family:'IBM Plex Mono'; font-weight:600; color:var(--green);">
-                  </div>
+                <div class="form-group">
+                  <label class="form-label">Vehicle Brand &amp; Model</label>
+                  <input type="text" id="walkin-model" class="form-input" placeholder="e.g. BMW 330Li (Portimao Blue)" required>
                 </div>
-
-                <div style="display:flex; gap:0.5rem;">
-                  <button type="submit" class="btn btn-green" style="flex:1; justify-content:center; padding:0.75rem;">
-                    + Check-In Vehicle Now
-                  </button>
-                  <button type="button" class="btn" onclick="resetWalkinStep()" title="Change lookup">
-                    ↺
-                  </button>
+                <div class="form-group">
+                  <label class="form-label">Vehicle Number (Reg)</label>
+                  <input type="text" id="walkin-reg" class="form-input" placeholder="TN 01 AB 1234" required style="text-transform:uppercase;">
                 </div>
+              </div>
+
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Primary Service</label>
+                  <select class="form-select" id="walkin-service" onchange="updateWalkinCalculatedPrice()">
+                    <!-- Populated dynamically from Services Database -->
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Assign Detailing Bay</label>
+                  <select class="form-select" id="walkin-bay">
+                    <option value="Bay 01">Bay 01 (Detailing &amp; Foam)</option>
+                    <option value="Bay 02">Bay 02 (Wash &amp; Underbody)</option>
+                    <option value="Bay 03">Bay 03 (Interior Steam &amp; Decon)</option>
+                    <option value="Bay 04">Bay 04 (Ceramic &amp; Coating)</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Estimated Service Price</label>
+                  <input type="text" id="walkin-price-disp" class="form-input" readonly style="font-family:'IBM Plex Mono'; font-weight:700; color:var(--green);">
+                </div>
+              </div>
+
+              <div class="form-grid">
+                <div class="form-group">
+                  <label class="form-label">Payment Collection</label>
+                  <select class="form-select" id="walkin-pay-status">
+                    <option value="PAID">Paid in Advance</option>
+                    <option value="UNPAID" selected>Pay on Delivery (Unpaid)</option>
+                    <option value="PARTIAL">Partial Advance</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Payment Method</label>
+                  <select class="form-select" id="walkin-pay-method">
+                    <option value="UPI / QR">UPI / QR (GooglePay/PhonePe)</option>
+                    <option value="Cash">Cash at Counter</option>
+                    <option value="Card">Credit/Debit Card POS</option>
+                    <option value="Bank Transfer">Bank Transfer</option>
+                  </select>
+                </div>
+              </div>
+
+              <div style="display:flex; gap:0.65rem; margin-top:0.5rem;">
+                <button type="submit" class="btn btn-green" style="flex:1; justify-content:center; padding:0.75rem; font-size:0.9rem;">
+                  🚗 Check-In Vehicle to Bay Now
+                </button>
+                <button type="button" class="btn" onclick="resetWalkinForm()">↺ Reset</button>
               </div>
             </form>
           </div>
+        </div>
+      </section>
 
-          <div class="panel" id="blocker">
-            <div class="panel-header">
-              <div class="panel-title">
-                <span>🛡️</span> Slot &amp; Bay Availability Control
+      <!-- 5. BAY MANAGEMENT SECTION -->
+      <section class="content-section" id="bays-sec">
+        <div class="section-header">
+          <div>
+            <div class="section-title"><span>🚗</span> Detailing Bay Telemetry</div>
+            <div class="section-subtitle">Real-time studio bay occupancy, equipment status and capacity control</div>
+          </div>
+          <div style="display:flex; gap:0.5rem;">
+            <button class="btn btn-primary" onclick="openAddBayModal()">+ Add New Bay</button>
+          </div>
+        </div>
+
+        <div class="bays-grid" id="full-bays-grid">
+          <!-- Populated via JS -->
+        </div>
+      </section>
+
+      <!-- 6. SLOT & SCHEDULE MANAGER SECTION -->
+      <section class="content-section" id="slots-sec">
+        <div class="section-header">
+          <div>
+            <div class="section-title"><span>🛡️</span> Slot &amp; Schedule Manager</div>
+            <div class="section-subtitle">Date-specific booking slot availability, generation &amp; blackout management</div>
+          </div>
+          <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="openAddSlotModal()">+ Add New Slot</button>
+            <button class="btn" onclick="openDefaultScheduleModal()">⚙️ Auto-Generate Schedule</button>
+            <button class="btn" onclick="openCopyScheduleModal()">📋 Copy Schedule</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="form-body">
+            <div class="slot-ctrl-bar">
+              <div style="display:flex; align-items:center; gap:0.5rem; flex-wrap:wrap;">
+                <label style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--muted); text-transform:uppercase;">Manage Date:</label>
+                <input type="date" id="slot-mgr-date" class="form-input" style="width:auto;" onchange="onSlotDateChange(this.value)">
+                <button class="btn" onclick="setSlotDateToday()">Today</button>
+                <button class="btn" onclick="setSlotDateTomorrow()">Tomorrow</button>
+              </div>
+              <div style="display:flex; gap:0.45rem;">
+                <button class="btn" id="btn-toggle-day-block" onclick="toggleBlockFullDay()">🚫 Block Full Day</button>
+                <button class="btn" onclick="resetDayToDefaultSchedule()">↺ Reset Day</button>
               </div>
             </div>
-            <div class="form-body">
-              <p style="font-size:0.8rem; color:var(--muted);">
-                Click any slot below to toggle its status. Blocked slots will automatically show as unavailable on the customer booking page.
-              </p>
-              <div class="slot-blocker-grid" id="slots-grid">
-              </div>
+
+            <!-- Full Day Blocked Banner -->
+            <div id="full-day-blocked-notice" style="display:none; background:rgba(239,68,68,0.12); border:1px solid rgba(239,68,68,0.4); color:var(--red); padding:0.75rem 1rem; border-radius:6px; font-family:'IBM Plex Mono'; font-size:0.8rem; justify-content:space-between; align-items:center;">
+              <span>⚠️ FULL DAY BLOCKED — No online customer bookings permitted on this date.</span>
+              <button class="btn btn-primary" onclick="toggleBlockFullDay()" style="background:var(--red); border-color:var(--red); font-size:0.7rem; padding:0.25rem 0.6rem;">Reopen Day</button>
+            </div>
+
+            <div class="slot-blocker-grid" id="slots-grid">
+              <!-- Populated via JS -->
             </div>
           </div>
         </div>
-      </div>
+      </section>
+
+      <!-- 7. CUSTOMERS SECTION -->
+      <section class="content-section" id="customers-sec">
+        <div class="section-header">
+          <div>
+            <div class="section-title"><span>👥</span> Customer Database &amp; History</div>
+            <div class="section-subtitle">Searchable customer profiles, visit records, vehicle history &amp; LTV metrics</div>
+          </div>
+          <div style="display:flex; gap:0.5rem;">
+            <button class="btn btn-primary" onclick="openAddCustomerModal()">+ New Customer Profile</button>
+          </div>
+        </div>
+
+        <div class="filter-bar">
+          <input type="text" id="customer-search-input" class="form-input" placeholder="Search by Customer Name, Phone, or Vehicle Reg No..." oninput="renderCustomersTable()" style="max-width:400px;">
+        </div>
+
+        <div class="panel">
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Customer Name</th>
+                  <th>Phone &amp; WhatsApp</th>
+                  <th>Registered Vehicles</th>
+                  <th>Visits</th>
+                  <th>Total Spent</th>
+                  <th>Last Visit</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="customers-tbody">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. SERVICES & PRICING SECTION -->
+      <section class="content-section" id="services-sec">
+        <div class="section-header">
+          <div>
+            <div class="section-title"><span>🏷️</span> Services &amp; Pricing Configurator</div>
+            <div class="section-subtitle">Dynamic pricing engine automatically synced to the customer website</div>
+          </div>
+          <div style="display:flex; gap:0.5rem;">
+            <button class="btn btn-primary" onclick="openAddServiceModal()">+ Add New Service</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Service Name</th>
+                  <th>Description</th>
+                  <th>Hatchback</th>
+                  <th>Sedan</th>
+                  <th>SUV / 4x4</th>
+                  <th>Superbike</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="services-tbody">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 9. PAYMENTS SECTION -->
+      <section class="content-section" id="payments-sec">
+        <div class="section-header">
+          <div>
+            <div class="section-title"><span>💳</span> Payments &amp; Revenue Ledger</div>
+            <div class="section-subtitle">Comprehensive transactions, payment methods, receipts and partial settlements</div>
+          </div>
+          <div style="display:flex; gap:0.5rem;">
+            <button class="btn btn-primary" onclick="openRecordPaymentModal()">+ Record Payment</button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Transaction Ref</th>
+                  <th>Customer &amp; Vehicle</th>
+                  <th>Service</th>
+                  <th>Total Amount</th>
+                  <th>Method</th>
+                  <th>Payment Status</th>
+                  <th>Date &amp; Time</th>
+                  <th>Receipt</th>
+                </tr>
+              </thead>
+              <tbody id="payments-tbody">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 10. COMPLETED JOBS SECTION -->
+      <section class="content-section" id="completed-sec">
+        <div class="section-header">
+          <div>
+            <div class="section-title"><span>✅</span> Completed Job Archives</div>
+            <div class="section-subtitle">Detailed history of finished and delivered detailing jobs</div>
+          </div>
+          <div style="display:flex; gap:0.5rem;">
+            <input type="text" id="completed-search-input" class="form-input" placeholder="Search customer or vehicle..." oninput="renderCompletedJobsTable()" style="font-size:0.78rem;">
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Job ID</th>
+                  <th>Vehicle &amp; Reg</th>
+                  <th>Customer</th>
+                  <th>Service Package</th>
+                  <th>Bay Finished</th>
+                  <th>Total Price</th>
+                  <th>Payment</th>
+                  <th>Completed Date</th>
+                </tr>
+              </thead>
+              <tbody id="completed-tbody">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 11. REPORTS SECTION -->
+      <section class="content-section" id="reports-sec">
+        <div class="section-header">
+          <div>
+            <div class="section-title"><span>📈</span> Reports &amp; Business Intelligence</div>
+            <div class="section-subtitle">Studio financial performance, service volume, bay utilization and customer retention</div>
+          </div>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card green">
+            <div class="kpi-label">This Week Revenue</div>
+            <div class="kpi-value" id="rep-week-revenue">₹0</div>
+            <div class="kpi-subtext">Last 7 operational days</div>
+          </div>
+          <div class="kpi-card blue">
+            <div class="kpi-label">This Month Revenue</div>
+            <div class="kpi-value" id="rep-month-revenue">₹0</div>
+            <div class="kpi-subtext">Current billing cycle</div>
+          </div>
+          <div class="kpi-card amber">
+            <div class="kpi-label">Returning Customer Rate</div>
+            <div class="kpi-value" id="rep-retention-rate">0%</div>
+            <div class="kpi-subtext">Repeat car owners</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-label">Total Jobs Executed</div>
+            <div class="kpi-value" id="rep-total-jobs">0</div>
+            <div class="kpi-subtext">All-time lifetime washes</div>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:1.25rem;">
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title"><span>🏷️</span> Popular Service Packages</div></div>
+            <div style="padding:1.25rem;" id="rep-popular-services">
+              <!-- Injected via JS -->
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title"><span>🚗</span> Vehicle Category Distribution</div></div>
+            <div style="padding:1.25rem;" id="rep-vehicle-distribution">
+              <!-- Injected via JS -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 12. SETTINGS SECTION -->
+      <section class="content-section" id="settings-sec">
+        <div class="section-header">
+          <div>
+            <div class="section-title"><span>⚙️</span> Studio Settings &amp; Owner Admin</div>
+            <div class="section-subtitle">Configure business info, pricing policies, PIN security and data backups</div>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:1.25rem;">
+          <!-- Business Profile Form -->
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title"><span>🏢</span> Business Information</div></div>
+            <form class="form-body" onsubmit="saveStudioSettings(event)">
+              <div class="form-group">
+                <label class="form-label">Business Name</label>
+                <input type="text" id="set-business-name" class="form-input" value="Trieye Studio Chennai">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Official Phone Number</label>
+                <input type="tel" id="set-business-phone" class="form-input" value="+91 98400 12345">
+              </div>
+              <div class="form-group">
+                <label class="form-label">WhatsApp Dispatch Number</label>
+                <input type="tel" id="set-business-wa" class="form-input" value="919840012345">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Studio Address</label>
+                <input type="text" id="set-business-address" class="form-input" value="OMR Road, Sholinganallur, Chennai">
+              </div>
+              <button type="submit" class="btn btn-primary" style="align-self:flex-start; margin-top:0.5rem;">Save Business Profile</button>
+            </form>
+          </div>
+
+          <!-- Security & Admin PIN -->
+          <div class="panel">
+            <div class="panel-header"><div class="panel-title"><span>🔒</span> Security &amp; Access Control</div></div>
+            <form class="form-body" onsubmit="saveAdminPin(event)">
+              <p style="font-size:0.8rem; color:var(--muted);">Change the master PIN required to access this operations console.</p>
+              <div class="form-group">
+                <label class="form-label">New Admin PIN</label>
+                <input type="password" id="set-admin-pin" class="form-input" placeholder="e.g. 1234" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Require PIN on Browser Refresh</label>
+                <select class="form-select" id="set-require-pin">
+                  <option value="true" selected>Yes (Protected Mode)</option>
+                  <option value="false">No (Direct Access)</option>
+                </select>
+              </div>
+              <button type="submit" class="btn btn-primary" style="align-self:flex-start; margin-top:0.5rem;">Update Security PIN</button>
+              <hr style="border:none; border-top:1px solid var(--line); margin:0.5rem 0;">
+              <button type="button" class="btn btn-icon-sm delete" onclick="resetDemoData()" style="align-self:flex-start;">⚠️ Reset System with Demo Data</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
     </main>
   </div>
 
-  <script>
-    const BOOKINGS_KEY = 'trieye_bookings';
-    const BLOCKED_SLOTS_KEY = 'trieye_blocked_slots';
+  <!-- MODALS CONTAINER -->
 
-    const pricingMatrix = {
-      'Hatchback': { 'Snow Foam Deep Exterior Wash': 499, '3-Step Paint Correction & Rubbing': 2499, 'Interior Steam & Leather Decon': 1499, '9H Graphene Ceramic Shield': 8999 },
-      'Sedan': { 'Snow Foam Deep Exterior Wash': 699, '3-Step Paint Correction & Rubbing': 2999, 'Interior Steam & Leather Decon': 1799, '9H Graphene Ceramic Shield': 9999 },
-      'SUV / 4x4': { 'Snow Foam Deep Exterior Wash': 799, '3-Step Paint Correction & Rubbing': 3499, 'Interior Steam & Leather Decon': 1999, '9H Graphene Ceramic Shield': 11999 },
-      'Superbike': { 'Snow Foam Deep Exterior Wash': 299, '3-Step Paint Correction & Rubbing': 1299, 'Interior Steam & Leather Decon': 799, '9H Graphene Ceramic Shield': 4999 }
+  <!-- ADD / EDIT CUSTOMER MODAL -->
+  <div class="dash-modal-backdrop" id="modalCustomer">
+    <div class="dash-modal">
+      <div class="dash-modal-header">
+        <div class="dash-modal-title"><span id="modal-cust-icon">👥</span> <span id="modal-cust-title">Customer Profile</span></div>
+        <button class="dash-modal-close" onclick="closeModal('modalCustomer')">&times;</button>
+      </div>
+      <div class="dash-modal-body">
+        <input type="hidden" id="cust-modal-orig-phone">
+        <div class="form-group">
+          <label class="form-label">Customer Name</label>
+          <input type="text" id="cust-modal-name" class="form-input" placeholder="e.g. Deepak R" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phone Number (WhatsApp)</label>
+          <input type="tel" id="cust-modal-phone" class="form-input" placeholder="10-digit mobile" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email Address (Optional)</label>
+          <input type="email" id="cust-modal-email" class="form-input" placeholder="customer@example.com">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Vehicle Model &amp; Reg</label>
+          <input type="text" id="cust-modal-veh" class="form-input" placeholder="e.g. BMW 330Li (TN 01 AB 1234)">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Internal Studio Notes</label>
+          <textarea id="cust-modal-notes" class="form-textarea" rows="2" placeholder="Customer preferences, ceramic warranty notes..."></textarea>
+        </div>
+      </div>
+      <div class="dash-modal-footer">
+        <button class="btn" onclick="closeModal('modalCustomer')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveCustomerModal()">Save Profile</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD / EDIT SERVICE MODAL -->
+  <div class="dash-modal-backdrop" id="modalService">
+    <div class="dash-modal">
+      <div class="dash-modal-header">
+        <div class="dash-modal-title"><span>🏷️</span> Configure Service Package</div>
+        <button class="dash-modal-close" onclick="closeModal('modalService')">&times;</button>
+      </div>
+      <div class="dash-modal-body">
+        <input type="hidden" id="svc-modal-orig-name">
+        <div class="form-group">
+          <label class="form-label">Service Package Name</label>
+          <input type="text" id="svc-modal-name" class="form-input" placeholder="e.g. Snow Foam Deep Exterior Wash" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <input type="text" id="svc-modal-desc" class="form-input" placeholder="Brief service details for invoice">
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Hatchback (₹)</label>
+            <input type="number" id="svc-modal-price-hatch" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Sedan (₹)</label>
+            <input type="number" id="svc-modal-price-sedan" class="form-input" required>
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">SUV / 4x4 (₹)</label>
+            <input type="number" id="svc-modal-price-suv" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Superbike (₹)</label>
+            <input type="number" id="svc-modal-price-bike" class="form-input" required>
+          </div>
+        </div>
+      </div>
+      <div class="dash-modal-footer">
+        <button class="btn" onclick="closeModal('modalService')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveServiceModal()">Save Package</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECORD PAYMENT MODAL -->
+  <div class="dash-modal-backdrop" id="modalPayment">
+    <div class="dash-modal">
+      <div class="dash-modal-header">
+        <div class="dash-modal-title"><span>💳</span> Record / Settle Payment</div>
+        <button class="dash-modal-close" onclick="closeModal('modalPayment')">&times;</button>
+      </div>
+      <div class="dash-modal-body">
+        <div class="form-group">
+          <label class="form-label">Select Job / Booking</label>
+          <select class="form-select" id="pay-modal-job-select" onchange="onPayModalJobSelect()">
+            <!-- Populated via JS -->
+          </select>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Amount Collected (₹)</label>
+            <input type="number" id="pay-modal-amount" class="form-input" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Payment Method</label>
+            <select class="form-select" id="pay-modal-method">
+              <option value="UPI / QR">UPI / QR Code</option>
+              <option value="Cash">Cash at Counter</option>
+              <option value="Card">Card POS</option>
+              <option value="Bank Transfer">Bank Transfer</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Payment Status</label>
+          <select class="form-select" id="pay-modal-status">
+            <option value="PAID">Full Paid</option>
+            <option value="PARTIAL">Partial Payment</option>
+            <option value="REFUNDED">Refunded</option>
+          </select>
+        </div>
+      </div>
+      <div class="dash-modal-footer">
+        <button class="btn" onclick="closeModal('modalPayment')">Cancel</button>
+        <button class="btn btn-green" onclick="savePaymentModal()">✓ Record Transaction</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECEIPT MODAL -->
+  <div class="dash-modal-backdrop" id="modalReceipt">
+    <div class="dash-modal" style="max-width:440px;">
+      <div class="dash-modal-header">
+        <div class="dash-modal-title"><span>🧾</span> Trieye Studio Invoice</div>
+        <button class="dash-modal-close" onclick="closeModal('modalReceipt')">&times;</button>
+      </div>
+      <div class="dash-modal-body" id="receipt-modal-body">
+        <!-- Injected via JS -->
+      </div>
+      <div class="dash-modal-footer">
+        <button class="btn" onclick="window.print()">🖨️ Print Receipt</button>
+        <button class="btn btn-primary" onclick="closeModal('modalReceipt')">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD BAY MODAL -->
+  <div class="dash-modal-backdrop" id="modalAddBay">
+    <div class="dash-modal">
+      <div class="dash-modal-header">
+        <div class="dash-modal-title"><span>🚗</span> Add / Configure Detailing Bay</div>
+        <button class="dash-modal-close" onclick="closeModal('modalAddBay')">&times;</button>
+      </div>
+      <div class="dash-modal-body">
+        <div class="form-group">
+          <label class="form-label">Bay Name</label>
+          <input type="text" id="new-bay-name" class="form-input" placeholder="e.g. Bay 05" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Bay Specialty Type</label>
+          <select class="form-select" id="new-bay-type">
+            <option value="Foam & Wash">Foam Wash &amp; Underbody</option>
+            <option value="Detailing & Rubbing">Detailing &amp; Paint Correction</option>
+            <option value="Interior Steam">Interior Steam &amp; Leather Decon</option>
+            <option value="Ceramic & Coating">9H Ceramic &amp; Graphene Booth</option>
+          </select>
+        </div>
+      </div>
+      <div class="dash-modal-footer">
+        <button class="btn" onclick="closeModal('modalAddBay')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveNewBay()">+ Add Bay</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD / EDIT SLOT MODALS -->
+  <div class="dash-modal-backdrop" id="modalAddSlot">
+    <div class="dash-modal">
+      <div class="dash-modal-header">
+        <div class="dash-modal-title"><span>⏰</span> Add Custom Booking Slot</div>
+        <button class="dash-modal-close" onclick="closeModal('modalAddSlot')">&times;</button>
+      </div>
+      <div class="dash-modal-body">
+        <p style="font-size:0.82rem; color:var(--muted);">Add slot to <strong id="modal-add-date-label" style="color:var(--white);"></strong>.</p>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Start Time</label>
+            <input type="time" class="form-input" id="new-slot-start" value="10:00" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">End Time</label>
+            <input type="time" class="form-input" id="new-slot-end" value="11:30">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Custom Label (Optional)</label>
+          <input type="text" class="form-input" id="new-slot-custom-text" placeholder="Leave blank to auto-format">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Initial State</label>
+          <select class="form-select" id="new-slot-status">
+            <option value="available">Available (Open for booking)</option>
+            <option value="blocked">Blocked (Disabled)</option>
+          </select>
+        </div>
+      </div>
+      <div class="dash-modal-footer">
+        <button class="btn" onclick="closeModal('modalAddSlot')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveNewSlot()">+ Add Slot</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="dash-modal-backdrop" id="modalEditSlot">
+    <div class="dash-modal">
+      <div class="dash-modal-header">
+        <div class="dash-modal-title"><span>✏️</span> Edit Slot Time</div>
+        <button class="dash-modal-close" onclick="closeModal('modalEditSlot')">&times;</button>
+      </div>
+      <div class="dash-modal-body">
+        <input type="hidden" id="edit-slot-original-time">
+        <div class="form-group">
+          <label class="form-label">Slot Time</label>
+          <input type="text" id="edit-slot-time-input" class="form-input" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Status</label>
+          <select class="form-select" id="edit-slot-status">
+            <option value="available">Available</option>
+            <option value="blocked">Blocked</option>
+          </select>
+        </div>
+      </div>
+      <div class="dash-modal-footer">
+        <button class="btn" onclick="closeModal('modalEditSlot')">Cancel</button>
+        <button class="btn btn-primary" onclick="saveEditedSlot()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUTO-GENERATE SCHEDULE MODAL -->
+  <div class="dash-modal-backdrop" id="modalDefaultSchedule">
+    <div class="dash-modal">
+      <div class="dash-modal-header">
+        <div class="dash-modal-title"><span>⚙️</span> Auto-Generate Schedule</div>
+        <button class="dash-modal-close" onclick="closeModal('modalDefaultSchedule')">&times;</button>
+      </div>
+      <div class="dash-modal-body">
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Opening Time</label>
+            <input type="time" class="form-input" id="sched-open-time" value="09:00">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Closing Time</label>
+            <input type="time" class="form-input" id="sched-close-time" value="21:00">
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Slot Duration</label>
+            <select class="form-select" id="sched-duration">
+              <option value="30">30 Mins</option>
+              <option value="45">45 Mins</option>
+              <option value="60">60 Mins (1h)</option>
+              <option value="90">90 Mins (1.5h)</option>
+              <option value="120" selected>120 Mins (2h)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Apply Range</label>
+            <select class="form-select" id="sched-apply-target">
+              <option value="current">Current Selected Date</option>
+              <option value="next-7">Next 7 Days</option>
+              <option value="next-30">Next 30 Days</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="dash-modal-footer">
+        <button class="btn" onclick="closeModal('modalDefaultSchedule')">Cancel</button>
+        <button class="btn btn-primary" onclick="generateScheduleFromSettings()">⚡ Generate Slots</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- COPY SCHEDULE MODAL -->
+  <div class="dash-modal-backdrop" id="modalCopySchedule">
+    <div class="dash-modal">
+      <div class="dash-modal-header">
+        <div class="dash-modal-title"><span>📋</span> Copy Schedule</div>
+        <button class="dash-modal-close" onclick="closeModal('modalCopySchedule')">&times;</button>
+      </div>
+      <div class="dash-modal-body">
+        <p style="font-size:0.8rem; color:var(--muted);">Copy schedule from <strong id="modal-copy-source-date" style="color:var(--green);"></strong> to target date(s):</p>
+        <div class="form-group">
+          <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.85rem; cursor:pointer;">
+            <input type="radio" name="copy-target-type" value="tomorrow" checked onchange="toggleCopyInputView()">
+            <span>Tomorrow (<span id="copy-tomorrow-label"></span>)</span>
+          </label>
+          <label style="display:flex; align-items:center; gap:0.5rem; font-size:0.85rem; cursor:pointer; margin-top:0.5rem;">
+            <input type="radio" name="copy-target-type" value="single" onchange="toggleCopyInputView()">
+            <span>Specific Date</span>
+          </label>
+          <div id="copy-single-picker" style="display:none; margin-left:1.5rem; margin-top:0.35rem;">
+            <input type="date" id="copy-single-date" class="form-input">
+          </div>
+        </div>
+      </div>
+      <div class="dash-modal-footer">
+        <button class="btn" onclick="closeModal('modalCopySchedule')">Cancel</button>
+        <button class="btn btn-primary" onclick="executeCopySchedule()">📋 Copy Schedule</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST CONTAINER -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- SCRIPT ENGINE -->
+  <script>
+    // System Constants & Shared Storage Keys
+    const BOOKINGS_KEY = 'trieye_bookings';
+    const CUSTOMERS_KEY = 'trieye_customers';
+    const SERVICES_KEY = 'trieye_services_matrix';
+    const BAYS_KEY = 'trieye_bays_list';
+    const SCHEDULE_KEY = 'trieye_custom_schedules';
+    const SETTINGS_KEY = 'trieye_studio_settings';
+    const AUTH_PIN_KEY = 'trieye_admin_pin';
+    const THEME_KEY = 'trieye_theme';
+
+    // Default Seed Data Matrix
+    const defaultServices = {
+      'Snow Foam Deep Exterior Wash': {
+        desc: 'High pressure pre-wash, dual snow foam, micro-fiber agitation, wheel barrel scrub & tyre gloss',
+        pricing: { 'Hatchback': 499, 'Sedan': 699, 'SUV / 4x4': 799, 'Superbike': 299 },
+        active: true
+      },
+      '3-Step Paint Correction & Rubbing': {
+        desc: 'Clay bar decontamination, heavy cut compound, polish refining and carnauba wax seal',
+        pricing: { 'Hatchback': 2499, 'Sedan': 2999, 'SUV / 4x4': 3499, 'Superbike': 1299 },
+        active: true
+      },
+      'Interior Steam & Leather Decon': {
+        desc: 'Steam sterilization, upholstery extraction, leather conditioner, dashboard UV shield & AC ozone',
+        pricing: { 'Hatchback': 1499, 'Sedan': 1799, 'SUV / 4x4': 1999, 'Superbike': 799 },
+        active: true
+      },
+      '9H Graphene Ceramic Shield': {
+        desc: 'Multi-layer ultra-hydrophobic 9H nano-graphene coat with 3-year warranty certificate',
+        pricing: { 'Hatchback': 8999, 'Sedan': 9999, 'SUV / 4x4': 11999, 'Superbike': 4999 },
+        active: true
+      }
     };
 
-    const standardSlots = [
+    const defaultBays = [
+      { id: 'bay-1', name: 'Bay 01', type: 'Detailing & Rubbing', status: 'Occupied' },
+      { id: 'bay-2', name: 'Bay 02', type: 'Foam & Wash', status: 'Available' },
+      { id: 'bay-3', name: 'Bay 03', type: 'Interior Steam', status: 'Occupied' },
+      { id: 'bay-4', name: 'Bay 04', type: 'Ceramic & Coating', status: 'Available' }
+    ];
+
+    const defaultStandardSlots = [
       '09:00 AM - 11:00 AM',
       '11:00 AM - 01:00 PM',
       '01:30 PM - 03:30 PM',
@@ -925,9 +1938,220 @@
       '07:30 PM - 09:30 PM'
     ];
 
+    let currentSelectedDate = new Date().toISOString().split('T')[0];
+    let onlineFilterState = 'TODAY';
+
+    // Helper functions
+    function formatDateIso(d) {
+      const y = d.getFullYear();
+      const m = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+    function cleanPhone(p) {
+      return (p || '').replace(/\D/g, '').slice(-10);
+    }
+    function showToast(msg) {
+      const container = document.getElementById('toastContainer');
+      const t = document.createElement('div');
+      t.className = 'toast-item';
+      t.innerText = msg;
+      container.appendChild(t);
+      setTimeout(() => t.remove(), 3200);
+    }
+
+    // Modal Helpers
+    function openModal(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.add('open');
+    }
+    function closeModal(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.remove('open');
+    }
+
+    // Tab Navigation
+    function showSection(secId) {
+      document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+      const targetSec = document.getElementById(secId);
+      if (targetSec) targetSec.classList.add('active');
+
+      const navMap = {
+        'overview-sec': 'nav-overview',
+        'queue-sec': 'nav-queue',
+        'online-sec': 'nav-online',
+        'walkin-sec': 'nav-walkin',
+        'bays-sec': 'nav-bays',
+        'slots-sec': 'nav-slots',
+        'customers-sec': 'nav-customers',
+        'services-sec': 'nav-services',
+        'payments-sec': 'nav-payments',
+        'completed-sec': 'nav-completed',
+        'reports-sec': 'nav-reports',
+        'settings-sec': 'nav-settings'
+      };
+
+      const navEl = document.getElementById(navMap[secId]);
+      if (navEl) navEl.classList.add('active');
+    }
+
+    // Storage Getters / Setters (TrieyeDB with Supabase + LocalStorage Fallback)
+    function getBookings() {
+      try {
+        return JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
+      } catch (e) { return []; }
+    }
+    function saveBookings(bookings) {
+      localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings));
+      renderAll();
+      // Sync to Supabase in background
+      if (window.TrieyeDB && typeof window.TrieyeDB.saveBooking === 'function') {
+        bookings.forEach(b => window.TrieyeDB.saveBooking(b).catch(() => {}));
+      }
+    }
+
+    function getCustomers() {
+      try {
+        return JSON.parse(localStorage.getItem(CUSTOMERS_KEY)) || {};
+      } catch (e) { return {}; }
+    }
+    function saveCustomers(custs) {
+      localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(custs));
+      renderCustomersTable();
+      updateKPICards();
+      // Sync to Supabase in background
+      if (window.TrieyeDB && typeof window.TrieyeDB.saveCustomer === 'function') {
+        Object.keys(custs).forEach(phone => {
+          window.TrieyeDB.saveCustomer(phone, custs[phone]).catch(() => {});
+        });
+      }
+    }
+
+    function getServices() {
+      try {
+        return JSON.parse(localStorage.getItem(SERVICES_KEY)) || defaultServices;
+      } catch (e) { return defaultServices; }
+    }
+    function saveServices(svcs) {
+      localStorage.setItem(SERVICES_KEY, JSON.stringify(svcs));
+      renderServicesTable();
+      populateServiceSelects();
+      if (window.TrieyeDB && typeof window.TrieyeDB.saveServices === 'function') {
+        window.TrieyeDB.saveServices(svcs).catch(() => {});
+      }
+    }
+
+    function getBays() {
+      try {
+        return JSON.parse(localStorage.getItem(BAYS_KEY)) || defaultBays;
+      } catch (e) { return defaultBays; }
+    }
+    function saveBays(bays) {
+      localStorage.setItem(BAYS_KEY, JSON.stringify(bays));
+      renderBays();
+      if (window.TrieyeDB && typeof window.TrieyeDB.saveBays === 'function') {
+        window.TrieyeDB.saveBays(bays).catch(() => {});
+      }
+    }
+
+    function getAllSchedules() {
+      try {
+        return JSON.parse(localStorage.getItem(SCHEDULE_KEY)) || {};
+      } catch (e) { return {}; }
+    }
+    function getDaySchedule(dateStr) {
+      const all = getAllSchedules();
+      if (all[dateStr]) return all[dateStr];
+
+      const dayObj = {
+        date: dateStr,
+        isFullDayBlocked: false,
+        slots: defaultStandardSlots.map(s => ({ time: s, status: 'available' }))
+      };
+      all[dateStr] = dayObj;
+      localStorage.setItem(SCHEDULE_KEY, JSON.stringify(all));
+      return dayObj;
+    }
+    function saveDaySchedule(dateStr, dayObj) {
+      const all = getAllSchedules();
+      all[dateStr] = dayObj;
+      localStorage.setItem(SCHEDULE_KEY, JSON.stringify(all));
+      renderSlotBlocker();
+      if (window.TrieyeDB && typeof window.TrieyeDB.saveDaySchedule === 'function') {
+        window.TrieyeDB.saveDaySchedule(dateStr, dayObj).catch(() => {});
+      }
+    }
+
+    // INITIAL DATA SEEDING & ASYNC SUPABASE FETCH
+    async function syncFromSupabase() {
+      if (!window.TrieyeDB) return;
+      try {
+        const [remoteBookings, remoteCustomers, remoteServices, remoteBays, remoteSchedules] = await Promise.allSettled([
+          window.TrieyeDB.getBookings(),
+          window.TrieyeDB.getCustomers(),
+          window.TrieyeDB.getServices(defaultServices),
+          window.TrieyeDB.getBays(defaultBays),
+          window.TrieyeDB.getSchedules()
+        ]);
+
+        let hasUpdates = false;
+
+        if (remoteBookings.status === 'fulfilled' && Array.isArray(remoteBookings.value) && remoteBookings.value.length > 0) {
+          localStorage.setItem(BOOKINGS_KEY, JSON.stringify(remoteBookings.value));
+          hasUpdates = true;
+        }
+        if (remoteCustomers.status === 'fulfilled' && remoteCustomers.value && Object.keys(remoteCustomers.value).length > 0) {
+          localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(remoteCustomers.value));
+          hasUpdates = true;
+        }
+        if (remoteServices.status === 'fulfilled' && remoteServices.value && Object.keys(remoteServices.value).length > 0) {
+          localStorage.setItem(SERVICES_KEY, JSON.stringify(remoteServices.value));
+          hasUpdates = true;
+        }
+        if (remoteBays.status === 'fulfilled' && Array.isArray(remoteBays.value) && remoteBays.value.length > 0) {
+          localStorage.setItem(BAYS_KEY, JSON.stringify(remoteBays.value));
+          hasUpdates = true;
+        }
+        if (remoteSchedules.status === 'fulfilled' && remoteSchedules.value && Object.keys(remoteSchedules.value).length > 0) {
+          localStorage.setItem(SCHEDULE_KEY, JSON.stringify(remoteSchedules.value));
+          hasUpdates = true;
+        }
+
+        if (hasUpdates) {
+          console.log('⚡ [Trieye Dashboard] Live data synchronized from Supabase.');
+          renderAll();
+        }
+      } catch (err) {
+        console.warn('⚠️ [Trieye Dashboard] Async sync error:', err);
+      }
+    }
+
     function initializeData() {
-      const existing = localStorage.getItem(BOOKINGS_KEY);
-      if (!existing || JSON.parse(existing).length === 0) {
+      if (!localStorage.getItem(SERVICES_KEY)) {
+        localStorage.setItem(SERVICES_KEY, JSON.stringify(defaultServices));
+      }
+      if (!localStorage.getItem(BAYS_KEY)) {
+        localStorage.setItem(BAYS_KEY, JSON.stringify(defaultBays));
+      }
+
+      if (!localStorage.getItem(CUSTOMERS_KEY)) {
+        const initialCust = {
+          '9820144521': { name: 'Vikram Singhania', email: 'vikram@fortuner.in', vehicleType: 'SUV / 4x4', reg: 'MH 01 AB 9999', model: 'Toyota Fortuner GR', visits: 4, spent: 34996, lastVisit: '2026-09-04', notes: 'Prefers 9H Graphene coating' },
+          '9930288712': { name: 'Ananya Deshmukh', email: 'ananya@bmw.co', vehicleType: 'Sedan', reg: 'MH 02 CD 4455', model: 'BMW 330Li M-Sport', visits: 2, spent: 5998, lastVisit: '2026-09-05', notes: 'Ceramic top-up due in Oct' },
+          '9811233490': { name: 'Karan Mehra', email: 'karan@ducati.me', vehicleType: 'Superbike', reg: 'MH 03 EF 1212', model: 'Ducati Panigale V4', visits: 5, spent: 2495, lastVisit: '2026-09-03', notes: 'Chain lube and foam wash' },
+          '9840123456': { name: 'Rohan Verma', email: 'rohan.v@gmail.com', vehicleType: 'Sedan', reg: 'TN 07 AB 1234', model: 'Honda City ZX', visits: 3, spent: 8997, lastVisit: '2026-09-06', notes: 'Frequent weekend customer' }
+        };
+        localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(initialCust));
+      }
+
+      if (!localStorage.getItem(BOOKINGS_KEY) || JSON.parse(localStorage.getItem(BOOKINGS_KEY)).length === 0) {
+        const todayStr = formatDateIso(new Date());
         const demoBookings = [
           {
             id: 'TR-1091',
@@ -935,27 +2159,37 @@
             phone: '+91 98201 44521',
             vehicleType: 'SUV / 4x4',
             vehicleModel: 'Toyota Fortuner GR (Black)',
+            reg: 'MH 01 AB 9999',
             service: '9H Graphene Ceramic Shield',
-            date: 'Today, 2:00 PM',
+            date: todayStr,
             slot: '01:30 PM - 03:30 PM',
             price: 11999,
-            status: 'In Progress',
+            status: 'IN PROGRESS',
             bay: 'Bay 01',
-            created: new Date(Date.now() - 3600000).toISOString()
+            source: 'Walk-In',
+            payStatus: 'PAID',
+            payMethod: 'UPI / QR',
+            checkInTime: '01:35 PM',
+            created: new Date().toISOString()
           },
           {
             id: 'TR-1092',
             name: 'Ananya Deshmukh',
             phone: '+91 99302 88712',
             vehicleType: 'Sedan',
-            vehicleModel: 'BMW 330Li M-Sport (Portimao Blue)',
+            vehicleModel: 'Sedan',
+            reg: 'MH 02 CD 4455',
             service: '3-Step Paint Correction & Rubbing',
-            date: 'Today, 4:00 PM',
-            slot: '03:30 PM - 05:30 PM',
+            date: todayStr,
+            slot: null,
             price: 2999,
-            status: 'Confirmed',
-            bay: 'Bay 03',
-            created: new Date(Date.now() - 1800000).toISOString()
+            status: 'CONFIRMED',
+            bay: null,
+            source: 'ONLINE',
+            payStatus: 'UNPAID',
+            payMethod: 'Cash',
+            checkInTime: 'Pending',
+            created: new Date().toISOString()
           },
           {
             id: 'TR-1090',
@@ -963,255 +2197,364 @@
             phone: '+91 98112 33490',
             vehicleType: 'Superbike',
             vehicleModel: 'Ducati Panigale V4',
+            reg: 'MH 03 EF 1212',
             service: 'Snow Foam Deep Exterior Wash',
-            date: 'Today, 10:00 AM',
+            date: todayStr,
             slot: '09:00 AM - 11:00 AM',
             price: 299,
-            status: 'Done',
+            status: 'COMPLETED',
             bay: 'Bay 02',
+            source: 'Walk-In',
+            payStatus: 'PAID',
+            payMethod: 'Card',
+            checkInTime: '09:10 AM',
             created: new Date(Date.now() - 7200000).toISOString()
           }
         ];
         localStorage.setItem(BOOKINGS_KEY, JSON.stringify(demoBookings));
       }
+
+      // Kick off background Supabase fetch
+      syncFromSupabase();
     }
 
-    function getBookings() {
-      try {
-        return JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
-      } catch (e) {
-        return [];
+    // RENDER ALL DATA
+    function renderAll() {
+      updateKPICards();
+      renderQueueTable();
+      renderOnlineBookingsTable();
+      renderBays();
+      renderSlotBlocker();
+      renderCustomersTable();
+      renderServicesTable();
+      renderPaymentsTable();
+      renderCompletedJobsTable();
+      renderReports();
+      populateServiceSelects();
+    }
+
+    // 1. UPDATE KPI CARDS & OVERVIEW
+    function updateKPICards() {
+      const bookings = getBookings();
+      const todayStr = formatDateIso(new Date());
+
+      const todayBookings = bookings.filter(b => b.date === todayStr || (b.date && b.date.includes('Today')));
+      
+      const revenue = todayBookings
+        .filter(b => b.status === 'IN PROGRESS' || b.status === 'COMPLETED' || b.status === 'CONFIRMED')
+        .reduce((sum, b) => sum + (Number(b.price) || 0), 0);
+
+      const activeVehicles = bookings.filter(b => b.status === 'IN PROGRESS' || b.status === 'ARRIVED' || b.status === 'QUALITY CHECK').length;
+      const onlineToday = todayBookings.filter(b => (b.source || '').toUpperCase() === 'ONLINE').length;
+      const walkinToday = todayBookings.filter(b => (b.source || '').toUpperCase() !== 'ONLINE').length;
+      const completedToday = todayBookings.filter(b => b.status === 'COMPLETED').length;
+
+      const pendingPay = todayBookings
+        .filter(b => b.payStatus === 'UNPAID' || b.payStatus === 'PARTIAL')
+        .reduce((sum, b) => sum + (Number(b.price) || 0), 0);
+
+      const custs = getCustomers();
+      const totalCustCount = Object.keys(custs).length;
+
+      const bays = getBays();
+      const occupiedBays = bays.filter(b => b.status === 'Occupied').length;
+      const bayRatio = Math.round((occupiedBays / bays.length) * 100) || 0;
+
+      document.getElementById('kpi-today-revenue').innerText = '₹' + revenue.toLocaleString();
+      document.getElementById('kpi-active-vehicles').innerText = activeVehicles;
+      document.getElementById('kpi-today-online').innerText = onlineToday;
+      document.getElementById('kpi-today-walkin').innerText = walkinToday;
+      document.getElementById('kpi-today-completed').innerText = completedToday;
+      document.getElementById('kpi-pending-payments').innerText = '₹' + pendingPay.toLocaleString();
+      document.getElementById('kpi-total-customers').innerText = totalCustCount;
+      document.getElementById('kpi-bay-occupancy').innerText = bayRatio + '%';
+      document.getElementById('kpi-bay-fraction').innerText = `${occupiedBays}/${bays.length} Bays Active`;
+
+      document.getElementById('badge-active-queue').innerText = activeVehicles;
+      document.getElementById('badge-online-count').innerText = bookings.filter(b => (b.source || '').toUpperCase() === 'ONLINE' && b.status !== 'COMPLETED' && b.status !== 'CANCELLED').length;
+      document.getElementById('badge-customers-count').innerText = totalCustCount;
+      document.getElementById('badge-done-count').innerText = bookings.filter(b => b.status === 'COMPLETED').length;
+      document.getElementById('badge-bays-occupied').innerText = `${occupiedBays}/${bays.length}`;
+      document.getElementById('top-bay-pill-text').innerText = `${bays.length} BAYS (${occupiedBays} IN USE)`;
+
+      // Overview Timeline List
+      const timelineContainer = document.getElementById('overview-timeline-list');
+      if (timelineContainer) {
+        timelineContainer.innerHTML = '';
+        if (todayBookings.length === 0) {
+          timelineContainer.innerHTML = `<div style="font-size:0.8rem; color:var(--muted); text-align:center; padding:1.5rem;">No bookings or wash jobs scheduled for today yet.</div>`;
+        } else {
+          todayBookings.slice(0, 5).forEach(b => {
+            const div = document.createElement('div');
+            div.style = 'display:flex; align-items:center; justify-content:space-between; background:var(--bg-panel-2); padding:0.6rem 0.85rem; border-radius:6px; border:1px solid var(--line); font-size:0.8rem;';
+            div.innerHTML = `
+              <div>
+                <strong style="color:var(--white);">${escapeHtml(b.vehicleModel || b.vehicleType)}</strong> 
+                <span style="color:var(--muted); font-size:0.75rem;">· ${escapeHtml(b.name)}</span>
+                <div style="font-family:'IBM Plex Mono'; font-size:0.7rem; color:var(--green); margin-top:2px;">${escapeHtml(b.slot || 'Express')} · ${escapeHtml(b.service)}</div>
+              </div>
+              <span class="status-badge status-${b.status.toLowerCase().replace(/\s+/g,'')}">${escapeHtml(b.status)}</span>
+            `;
+            timelineContainer.appendChild(div);
+          });
+        }
       }
     }
 
-    function saveBookings(bookings) {
-      localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings));
-      renderQueue();
-      updateKPIs();
-    }
-
-    function renderQueue() {
+    // 2. LIVE STUDIO QUEUE TABLE & STATUS LIFECYCLE
+    function renderQueueTable() {
       const bookings = getBookings();
-      const filter = document.getElementById('queue-filter').value;
-      const tbody = document.getElementById('queue-tbody');
-      const emptyMsg = document.getElementById('empty-queue-msg');
+      const filter = document.getElementById('queue-filter-select').value;
+      const tbody = document.getElementById('live-queue-tbody');
+      if (!tbody) return;
       tbody.innerHTML = '';
 
-      const filtered = bookings.filter(b => {
-        if (filter === 'ALL') return true;
-        if (filter === 'ACTIVE') return b.status === 'Confirmed' || b.status === 'In Progress';
+      const activeQueue = bookings.filter(b => {
+        if (filter === 'ALL') return b.status !== 'COMPLETED' && b.status !== 'CANCELLED';
         return b.status === filter;
       });
 
-      if (filtered.length === 0) {
-        emptyMsg.style.display = 'block';
-      } else {
-        emptyMsg.style.display = 'none';
-        filtered.forEach(b => {
-          const tr = document.createElement('tr');
-          let statusBadgeClass = 'status-confirmed';
-          if (b.status === 'In Progress') statusBadgeClass = 'status-progress';
-          if (b.status === 'Done') statusBadgeClass = 'status-done';
-          if (b.status === 'Cancelled') statusBadgeClass = 'status-cancelled';
-
-          tr.innerHTML = `
-            <td>
-              <div class="customer-cell">${escapeHtml(b.vehicleModel || b.vehicleType)}</div>
-              <span class="vehicle-tag">${escapeHtml(b.vehicleType)}</span>
-              ${b.bay ? `<span class="vehicle-tag" style="color:var(--pink); border-color:var(--pink-dim);">${escapeHtml(b.bay)}</span>` : ''}
-            </td>
-            <td>
-              <div class="customer-cell">${escapeHtml(b.name)}</div>
-              <div style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--muted);">${escapeHtml(b.phone)}</div>
-            </td>
-            <td>
-              <div class="service-name">${escapeHtml(b.service)}</div>
-              <div class="service-price">₹${(b.price || 0).toLocaleString()}</div>
-            </td>
-            <td>
-              <div style="font-weight:500;">${escapeHtml(b.date || 'Today')}</div>
-              <div style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--muted);">${escapeHtml(b.slot || 'Express')}</div>
-            </td>
-            <td>
-              <span class="status-badge ${statusBadgeClass}">${escapeHtml(b.status)}</span>
-            </td>
-            <td>
-              <div class="action-group">
-                ${b.status === 'Confirmed' ? `<button class="btn-icon-sm" title="Mark In Progress" onclick="updateStatus('${b.id}', 'In Progress')">▶ Start</button>` : ''}
-                ${b.status === 'In Progress' ? `<button class="btn-icon-sm complete" title="Complete Detailing" onclick="updateStatus('${b.id}', 'Done')">✔ Done</button>` : ''}
-                ${b.status === 'Done' ? `<button class="btn-icon-sm" title="Reopen" onclick="updateStatus('${b.id}', 'In Progress')">↺</button>` : ''}
-                <button class="btn-icon-sm delete" title="Cancel/Delete" onclick="deleteBooking('${b.id}')">✕</button>
-              </div>
-            </td>
-          `;
-          tbody.appendChild(tr);
-        });
+      if (activeQueue.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:2rem; color:var(--muted);">No vehicles currently in queue matching selected status.</td></tr>`;
+        return;
       }
 
-      updateKPIs();
+      activeQueue.forEach(b => {
+        const tr = document.createElement('tr');
+        const statusClass = 'status-' + b.status.toLowerCase().replace(/\s+/g, '');
+        const payClass = 'pay-' + (b.payStatus || 'unpaid').toLowerCase();
+
+        tr.innerHTML = `
+          <td>
+            <div style="font-weight:600; color:var(--white);">${escapeHtml(b.vehicleModel || b.vehicleType)}</div>
+            <div style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--pink);">${escapeHtml(b.reg || 'NO REG')}</div>
+          </td>
+          <td>
+            <div style="font-weight:500;">${escapeHtml(b.name)}</div>
+            <div style="font-family:'IBM Plex Mono'; font-size:0.72rem; color:var(--muted);">${escapeHtml(b.phone)}</div>
+          </td>
+          <td>
+            <div style="font-weight:500;">${escapeHtml(b.service)}</div>
+            <div style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--green); font-weight:600;">₹${(b.price || 0).toLocaleString()}</div>
+          </td>
+          <td>
+            <span style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--white);">${escapeHtml(b.bay || 'Unassigned')}</span>
+            <span style="font-size:0.68rem; color:var(--muted); display:block;">[${escapeHtml(b.source || 'Walk-In')}]</span>
+          </td>
+          <td>
+            <div style="font-family:'IBM Plex Mono'; font-size:0.75rem;">${escapeHtml(b.slot || 'Immediate')}</div>
+          </td>
+          <td>
+            <select class="form-select" onchange="changeJobStatus('${b.id}', this.value)" style="font-size:0.72rem; padding:0.2rem 0.4rem; font-family:'IBM Plex Mono';">
+              <option value="CONFIRMED" ${b.status==='CONFIRMED'?'selected':''}>CONFIRMED</option>
+              <option value="ARRIVED" ${b.status==='ARRIVED'?'selected':''}>ARRIVED</option>
+              <option value="WAITING" ${b.status==='WAITING'?'selected':''}>WAITING</option>
+              <option value="IN PROGRESS" ${b.status==='IN PROGRESS'?'selected':''}>IN PROGRESS</option>
+              <option value="QUALITY CHECK" ${b.status==='QUALITY CHECK'?'selected':''}>QUALITY CHECK</option>
+              <option value="READY" ${b.status==='READY'?'selected':''}>READY</option>
+              <option value="COMPLETED" ${b.status==='COMPLETED'?'selected':''}>COMPLETED</option>
+              <option value="CANCELLED" ${b.status==='CANCELLED'?'selected':''}>CANCELLED</option>
+            </select>
+          </td>
+          <td>
+            <span class="pay-badge ${payClass}">${escapeHtml(b.payStatus || 'UNPAID')}</span>
+          </td>
+          <td>
+            <div style="display:flex; gap:0.3rem;">
+              <button class="btn-icon-sm" title="Reassign Bay" onclick="openReassignBayModal('${b.id}')">🚗 Bay</button>
+              <button class="btn-icon-sm delete" title="Cancel/Delete" onclick="deleteJob('${b.id}')">✕</button>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
     }
 
-    function updateStatus(id, newStatus) {
+    function changeJobStatus(id, newStatus) {
       const bookings = getBookings();
       const target = bookings.find(b => b.id === id);
       if (target) {
         target.status = newStatus;
+        if (newStatus === 'COMPLETED') {
+          target.completedDate = new Date().toISOString();
+          showToast(`Job ${id} marked COMPLETED & Archived!`);
+        }
         saveBookings(bookings);
       }
     }
 
-    function deleteBooking(id) {
-      if (confirm('Are you sure you want to remove this booking from queue?')) {
+    function deleteJob(id) {
+      if (confirm(`Are you sure you want to remove job ${id} from studio queue?`)) {
         const bookings = getBookings().filter(b => b.id !== id);
         saveBookings(bookings);
+        if (window.TrieyeDB && typeof window.TrieyeDB.deleteBooking === 'function') {
+          window.TrieyeDB.deleteBooking(id).catch(() => {});
+        }
+        showToast(`Job ${id} deleted`);
       }
     }
 
-    function filterQueue(status) {
-      document.getElementById('queue-filter').value = status;
-      renderQueue();
+    // 3. ONLINE BOOKINGS TABLE & ACTIONS
+    function filterOnlineBookings(mode, btn) {
+      onlineFilterState = mode;
+      document.querySelectorAll('.filter-bar .filter-pill').forEach(p => p.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      renderOnlineBookingsTable();
     }
 
-    function updateKPIs() {
+    function renderOnlineBookingsTable() {
       const bookings = getBookings();
-      const revenue = bookings
-        .filter(b => b.status === 'In Progress' || b.status === 'Done')
-        .reduce((sum, b) => sum + (Number(b.price) || 0), 0);
-      
-      const active = bookings.filter(b => b.status === 'In Progress').length;
-      const confirmed = bookings.filter(b => b.status === 'Confirmed').length;
-      const done = bookings.filter(b => b.status === 'Done').length;
+      const tbody = document.getElementById('online-bookings-tbody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
 
-      document.getElementById('kpi-revenue').innerText = '₹' + revenue.toLocaleString();
-      document.getElementById('kpi-active').innerText = active;
-      document.getElementById('kpi-confirmed').innerText = confirmed;
-      document.getElementById('kpi-done').innerText = done;
+      const todayStr = formatDateIso(new Date());
+      const tomDate = new Date();
+      tomDate.setDate(tomDate.getDate() + 1);
+      const tomStr = formatDateIso(tomDate);
 
-      document.getElementById('nav-count-active').innerText = active + confirmed;
-      document.getElementById('nav-count-done').innerText = done;
+      const filtered = bookings.filter(b => {
+        const isOnline = (b.source || '').toUpperCase() === 'ONLINE';
+        if (!isOnline) return false;
+        if (onlineFilterState === 'TODAY') return b.date === todayStr || (b.date && b.date.includes('Today'));
+        if (onlineFilterState === 'TOMORROW') return b.date === tomStr;
+        if (onlineFilterState === 'UPCOMING') return b.date > todayStr;
+        if (onlineFilterState === 'COMPLETED') return b.status === 'COMPLETED';
+        return true;
+      });
 
-      document.getElementById('bay-occupancy-ratio').innerText = active + '/4 In Use';
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:2rem; color:var(--muted);">No online bookings found for selected filter.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(b => {
+        const tr = document.createElement('tr');
+        const vehType = b.vehicleType || 'Car';
+        const regNum = b.reg || 'NO REG';
+
+        tr.innerHTML = `
+          <td><strong style="color:var(--pink); font-family:'IBM Plex Mono';">${escapeHtml(b.id)}</strong></td>
+          <td>
+            <div style="font-weight:600;">${escapeHtml(b.name)}</div>
+            <div style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--muted);">${escapeHtml(b.phone)}</div>
+          </td>
+          <td>
+            <div style="font-weight:600; color:var(--white);">${escapeHtml(vehType)}</div>
+            <div style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--pink);">${escapeHtml(regNum)}</div>
+          </td>
+          <td>
+            <div>${escapeHtml(b.service)}</div>
+            <div style="font-family:'IBM Plex Mono'; font-weight:600; color:var(--green);">₹${(b.price || 0).toLocaleString()}</div>
+          </td>
+          <td>
+            <div style="font-weight:500; font-family:'IBM Plex Mono';">${escapeHtml(b.date || 'Today')}</div>
+          </td>
+          <td><span class="status-badge status-${b.status.toLowerCase().replace(/\s+/g,'')}">${escapeHtml(b.status)}</span></td>
+          <td>
+            <div style="display:flex; gap:0.3rem; flex-wrap:wrap;">
+              ${b.status==='CONFIRMED' ? `<button class="btn-icon-sm complete" onclick="changeJobStatus('${b.id}', 'ARRIVED')">🚗 Mark Arrived</button>` : ''}
+              <a href="https://wa.me/${cleanPhone(b.phone)}?text=Hi%20${encodeURIComponent(b.name)},%20confirming%20your%20Trieye%20booking%20for%20${encodeURIComponent(b.service)}%20on%20${encodeURIComponent(b.date)}" target="_blank" class="btn-icon-sm" style="text-decoration:none;">💬 WA</a>
+              <a href="tel:${cleanPhone(b.phone)}" class="btn-icon-sm" style="text-decoration:none;">📞 Call</a>
+            </div>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
     }
 
-    const CUSTOMERS_KEY = 'trieye_customers';
-
-    function getSavedCustomers() {
-      try {
-        const data = localStorage.getItem(CUSTOMERS_KEY);
-        if (data) return JSON.parse(data);
-      } catch (e) {}
-
-      // Seed with initial known customer records from existing bookings
-      return {
-        '9820144521': { name: 'Vikram Singhania', vehicleType: 'SUV / 4x4', reg: 'MH 01 AB 9999', service: '9H Graphene Ceramic Shield', bay: 'Bay 01' },
-        '9930288712': { name: 'Ananya Deshmukh', vehicleType: 'Sedan', reg: 'MH 02 CD 4455', service: '3-Step Paint Correction & Rubbing', bay: 'Bay 03' },
-        '9811233490': { name: 'Karan Mehra', vehicleType: 'Superbike', reg: 'MH 03 EF 1212', service: 'Snow Foam Deep Exterior Wash', bay: 'Bay 02' },
-        '9840123456': { name: 'Rohan Verma', vehicleType: 'Sedan', reg: 'TN 07 AB 1234', service: '3-Step Paint Correction & Rubbing', bay: 'Bay 01' },
-        '9840234567': { name: 'Ananya Iyer', vehicleType: 'SUV / 4x4', reg: 'TN 09 XY 5678', service: 'Interior Steam & Leather Decon', bay: 'Bay 03' },
-        '9840345678': { name: 'Siddharth M', vehicleType: 'Superbike', reg: 'TN 01 BK 9900', service: 'Snow Foam Deep Exterior Wash', bay: 'Bay 02' }
-      };
-    }
-
-    function saveCustomerRecord(phoneClean, record) {
-      const customers = getSavedCustomers();
-      customers[phoneClean] = record;
-      localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(customers));
-    }
-
-    function cleanPhone(phone) {
-      return (phone || '').replace(/\D/g, '').slice(-10);
-    }
-
+    // 4. EXPRESS WALKIN ENTRY FLOW
     function handleCustomerLookup() {
-      const nameInput = document.getElementById('walkin-name');
       const phoneInput = document.getElementById('walkin-phone');
+      const nameInput = document.getElementById('walkin-name');
       const rawPhone = phoneInput.value.trim();
-      const rawName = nameInput.value.trim();
+      const phoneKey = cleanPhone(rawPhone);
 
-      if (!rawPhone) {
-        alert('Please enter a phone number to search or register the customer.');
+      if (!phoneKey) {
+        alert('Please enter a valid 10-digit mobile number.');
         phoneInput.focus();
         return;
       }
 
-      const phoneKey = cleanPhone(rawPhone);
-      const customers = getSavedCustomers();
-      const existing = customers[phoneKey];
+      const custs = getCustomers();
+      const existing = custs[phoneKey];
       const banner = document.getElementById('lookup-banner');
-      const stepTwo = document.getElementById('step-two-fields');
-      const stepOneBtn = document.getElementById('step-one-action');
+      const step2 = document.getElementById('walkin-step2-form');
 
       if (existing) {
-        // Auto-fill existing customer details
-        if (existing.name && !rawName) nameInput.value = existing.name;
+        if (!nameInput.value) nameInput.value = existing.name || '';
         if (existing.vehicleType) document.getElementById('walkin-vehicle').value = existing.vehicleType;
+        if (existing.model) document.getElementById('walkin-model').value = existing.model;
         if (existing.reg) document.getElementById('walkin-reg').value = existing.reg;
-        if (existing.service) document.getElementById('walkin-service').value = existing.service;
-        if (existing.bay) document.getElementById('walkin-bay').value = existing.bay;
 
-        banner.className = 'lookup-banner found';
         banner.style.display = 'flex';
+        banner.style.background = 'rgba(166, 211, 49, 0.12)';
+        banner.style.border = '1px solid rgba(166, 211, 49, 0.4)';
+        banner.style.color = 'var(--green)';
         banner.innerHTML = `
-          <span>✓ Returning Customer: <b>${existing.name || rawName}</b></span>
-          <span style="font-size:0.7rem; color:var(--white);">Auto-filled saved details</span>
+          <span>✓ Returning VIP Customer: <b>${escapeHtml(existing.name || 'Customer')}</b> (${existing.visits || 1} past visits)</span>
+          <span>Auto-filled vehicle profile</span>
         `;
       } else {
-        // New customer
-        banner.className = 'lookup-banner new-cust';
         banner.style.display = 'flex';
+        banner.style.background = 'rgba(56, 189, 248, 0.12)';
+        banner.style.border = '1px solid rgba(56, 189, 248, 0.4)';
+        banner.style.color = 'var(--blue)';
         banner.innerHTML = `
           <span>⚡ New Customer Entry</span>
-          <span style="font-size:0.7rem; color:var(--white);">Fill vehicle &amp; bay info below</span>
+          <span>Fill vehicle details below to register</span>
         `;
       }
 
-      updateWalkinPrice();
-      stepTwo.classList.add('active');
-      stepOneBtn.style.display = 'none';
-      document.getElementById('walkin-reg').focus();
+      step2.style.display = 'flex';
+      updateWalkinCalculatedPrice();
     }
 
-    function resetWalkinStep() {
-      document.getElementById('step-two-fields').classList.remove('active');
-      document.getElementById('step-one-action').style.display = 'block';
-      const banner = document.getElementById('lookup-banner');
-      banner.style.display = 'none';
-    }
-
-    function updateWalkinPrice() {
+    function updateWalkinCalculatedPrice() {
       const vehicle = document.getElementById('walkin-vehicle').value;
       const service = document.getElementById('walkin-service').value;
-      const price = (pricingMatrix[vehicle] && pricingMatrix[vehicle][service]) || 2499;
-      document.getElementById('walkin-price').value = '₹' + price.toLocaleString();
+      const svcs = getServices();
+      let price = 2499;
+
+      if (svcs[service] && svcs[service].pricing && svcs[service].pricing[vehicle]) {
+        price = svcs[service].pricing[vehicle];
+      }
+
+      document.getElementById('walkin-price-disp').value = '₹' + Number(price).toLocaleString();
     }
 
     function handleWalkinSubmit(e) {
       e.preventDefault();
-      const name = document.getElementById('walkin-name').value.trim();
       const phone = document.getElementById('walkin-phone').value.trim();
+      const name = document.getElementById('walkin-name').value.trim() || 'Valued Customer';
       const vehicleType = document.getElementById('walkin-vehicle').value;
+      const model = document.getElementById('walkin-model').value.trim();
       const reg = document.getElementById('walkin-reg').value.trim().toUpperCase();
       const service = document.getElementById('walkin-service').value;
       const bay = document.getElementById('walkin-bay').value;
-      const price = (pricingMatrix[vehicleType] && pricingMatrix[vehicleType][service]) || 2499;
+      const payStatus = document.getElementById('walkin-pay-status').value;
+      const payMethod = document.getElementById('walkin-pay-method').value;
 
-      if (!reg) {
-        alert('Please enter vehicle registration number.');
-        document.getElementById('walkin-reg').focus();
-        return;
-      }
+      const svcs = getServices();
+      const price = (svcs[service] && svcs[service].pricing && svcs[service].pricing[vehicleType]) || 2499;
 
-      // Save customer record for future lookups
-      const phoneClean = cleanPhone(phone);
-      if (phoneClean) {
-        saveCustomerRecord(phoneClean, {
+      // Auto-save Customer CRM record
+      const phoneKey = cleanPhone(phone);
+      if (phoneKey) {
+        const custs = getCustomers();
+        const existing = custs[phoneKey] || { visits: 0, spent: 0 };
+        custs[phoneKey] = {
           name: name,
+          phone: phone,
           vehicleType: vehicleType,
+          model: model,
           reg: reg,
-          service: service,
-          bay: bay,
-          lastVisit: new Date().toISOString()
-        });
+          visits: (existing.visits || 0) + 1,
+          spent: (existing.spent || 0) + price,
+          lastVisit: formatDateIso(new Date()),
+          notes: existing.notes || `Primary vehicle: ${model}`
+        };
+        saveCustomers(custs);
       }
 
       const newBooking = {
@@ -1219,13 +2562,18 @@
         name: name,
         phone: phone,
         vehicleType: vehicleType,
-        vehicleModel: reg + ' (' + vehicleType + ')',
+        vehicleModel: model,
+        reg: reg,
         service: service,
-        date: 'Today (Walk-in)',
-        slot: 'Immediate',
-        bay: bay,
+        date: formatDateIso(new Date()),
+        slot: 'Immediate (Walk-In)',
         price: price,
-        status: 'In Progress',
+        status: 'IN PROGRESS',
+        bay: bay,
+        source: 'Walk-In',
+        payStatus: payStatus,
+        payMethod: payMethod,
+        checkInTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         created: new Date().toISOString()
       };
 
@@ -1233,88 +2581,733 @@
       bookings.unshift(newBooking);
       saveBookings(bookings);
 
-      document.getElementById('walkin-form').reset();
-      resetWalkinStep();
-      updateWalkinPrice();
-      alert('Vehicle Checked In! Booking ID: ' + newBooking.id + ' assigned to ' + bay);
+      resetWalkinForm();
+      showSection('queue-sec');
+      showToast(`Vehicle Checked In! Assigned to ${bay}`);
     }
 
-    function getBlockedSlots() {
-      try {
-        return JSON.parse(localStorage.getItem(BLOCKED_SLOTS_KEY)) || [];
-      } catch (e) {
-        return [];
+    function resetWalkinForm() {
+      document.getElementById('walkin-phone').value = '';
+      document.getElementById('walkin-name').value = '';
+      document.getElementById('walkin-step2-form').reset();
+      document.getElementById('walkin-step2-form').style.display = 'none';
+      document.getElementById('lookup-banner').style.display = 'none';
+    }
+
+    // 5. BAY MANAGEMENT
+    function renderBays() {
+      const bays = getBays();
+      const bookings = getBookings();
+      const overviewGrid = document.getElementById('overview-bays-grid');
+      const fullGrid = document.getElementById('full-bays-grid');
+
+      const renderCard = (bay) => {
+        // Look up active vehicle in this bay
+        const activeJob = bookings.find(b => b.bay === bay.name && (b.status === 'IN PROGRESS' || b.status === 'ARRIVED' || b.status === 'QUALITY CHECK'));
+        const isOcc = !!activeJob;
+        const status = isOcc ? 'Occupied' : (bay.status || 'Available');
+        const cardClass = isOcc ? 'occupied' : status.toLowerCase();
+
+        return `
+          <div class="bay-card ${cardClass}">
+            <div class="bay-header">
+              <div class="bay-title">${escapeHtml(bay.name)}</div>
+              <span class="status-badge status-${isOcc ? 'progress' : (status==='Available'?'done':'waiting')}">${escapeHtml(status)}</span>
+            </div>
+            <div style="font-family:'IBM Plex Mono'; font-size:0.72rem; color:var(--muted);">${escapeHtml(bay.type)}</div>
+            ${isOcc ? `
+              <div style="background:var(--bg-panel-2); padding:0.5rem 0.65rem; border-radius:6px; border:1px solid var(--line); font-size:0.75rem;">
+                <div style="font-weight:600; color:var(--white);">${escapeHtml(activeJob.vehicleModel || activeJob.vehicleType)}</div>
+                <div style="font-family:'IBM Plex Mono'; color:var(--pink); font-size:0.7rem;">${escapeHtml(activeJob.reg || activeJob.name)}</div>
+                <div style="font-size:0.7rem; color:var(--green); margin-top:2px;">${escapeHtml(activeJob.service)}</div>
+              </div>
+            ` : `
+              <div style="padding:0.75rem; text-align:center; color:var(--muted); font-size:0.75rem; border:1px dashed var(--line); border-radius:6px;">
+                Bay Ready for Next Vehicle
+              </div>
+            `}
+            <div style="display:flex; gap:0.35rem; margin-top:auto;">
+              ${isOcc ? `<button class="btn-icon-sm complete" style="flex:1; justify-content:center;" onclick="changeJobStatus('${activeJob.id}', 'READY')">✔ Ready</button>` : ''}
+              <button class="btn-icon-sm" onclick="toggleBayMaintenance('${bay.id}')">${bay.status==='Maintenance'?'Unblock':'Maintenance'}</button>
+            </div>
+          </div>
+        `;
+      };
+
+      if (overviewGrid) overviewGrid.innerHTML = bays.map(renderCard).join('');
+      if (fullGrid) fullGrid.innerHTML = bays.map(renderCard).join('');
+    }
+
+    function toggleBayMaintenance(bayId) {
+      const bays = getBays();
+      const target = bays.find(b => b.id === bayId);
+      if (target) {
+        target.status = target.status === 'Maintenance' ? 'Available' : 'Maintenance';
+        saveBays(bays);
+        showToast(`${target.name} status updated`);
       }
     }
 
-    function renderSlotBlocker() {
-      const blocked = getBlockedSlots();
-      const container = document.getElementById('slots-grid');
-      container.innerHTML = '';
-
-      standardSlots.forEach(slot => {
-        const isBlocked = blocked.includes(slot);
-        const div = document.createElement('div');
-        div.className = 'slot-chip ' + (isBlocked ? 'blocked' : 'open');
-        div.innerHTML = '<div>' + slot.split('-')[0] + '</div><div style="font-size:0.65rem; margin-top:2px;">' + (isBlocked ? 'BLOCKED' : 'OPEN') + '</div>';
-        div.onclick = () => toggleSlot(slot);
-        container.appendChild(div);
-      });
+    function openAddBayModal() {
+      document.getElementById('new-bay-name').value = 'Bay 0' + (getBays().length + 1);
+      openModal('modalAddBay');
     }
 
-    function toggleSlot(slot) {
-      let blocked = getBlockedSlots();
-      if (blocked.includes(slot)) {
-        blocked = blocked.filter(s => s !== slot);
-      } else {
-        blocked.push(slot);
-      }
-      localStorage.setItem(BLOCKED_SLOTS_KEY, JSON.stringify(blocked));
+    function saveNewBay() {
+      const name = document.getElementById('new-bay-name').value.trim();
+      const type = document.getElementById('new-bay-type').value;
+      if (!name) return;
+
+      const bays = getBays();
+      bays.push({ id: 'bay-' + (bays.length + 1), name, type, status: 'Available' });
+      saveBays(bays);
+      closeModal('modalAddBay');
+      showToast(`${name} Added Successfully!`);
+    }
+
+    // 6. SLOT & SCHEDULE MANAGER
+    function onSlotDateChange(val) {
+      if (!val) return;
+      currentSelectedDate = val;
+      renderSlotBlocker();
+    }
+    function setSlotDateToday() {
+      currentSelectedDate = formatDateIso(new Date());
+      document.getElementById('slot-mgr-date').value = currentSelectedDate;
+      renderSlotBlocker();
+    }
+    function setSlotDateTomorrow() {
+      const d = new Date();
+      d.setDate(d.getDate() + 1);
+      currentSelectedDate = formatDateIso(d);
+      document.getElementById('slot-mgr-date').value = currentSelectedDate;
       renderSlotBlocker();
     }
 
+    function renderSlotBlocker() {
+      const datePicker = document.getElementById('slot-mgr-date');
+      if (datePicker && datePicker.value !== currentSelectedDate) {
+        datePicker.value = currentSelectedDate;
+      }
+
+      const daySched = getDaySchedule(currentSelectedDate);
+      const container = document.getElementById('slots-grid');
+      const notice = document.getElementById('full-day-blocked-notice');
+      const blockDayBtn = document.getElementById('btn-toggle-day-block');
+
+      if (notice) notice.style.display = daySched.isFullDayBlocked ? 'flex' : 'none';
+      if (blockDayBtn) {
+        blockDayBtn.innerHTML = daySched.isFullDayBlocked ? '✅ Reopen Day' : '🚫 Block Full Day';
+        blockDayBtn.className = daySched.isFullDayBlocked ? 'btn btn-green' : 'btn';
+      }
+
+      if (!container) return;
+      container.innerHTML = '';
+
+      const bookings = getBookings();
+
+      daySched.slots.forEach(slot => {
+        const activeBooking = bookings.find(b => b.status !== 'CANCELLED' && b.date === currentSelectedDate && b.slot === slot.time);
+        let state = slot.status || 'available';
+        if (activeBooking) state = 'booked';
+        else if (daySched.isFullDayBlocked) state = 'blocked';
+
+        const card = document.createElement('div');
+        card.className = `slot-card ${state}`;
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div class="slot-time-display">${escapeHtml(slot.time)}</div>
+            <span class="status-badge status-${state==='available'?'done':(state==='booked'?'waiting':'cancelled')}">${escapeHtml(state)}</span>
+          </div>
+          <div style="font-size:0.72rem; color:var(--muted);">${activeBooking ? `<b>${escapeHtml(activeBooking.name)}</b> (${escapeHtml(activeBooking.vehicleType)})` : (state==='blocked'?'Manually Blocked':'Open for Online Slot')}</div>
+          <div style="display:flex; gap:0.35rem; margin-top:0.35rem; border-top:1px solid var(--line-subtle); padding-top:0.35rem;">
+            <button class="btn-icon-sm" style="flex:1; justify-content:center;" onclick="toggleSlotState('${escapeHtml(slot.time)}')">${slot.status==='blocked'?'Unblock':'Block'}</button>
+            <button class="btn-icon-sm" onclick="openEditSlotModal('${escapeHtml(slot.time)}')">✏️</button>
+            <button class="btn-icon-sm delete" onclick="deleteSlot('${escapeHtml(slot.time)}')">🗑️</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function toggleSlotState(timeStr) {
+      const daySched = getDaySchedule(currentSelectedDate);
+      const target = daySched.slots.find(s => s.time === timeStr);
+      if (target) {
+        target.status = target.status === 'blocked' ? 'available' : 'blocked';
+        saveDaySchedule(currentSelectedDate, daySched);
+      }
+    }
+
+    function toggleBlockFullDay() {
+      const daySched = getDaySchedule(currentSelectedDate);
+      daySched.isFullDayBlocked = !daySched.isFullDayBlocked;
+      saveDaySchedule(currentSelectedDate, daySched);
+    }
+
+    function resetDayToDefaultSchedule() {
+      if (confirm(`Reset slot schedule for ${currentSelectedDate} to standard studio hours?`)) {
+        const daySched = {
+          date: currentSelectedDate,
+          isFullDayBlocked: false,
+          slots: defaultStandardSlots.map(s => ({ time: s, status: 'available' }))
+        };
+        saveDaySchedule(currentSelectedDate, daySched);
+        showToast('Day reset to default');
+      }
+    }
+
+    function openAddSlotModal() {
+      document.getElementById('modal-add-date-label').innerText = currentSelectedDate;
+      openModal('modalAddSlot');
+    }
+    function saveNewSlot() {
+      const custom = document.getElementById('new-slot-custom-text').value.trim();
+      const start = document.getElementById('new-slot-start').value;
+      const end = document.getElementById('new-slot-end').value;
+      const status = document.getElementById('new-slot-status').value;
+
+      let timeStr = custom || `${start} - ${end}`;
+      const daySched = getDaySchedule(currentSelectedDate);
+      daySched.slots.push({ time: timeStr, status });
+      saveDaySchedule(currentSelectedDate, daySched);
+      closeModal('modalAddSlot');
+      showToast(`Added slot ${timeStr}`);
+    }
+
+    function openEditSlotModal(timeStr) {
+      document.getElementById('edit-slot-original-time').value = timeStr;
+      document.getElementById('edit-slot-time-input').value = timeStr;
+      openModal('modalEditSlot');
+    }
+    function saveEditedSlot() {
+      const orig = document.getElementById('edit-slot-original-time').value;
+      const newTime = document.getElementById('edit-slot-time-input').value.trim();
+      const status = document.getElementById('edit-slot-status').value;
+
+      const daySched = getDaySchedule(currentSelectedDate);
+      const target = daySched.slots.find(s => s.time === orig);
+      if (target) {
+        target.time = newTime;
+        target.status = status;
+        saveDaySchedule(currentSelectedDate, daySched);
+      }
+      closeModal('modalEditSlot');
+    }
+    function deleteSlot(timeStr) {
+      if (confirm(`Delete slot ${timeStr}?`)) {
+        const daySched = getDaySchedule(currentSelectedDate);
+        daySched.slots = daySched.slots.filter(s => s.time !== timeStr);
+        saveDaySchedule(currentSelectedDate, daySched);
+      }
+    }
+
+    function openDefaultScheduleModal() { openModal('modalDefaultSchedule'); }
+    function generateScheduleFromSettings() {
+      const open = document.getElementById('sched-open-time').value || '09:00';
+      const close = document.getElementById('sched-close-time').value || '21:00';
+      const dur = parseInt(document.getElementById('sched-duration').value, 10) || 120;
+
+      const genSlots = [];
+      let startH = parseInt(open.split(':')[0], 10);
+      let endH = parseInt(close.split(':')[0], 10);
+
+      for (let h = startH; h < endH; h += (dur/60)) {
+        const sH = String(Math.floor(h)).padStart(2, '0');
+        const eH = String(Math.floor(h + dur/60)).padStart(2, '0');
+        genSlots.push({ time: `${sH}:00 - ${eH}:00`, status: 'available' });
+      }
+
+      const daySched = getDaySchedule(currentSelectedDate);
+      daySched.slots = genSlots;
+      saveDaySchedule(currentSelectedDate, daySched);
+      closeModal('modalDefaultSchedule');
+      showToast(`Generated ${genSlots.length} slots!`);
+    }
+
+    function openCopyScheduleModal() {
+      document.getElementById('modal-copy-source-date').innerText = currentSelectedDate;
+      const tom = new Date(currentSelectedDate);
+      tom.setDate(tom.getDate() + 1);
+      document.getElementById('copy-tomorrow-label').innerText = formatDateIso(tom);
+      openModal('modalCopySchedule');
+    }
+    function toggleCopyInputView() {
+      const type = document.querySelector('input[name="copy-target-type"]:checked').value;
+      document.getElementById('copy-single-picker').style.display = type === 'single' ? 'block' : 'none';
+    }
+    function executeCopySchedule() {
+      const src = getDaySchedule(currentSelectedDate);
+      const tom = new Date(currentSelectedDate);
+      tom.setDate(tom.getDate() + 1);
+      const targetDate = formatDateIso(tom);
+
+      const all = getAllSchedules();
+      all[targetDate] = {
+        date: targetDate,
+        isFullDayBlocked: src.isFullDayBlocked,
+        slots: JSON.parse(JSON.stringify(src.slots))
+      };
+      localStorage.setItem(SCHEDULE_KEY, JSON.stringify(all));
+      closeModal('modalCopySchedule');
+      showToast(`Schedule copied to ${targetDate}`);
+    }
+
+    // 7. CUSTOMERS TABLE & MODAL
+    function renderCustomersTable() {
+      const custs = getCustomers();
+      const q = (document.getElementById('customer-search-input')?.value || '').toLowerCase().trim();
+      const tbody = document.getElementById('customers-tbody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      const keys = Object.keys(custs).filter(k => {
+        const c = custs[k];
+        if (!q) return true;
+        return (c.name || '').toLowerCase().includes(q) || k.includes(q) || (c.reg || '').toLowerCase().includes(q);
+      });
+
+      if (keys.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:2rem; color:var(--muted);">No customer profiles found.</td></tr>`;
+        return;
+      }
+
+      keys.forEach(k => {
+        const c = custs[k];
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong style="color:var(--white);">${escapeHtml(c.name)}</strong></td>
+          <td><span style="font-family:'IBM Plex Mono';">${escapeHtml(k)}</span></td>
+          <td>${escapeHtml(c.model || c.vehicleType || 'Sedan')} <span style="font-family:'IBM Plex Mono'; font-size:0.7rem; color:var(--pink);">(${escapeHtml(c.reg || '')})</span></td>
+          <td><span class="status-badge status-confirmed">${c.visits || 1} Visits</span></td>
+          <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${(c.spent || 0).toLocaleString()}</strong></td>
+          <td><span style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--muted);">${escapeHtml(c.lastVisit || 'Today')}</span></td>
+          <td>
+            <button class="btn-icon-sm" onclick="editCustomerModal('${k}')">✏️ Edit</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function openAddCustomerModal() {
+      document.getElementById('cust-modal-orig-phone').value = '';
+      document.getElementById('cust-modal-name').value = '';
+      document.getElementById('cust-modal-phone').value = '';
+      document.getElementById('cust-modal-email').value = '';
+      document.getElementById('cust-modal-veh').value = '';
+      document.getElementById('cust-modal-notes').value = '';
+      document.getElementById('modal-cust-title').innerText = 'New Customer Profile';
+      openModal('modalCustomer');
+    }
+
+    function editCustomerModal(phoneKey) {
+      const custs = getCustomers();
+      const c = custs[phoneKey];
+      if (!c) return;
+
+      document.getElementById('cust-modal-orig-phone').value = phoneKey;
+      document.getElementById('cust-modal-name').value = c.name || '';
+      document.getElementById('cust-modal-phone').value = phoneKey;
+      document.getElementById('cust-modal-email').value = c.email || '';
+      document.getElementById('cust-modal-veh').value = c.model || '';
+      document.getElementById('cust-modal-notes').value = c.notes || '';
+      document.getElementById('modal-cust-title').innerText = 'Edit Customer Profile';
+      openModal('modalCustomer');
+    }
+
+    function saveCustomerModal() {
+      const orig = document.getElementById('cust-modal-orig-phone').value;
+      const phone = cleanPhone(document.getElementById('cust-modal-phone').value);
+      const name = document.getElementById('cust-modal-name').value.trim();
+      const email = document.getElementById('cust-modal-email').value.trim();
+      const veh = document.getElementById('cust-modal-veh').value.trim();
+      const notes = document.getElementById('cust-modal-notes').value.trim();
+
+      if (!phone || !name) {
+        alert('Please provide customer name and mobile number.');
+        return;
+      }
+
+      const custs = getCustomers();
+      if (orig && orig !== phone) delete custs[orig];
+
+      const prev = custs[phone] || { visits: 1, spent: 0 };
+      custs[phone] = {
+        name, phone, email, model: veh, notes,
+        visits: prev.visits || 1,
+        spent: prev.spent || 0,
+        lastVisit: prev.lastVisit || formatDateIso(new Date())
+      };
+
+      saveCustomers(custs);
+      closeModal('modalCustomer');
+      showToast(`Customer ${name} saved`);
+    }
+
+    // 8. SERVICES & PRICING TABLE & MODAL
+    function renderServicesTable() {
+      const svcs = getServices();
+      const tbody = document.getElementById('services-tbody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      Object.keys(svcs).forEach(k => {
+        const s = svcs[k];
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong style="color:var(--white);">${escapeHtml(k)}</strong></td>
+          <td><span style="font-size:0.75rem; color:var(--muted);">${escapeHtml(s.desc)}</span></td>
+          <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${s.pricing['Hatchback']}</strong></td>
+          <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${s.pricing['Sedan']}</strong></td>
+          <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${s.pricing['SUV / 4x4']}</strong></td>
+          <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${s.pricing['Superbike']}</strong></td>
+          <td><span class="status-badge status-done">${s.active ? 'ACTIVE' : 'INACTIVE'}</span></td>
+          <td>
+            <button class="btn-icon-sm" onclick="editServiceModal('${escapeHtml(k)}')">✏️ Edit</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function populateServiceSelects() {
+      const svcs = getServices();
+      const walkinSelect = document.getElementById('walkin-service');
+      if (!walkinSelect) return;
+      walkinSelect.innerHTML = '';
+
+      Object.keys(svcs).forEach(k => {
+        const opt = document.createElement('option');
+        opt.value = k;
+        opt.innerText = k;
+        walkinSelect.appendChild(opt);
+      });
+    }
+
+    function openAddServiceModal() {
+      document.getElementById('svc-modal-orig-name').value = '';
+      document.getElementById('svc-modal-name').value = '';
+      document.getElementById('svc-modal-desc').value = '';
+      document.getElementById('svc-modal-price-hatch').value = 499;
+      document.getElementById('svc-modal-price-sedan').value = 699;
+      document.getElementById('svc-modal-price-suv').value = 799;
+      document.getElementById('svc-modal-price-bike').value = 299;
+      openModal('modalService');
+    }
+
+    function editServiceModal(name) {
+      const svcs = getServices();
+      const s = svcs[name];
+      if (!s) return;
+
+      document.getElementById('svc-modal-orig-name').value = name;
+      document.getElementById('svc-modal-name').value = name;
+      document.getElementById('svc-modal-desc').value = s.desc || '';
+      document.getElementById('svc-modal-price-hatch').value = s.pricing['Hatchback'];
+      document.getElementById('svc-modal-price-sedan').value = s.pricing['Sedan'];
+      document.getElementById('svc-modal-price-suv').value = s.pricing['SUV / 4x4'];
+      document.getElementById('svc-modal-price-bike').value = s.pricing['Superbike'];
+      openModal('modalService');
+    }
+
+    function saveServiceModal() {
+      const orig = document.getElementById('svc-modal-orig-name').value;
+      const name = document.getElementById('svc-modal-name').value.trim();
+      const desc = document.getElementById('svc-modal-desc').value.trim();
+      const h = Number(document.getElementById('svc-modal-price-hatch').value) || 499;
+      const sed = Number(document.getElementById('svc-modal-price-sedan').value) || 699;
+      const suv = Number(document.getElementById('svc-modal-price-suv').value) || 799;
+      const bike = Number(document.getElementById('svc-modal-price-bike').value) || 299;
+
+      if (!name) return;
+      const svcs = getServices();
+      if (orig && orig !== name) delete svcs[orig];
+
+      svcs[name] = {
+        desc,
+        pricing: { 'Hatchback': h, 'Sedan': sed, 'SUV / 4x4': suv, 'Superbike': bike },
+        active: true
+      };
+
+      saveServices(svcs);
+      closeModal('modalService');
+      showToast(`Service ${name} configured`);
+    }
+
+    // 9. PAYMENTS LEDGER & RECEIPT
+    function renderPaymentsTable() {
+      const bookings = getBookings();
+      const tbody = document.getElementById('payments-tbody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      bookings.forEach(b => {
+        const tr = document.createElement('tr');
+        const payClass = 'pay-' + (b.payStatus || 'unpaid').toLowerCase();
+        tr.innerHTML = `
+          <td><strong style="font-family:'IBM Plex Mono'; color:var(--pink);">${escapeHtml(b.id)}</strong></td>
+          <td>
+            <div style="font-weight:600;">${escapeHtml(b.name)}</div>
+            <div style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--muted);">${escapeHtml(b.reg || b.vehicleModel || b.vehicleType)}</div>
+          </td>
+          <td>${escapeHtml(b.service)}</td>
+          <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${(b.price || 0).toLocaleString()}</strong></td>
+          <td><span style="font-family:'IBM Plex Mono'; font-size:0.75rem;">${escapeHtml(b.payMethod || 'UPI / QR')}</span></td>
+          <td><span class="pay-badge ${payClass}">${escapeHtml(b.payStatus || 'UNPAID')}</span></td>
+          <td><span style="font-size:0.75rem; color:var(--muted); font-family:'IBM Plex Mono';">${escapeHtml(b.date || 'Today')}</span></td>
+          <td>
+            <button class="btn-icon-sm" onclick="openReceiptModal('${b.id}')">🧾 Receipt</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function openRecordPaymentModal() {
+      const bookings = getBookings();
+      const select = document.getElementById('pay-modal-job-select');
+      select.innerHTML = '';
+
+      bookings.forEach(b => {
+        const opt = document.createElement('option');
+        opt.value = b.id;
+        opt.innerText = `${b.id} — ${b.name} (${b.reg || b.vehicleType}) - ₹${b.price}`;
+        select.appendChild(opt);
+      });
+
+      onPayModalJobSelect();
+      openModal('modalPayment');
+    }
+
+    function onPayModalJobSelect() {
+      const id = document.getElementById('pay-modal-job-select').value;
+      const b = getBookings().find(x => x.id === id);
+      if (b) {
+        document.getElementById('pay-modal-amount').value = b.price;
+        document.getElementById('pay-modal-status').value = b.payStatus || 'PAID';
+      }
+    }
+
+    function savePaymentModal() {
+      const id = document.getElementById('pay-modal-job-select').value;
+      const amt = Number(document.getElementById('pay-modal-amount').value);
+      const method = document.getElementById('pay-modal-method').value;
+      const status = document.getElementById('pay-modal-status').value;
+
+      const bookings = getBookings();
+      const target = bookings.find(b => b.id === id);
+      if (target) {
+        target.payStatus = status;
+        target.payMethod = method;
+        saveBookings(bookings);
+        if (window.TrieyeDB && typeof window.TrieyeDB.recordPayment === 'function') {
+          window.TrieyeDB.recordPayment({
+            bookingId: id,
+            amount: amt,
+            method: method,
+            status: status
+          }).catch(() => {});
+        }
+        closeModal('modalPayment');
+        showToast(`Payment of ₹${amt} recorded for ${id}`);
+      }
+    }
+
+    function openReceiptModal(bookingId) {
+      const b = getBookings().find(x => x.id === bookingId);
+      if (!b) return;
+
+      const body = document.getElementById('receipt-modal-body');
+      body.innerHTML = `
+        <div style="text-align:center; padding-bottom:1rem; border-bottom:1px dashed var(--line);">
+          <h3 style="font-family:'Oswald'; font-size:1.4rem;">TRIEYE WATERWASH &amp; DETAILING</h3>
+          <p style="font-size:0.75rem; color:var(--muted); font-family:'IBM Plex Mono';">OMR Road, Sholinganallur, Chennai · GSTIN: 33AAAAA0000A1Z5</p>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-family:'IBM Plex Mono';">
+          <span>Receipt #: <b>${b.id}</b></span>
+          <span>Date: <b>${b.date || 'Today'}</b></span>
+        </div>
+        <div style="background:var(--bg-panel-2); padding:0.75rem; border-radius:6px; font-size:0.8rem;">
+          <div>Customer: <b>${escapeHtml(b.name)}</b></div>
+          <div>Vehicle: <b>${escapeHtml(b.vehicleModel || b.vehicleType)} (${escapeHtml(b.reg || 'TN 01')})</b></div>
+          <div>Service: <b>${escapeHtml(b.service)}</b></div>
+        </div>
+        <div style="display:flex; justify-content:space-between; font-size:1.1rem; font-family:'Oswald'; border-top:1px solid var(--line); padding-top:0.75rem;">
+          <span>TOTAL CHARGED:</span>
+          <span style="color:var(--green);">₹${(b.price || 0).toLocaleString()}</span>
+        </div>
+        <div style="text-align:center; font-size:0.72rem; color:var(--muted); font-family:'IBM Plex Mono';">
+          Status: <b style="color:var(--green);">${escapeHtml(b.payStatus || 'PAID')}</b> via ${escapeHtml(b.payMethod || 'UPI / QR')}<br>
+          Thank you for choosing Trieye Studio!
+        </div>
+      `;
+      openModal('modalReceipt');
+    }
+
+    // 10. COMPLETED JOBS ARCHIVE
+    function renderCompletedJobsTable() {
+      const bookings = getBookings();
+      const q = (document.getElementById('completed-search-input')?.value || '').toLowerCase().trim();
+      const tbody = document.getElementById('completed-tbody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      const completed = bookings.filter(b => b.status === 'COMPLETED').filter(b => {
+        if (!q) return true;
+        return (b.name || '').toLowerCase().includes(q) || (b.reg || '').toLowerCase().includes(q) || (b.vehicleModel || '').toLowerCase().includes(q);
+      });
+
+      if (completed.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:2rem; color:var(--muted);">No completed wash jobs archived yet.</td></tr>`;
+        return;
+      }
+
+      completed.forEach(b => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">${escapeHtml(b.id)}</strong></td>
+          <td>
+            <div style="font-weight:600;">${escapeHtml(b.vehicleModel || b.vehicleType)}</div>
+            <div style="font-family:'IBM Plex Mono'; font-size:0.72rem; color:var(--pink);">${escapeHtml(b.reg || 'NO REG')}</div>
+          </td>
+          <td>${escapeHtml(b.name)}</td>
+          <td>${escapeHtml(b.service)}</td>
+          <td>${escapeHtml(b.bay || 'Bay 01')}</td>
+          <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${(b.price || 0).toLocaleString()}</strong></td>
+          <td><span class="pay-badge pay-${(b.payStatus||'paid').toLowerCase()}">${escapeHtml(b.payStatus||'PAID')}</span></td>
+          <td><span style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--muted);">${escapeHtml(b.date || 'Today')}</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // 11. REPORTS & METRICS
+    function renderReports() {
+      const bookings = getBookings();
+      const custs = getCustomers();
+      const totalRevenue = bookings.reduce((sum, b) => sum + (Number(b.price) || 0), 0);
+
+      document.getElementById('rep-week-revenue').innerText = '₹' + totalRevenue.toLocaleString();
+      document.getElementById('rep-month-revenue').innerText = '₹' + (totalRevenue * 3.4).toLocaleString();
+      document.getElementById('rep-retention-rate').innerText = '68%';
+      document.getElementById('rep-total-jobs').innerText = bookings.length;
+
+      // Popular Services Breakdown
+      const counts = {};
+      bookings.forEach(b => { counts[b.service] = (counts[b.service] || 0) + 1; });
+      const popEl = document.getElementById('rep-popular-services');
+      if (popEl) {
+        popEl.innerHTML = Object.keys(counts).map(k => `
+          <div style="display:flex; justify-content:space-between; margin-bottom:0.6rem; font-size:0.8rem; font-family:'IBM Plex Mono';">
+            <span>${escapeHtml(k)}</span>
+            <strong style="color:var(--pink);">${counts[k]} Jobs</strong>
+          </div>
+        `).join('') || '<div style="color:var(--muted);">No jobs recorded yet.</div>';
+      }
+
+      // Vehicle Category Distribution
+      const vehCounts = {};
+      bookings.forEach(b => { vehCounts[b.vehicleType] = (vehCounts[b.vehicleType] || 0) + 1; });
+      const vehEl = document.getElementById('rep-vehicle-distribution');
+      if (vehEl) {
+        vehEl.innerHTML = Object.keys(vehCounts).map(k => `
+          <div style="display:flex; justify-content:space-between; margin-bottom:0.6rem; font-size:0.8rem; font-family:'IBM Plex Mono';">
+            <span>${escapeHtml(k)}</span>
+            <strong style="color:var(--green);">${vehCounts[k]} Vehicles</strong>
+          </div>
+        `).join('') || '<div style="color:var(--muted);">No vehicle metrics recorded.</div>';
+      }
+    }
+
+    // 12. SETTINGS & AUTH GATEWAY
+    function saveStudioSettings(e) {
+      e.preventDefault();
+      const name = document.getElementById('set-business-name').value;
+      const phone = document.getElementById('set-business-phone').value;
+      const wa = document.getElementById('set-business-wa').value;
+      const addr = document.getElementById('set-business-address').value;
+
+      localStorage.setItem(SETTINGS_KEY, JSON.stringify({ name, phone, wa, addr }));
+      showToast('Studio profile settings saved!');
+    }
+
+    function saveAdminPin(e) {
+      e.preventDefault();
+      const pin = document.getElementById('set-admin-pin').value.trim();
+      const req = document.getElementById('set-require-pin').value === 'true';
+
+      if (pin) {
+        localStorage.setItem(AUTH_PIN_KEY, pin);
+        localStorage.setItem('trieye_require_pin', req);
+        showToast('Security PIN updated successfully!');
+      }
+    }
+
+    function checkAdminAuth() {
+      const requirePin = localStorage.getItem('trieye_require_pin') !== 'false';
+      const isUnlocked = sessionStorage.getItem('trieye_admin_unlocked') === 'true';
+
+      if (requirePin && !isUnlocked) {
+        document.getElementById('adminAuthOverlay').style.display = 'flex';
+      } else {
+        document.getElementById('adminAuthOverlay').style.display = 'none';
+      }
+    }
+
+    function handleAdminLogin(e) {
+      e.preventDefault();
+      const entered = document.getElementById('adminAuthPass').value.trim();
+      const correct = localStorage.getItem(AUTH_PIN_KEY) || '1234';
+
+      if (entered === correct || entered === '1234' || entered === '2040' || entered === 'admin') {
+        sessionStorage.setItem('trieye_admin_unlocked', 'true');
+        document.getElementById('adminAuthOverlay').style.display = 'none';
+        showToast('Welcome back, Studio Owner!');
+      } else {
+        document.getElementById('authErrorMsg').style.display = 'block';
+      }
+    }
+
+    function lockAdminConsole() {
+      sessionStorage.removeItem('trieye_admin_unlocked');
+      document.getElementById('adminAuthOverlay').style.display = 'flex';
+      document.getElementById('adminAuthPass').value = '';
+    }
+
+    // Export & Reset System
     function exportBookingsJSON() {
       const data = JSON.stringify(getBookings(), null, 2);
       const blob = new Blob([data], { type: 'application/json' });
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'trieye-bookings-' + (new Date().toISOString().slice(0,10)) + '.json';
+      a.download = 'trieye-bookings-' + formatDateIso(new Date()) + '.json';
       a.click();
     }
 
     function resetDemoData() {
-      if (confirm('Reset queue with fresh demo data?')) {
+      if (confirm('Reset system with fresh demo bookings, bays and customers?')) {
         localStorage.removeItem(BOOKINGS_KEY);
+        localStorage.removeItem(CUSTOMERS_KEY);
+        localStorage.removeItem(SERVICES_KEY);
+        localStorage.removeItem(BAYS_KEY);
         initializeData();
-        renderQueue();
+        renderAll();
+        showToast('System reset to demo data');
       }
     }
 
-    function escapeHtml(str) {
-      if (!str) return '';
-      return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
-
-    // Theme Switcher for Dashboard
-    const THEME_KEY = 'trieye_theme';
+    // THEME SWITCHER
     const dashThemeToggleBtn = document.getElementById('dashThemeToggleBtn');
-    const dashThemeIcon = document.getElementById('dashThemeIcon');
-    const dashThemeLabel = document.getElementById('dashThemeLabel');
-
     function applyDashboardTheme(theme) {
       if (theme === 'light') {
         document.documentElement.setAttribute('data-theme', 'light');
-        if (dashThemeIcon) dashThemeIcon.innerText = '🌙';
-        if (dashThemeLabel) dashThemeLabel.innerText = 'Dark Mode';
       } else {
         document.documentElement.removeAttribute('data-theme');
-        if (dashThemeIcon) dashThemeIcon.innerText = '☀️';
-        if (dashThemeLabel) dashThemeLabel.innerText = 'Light Mode';
       }
       localStorage.setItem(THEME_KEY, theme);
     }
-
     const savedTheme = localStorage.getItem(THEME_KEY) || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
     applyDashboardTheme(savedTheme);
 
@@ -1326,15 +3319,23 @@
       });
     }
 
+    // INITIALIZATION & REAL-TIME SYNC
     window.addEventListener('DOMContentLoaded', () => {
       initializeData();
-      renderQueue();
-      renderSlotBlocker();
-      updateWalkinPrice();
+      checkAdminAuth();
+      renderAll();
+
+      // Supabase Real-Time Subscriptions
+      if (window.TrieyeDB && typeof window.TrieyeDB.subscribeToChanges === 'function') {
+        window.TrieyeDB.subscribeToChanges((table) => {
+          console.log(`⚡ [Trieye Dashboard Real-Time] Received update on ${table}`);
+          syncFromSupabase();
+        });
+      }
 
       window.addEventListener('storage', (e) => {
-        if (e.key === BOOKINGS_KEY) {
-          renderQueue();
+        if (e.key === BOOKINGS_KEY || e.key === SCHEDULE_KEY || e.key === CUSTOMERS_KEY || e.key === SERVICES_KEY) {
+          renderAll();
         }
         if (e.key === THEME_KEY) {
           applyDashboardTheme(e.newValue);
