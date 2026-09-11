@@ -1,0 +1,70 @@
+{
+  "Foam Wash": {
+    "name": "Foam Wash",
+    "desc": "Snow Foam Pre-Wash & Decontamination detailing",
+    "duration_minutes": 45,
+    "base_price": 699,
+    "hatchback_price": 566,
+    "sedan_price": 699,
+    "suv_price": 874,
+    "bike_price": 350,
+    "pricing": {
+      "Hatchback": 566,
+      "Sedan": 699,
+      "SUV / 4x4": 874,
+      "Superbike": 350
+    },
+    "active": true
+  },
+  "Full Detail Combo": {
+    "name": "Full Detail Combo",
+    "desc": "Comprehensive detailing package (Foam Wash + Rubbing Polish + Interior Deep Cleaning)",
+    "duration_minutes": 180,
+    "base_price": 4999,
+    "hatchback_price": 3999,
+    "sedan_price": 4999,
+    "suv_price": 6249,
+    "bike_price": 2500,
+    "pricing": {
+      "Hatchback": 3999,
+      "Sedan": 4999,
+      "SUV / 4x4": 6249,
+      "Superbike": 2500
+    },
+    "active": true
+  },
+  "Interior Deep Cleaning": {
+    "name": "Interior Deep Cleaning",
+    "desc": "Steam extraction & interior upholstery deep clean",
+    "duration_minutes": 90,
+    "base_price": 2299,
+    "hatchback_price": 1839,
+    "sedan_price": 2299,
+    "suv_price": 2874,
+    "bike_price": 1150,
+    "pricing": {
+      "Hatchback": 1839,
+      "Sedan": 2299,
+      "SUV / 4x4": 2874,
+      "Superbike": 1150
+    },
+    "active": true
+  },
+  "Rubbing Polish": {
+    "name": "Rubbing Polish",
+    "desc": "Dual-Action Rubbing Polish & Paint Correction",
+    "duration_minutes": 120,
+    "base_price": 3499,
+    "hatchback_price": 2799,
+    "sedan_price": 3499,
+    "suv_price": 4374,
+    "bike_price": 1750,
+    "pricing": {
+      "Hatchback": 2799,
+      "Sedan": 3499,
+      "SUV / 4x4": 4374,
+      "Superbike": 1750
+    },
+    "active": true
+  }
+}

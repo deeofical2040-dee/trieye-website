@@ -508,12 +508,13 @@
     .table-container {
       overflow-x: auto;
       width: 100%;
+      border-radius: 8px;
     }
     table.data-table {
       width: 100%;
       border-collapse: collapse;
       text-align: left;
-      font-size: 0.83rem;
+      font-size: 0.84rem;
     }
     table.data-table th {
       background: var(--bg-panel-2);
@@ -523,17 +524,99 @@
       font-weight: 600;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      padding: 0.75rem 1rem;
+      padding: 0.9rem 1.15rem;
       border-bottom: 1px solid var(--line);
       white-space: nowrap;
     }
     table.data-table td {
-      padding: 0.85rem 1rem;
+      padding: 1rem 1.15rem;
       border-bottom: 1px solid var(--line-subtle);
       vertical-align: middle;
+      font-size: 0.85rem;
+    }
+    table.data-table tr {
+      transition: background-color 0.15s ease;
     }
     table.data-table tr:hover {
       background: var(--bg-panel-2);
+    }
+
+    /* Booking ID Badge */
+    .booking-id-tag {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.76rem;
+      font-weight: 600;
+      color: var(--pink);
+      background: var(--pink-dim);
+      padding: 0.3rem 0.55rem;
+      border-radius: 6px;
+      border: 1px solid rgba(238, 47, 118, 0.25);
+      display: inline-flex;
+      align-items: center;
+      letter-spacing: 0.02em;
+    }
+
+    /* Action Button Group */
+    .action-btn-group {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      flex-wrap: wrap;
+    }
+    .action-btn {
+      padding: 0.32rem 0.65rem;
+      font-size: 0.72rem;
+      border-radius: 5px;
+      border: 1px solid var(--line);
+      background: var(--bg-panel-2);
+      color: var(--white);
+      cursor: pointer;
+      font-family: 'IBM Plex Mono', monospace;
+      font-weight: 500;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .action-btn:hover {
+      background: var(--bg-panel-3);
+      border-color: var(--muted);
+      transform: translateY(-1px);
+    }
+    .action-btn.arrive {
+      background: rgba(166, 211, 49, 0.12);
+      border-color: rgba(166, 211, 49, 0.35);
+      color: var(--green);
+      font-weight: 600;
+    }
+    .action-btn.arrive:hover {
+      background: var(--green);
+      color: #0a0a0c;
+      border-color: var(--green);
+      box-shadow: 0 0 10px var(--green-glow);
+    }
+    .action-btn.wa {
+      background: rgba(37, 211, 102, 0.1);
+      border-color: rgba(37, 211, 102, 0.3);
+      color: #25d366;
+    }
+    .action-btn.wa:hover {
+      background: #25d366;
+      color: #ffffff;
+      border-color: #25d366;
+    }
+    .action-btn.call {
+      background: var(--blue-dim);
+      border-color: rgba(56, 189, 248, 0.3);
+      color: var(--blue);
+    }
+    .action-btn.call:hover {
+      background: var(--blue);
+      color: #ffffff;
+      border-color: var(--blue);
     }
 
     /* Status Badges */
@@ -541,12 +624,13 @@
       display: inline-flex;
       align-items: center;
       gap: 0.35rem;
-      padding: 0.2rem 0.55rem;
-      border-radius: 4px;
+      padding: 0.25rem 0.65rem;
+      border-radius: 5px;
       font-family: 'IBM Plex Mono', monospace;
       font-size: 0.68rem;
       font-weight: 600;
       text-transform: uppercase;
+      letter-spacing: 0.05em;
       white-space: nowrap;
     }
     .status-confirmed { background: var(--blue-dim); color: var(--blue); border: 1px solid rgba(56, 189, 248, 0.4); }
@@ -866,6 +950,113 @@
       .dashboard-layout { flex-direction: column; }
       .sidebar { width: 100%; height: auto; position: static; }
     }
+
+    /* Customer Profile Card & History Styles */
+    .customer-profile-card {
+      background: var(--bg-panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
+      animation: fadeIn 0.25s ease;
+    }
+    .customer-profile-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 1.2rem;
+    }
+    .customer-profile-name {
+      font-family: 'Oswald', sans-serif;
+      font-size: 1.45rem;
+      letter-spacing: 0.03em;
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .customer-profile-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 1rem;
+    }
+    .customer-profile-stat {
+      background: var(--bg-panel-2);
+      border: 1px solid var(--line-subtle);
+      border-radius: 8px;
+      padding: 0.85rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+    .customer-profile-stat-lbl {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+    }
+    .customer-profile-stat-val {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--white);
+    }
+
+    /* Print invoice specific media query */
+    @media print {
+      body * {
+        visibility: hidden !important;
+      }
+      #modalReceipt, #modalReceipt * {
+        visibility: visible !important;
+      }
+      #modalReceipt {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        height: auto !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        padding: 0 !important;
+        display: block !important;
+      }
+      #modalReceipt .dash-modal {
+        box-shadow: none !important;
+        border: none !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      #modalReceipt .dash-modal-header,
+      #modalReceipt .dash-modal-footer,
+      #modalReceipt .dash-modal-close {
+        display: none !important;
+      }
+      #modalReceipt .dash-modal-body {
+        padding: 20px !important;
+        color: #000000 !important;
+        background: #ffffff !important;
+      }
+      #modalReceipt .dash-modal-body * {
+        color: #000000 !important;
+        background: transparent !important;
+        border-color: #cccccc !important;
+      }
+      #modalReceipt .dash-modal-body .invoice-box {
+        border: 1px solid #000000 !important;
+        background: #f9f9f9 !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -876,13 +1067,20 @@
       <img src="assets/trieye-logo-dark.png" alt="Trieye" class="auth-logo logo-dark">
       <img src="assets/trieye-logo-light.png" alt="Trieye" class="auth-logo logo-light">
       <div>
-        <h2 style="font-family:'Oswald'; font-size:1.5rem; letter-spacing:0.04em;">ADMIN CONSOLE ACCESS</h2>
-        <p style="font-size:0.8rem; color:var(--muted); margin-top:4px;">Enter PIN or password to manage studio</p>
+        <h2 style="font-family:'Oswald'; font-size:1.5rem; letter-spacing:0.04em;">ADMIN CONSOLE LOGIN</h2>
+        <p style="font-size:0.8rem; color:var(--muted); margin-top:4px;">Sign in with your verified Supabase Admin credentials</p>
       </div>
-      <form id="adminLoginForm" onsubmit="handleAdminLogin(event)" style="display:flex; flex-direction:column; gap:0.85rem;">
-        <input type="password" id="adminAuthPass" class="form-input" placeholder="Enter Admin PIN (Default: 1234)" autofocus style="text-align:center; font-size:1.1rem; letter-spacing:0.2em;">
-        <button type="submit" class="btn btn-primary" style="justify-content:center; padding:0.7rem;">Unlock Dashboard →</button>
-        <div id="authErrorMsg" style="font-size:0.75rem; color:var(--red); display:none;">Invalid credentials. Please try again.</div>
+      <form id="adminLoginForm" onsubmit="handleAdminLogin(event)" style="display:flex; flex-direction:column; gap:0.85rem; text-align:left;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label" style="font-size:0.75rem;">Admin Email</label>
+          <input type="email" id="adminAuthEmail" class="form-input" placeholder="admin@trieyestudio.com" required autocomplete="email" style="font-size:0.9rem;">
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="form-label" style="font-size:0.75rem;">Password</label>
+          <input type="password" id="adminAuthPass" class="form-input" placeholder="••••••••" required autocomplete="current-password" style="font-size:0.9rem;">
+        </div>
+        <button type="submit" id="adminLoginBtn" class="btn btn-primary" style="justify-content:center; padding:0.7rem; margin-top:0.35rem; font-size:0.85rem;">Sign In to Dashboard →</button>
+        <div id="authErrorMsg" style="font-size:0.78rem; color:var(--red); display:none; text-align:center; padding:0.4rem; background:var(--red-dim); border:1px solid var(--red); border-radius:6px;"></div>
       </form>
     </div>
   </div>
@@ -1319,18 +1517,94 @@
         <div class="section-header">
           <div>
             <div class="section-title"><span>👥</span> Customer Database &amp; History</div>
-            <div class="section-subtitle">Searchable customer profiles, visit records, vehicle history &amp; LTV metrics</div>
+            <div class="section-subtitle">Searchable customer profiles, visit records, vehicle history, LTV metrics &amp; instant bill retrieval</div>
           </div>
           <div style="display:flex; gap:0.5rem;">
             <button class="btn btn-primary" onclick="openAddCustomerModal()">+ New Customer Profile</button>
           </div>
         </div>
 
-        <div class="filter-bar">
-          <input type="text" id="customer-search-input" class="form-input" placeholder="Search by Customer Name, Phone, or Vehicle Reg No..." oninput="renderCustomersTable()" style="max-width:400px;">
+        <!-- Large Search Bar at Top -->
+        <div style="margin-bottom: 1.5rem;">
+          <div style="position:relative; width:100%;">
+            <input type="text" id="customer-search-input" class="form-input" 
+                   placeholder="Search by phone number, customer name, or vehicle number" 
+                   oninput="handleCustomerSearchInput()" 
+                   style="width:100%; max-width:100%; font-size:1.05rem; padding:0.95rem 1.25rem 0.95rem 2.85rem; border-radius:10px; background:var(--bg-panel); border:1px solid var(--line); box-shadow:0 4px 14px rgba(0,0,0,0.35);">
+            <span style="position:absolute; left:1rem; top:50%; transform:translateY(-50%); font-size:1.15rem; color:var(--muted); pointer-events:none;">🔍</span>
+          </div>
         </div>
 
-        <div class="panel">
+        <!-- Customer Profile Panel (Shown when customer selected or searched) -->
+        <div id="customer-profile-panel" style="display:none;" class="customer-profile-card">
+          <div class="customer-profile-header">
+            <div>
+              <div class="customer-profile-name" id="cust-prof-name">Customer Profile</div>
+              <div style="font-family:'IBM Plex Mono', monospace; font-size:0.85rem; color:var(--muted); margin-top:3px;" id="cust-prof-phone">+91 0000000000</div>
+            </div>
+            <div style="display:flex; gap:0.5rem; align-items:center;">
+              <button class="btn btn-sm" id="cust-prof-edit-btn" onclick="editSelectedCustomer()">✏️ Edit Profile</button>
+              <button class="btn btn-sm" onclick="clearSelectedCustomer()" style="background:var(--bg-panel-3); color:var(--muted);">✕ Close Profile</button>
+            </div>
+          </div>
+          
+          <div class="customer-profile-grid">
+            <div class="customer-profile-stat">
+              <span class="customer-profile-stat-lbl">Vehicle Type</span>
+              <span class="customer-profile-stat-val" id="cust-prof-vehtype">Sedan</span>
+            </div>
+            <div class="customer-profile-stat">
+              <span class="customer-profile-stat-lbl">Vehicle Reg Number</span>
+              <span class="customer-profile-stat-val" style="color:var(--pink);" id="cust-prof-vehreg">TN 01 AB 1234</span>
+            </div>
+            <div class="customer-profile-stat">
+              <span class="customer-profile-stat-lbl">Total Visits</span>
+              <span class="customer-profile-stat-val" style="color:var(--blue);" id="cust-prof-visits">1 Visit</span>
+            </div>
+            <div class="customer-profile-stat">
+              <span class="customer-profile-stat-lbl">Total Amount Spent</span>
+              <span class="customer-profile-stat-val" style="color:var(--green);" id="cust-prof-spent">₹0</span>
+            </div>
+            <div class="customer-profile-stat">
+              <span class="customer-profile-stat-lbl">Last Visit Date</span>
+              <span class="customer-profile-stat-val" style="font-size:0.95rem; color:var(--muted);" id="cust-prof-lastvisit">—</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Service History Section -->
+        <div class="panel" id="customer-history-panel" style="display:none; margin-bottom:1.5rem;">
+          <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center;">
+            <div class="panel-title"><span>📜</span> Service History &amp; Bills</div>
+            <span class="booking-id-tag" id="cust-history-count-badge">0 Records Found</span>
+          </div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Booking / Job ID</th>
+                  <th>Date</th>
+                  <th>Vehicle</th>
+                  <th>Service</th>
+                  <th>Amount</th>
+                  <th>Payment Status</th>
+                  <th>Payment Method</th>
+                  <th>Job Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="customer-history-tbody">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- All Customers Table -->
+        <div class="panel" id="all-customers-panel">
+          <div class="panel-header">
+            <div class="panel-title"><span>👥</span> All Registered Customers</div>
+          </div>
           <div class="table-container">
             <table class="data-table">
               <thead>
@@ -1623,6 +1897,10 @@
           <label class="form-label">Description</label>
           <input type="text" id="svc-modal-desc" class="form-input" placeholder="Brief service details for invoice">
         </div>
+        <div class="form-group">
+          <label class="form-label">Duration (Minutes)</label>
+          <input type="number" id="svc-modal-duration" class="form-input" placeholder="e.g. 45">
+        </div>
         <div class="form-grid">
           <div class="form-group">
             <label class="form-label">Hatchback (₹)</label>
@@ -1898,26 +2176,54 @@
     const AUTH_PIN_KEY = 'trieye_admin_pin';
     const THEME_KEY = 'trieye_theme';
 
-    // Default Seed Data Matrix
+    // Default Seed Data Matrix matching live catalog
     const defaultServices = {
-      'Snow Foam Deep Exterior Wash': {
-        desc: 'High pressure pre-wash, dual snow foam, micro-fiber agitation, wheel barrel scrub & tyre gloss',
-        pricing: { 'Hatchback': 499, 'Sedan': 699, 'SUV / 4x4': 799, 'Superbike': 299 },
+      'Foam Wash': {
+        name: 'Foam Wash',
+        desc: 'Snow Foam Pre-Wash & Decontamination detailing',
+        duration_minutes: 45,
+        base_price: 699,
+        hatchback_price: 566,
+        sedan_price: 699,
+        suv_price: 874,
+        bike_price: 350,
+        pricing: { 'Hatchback': 566, 'Sedan': 699, 'SUV / 4x4': 874, 'Superbike': 350 },
         active: true
       },
-      '3-Step Paint Correction & Rubbing': {
-        desc: 'Clay bar decontamination, heavy cut compound, polish refining and carnauba wax seal',
-        pricing: { 'Hatchback': 2499, 'Sedan': 2999, 'SUV / 4x4': 3499, 'Superbike': 1299 },
+      'Full Detail Combo': {
+        name: 'Full Detail Combo',
+        desc: 'Comprehensive detailing package (Foam Wash + Rubbing Polish + Interior Deep Cleaning)',
+        duration_minutes: 180,
+        base_price: 4999,
+        hatchback_price: 3999,
+        sedan_price: 4999,
+        suv_price: 6249,
+        bike_price: 2500,
+        pricing: { 'Hatchback': 3999, 'Sedan': 4999, 'SUV / 4x4': 6249, 'Superbike': 2500 },
         active: true
       },
-      'Interior Steam & Leather Decon': {
-        desc: 'Steam sterilization, upholstery extraction, leather conditioner, dashboard UV shield & AC ozone',
-        pricing: { 'Hatchback': 1499, 'Sedan': 1799, 'SUV / 4x4': 1999, 'Superbike': 799 },
+      'Interior Deep Cleaning': {
+        name: 'Interior Deep Cleaning',
+        desc: 'Steam extraction & interior upholstery deep clean',
+        duration_minutes: 90,
+        base_price: 2299,
+        hatchback_price: 1839,
+        sedan_price: 2299,
+        suv_price: 2874,
+        bike_price: 1150,
+        pricing: { 'Hatchback': 1839, 'Sedan': 2299, 'SUV / 4x4': 2874, 'Superbike': 1150 },
         active: true
       },
-      '9H Graphene Ceramic Shield': {
-        desc: 'Multi-layer ultra-hydrophobic 9H nano-graphene coat with 3-year warranty certificate',
-        pricing: { 'Hatchback': 8999, 'Sedan': 9999, 'SUV / 4x4': 11999, 'Superbike': 4999 },
+      'Rubbing Polish': {
+        name: 'Rubbing Polish',
+        desc: 'Dual-Action Rubbing Polish & Paint Correction',
+        duration_minutes: 120,
+        base_price: 3499,
+        hatchback_price: 2799,
+        sedan_price: 3499,
+        suv_price: 4374,
+        bike_price: 1750,
+        pricing: { 'Hatchback': 2799, 'Sedan': 3499, 'SUV / 4x4': 4374, 'Superbike': 1750 },
         active: true
       }
     };
@@ -1999,6 +2305,14 @@
 
       const navEl = document.getElementById(navMap[secId]);
       if (navEl) navEl.classList.add('active');
+
+      if (secId === 'customers-sec') {
+        renderCustomersTable();
+      }
+      if (secId === 'services-sec') {
+        renderServicesTable();
+        populateServiceSelects();
+      }
     }
 
     // Storage Getters / Setters (TrieyeDB with Supabase + LocalStorage Fallback)
@@ -2017,9 +2331,46 @@
     }
 
     function getCustomers() {
+      let custs = {};
       try {
-        return JSON.parse(localStorage.getItem(CUSTOMERS_KEY)) || {};
-      } catch (e) { return {}; }
+        custs = JSON.parse(localStorage.getItem(CUSTOMERS_KEY)) || {};
+      } catch (e) { custs = {}; }
+
+      // Seamlessly merge and include any customer who has made a booking
+      try {
+        const bookings = JSON.parse(localStorage.getItem(BOOKINGS_KEY)) || [];
+        bookings.forEach(b => {
+          const rawPhone = b.phone || '';
+          const clean = cleanPhone(rawPhone) || rawPhone.replace(/\D/g, '').slice(-10);
+          if (clean && !custs[clean]) {
+            custs[clean] = {
+              name: b.name || 'Valued Customer',
+              phone: rawPhone,
+              vehicleType: b.vehicleType || b.vehicleModel || 'Car',
+              model: b.vehicleModel || b.vehicleType || 'Car',
+              reg: b.reg || '',
+              vehicles: [{
+                type: b.vehicleType || 'Car',
+                reg: b.reg || ''
+              }],
+              visits: 1,
+              spent: Number(b.price) || 0,
+              lastVisit: b.date || '',
+              notes: ''
+            };
+          } else if (clean && custs[clean]) {
+            // Ensure vehicle details are backfilled if missing
+            if (!custs[clean].reg && b.reg) {
+              custs[clean].reg = b.reg;
+            }
+            if (!custs[clean].vehicleType && (b.vehicleType || b.vehicleModel)) {
+              custs[clean].vehicleType = b.vehicleType || b.vehicleModel;
+            }
+          }
+        });
+      } catch (err) {}
+
+      return custs;
     }
     function saveCustomers(custs) {
       localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(custs));
@@ -2042,6 +2393,12 @@
       localStorage.setItem(SERVICES_KEY, JSON.stringify(svcs));
       renderServicesTable();
       populateServiceSelects();
+      try {
+        if (typeof BroadcastChannel !== 'undefined') {
+          const chan = new BroadcastChannel('trieye_pricing_sync');
+          chan.postMessage({ type: 'PRICING_UPDATED', matrix: svcs });
+        }
+      } catch (e) {}
       if (window.TrieyeDB && typeof window.TrieyeDB.saveServices === 'function') {
         window.TrieyeDB.saveServices(svcs).catch(() => {});
       }
@@ -2102,7 +2459,7 @@
 
         let hasUpdates = false;
 
-        if (remoteBookings.status === 'fulfilled' && Array.isArray(remoteBookings.value) && remoteBookings.value.length > 0) {
+        if (remoteBookings.status === 'fulfilled' && Array.isArray(remoteBookings.value)) {
           localStorage.setItem(BOOKINGS_KEY, JSON.stringify(remoteBookings.value));
           hasUpdates = true;
         }
@@ -2141,81 +2498,13 @@
       }
 
       if (!localStorage.getItem(CUSTOMERS_KEY)) {
-        const initialCust = {
-          '9820144521': { name: 'Vikram Singhania', email: 'vikram@fortuner.in', vehicleType: 'SUV / 4x4', reg: 'MH 01 AB 9999', model: 'Toyota Fortuner GR', visits: 4, spent: 34996, lastVisit: '2026-09-04', notes: 'Prefers 9H Graphene coating' },
-          '9930288712': { name: 'Ananya Deshmukh', email: 'ananya@bmw.co', vehicleType: 'Sedan', reg: 'MH 02 CD 4455', model: 'BMW 330Li M-Sport', visits: 2, spent: 5998, lastVisit: '2026-09-05', notes: 'Ceramic top-up due in Oct' },
-          '9811233490': { name: 'Karan Mehra', email: 'karan@ducati.me', vehicleType: 'Superbike', reg: 'MH 03 EF 1212', model: 'Ducati Panigale V4', visits: 5, spent: 2495, lastVisit: '2026-09-03', notes: 'Chain lube and foam wash' },
-          '9840123456': { name: 'Rohan Verma', email: 'rohan.v@gmail.com', vehicleType: 'Sedan', reg: 'TN 07 AB 1234', model: 'Honda City ZX', visits: 3, spent: 8997, lastVisit: '2026-09-06', notes: 'Frequent weekend customer' }
-        };
-        localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(initialCust));
+        localStorage.setItem(CUSTOMERS_KEY, JSON.stringify({}));
       }
 
-      if (!localStorage.getItem(BOOKINGS_KEY) || JSON.parse(localStorage.getItem(BOOKINGS_KEY)).length === 0) {
-        const todayStr = formatDateIso(new Date());
-        const demoBookings = [
-          {
-            id: 'TR-1091',
-            name: 'Vikram Singhania',
-            phone: '+91 98201 44521',
-            vehicleType: 'SUV / 4x4',
-            vehicleModel: 'Toyota Fortuner GR (Black)',
-            reg: 'MH 01 AB 9999',
-            service: '9H Graphene Ceramic Shield',
-            date: todayStr,
-            slot: '01:30 PM - 03:30 PM',
-            price: 11999,
-            status: 'IN PROGRESS',
-            bay: 'Bay 01',
-            source: 'Walk-In',
-            payStatus: 'PAID',
-            payMethod: 'UPI / QR',
-            checkInTime: '01:35 PM',
-            created: new Date().toISOString()
-          },
-          {
-            id: 'TR-1092',
-            name: 'Ananya Deshmukh',
-            phone: '+91 99302 88712',
-            vehicleType: 'Sedan',
-            vehicleModel: 'Sedan',
-            reg: 'MH 02 CD 4455',
-            service: '3-Step Paint Correction & Rubbing',
-            date: todayStr,
-            slot: null,
-            price: 2999,
-            status: 'CONFIRMED',
-            bay: null,
-            source: 'ONLINE',
-            payStatus: 'UNPAID',
-            payMethod: 'Cash',
-            checkInTime: 'Pending',
-            created: new Date().toISOString()
-          },
-          {
-            id: 'TR-1090',
-            name: 'Karan Mehra',
-            phone: '+91 98112 33490',
-            vehicleType: 'Superbike',
-            vehicleModel: 'Ducati Panigale V4',
-            reg: 'MH 03 EF 1212',
-            service: 'Snow Foam Deep Exterior Wash',
-            date: todayStr,
-            slot: '09:00 AM - 11:00 AM',
-            price: 299,
-            status: 'COMPLETED',
-            bay: 'Bay 02',
-            source: 'Walk-In',
-            payStatus: 'PAID',
-            payMethod: 'Card',
-            checkInTime: '09:10 AM',
-            created: new Date(Date.now() - 7200000).toISOString()
-          }
-        ];
-        localStorage.setItem(BOOKINGS_KEY, JSON.stringify(demoBookings));
+      // Do not inject hardcoded demo bookings if bookings storage is uninitialized; default to clean empty list
+      if (!localStorage.getItem(BOOKINGS_KEY)) {
+        localStorage.setItem(BOOKINGS_KEY, JSON.stringify([]));
       }
-
-      // Kick off background Supabase fetch
-      syncFromSupabase();
     }
 
     // RENDER ALL DATA
@@ -2408,18 +2697,39 @@
       if (!tbody) return;
       tbody.innerHTML = '';
 
-      const todayStr = formatDateIso(new Date());
-      const tomDate = new Date();
-      tomDate.setDate(tomDate.getDate() + 1);
-      const tomStr = formatDateIso(tomDate);
+      // Calculate local YYYY-MM-DD dates without UTC/timezone shifting
+      const now = new Date();
+      const todayYear = now.getFullYear();
+      const todayMonth = String(now.getMonth() + 1).padStart(2, '0');
+      const todayDay = String(now.getDate()).padStart(2, '0');
+      const localToday = `${todayYear}-${todayMonth}-${todayDay}`;
+
+      const tomDate = new Date(todayYear, now.getMonth(), now.getDate() + 1);
+      const tomYear = tomDate.getFullYear();
+      const tomMonth = String(tomDate.getMonth() + 1).padStart(2, '0');
+      const tomDay = String(tomDate.getDate()).padStart(2, '0');
+      const localTomorrow = `${tomYear}-${tomMonth}-${tomDay}`;
 
       const filtered = bookings.filter(b => {
         const isOnline = (b.source || '').toUpperCase() === 'ONLINE';
         if (!isOnline) return false;
-        if (onlineFilterState === 'TODAY') return b.date === todayStr || (b.date && b.date.includes('Today'));
-        if (onlineFilterState === 'TOMORROW') return b.date === tomStr;
-        if (onlineFilterState === 'UPCOMING') return b.date > todayStr;
-        if (onlineFilterState === 'COMPLETED') return b.status === 'COMPLETED';
+
+        // Treat booking_date strictly as a date-only YYYY-MM-DD string
+        const bDate = (b.date || '').trim().slice(0, 10);
+
+        if (onlineFilterState === 'TODAY') {
+          return bDate === localToday;
+        }
+        if (onlineFilterState === 'TOMORROW') {
+          return bDate === localTomorrow;
+        }
+        if (onlineFilterState === 'UPCOMING') {
+          return bDate > localTomorrow;
+        }
+        if (onlineFilterState === 'COMPLETED') {
+          return (b.status || '').toUpperCase() === 'COMPLETED';
+        }
+        // ALL or default: show all online bookings
         return true;
       });
 
@@ -2431,31 +2741,36 @@
       filtered.forEach(b => {
         const tr = document.createElement('tr');
         const vehType = b.vehicleType || 'Car';
-        const regNum = b.reg || 'NO REG';
+        const regNum = b.reg || '';
+        const shortId = (b.id && b.id.length > 12) ? `${b.id.slice(0, 8)}…` : (b.id || 'N/A');
 
         tr.innerHTML = `
-          <td><strong style="color:var(--pink); font-family:'IBM Plex Mono';">${escapeHtml(b.id)}</strong></td>
           <td>
-            <div style="font-weight:600;">${escapeHtml(b.name)}</div>
-            <div style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--muted);">${escapeHtml(b.phone)}</div>
+            <span class="booking-id-tag" title="${escapeHtml(b.id)}">#${escapeHtml(shortId)}</span>
           </td>
           <td>
-            <div style="font-weight:600; color:var(--white);">${escapeHtml(vehType)}</div>
-            <div style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--pink);">${escapeHtml(regNum)}</div>
+            <div style="font-weight:600; color:var(--white); font-size:0.88rem;">${escapeHtml(b.name || 'Valued Customer')}</div>
+            <div style="font-family:'IBM Plex Mono', monospace; font-size:0.75rem; color:var(--muted); margin-top:2px;">${escapeHtml(b.phone || '')}</div>
           </td>
           <td>
-            <div>${escapeHtml(b.service)}</div>
-            <div style="font-family:'IBM Plex Mono'; font-weight:600; color:var(--green);">₹${(b.price || 0).toLocaleString()}</div>
+            <div style="font-weight:600; color:var(--white); font-size:0.86rem;">${escapeHtml(vehType)}</div>
+            ${regNum ? `<div style="font-family:'IBM Plex Mono', monospace; font-size:0.75rem; color:var(--pink); font-weight:600; margin-top:2px;">${escapeHtml(regNum)}</div>` : `<span style="color:var(--muted); font-size:0.72rem;">No Reg</span>`}
           </td>
           <td>
-            <div style="font-weight:500; font-family:'IBM Plex Mono';">${escapeHtml(b.date || 'Today')}</div>
+            <div style="font-weight:500; font-size:0.86rem; color:var(--white);">${escapeHtml(b.service)}</div>
+            <div style="font-family:'IBM Plex Mono', monospace; font-weight:600; color:var(--green); font-size:0.84rem; margin-top:2px;">₹${(b.price || 0).toLocaleString()}</div>
           </td>
-          <td><span class="status-badge status-${b.status.toLowerCase().replace(/\s+/g,'')}">${escapeHtml(b.status)}</span></td>
           <td>
-            <div style="display:flex; gap:0.3rem; flex-wrap:wrap;">
-              ${b.status==='CONFIRMED' ? `<button class="btn-icon-sm complete" onclick="changeJobStatus('${b.id}', 'ARRIVED')">🚗 Mark Arrived</button>` : ''}
-              <a href="https://wa.me/${cleanPhone(b.phone)}?text=Hi%20${encodeURIComponent(b.name)},%20confirming%20your%20Trieye%20booking%20for%20${encodeURIComponent(b.service)}%20on%20${encodeURIComponent(b.date)}" target="_blank" class="btn-icon-sm" style="text-decoration:none;">💬 WA</a>
-              <a href="tel:${cleanPhone(b.phone)}" class="btn-icon-sm" style="text-decoration:none;">📞 Call</a>
+            <div style="font-family:'IBM Plex Mono', monospace; font-size:0.82rem; font-weight:500; color:var(--white);">${escapeHtml(b.date || 'Today')}</div>
+          </td>
+          <td>
+            <span class="status-badge status-${(b.status || 'CONFIRMED').toLowerCase().replace(/\s+/g,'')}">${escapeHtml(b.status || 'CONFIRMED')}</span>
+          </td>
+          <td>
+            <div class="action-btn-group">
+              ${(b.status || '').toUpperCase() === 'CONFIRMED' ? `<button class="action-btn arrive" onclick="changeJobStatus('${b.id}', 'ARRIVED')" title="Mark Vehicle Arrived">🚗 Arrived</button>` : ''}
+              ${b.phone ? `<a href="https://wa.me/${cleanPhone(b.phone)}?text=Hi%20${encodeURIComponent(b.name || 'Customer')},%20confirming%20your%20Trieye%20booking%20for%20${encodeURIComponent(b.service)}%20on%20${encodeURIComponent(b.date)}" target="_blank" class="action-btn wa" title="Message on WhatsApp">💬 WA</a>` : ''}
+              ${b.phone ? `<a href="tel:${cleanPhone(b.phone)}" class="action-btn call" title="Call Customer">📞 Call</a>` : ''}
             </div>
           </td>
         `;
@@ -2853,10 +3168,192 @@
       showToast(`Schedule copied to ${targetDate}`);
     }
 
-    // 7. CUSTOMERS TABLE & MODAL
+    // 7. CUSTOMER HISTORY & BILL LOOKUP SYSTEM
+    let selectedCustomerPhone = null;
+
+    function handleCustomerSearchInput() {
+      const q = (document.getElementById('customer-search-input')?.value || '').trim();
+      if (!q) {
+        // Clear customer profile panel when search is empty
+        selectedCustomerPhone = null;
+        document.getElementById('customer-profile-panel').style.display = 'none';
+        document.getElementById('customer-history-panel').style.display = 'none';
+        renderCustomersTable();
+        return;
+      }
+
+      renderCustomersTable();
+
+      // Automatically find best matching customer to display profile & history
+      const custs = getCustomers();
+      const bookings = getBookings();
+      const cleanQ = q.replace(/\D/g, '');
+      const lowerQ = q.toLowerCase();
+
+      let matchedPhone = null;
+
+      // 1. Phone match
+      if (cleanQ.length >= 3) {
+        matchedPhone = Object.keys(custs).find(p => p.includes(cleanQ));
+      }
+
+      // 2. Name match
+      if (!matchedPhone) {
+        matchedPhone = Object.keys(custs).find(p => {
+          const c = custs[p];
+          return (c.name || '').toLowerCase().includes(lowerQ);
+        });
+      }
+
+      // 3. Vehicle Reg match (from customer or bookings)
+      if (!matchedPhone) {
+        matchedPhone = Object.keys(custs).find(p => {
+          const c = custs[p];
+          const directReg = (c.reg || '').toLowerCase().includes(lowerQ);
+          const listReg = Array.isArray(c.vehicles) && c.vehicles.some(v => (v.reg || '').toLowerCase().includes(lowerQ));
+          return directReg || listReg;
+        });
+      }
+
+      // 4. Booking record match fallback
+      if (!matchedPhone) {
+        const bMatch = bookings.find(b => {
+          const bReg = (b.reg || '').toLowerCase().includes(lowerQ);
+          const bName = (b.name || '').toLowerCase().includes(lowerQ);
+          const bPhone = (b.phone || '').replace(/\D/g, '').includes(cleanQ && cleanQ.length >= 3 ? cleanQ : '____');
+          return bReg || bName || bPhone;
+        });
+        if (bMatch && bMatch.phone) {
+          const cleanBPhone = cleanPhone(bMatch.phone);
+          if (cleanBPhone) matchedPhone = cleanBPhone;
+        }
+      }
+
+      if (matchedPhone) {
+        showCustomerProfile(matchedPhone);
+      }
+    }
+
+    function showCustomerProfile(phoneKey) {
+      selectedCustomerPhone = phoneKey;
+      const custs = getCustomers();
+      const bookings = getBookings();
+      const c = custs[phoneKey] || {};
+
+      // Filter all booking records for this customer (handling phone formatting variations)
+      const cleanTargetPhone = cleanPhone(phoneKey);
+      const customerBookings = bookings.filter(b => {
+        const bClean = cleanPhone(b.phone);
+        if (bClean && cleanTargetPhone && bClean === cleanTargetPhone) return true;
+        if (c.name && b.name && b.name.toLowerCase() === c.name.toLowerCase()) return true;
+        return false;
+      });
+
+      // Calculate real stats
+      const totalVisits = customerBookings.length || c.visits || 1;
+      const totalSpent = customerBookings.reduce((sum, b) => sum + (Number(b.price) || 0), 0) || c.spent || 0;
+      
+      let lastVisit = c.lastVisit || '—';
+      if (customerBookings.length > 0) {
+        const sorted = [...customerBookings].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+        if (sorted[0] && sorted[0].date) lastVisit = sorted[0].date;
+      }
+
+      // Vehicle details
+      let vehType = c.vehicleType || 'Car';
+      let vehReg = c.reg || 'NO REG';
+      if (customerBookings.length > 0 && customerBookings[0].reg) {
+        vehReg = customerBookings[0].reg;
+        vehType = customerBookings[0].vehicleType || customerBookings[0].vehicleModel || vehType;
+      } else if (Array.isArray(c.vehicles) && c.vehicles.length > 0) {
+        vehType = c.vehicles[0].type || vehType;
+        vehReg = c.vehicles[0].reg || vehReg;
+      }
+
+      // Populate Customer Profile Panel
+      document.getElementById('cust-prof-name').innerHTML = `<span>👤</span> ${escapeHtml(c.name || 'Valued Customer')}`;
+      document.getElementById('cust-prof-phone').innerText = `📱 +91 ${phoneKey}`;
+      document.getElementById('cust-prof-vehtype').innerText = vehType;
+      document.getElementById('cust-prof-vehreg').innerText = vehReg;
+      document.getElementById('cust-prof-visits').innerText = `${totalVisits} ${totalVisits === 1 ? 'Visit' : 'Visits'}`;
+      document.getElementById('cust-prof-spent').innerText = `₹${totalSpent.toLocaleString()}`;
+      document.getElementById('cust-prof-lastvisit').innerText = lastVisit;
+
+      document.getElementById('customer-profile-panel').style.display = 'block';
+
+      // Render Service History Table
+      renderCustomerHistoryTable(customerBookings, c, phoneKey);
+    }
+
+    function clearSelectedCustomer() {
+      selectedCustomerPhone = null;
+      document.getElementById('customer-profile-panel').style.display = 'none';
+      document.getElementById('customer-history-panel').style.display = 'none';
+    }
+
+    function editSelectedCustomer() {
+      if (selectedCustomerPhone) {
+        editCustomerModal(selectedCustomerPhone);
+      }
+    }
+
+    function renderCustomerHistoryTable(customerBookings, customerObj, phoneKey) {
+      const historyPanel = document.getElementById('customer-history-panel');
+      const historyTbody = document.getElementById('customer-history-tbody');
+      const badge = document.getElementById('cust-history-count-badge');
+      if (!historyPanel || !historyTbody) return;
+
+      historyPanel.style.display = 'block';
+      badge.innerText = `${customerBookings.length} ${customerBookings.length === 1 ? 'Record' : 'Records'} Found`;
+      historyTbody.innerHTML = '';
+
+      if (customerBookings.length === 0) {
+        historyTbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:2rem; color:var(--muted);">No previous service bookings recorded for this customer profile yet.</td></tr>`;
+        return;
+      }
+
+      customerBookings.forEach(b => {
+        const tr = document.createElement('tr');
+        const payStatus = (b.payStatus || 'UNPAID').toUpperCase();
+        const payMethod = b.payMethod || 'UPI / QR';
+        const jobStatus = (b.status || 'CONFIRMED').toUpperCase();
+        const payBadgeClass = 'pay-' + payStatus.toLowerCase();
+        
+        let statusBadgeClass = 'status-confirmed';
+        if (jobStatus === 'COMPLETED') statusBadgeClass = 'status-done';
+        else if (jobStatus === 'IN PROGRESS') statusBadgeClass = 'status-progress';
+        else if (jobStatus === 'ARRIVED') statusBadgeClass = 'status-arrived';
+        else if (jobStatus === 'CANCELLED') statusBadgeClass = 'status-cancelled';
+
+        tr.innerHTML = `
+          <td><strong class="booking-id-tag">${escapeHtml(b.id)}</strong></td>
+          <td><span style="font-family:'IBM Plex Mono'; font-size:0.8rem; color:var(--muted);">${escapeHtml(b.date || 'Today')}</span></td>
+          <td>
+            <div style="font-weight:600;">${escapeHtml(b.vehicleModel || b.vehicleType || 'Car')}</div>
+            <div style="font-family:'IBM Plex Mono'; font-size:0.72rem; color:var(--pink);">${escapeHtml(b.reg || 'NO REG')}</div>
+          </td>
+          <td><strong>${escapeHtml(b.service || 'Foam Wash')}</strong></td>
+          <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${(b.price || 0).toLocaleString()}</strong></td>
+          <td><span class="pay-badge ${payBadgeClass}">${escapeHtml(payStatus)}</span></td>
+          <td><span style="font-family:'IBM Plex Mono'; font-size:0.75rem;">${escapeHtml(payMethod)}</span></td>
+          <td><span class="status-badge ${statusBadgeClass}">${escapeHtml(jobStatus)}</span></td>
+          <td>
+            <div class="action-btn-group">
+              <button class="action-btn" title="View & Print Bill Invoice" onclick="openBillInvoiceModal('${b.id}')">🧾 View Bill</button>
+              <button class="action-btn wa" title="Share Bill on WhatsApp" onclick="shareBillWhatsApp('${b.id}')">💬 WhatsApp Bill</button>
+              <button class="action-btn" title="Print Invoice" onclick="printBillDirect('${b.id}')">🖨️ Print Bill</button>
+            </div>
+          </td>
+        `;
+        historyTbody.appendChild(tr);
+      });
+    }
+
     function renderCustomersTable() {
       const custs = getCustomers();
+      const bookings = getBookings();
       const q = (document.getElementById('customer-search-input')?.value || '').toLowerCase().trim();
+      const cleanQ = q.replace(/\D/g, '');
       const tbody = document.getElementById('customers-tbody');
       if (!tbody) return;
       tbody.innerHTML = '';
@@ -2864,30 +3361,192 @@
       const keys = Object.keys(custs).filter(k => {
         const c = custs[k];
         if (!q) return true;
-        return (c.name || '').toLowerCase().includes(q) || k.includes(q) || (c.reg || '').toLowerCase().includes(q);
+        const nameMatch = (c.name || '').toLowerCase().includes(q);
+        const phoneMatch = k.includes(cleanQ && cleanQ.length >= 2 ? cleanQ : q);
+        const regMatch = (c.reg || '').toLowerCase().includes(q) || 
+                         (Array.isArray(c.vehicles) && c.vehicles.some(v => (v.reg || '').toLowerCase().includes(q)));
+        return nameMatch || phoneMatch || regMatch;
       });
 
       if (keys.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:2rem; color:var(--muted);">No customer profiles found.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:2rem; color:var(--muted);">No customer profiles found. Use "+ New Customer Profile" to add one.</td></tr>`;
         return;
       }
 
       keys.forEach(k => {
         const c = custs[k];
+        const cleanK = cleanPhone(k);
+        const customerBookings = bookings.filter(b => cleanPhone(b.phone) === cleanK || (c.name && b.name && b.name.toLowerCase() === c.name.toLowerCase()));
+        
+        const visits = customerBookings.length || c.visits || 1;
+        const totalSpent = customerBookings.reduce((sum, b) => sum + (Number(b.price) || 0), 0) || c.spent || 0;
+        
+        let lastVisit = c.lastVisit || '—';
+        if (customerBookings.length > 0) {
+          const sorted = [...customerBookings].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+          if (sorted[0] && sorted[0].date) lastVisit = sorted[0].date;
+        }
+
+        const vehDisplay = c.reg ? `${c.vehicleType || 'Car'} (${c.reg})` : (c.model || c.vehicleType || 'Car');
+
         const tr = document.createElement('tr');
+        tr.style.cursor = 'pointer';
         tr.innerHTML = `
-          <td><strong style="color:var(--white);">${escapeHtml(c.name)}</strong></td>
-          <td><span style="font-family:'IBM Plex Mono';">${escapeHtml(k)}</span></td>
-          <td>${escapeHtml(c.model || c.vehicleType || 'Sedan')} <span style="font-family:'IBM Plex Mono'; font-size:0.7rem; color:var(--pink);">(${escapeHtml(c.reg || '')})</span></td>
-          <td><span class="status-badge status-confirmed">${c.visits || 1} Visits</span></td>
-          <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${(c.spent || 0).toLocaleString()}</strong></td>
-          <td><span style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--muted);">${escapeHtml(c.lastVisit || 'Today')}</span></td>
+          <td onclick="showCustomerProfile('${k}')">
+            <strong style="color:var(--white);">${escapeHtml(c.name || 'Valued Customer')}</strong>
+            <div style="font-size:0.72rem; color:var(--muted);">Click to view history &amp; bills</div>
+          </td>
+          <td onclick="showCustomerProfile('${k}')"><span style="font-family:'IBM Plex Mono'; font-weight:600;">+91 ${escapeHtml(k)}</span></td>
+          <td onclick="showCustomerProfile('${k}')">${escapeHtml(vehDisplay)}</td>
+          <td onclick="showCustomerProfile('${k}')"><span class="status-badge status-confirmed">${visits} ${visits === 1 ? 'Visit' : 'Visits'}</span></td>
+          <td onclick="showCustomerProfile('${k}')"><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${totalSpent.toLocaleString()}</strong></td>
+          <td onclick="showCustomerProfile('${k}')"><span style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--muted);">${escapeHtml(lastVisit)}</span></td>
           <td>
-            <button class="btn-icon-sm" onclick="editCustomerModal('${k}')">✏️ Edit</button>
+            <div class="action-btn-group">
+              <button class="action-btn" onclick="event.stopPropagation(); showCustomerProfile('${k}')">📜 History &amp; Bills</button>
+              <button class="action-btn-sm" onclick="event.stopPropagation(); editCustomerModal('${k}')">✏️ Edit</button>
+            </div>
           </td>
         `;
         tbody.appendChild(tr);
       });
+    }
+
+    // Bill & Invoice Modal with TRIEYE Branding & WhatsApp Generation
+    function openBillInvoiceModal(bookingId) {
+      const b = getBookings().find(x => x.id === bookingId);
+      if (!b) {
+        showToast('Booking details not found');
+        return;
+      }
+
+      const body = document.getElementById('receipt-modal-body');
+      body.innerHTML = `
+        <div class="invoice-box" style="padding:1.25rem; border-radius:8px; background:var(--bg-panel-2); border:1px solid var(--line); display:flex; flex-direction:column; gap:1rem;">
+          <!-- Studio Branding Header -->
+          <div style="text-align:center; padding-bottom:0.75rem; border-bottom:1px dashed var(--line);">
+            <div style="font-family:'Oswald', sans-serif; font-size:1.5rem; letter-spacing:0.04em; color:var(--white);">TRIEYE WATERWASH &amp; DETAILING</div>
+            <div style="font-size:0.75rem; color:var(--muted); font-family:'IBM Plex Mono'; margin-top:2px;">
+              Premium Car Spa, Ceramic Coating &amp; Paint Protection Studio<br>
+              OMR Road, Sholinganallur, Chennai · GSTIN: 33AAAAA0000A1Z5 · Ph: +91 98765 43210
+            </div>
+          </div>
+
+          <!-- Invoice Reference & Meta -->
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; font-family:'IBM Plex Mono';">
+            <div>
+              <span style="color:var(--muted);">INVOICE / REF:</span><br>
+              <strong style="color:var(--pink); font-size:0.95rem;">${escapeHtml(b.id)}</strong>
+            </div>
+            <div style="text-align:right;">
+              <span style="color:var(--muted);">DATE:</span><br>
+              <strong style="color:var(--white);">${escapeHtml(b.date || formatDateIso(new Date()))}</strong>
+            </div>
+          </div>
+
+          <!-- Customer & Vehicle Info -->
+          <div style="background:var(--bg-panel); border:1px solid var(--line-subtle); padding:0.85rem; border-radius:6px; font-size:0.82rem; line-height:1.45;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+              <span style="color:var(--muted);">Customer Name:</span>
+              <strong style="color:var(--white);">${escapeHtml(b.name || 'Valued Customer')}</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+              <span style="color:var(--muted);">Mobile / WhatsApp:</span>
+              <span style="font-family:'IBM Plex Mono'; font-weight:600;">${escapeHtml(b.phone || 'N/A')}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+              <span style="color:var(--muted);">Vehicle Type:</span>
+              <span>${escapeHtml(b.vehicleType || b.vehicleModel || 'Car')}</span>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+              <span style="color:var(--muted);">Registration Number:</span>
+              <strong style="font-family:'IBM Plex Mono'; color:var(--pink);">${escapeHtml(b.reg || 'TN 01 NO REG')}</strong>
+            </div>
+          </div>
+
+          <!-- Service & Pricing Breakdown -->
+          <div style="border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:0.75rem 0;">
+            <div style="display:flex; justify-content:space-between; font-size:0.75rem; font-family:'IBM Plex Mono'; color:var(--muted); text-transform:uppercase; margin-bottom:6px;">
+              <span>Service Description</span>
+              <span>Amount</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:0.9rem; align-items:center;">
+              <div>
+                <strong>${escapeHtml(b.service || 'Foam Wash')}</strong>
+                <div style="font-size:0.72rem; color:var(--muted);">${escapeHtml(b.bay || 'Detailing Bay 01')}</div>
+              </div>
+              <strong style="font-family:'IBM Plex Mono'; font-size:1rem; color:var(--white);">₹${(b.price || 0).toLocaleString()}</strong>
+            </div>
+          </div>
+
+          <!-- Payment Info & Final Total -->
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-size:0.72rem; color:var(--muted); font-family:'IBM Plex Mono';">PAYMENT METHOD</div>
+              <div style="font-size:0.85rem; font-weight:600; font-family:'IBM Plex Mono';">${escapeHtml(b.payMethod || 'UPI / QR')}</div>
+              <div style="font-size:0.72rem; color:var(--muted); font-family:'IBM Plex Mono'; margin-top:2px;">STATUS: <b style="color:var(--green);">${escapeHtml(b.payStatus || 'PAID')}</b></div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:0.75rem; color:var(--muted); font-family:'IBM Plex Mono'; text-transform:uppercase;">Final Total</div>
+              <div style="font-family:'Oswald', sans-serif; font-size:1.6rem; color:var(--green); font-weight:700;">₹${(b.price || 0).toLocaleString()}</div>
+            </div>
+          </div>
+
+          <!-- Footer Note -->
+          <div style="text-align:center; font-size:0.72rem; color:var(--muted); font-family:'IBM Plex Mono'; border-top:1px dashed var(--line); padding-top:0.6rem;">
+            Thank you for trusting Trieye Waterwash &amp; Detailing!<br>
+            For queries, call +91 98765 43210 or visit trieyestudio.com
+          </div>
+        </div>
+      `;
+      openModal('modalReceipt');
+    }
+
+    function shareBillWhatsApp(bookingId) {
+      const b = getBookings().find(x => x.id === bookingId);
+      if (!b) {
+        showToast('Booking details not found');
+        return;
+      }
+
+      const cleanP = cleanPhone(b.phone);
+      if (!cleanP || cleanP.length < 10) {
+        alert('Customer mobile number is not available or invalid.');
+        return;
+      }
+
+      const msg = 
+`✨ *TRIEYE WATERWASH & DETAILING STUDIO* ✨
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+📄 *SERVICE INVOICE & RECEIPT*
+
+*Invoice Ref:* #${b.id}
+*Date:* ${b.date || formatDateIso(new Date())}
+*Customer:* ${b.name || 'Valued Customer'}
+*Vehicle:* ${b.vehicleType || b.vehicleModel || 'Car'} (${b.reg || 'NO REG'})
+
+*Service Rendered:* ${b.service || 'Foam Wash'}
+*Payment Method:* ${b.payMethod || 'UPI / Cash'}
+*Payment Status:* ${b.payStatus || 'PAID'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+💰 *TOTAL AMOUNT:* ₹${(b.price || 0).toLocaleString()}
+━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Thank you for choosing Trieye Studio! 🚗✨
+📍 OMR Road, Sholinganallur, Chennai
+📞 Helpdesk: +91 98765 43210`;
+
+      const encoded = encodeURIComponent(msg);
+      window.open(`https://wa.me/91${cleanP}?text=${encoded}`, '_blank');
+      showToast('Opening WhatsApp Bill...');
+    }
+
+    function printBillDirect(bookingId) {
+      openBillInvoiceModal(bookingId);
+      setTimeout(() => {
+        window.print();
+      }, 350);
     }
 
     function openAddCustomerModal() {
@@ -2910,7 +3569,7 @@
       document.getElementById('cust-modal-name').value = c.name || '';
       document.getElementById('cust-modal-phone').value = phoneKey;
       document.getElementById('cust-modal-email').value = c.email || '';
-      document.getElementById('cust-modal-veh').value = c.model || '';
+      document.getElementById('cust-modal-veh').value = c.reg ? `${c.vehicleType || 'Car'} (${c.reg})` : (c.model || '');
       document.getElementById('cust-modal-notes').value = c.notes || '';
       document.getElementById('modal-cust-title').innerText = 'Edit Customer Profile';
       openModal('modalCustomer');
@@ -2943,6 +3602,9 @@
       saveCustomers(custs);
       closeModal('modalCustomer');
       showToast(`Customer ${name} saved`);
+      if (selectedCustomerPhone === phone || selectedCustomerPhone === orig) {
+        showCustomerProfile(phone);
+      }
     }
 
     // 8. SERVICES & PRICING TABLE & MODAL
@@ -2952,17 +3614,34 @@
       if (!tbody) return;
       tbody.innerHTML = '';
 
-      Object.keys(svcs).forEach(k => {
+      const serviceKeys = Object.keys(svcs);
+      if (serviceKeys.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:2rem; color:var(--muted);">No services configured yet. Click "+ Add New Service" to create one.</td></tr>`;
+        return;
+      }
+
+      serviceKeys.forEach(k => {
         const s = svcs[k];
+        const basePrice = Number(s.base_price || (s.pricing && s.pricing['Sedan']) || 0);
+        const hatchPrice = s.pricing && s.pricing['Hatchback'] !== undefined ? s.pricing['Hatchback'] : basePrice;
+        const sedanPrice = s.pricing && s.pricing['Sedan'] !== undefined ? s.pricing['Sedan'] : basePrice;
+        const suvPrice = s.pricing && s.pricing['SUV / 4x4'] !== undefined ? s.pricing['SUV / 4x4'] : basePrice;
+        const bikePrice = s.pricing && s.pricing['Superbike'] !== undefined ? s.pricing['Superbike'] : basePrice;
+
+        const durationBadge = s.duration_minutes ? `<span style="font-family:'IBM Plex Mono'; font-size:0.7rem; color:var(--blue); margin-left:4px;">⏱️ ${s.duration_minutes}m</span>` : '';
+
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td><strong style="color:var(--white);">${escapeHtml(k)}</strong></td>
-          <td><span style="font-size:0.75rem; color:var(--muted);">${escapeHtml(s.desc)}</span></td>
-          <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${s.pricing['Hatchback']}</strong></td>
-          <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${s.pricing['Sedan']}</strong></td>
-          <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${s.pricing['SUV / 4x4']}</strong></td>
-          <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${s.pricing['Superbike']}</strong></td>
-          <td><span class="status-badge status-done">${s.active ? 'ACTIVE' : 'INACTIVE'}</span></td>
+          <td>
+            <strong style="color:var(--white);">${escapeHtml(k)}</strong>
+            ${durationBadge}
+          </td>
+          <td><span style="font-size:0.75rem; color:var(--muted);">${escapeHtml(s.desc || 'Standard Studio Service')}</span></td>
+          <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${hatchPrice.toLocaleString()}</strong></td>
+          <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${sedanPrice.toLocaleString()}</strong></td>
+          <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${suvPrice.toLocaleString()}</strong></td>
+          <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${bikePrice.toLocaleString()}</strong></td>
+          <td><span class="status-badge ${s.active !== false ? 'status-done' : 'status-cancelled'}">${s.active !== false ? 'ACTIVE' : 'INACTIVE'}</span></td>
           <td>
             <button class="btn-icon-sm" onclick="editServiceModal('${escapeHtml(k)}')">✏️ Edit</button>
           </td>
@@ -2989,6 +3668,8 @@
       document.getElementById('svc-modal-orig-name').value = '';
       document.getElementById('svc-modal-name').value = '';
       document.getElementById('svc-modal-desc').value = '';
+      const durEl = document.getElementById('svc-modal-duration');
+      if (durEl) durEl.value = 45;
       document.getElementById('svc-modal-price-hatch').value = 499;
       document.getElementById('svc-modal-price-sedan').value = 699;
       document.getElementById('svc-modal-price-suv').value = 799;
@@ -3001,13 +3682,21 @@
       const s = svcs[name];
       if (!s) return;
 
+      const p = s.pricing || {};
+      const hatch = s.hatchback_price !== undefined ? s.hatchback_price : (p['Hatchback'] !== undefined ? p['Hatchback'] : s.base_price);
+      const sedan = s.sedan_price !== undefined ? s.sedan_price : (p['Sedan'] !== undefined ? p['Sedan'] : s.base_price);
+      const suv = s.suv_price !== undefined ? s.suv_price : (p['SUV / 4x4'] !== undefined ? p['SUV / 4x4'] : s.base_price);
+      const bike = s.bike_price !== undefined ? s.bike_price : (p['Superbike'] !== undefined ? p['Superbike'] : s.base_price);
+
       document.getElementById('svc-modal-orig-name').value = name;
       document.getElementById('svc-modal-name').value = name;
       document.getElementById('svc-modal-desc').value = s.desc || '';
-      document.getElementById('svc-modal-price-hatch').value = s.pricing['Hatchback'];
-      document.getElementById('svc-modal-price-sedan').value = s.pricing['Sedan'];
-      document.getElementById('svc-modal-price-suv').value = s.pricing['SUV / 4x4'];
-      document.getElementById('svc-modal-price-bike').value = s.pricing['Superbike'];
+      const durEl = document.getElementById('svc-modal-duration');
+      if (durEl) durEl.value = s.duration_minutes || '';
+      document.getElementById('svc-modal-price-hatch').value = hatch;
+      document.getElementById('svc-modal-price-sedan').value = sedan;
+      document.getElementById('svc-modal-price-suv').value = suv;
+      document.getElementById('svc-modal-price-bike').value = bike;
       openModal('modalService');
     }
 
@@ -3015,24 +3704,35 @@
       const orig = document.getElementById('svc-modal-orig-name').value;
       const name = document.getElementById('svc-modal-name').value.trim();
       const desc = document.getElementById('svc-modal-desc').value.trim();
-      const h = Number(document.getElementById('svc-modal-price-hatch').value) || 499;
-      const sed = Number(document.getElementById('svc-modal-price-sedan').value) || 699;
-      const suv = Number(document.getElementById('svc-modal-price-suv').value) || 799;
-      const bike = Number(document.getElementById('svc-modal-price-bike').value) || 299;
+      const durEl = document.getElementById('svc-modal-duration');
+      const duration = durEl && durEl.value ? Number(durEl.value) : null;
+      const h = Number(document.getElementById('svc-modal-price-hatch').value) || 0;
+      const sed = Number(document.getElementById('svc-modal-price-sedan').value) || 0;
+      const suv = Number(document.getElementById('svc-modal-price-suv').value) || 0;
+      const bike = Number(document.getElementById('svc-modal-price-bike').value) || 0;
 
       if (!name) return;
       const svcs = getServices();
+      const existing = svcs[orig] || svcs[name] || {};
       if (orig && orig !== name) delete svcs[orig];
 
       svcs[name] = {
-        desc,
+        id: existing.id || null,
+        name: name,
+        desc: desc,
+        base_price: sed,
+        hatchback_price: h,
+        sedan_price: sed,
+        suv_price: suv,
+        bike_price: bike,
+        duration_minutes: duration || existing.duration_minutes || null,
         pricing: { 'Hatchback': h, 'Sedan': sed, 'SUV / 4x4': suv, 'Superbike': bike },
-        active: true
+        active: existing.active !== false
       };
 
       saveServices(svcs);
       closeModal('modalService');
-      showToast(`Service ${name} configured`);
+      showToast(`Service ${name} configured and synced`);
     }
 
     // 9. PAYMENTS LEDGER & RECEIPT
@@ -3115,34 +3815,7 @@
     }
 
     function openReceiptModal(bookingId) {
-      const b = getBookings().find(x => x.id === bookingId);
-      if (!b) return;
-
-      const body = document.getElementById('receipt-modal-body');
-      body.innerHTML = `
-        <div style="text-align:center; padding-bottom:1rem; border-bottom:1px dashed var(--line);">
-          <h3 style="font-family:'Oswald'; font-size:1.4rem;">TRIEYE WATERWASH &amp; DETAILING</h3>
-          <p style="font-size:0.75rem; color:var(--muted); font-family:'IBM Plex Mono';">OMR Road, Sholinganallur, Chennai · GSTIN: 33AAAAA0000A1Z5</p>
-        </div>
-        <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-family:'IBM Plex Mono';">
-          <span>Receipt #: <b>${b.id}</b></span>
-          <span>Date: <b>${b.date || 'Today'}</b></span>
-        </div>
-        <div style="background:var(--bg-panel-2); padding:0.75rem; border-radius:6px; font-size:0.8rem;">
-          <div>Customer: <b>${escapeHtml(b.name)}</b></div>
-          <div>Vehicle: <b>${escapeHtml(b.vehicleModel || b.vehicleType)} (${escapeHtml(b.reg || 'TN 01')})</b></div>
-          <div>Service: <b>${escapeHtml(b.service)}</b></div>
-        </div>
-        <div style="display:flex; justify-content:space-between; font-size:1.1rem; font-family:'Oswald'; border-top:1px solid var(--line); padding-top:0.75rem;">
-          <span>TOTAL CHARGED:</span>
-          <span style="color:var(--green);">₹${(b.price || 0).toLocaleString()}</span>
-        </div>
-        <div style="text-align:center; font-size:0.72rem; color:var(--muted); font-family:'IBM Plex Mono';">
-          Status: <b style="color:var(--green);">${escapeHtml(b.payStatus || 'PAID')}</b> via ${escapeHtml(b.payMethod || 'UPI / QR')}<br>
-          Thank you for choosing Trieye Studio!
-        </div>
-      `;
-      openModal('modalReceipt');
+      openBillInvoiceModal(bookingId);
     }
 
     // 10. COMPLETED JOBS ARCHIVE
@@ -3232,50 +3905,132 @@
       showToast('Studio profile settings saved!');
     }
 
-    function saveAdminPin(e) {
+    let realtimeChannel = null;
+
+    // Check whether an active admin session exists
+    async function checkAdminAuth() {
+      const overlay = document.getElementById('adminAuthOverlay');
+      if (!window.TrieyeDB) {
+        if (overlay) overlay.style.display = 'flex';
+        return false;
+      }
+
+      try {
+        const session = await window.TrieyeDB.getSession();
+        if (!session || !session.user) {
+          console.warn('⚠️ [Trieye Dashboard] No active Supabase session found. Displaying Admin Login screen.');
+          if (overlay) overlay.style.display = 'flex';
+          return false;
+        }
+
+        console.log(`⚡ [Trieye Dashboard] Active session found for user: ${session.user.email} (${session.user.id}). Verifying admin role...`);
+        const roleCheck = await window.TrieyeDB.verifyAdminRole(session.user.id);
+        
+        if (!roleCheck.isAdmin) {
+          console.warn(`⚠️ [Trieye Dashboard] User ${session.user.email} lacks 'admin' role in public.profiles. Current role: "${roleCheck.role}". Signing out.`);
+          await window.TrieyeDB.signOutAdmin();
+          if (overlay) overlay.style.display = 'flex';
+          const errEl = document.getElementById('authErrorMsg');
+          if (errEl) {
+            errEl.innerText = 'Unauthorized admin account.';
+            errEl.style.display = 'block';
+          }
+          return false;
+        }
+
+        console.log(`✅ [Trieye Dashboard] Admin role confirmed for user: ${session.user.email}`);
+        if (overlay) overlay.style.display = 'none';
+        
+        // After successful admin verification, load admin data & start realtime subscriptions
+        await onAdminAuthenticated();
+        return true;
+      } catch (err) {
+        console.error('🚨 [Trieye Dashboard Auth Error]:', err);
+        if (overlay) overlay.style.display = 'flex';
+        return false;
+      }
+    }
+
+    // Called only after successful admin verification
+    async function onAdminAuthenticated() {
+      console.log('⚡ [Trieye Dashboard] Loading authenticated admin data from Supabase...');
+      await syncFromSupabase();
+      renderAll();
+
+      // Establish real-time subscriptions if not already active
+      if (!realtimeChannel && window.TrieyeDB && typeof window.TrieyeDB.subscribeToChanges === 'function') {
+        realtimeChannel = window.TrieyeDB.subscribeToChanges((table) => {
+          console.log(`⚡ [Trieye Dashboard Real-Time] Received update on ${table}`);
+          syncFromSupabase();
+        });
+      }
+    }
+
+    async function handleAdminLogin(e) {
       e.preventDefault();
-      const pin = document.getElementById('set-admin-pin').value.trim();
-      const req = document.getElementById('set-require-pin').value === 'true';
+      const email = document.getElementById('adminAuthEmail').value.trim();
+      const pass = document.getElementById('adminAuthPass').value;
+      const btn = document.getElementById('adminLoginBtn');
+      const errEl = document.getElementById('authErrorMsg');
 
-      if (pin) {
-        localStorage.setItem(AUTH_PIN_KEY, pin);
-        localStorage.setItem('trieye_require_pin', req);
-        showToast('Security PIN updated successfully!');
+      if (!email || !pass) {
+        if (errEl) {
+          errEl.innerText = 'Please enter both email and password.';
+          errEl.style.display = 'block';
+        }
+        return;
       }
-    }
 
-    function checkAdminAuth() {
-      const requirePin = localStorage.getItem('trieye_require_pin') !== 'false';
-      const isUnlocked = sessionStorage.getItem('trieye_admin_unlocked') === 'true';
+      if (errEl) errEl.style.display = 'none';
+      if (btn) {
+        btn.disabled = true;
+        btn.innerText = 'Verifying Admin Credentials...';
+      }
 
-      if (requirePin && !isUnlocked) {
-        document.getElementById('adminAuthOverlay').style.display = 'flex';
-      } else {
+      try {
+        const result = await window.TrieyeDB.signInAdmin(email, pass);
+
+        if (!result.success) {
+          if (errEl) {
+            errEl.innerText = result.error || 'Authentication failed.';
+            errEl.style.display = 'block';
+          }
+          return;
+        }
+
         document.getElementById('adminAuthOverlay').style.display = 'none';
+        showToast('Welcome back, Studio Admin!');
+        await onAdminAuthenticated();
+      } catch (err) {
+        console.error('🚨 [Trieye Dashboard Login Error]:', err);
+        if (errEl) {
+          errEl.innerText = err.message || 'Login failed. Please check your credentials.';
+          errEl.style.display = 'block';
+        }
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerText = 'Sign In to Dashboard →';
+        }
       }
     }
 
-    function handleAdminLogin(e) {
-      e.preventDefault();
-      const entered = document.getElementById('adminAuthPass').value.trim();
-      const correct = localStorage.getItem(AUTH_PIN_KEY) || '1234';
-
-      if (entered === correct || entered === '1234' || entered === '2040' || entered === 'admin') {
-        sessionStorage.setItem('trieye_admin_unlocked', 'true');
-        document.getElementById('adminAuthOverlay').style.display = 'none';
-        showToast('Welcome back, Studio Owner!');
-      } else {
-        document.getElementById('authErrorMsg').style.display = 'block';
+    async function lockAdminConsole() {
+      console.log('⚡ [Trieye Dashboard] Admin logging out...');
+      if (window.TrieyeDB && typeof window.TrieyeDB.signOutAdmin === 'function') {
+        await window.TrieyeDB.signOutAdmin();
       }
-    }
-
-    function lockAdminConsole() {
-      sessionStorage.removeItem('trieye_admin_unlocked');
+      realtimeChannel = null;
       document.getElementById('adminAuthOverlay').style.display = 'flex';
-      document.getElementById('adminAuthPass').value = '';
+      const emailEl = document.getElementById('adminAuthEmail');
+      const passEl = document.getElementById('adminAuthPass');
+      const errEl = document.getElementById('authErrorMsg');
+      if (passEl) passEl.value = '';
+      if (errEl) errEl.style.display = 'none';
+      showToast('Logged out of Admin Console.');
     }
 
-    // Export & Reset System
+    // Export System Data
     function exportBookingsJSON() {
       const data = JSON.stringify(getBookings(), null, 2);
       const blob = new Blob([data], { type: 'application/json' });
@@ -3284,18 +4039,6 @@
       a.href = url;
       a.download = 'trieye-bookings-' + formatDateIso(new Date()) + '.json';
       a.click();
-    }
-
-    function resetDemoData() {
-      if (confirm('Reset system with fresh demo bookings, bays and customers?')) {
-        localStorage.removeItem(BOOKINGS_KEY);
-        localStorage.removeItem(CUSTOMERS_KEY);
-        localStorage.removeItem(SERVICES_KEY);
-        localStorage.removeItem(BAYS_KEY);
-        initializeData();
-        renderAll();
-        showToast('System reset to demo data');
-      }
     }
 
     // THEME SWITCHER
@@ -3320,18 +4063,33 @@
     }
 
     // INITIALIZATION & REAL-TIME SYNC
-    window.addEventListener('DOMContentLoaded', () => {
+    window.addEventListener('DOMContentLoaded', async () => {
       initializeData();
-      checkAdminAuth();
       renderAll();
 
-      // Supabase Real-Time Subscriptions
-      if (window.TrieyeDB && typeof window.TrieyeDB.subscribeToChanges === 'function') {
+      // Check Supabase session first before loading sensitive admin data
+      await checkAdminAuth();
+
+      // Setup live Realtime subscription from Supabase
+      if (window.TrieyeDB) {
         window.TrieyeDB.subscribeToChanges((table) => {
-          console.log(`⚡ [Trieye Dashboard Real-Time] Received update on ${table}`);
+          console.log('⚡ [Realtime Notification received on dashboard.html for table]:', table);
           syncFromSupabase();
         });
       }
+
+      // Cross-tab BroadcastChannel listener
+      try {
+        if (typeof BroadcastChannel !== 'undefined') {
+          const syncChan = new BroadcastChannel('trieye_pricing_sync');
+          syncChan.onmessage = (msg) => {
+            if (msg.data && msg.data.type === 'PRICING_UPDATED') {
+              renderServicesTable();
+              populateServiceSelects();
+            }
+          };
+        }
+      } catch (e) {}
 
       window.addEventListener('storage', (e) => {
         if (e.key === BOOKINGS_KEY || e.key === SCHEDULE_KEY || e.key === CUSTOMERS_KEY || e.key === SERVICES_KEY) {

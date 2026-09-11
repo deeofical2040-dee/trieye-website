@@ -320,7 +320,7 @@
   /* ---------- SPEC SHEET / PRICING ---------- */
   .spec-table{border:1px solid var(--line);background:var(--bg-panel);}
   .spec-row{
-    display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;
+    display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr 1fr;
     border-bottom:1px solid var(--line);align-items:center;
   }
   .spec-row:last-child{border-bottom:none;}
@@ -837,63 +837,68 @@
     <div class="sec-head">
       <div class="sec-tag">// Services &amp; pricing</div>
       <h2>Pick your vehicle class</h2>
-      <p>Three service tiers, three vehicle classes. Rates shown are current studio pricing.</p>
+      <p>Three service tiers, four vehicle classes. Rates shown are current studio pricing synced live from the studio database.</p>
     </div>
 
-    <div class="spec-table">
+    <div class="spec-table" id="public-services-table">
       <div class="spec-row head">
         <div class="cell">Vehicle</div>
-        <div class="cell">Foam Wash</div>
-        <div class="cell">Rubbing Polish</div>
-        <div class="cell">Interior Deep Cleaning</div>
+        <div class="cell" id="col-svc-1">Foam Wash</div>
+        <div class="cell" id="col-svc-2">Full Detail Combo</div>
+        <div class="cell" id="col-svc-3">Interior Deep Cleaning</div>
+        <div class="cell" id="col-svc-4">Rubbing Polish</div>
       </div>
 
-      <div class="spec-row">
+      <div class="spec-row" data-veh-row="Hatchback">
         <div class="cell veh-cell">
           <div class="veh-icon" data-veh="Hatchback" title="Click to pop foam bubbles!">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13l1.5-4.5A2 2 0 0 1 6.4 7h11.2a2 2 0 0 1 1.9 1.5L21 13"/><rect x="2" y="13" width="20" height="5" rx="1"/><circle cx="7" cy="18.5" r="1.6"/><circle cx="17" cy="18.5" r="1.6"/></svg>
           </div>
           <span class="veh-name">Hatchback</span>
         </div>
-        <div class="cell" data-label="Foam Wash"><span class="price mono">₹599</span><span class="price-lbl">per wash</span></div>
-        <div class="cell" data-label="Rubbing Polish"><span class="price mono">₹2,999</span><span class="price-lbl">per visit</span></div>
-        <div class="cell" data-label="Interior Deep Cleaning"><span class="price mono hi">₹1,699</span><span class="price-lbl">per visit</span></div>
+        <div class="cell" data-label="Foam Wash" data-svc-cell="Foam Wash"><span class="price mono">₹566</span><span class="price-lbl">per wash</span></div>
+        <div class="cell" data-label="Full Detail Combo" data-svc-cell="Full Detail Combo"><span class="price mono hi">₹3,999</span><span class="price-lbl">per visit</span></div>
+        <div class="cell" data-label="Interior Deep Cleaning" data-svc-cell="Interior Deep Cleaning"><span class="price mono">₹1,839</span><span class="price-lbl">per visit</span></div>
+        <div class="cell" data-label="Rubbing Polish" data-svc-cell="Rubbing Polish"><span class="price mono hi">₹2,799</span><span class="price-lbl">per visit</span></div>
       </div>
 
-      <div class="spec-row">
+      <div class="spec-row" data-veh-row="Sedan">
         <div class="cell veh-cell">
           <div class="veh-icon" data-veh="Sedan" title="Click to pop foam bubbles!">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 13l2-5A2 2 0 0 1 6.3 6.7h4.4l2 2.3h4.1a2 2 0 0 1 1.9 1.4l1.3 2.6"/><rect x="1.5" y="13" width="21" height="5" rx="1"/><circle cx="7" cy="18.5" r="1.6"/><circle cx="17" cy="18.5" r="1.6"/></svg>
           </div>
           <span class="veh-name">Sedan</span>
         </div>
-        <div class="cell" data-label="Foam Wash"><span class="price mono">₹699</span><span class="price-lbl">per wash</span></div>
-        <div class="cell" data-label="Rubbing Polish"><span class="price mono">₹3,499</span><span class="price-lbl">per visit</span></div>
-        <div class="cell" data-label="Interior Deep Cleaning"><span class="price mono hi">₹2,299</span><span class="price-lbl">per visit</span></div>
+        <div class="cell" data-label="Foam Wash" data-svc-cell="Foam Wash"><span class="price mono">₹699</span><span class="price-lbl">per wash</span></div>
+        <div class="cell" data-label="Full Detail Combo" data-svc-cell="Full Detail Combo"><span class="price mono hi">₹4,999</span><span class="price-lbl">per visit</span></div>
+        <div class="cell" data-label="Interior Deep Cleaning" data-svc-cell="Interior Deep Cleaning"><span class="price mono hi">₹2,299</span><span class="price-lbl">per visit</span></div>
+        <div class="cell" data-label="Rubbing Polish" data-svc-cell="Rubbing Polish"><span class="price mono hi">₹3,499</span><span class="price-lbl">per visit</span></div>
       </div>
 
-      <div class="spec-row">
+      <div class="spec-row" data-veh-row="SUV">
         <div class="cell veh-cell">
           <div class="veh-icon" data-veh="SUV" title="Click to pop foam bubbles!">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13l1.8-5.2A2.2 2.2 0 0 1 5.9 6.3h3.5l2.3 2.4h4.6a2.2 2.2 0 0 1 2 1.3l1.7 3"/><rect x="1" y="13" width="22" height="5.5" rx="1"/><circle cx="6.8" cy="18.8" r="1.8"/><circle cx="17.2" cy="18.8" r="1.8"/></svg>
           </div>
-          <span class="veh-name">SUV</span>
+          <span class="veh-name">SUV / 4x4</span>
         </div>
-        <div class="cell" data-label="Foam Wash"><span class="price mono">₹799</span><span class="price-lbl">per wash</span></div>
-        <div class="cell" data-label="Rubbing Polish"><span class="price mono">₹4,499</span><span class="price-lbl">per visit</span></div>
-        <div class="cell" data-label="Interior Deep Cleaning"><span class="price mono hi">₹2,999</span><span class="price-lbl">per visit</span></div>
+        <div class="cell" data-label="Foam Wash" data-svc-cell="Foam Wash"><span class="price mono">₹874</span><span class="price-lbl">per wash</span></div>
+        <div class="cell" data-label="Full Detail Combo" data-svc-cell="Full Detail Combo"><span class="price mono hi">₹6,249</span><span class="price-lbl">per visit</span></div>
+        <div class="cell" data-label="Interior Deep Cleaning" data-svc-cell="Interior Deep Cleaning"><span class="price mono hi">₹2,874</span><span class="price-lbl">per visit</span></div>
+        <div class="cell" data-label="Rubbing Polish" data-svc-cell="Rubbing Polish"><span class="price mono hi">₹4,374</span><span class="price-lbl">per visit</span></div>
       </div>
 
-      <div class="spec-row">
+      <div class="spec-row" data-veh-row="Bike">
         <div class="cell veh-cell">
           <div class="veh-icon" data-veh="Bike" title="Click to pop foam bubbles!">
             <svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg>
           </div>
           <span class="veh-name">Superbike / Bike</span>
         </div>
-        <div class="cell" data-label="Foam Wash"><span class="price mono">₹299</span><span class="price-lbl">per wash</span></div>
-        <div class="cell" data-label="Rubbing Polish"><span class="price mono">₹1,499</span><span class="price-lbl">per visit</span></div>
-        <div class="cell" data-label="Interior Deep Cleaning"><span class="price mono">₹799</span><span class="price-lbl">chain &amp; deep clean</span></div>
+        <div class="cell" data-label="Foam Wash" data-svc-cell="Foam Wash"><span class="price mono">₹350</span><span class="price-lbl">per wash</span></div>
+        <div class="cell" data-label="Full Detail Combo" data-svc-cell="Full Detail Combo"><span class="price mono hi">₹2,500</span><span class="price-lbl">per visit</span></div>
+        <div class="cell" data-label="Interior Deep Cleaning" data-svc-cell="Interior Deep Cleaning"><span class="price mono">₹1,150</span><span class="price-lbl">chain &amp; deep clean</span></div>
+        <div class="cell" data-label="Rubbing Polish" data-svc-cell="Rubbing Polish"><span class="price mono">₹1,750</span><span class="price-lbl">per visit</span></div>
       </div>
     </div>
     <div class="pricing-note">
@@ -920,19 +925,16 @@
         <div class="field">
           <label for="vt">Vehicle type</label>
           <select id="vt" required>
-            <option value="Hatchback">Hatchback (₹599+)</option>
-            <option value="Sedan">Sedan (₹699+)</option>
-            <option value="SUV">SUV (₹799+)</option>
-            <option value="Bike">Superbike / Bike (₹299+)</option>
+            <option value="Hatchback">Hatchback</option>
+            <option value="Sedan">Sedan</option>
+            <option value="SUV">SUV / 4x4</option>
+            <option value="Bike">Superbike / Bike</option>
           </select>
         </div>
         <div class="field">
           <label for="svc">Service Package</label>
           <select id="svc" required>
-            <option value="Foam Wash">Foam Wash</option>
-            <option value="Rubbing Polish">Rubbing Polish</option>
-            <option value="Interior Deep Cleaning">Interior Deep Cleaning</option>
-            <option value="Full Detail Combo">Full Detail Combo (Wash + Polish + Interior)</option>
+            <option value="Foam Wash">Loading services...</option>
           </select>
         </div>
       </div>
@@ -1264,15 +1266,201 @@
   // Slot Selection State
   let selectedSlot = '';
 
+  // Default Studio Services Catalog Matrix
+  const defaultServices = {
+    'Foam Wash': {
+      name: 'Foam Wash',
+      desc: 'Snow Foam Pre-Wash & Decontamination detailing',
+      duration_minutes: 45,
+      base_price: 699,
+      hatchback_price: 566,
+      sedan_price: 699,
+      suv_price: 874,
+      bike_price: 350,
+      pricing: { 'Hatchback': 566, 'Sedan': 699, 'SUV / 4x4': 874, 'Superbike': 350 },
+      active: true
+    },
+    'Full Detail Combo': {
+      name: 'Full Detail Combo',
+      desc: 'Comprehensive detailing package (Foam Wash + Rubbing Polish + Interior Deep Cleaning)',
+      duration_minutes: 180,
+      base_price: 4999,
+      hatchback_price: 3999,
+      sedan_price: 4999,
+      suv_price: 6249,
+      bike_price: 2500,
+      pricing: { 'Hatchback': 3999, 'Sedan': 4999, 'SUV / 4x4': 6249, 'Superbike': 2500 },
+      active: true
+    },
+    'Interior Deep Cleaning': {
+      name: 'Interior Deep Cleaning',
+      desc: 'Steam extraction & interior upholstery deep clean',
+      duration_minutes: 90,
+      base_price: 2299,
+      hatchback_price: 1839,
+      sedan_price: 2299,
+      suv_price: 2874,
+      bike_price: 1150,
+      pricing: { 'Hatchback': 1839, 'Sedan': 2299, 'SUV / 4x4': 2874, 'Superbike': 1150 },
+      active: true
+    },
+    'Rubbing Polish': {
+      name: 'Rubbing Polish',
+      desc: 'Dual-Action Rubbing Polish & Paint Correction',
+      duration_minutes: 120,
+      base_price: 3499,
+      hatchback_price: 2799,
+      sedan_price: 3499,
+      suv_price: 4374,
+      bike_price: 1750,
+      pricing: { 'Hatchback': 2799, 'Sedan': 3499, 'SUV / 4x4': 4374, 'Superbike': 1750 },
+      active: true
+    }
+  };
+
+  // Dynamic Service Table & Booking Dropdown Rendering from Backend/Admin
+  let activeServicesList = [];
+
+  function getVehiclePrice(service, vehicleType) {
+    if (!service) return 0;
+    const vt = (vehicleType || '').toLowerCase();
+    const p = service.pricing || {};
+    if (vt.includes('hatch')) {
+      return Number(service.hatchback_price !== null && service.hatchback_price !== undefined ? service.hatchback_price : (p['Hatchback'] !== undefined ? p['Hatchback'] : service.base_price || 0));
+    }
+    if (vt.includes('suv') || vt.includes('4x4')) {
+      return Number(service.suv_price !== null && service.suv_price !== undefined ? service.suv_price : (p['SUV / 4x4'] !== undefined ? p['SUV / 4x4'] : service.base_price || 0));
+    }
+    if (vt.includes('bike') || vt.includes('superbike') || vt.includes('motorcycle') || vt.includes('two')) {
+      return Number(service.bike_price !== null && service.bike_price !== undefined ? service.bike_price : (p['Superbike'] !== undefined ? p['Superbike'] : service.base_price || 0));
+    }
+    // Default Sedan / Car
+    return Number(service.sedan_price !== null && service.sedan_price !== undefined ? service.sedan_price : (p['Sedan'] !== undefined ? p['Sedan'] : service.base_price || 0));
+  }
+
+  function updateBookingDropdownPrices() {
+    const selectEl = document.getElementById('svc');
+    const vehTypeEl = document.getElementById('vt');
+    if (!selectEl || activeServicesList.length === 0) return;
+
+    const currentVeh = vehTypeEl ? vehTypeEl.value : 'Sedan';
+    const prevVal = selectEl.value;
+
+    selectEl.innerHTML = '';
+    activeServicesList.forEach(s => {
+      const price = getVehiclePrice(s, currentVeh);
+      const opt = document.createElement('option');
+      opt.value = s.name;
+      opt.innerText = `${s.name} (₹${price.toLocaleString('en-IN')})`;
+      selectEl.appendChild(opt);
+    });
+
+    if (prevVal && activeServicesList.some(s => s.name === prevVal)) {
+      selectEl.value = prevVal;
+    }
+  }
+
+  function renderPublicServices(servicesMap) {
+    if (!servicesMap || typeof servicesMap !== 'object') return;
+
+    // Filter only active services
+    const services = Object.values(servicesMap).filter(s => s.active !== false);
+    if (services.length === 0) return;
+    activeServicesList = services;
+
+    const tableEl = document.getElementById('public-services-table');
+    if (tableEl) {
+      // Vehicle rows metadata
+      const vehRows = [
+        {
+          key: 'Hatchback',
+          name: 'Hatchback',
+          icon: `<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 13l1.5-4.5A2 2 0 0 1 6.4 7h11.2a2 2 0 0 1 1.9 1.5L21 13"/><rect x="2" y="13" width="20" height="5" rx="1"/><circle cx="7" cy="18.5" r="1.6"/><circle cx="17" cy="18.5" r="1.6"/></svg>`
+        },
+        {
+          key: 'Sedan',
+          name: 'Sedan',
+          icon: `<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 13l2-5A2 2 0 0 1 6.3 6.7h4.4l2 2.3h4.1a2 2 0 0 1 1.9 1.4l1.3 2.6"/><rect x="1.5" y="13" width="21" height="5" rx="1"/><circle cx="7" cy="18.5" r="1.6"/><circle cx="17" cy="18.5" r="1.6"/></svg>`
+        },
+        {
+          key: 'SUV',
+          name: 'SUV / 4x4',
+          icon: `<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13l1.8-5.2A2.2 2.2 0 0 1 5.9 6.3h3.5l2.3 2.4h4.6a2.2 2.2 0 0 1 2 1.3l1.7 3"/><rect x="1" y="13" width="22" height="5.5" rx="1"/><circle cx="6.8" cy="18.8" r="1.8"/><circle cx="17.2" cy="18.8" r="1.8"/></svg>`
+        },
+        {
+          key: 'Bike',
+          name: 'Superbike / Bike',
+          icon: `<svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="18.5" cy="17.5" r="3.5"/><circle cx="5.5" cy="17.5" r="3.5"/><circle cx="15" cy="5" r="1"/><path d="M12 17.5V14l-3-3 4-3 2 3h2"/></svg>`
+        }
+      ];
+
+      // Build CSS grid template columns
+      const gridCols = `1.4fr ${services.map(() => '1fr').join(' ')}`;
+
+      // 1. Build Header Row
+      let headerHtml = `<div class="spec-row head" style="grid-template-columns: ${gridCols};">
+        <div class="cell">Vehicle</div>
+        ${services.map(s => `<div class="cell">${escapeHtml(s.name)}</div>`).join('')}
+      </div>`;
+
+      // 2. Build Vehicle Tier Rows
+      let bodyHtml = vehRows.map(veh => {
+        const cellsHtml = services.map(s => {
+          const price = getVehiclePrice(s, veh.key);
+          const isHigh = price >= 2000;
+          let label = 'per visit';
+          if (s.name && s.name.toLowerCase().includes('wash')) {
+            label = 'per wash';
+          } else if (veh.key === 'Bike' && s.name && s.name.toLowerCase().includes('interior')) {
+            label = 'chain & deep clean';
+          }
+
+          return `<div class="cell" data-label="${escapeHtml(s.name)}">
+            <span class="price mono ${isHigh ? 'hi' : ''}">₹${price.toLocaleString('en-IN')}</span>
+            <span class="price-lbl">${label}</span>
+          </div>`;
+        }).join('');
+
+        return `<div class="spec-row" data-veh-row="${veh.key}" style="grid-template-columns: ${gridCols};">
+          <div class="cell veh-cell">
+            <div class="veh-icon" data-veh="${veh.key}" title="Click to pop foam bubbles!">
+              ${veh.icon}
+            </div>
+            <span class="veh-name">${veh.name}</span>
+          </div>
+          ${cellsHtml}
+        </div>`;
+      }).join('');
+
+      tableEl.innerHTML = headerHtml + bodyHtml;
+    }
+
+    // 3. Update Booking Form Service Dropdown with vehicle-specific prices
+    updateBookingDropdownPrices();
+  }
+
+  // Listen to vehicle type selector changes to immediately adjust service dropdown prices
+  const vehicleTypeSelect = document.getElementById('vt');
+  if (vehicleTypeSelect) {
+    vehicleTypeSelect.addEventListener('change', () => {
+      updateBookingDropdownPrices();
+    });
+  }
+
   async function syncFromSupabase() {
-    if (window.TrieyeDB && window.TrieyeDB.isSupabaseReady()) {
-      try {
-        await Promise.all([
-          window.TrieyeDB.getServices()
-        ]);
-      } catch (e) {
-        console.warn('⚠️ [Trieye Supabase sync error]:', e);
+    try {
+      let servicesMap = null;
+      if (window.TrieyeDB && typeof window.TrieyeDB.getServices === 'function') {
+        servicesMap = await window.TrieyeDB.getServices(defaultServices);
+      } else {
+        const local = localStorage.getItem('trieye_services_matrix');
+        servicesMap = local ? JSON.parse(local) : defaultServices;
       }
+      if (servicesMap && Object.keys(servicesMap).length > 0) {
+        renderPublicServices(servicesMap);
+      }
+    } catch (e) {
+      console.warn('⚠️ [Trieye Supabase sync error]:', e);
     }
   }
 
@@ -1315,12 +1503,12 @@
         return;
       }
 
-      // Resolve dynamic pricing from shared services matrix
-      let price = 699;
+      // Resolve dynamic vehicle-specific price strictly from active Supabase services
+      let price = 0;
       try {
-        const svcs = JSON.parse(localStorage.getItem('trieye_services_matrix'));
-        if (svcs && svcs[svc] && svcs[svc].pricing && svcs[svc].pricing[veh]) {
-          price = svcs[svc].pricing[veh];
+        const foundSvc = activeServicesList.find(s => s.name === svc);
+        if (foundSvc) {
+          price = getVehiclePrice(foundSvc, veh);
         }
       } catch (e) {}
 
@@ -1332,7 +1520,7 @@
       }
 
       try {
-        // Execute Secure PostgreSQL RPC (no slot / time parameter)
+        // Execute Secure PostgreSQL RPC
         const result = await window.TrieyeDB.createOnlineBooking({
           name: name,
           phone: phone,
@@ -1354,7 +1542,7 @@
               <div class="summary-row"><span class="label">Vehicle:</span><span class="val">${escapeHtml(veh)} (${escapeHtml(vnum)})</span></div>
               <div class="summary-row"><span class="label">Package:</span><span class="val">${escapeHtml(svc)}</span></div>
               <div class="summary-row"><span class="label">Booking Date:</span><span class="val" style="color:var(--green); font-weight:600;">${escapeHtml(date)} (Direct Entry)</span></div>
-              <div class="summary-row"><span class="label">Amount:</span><span class="val" style="color:var(--green); font-weight:700;">₹${price.toLocaleString()}</span></div>
+              <div class="summary-row"><span class="label">Estimated Price:</span><span class="val" style="color:var(--green); font-weight:700;">₹${price.toLocaleString()}</span></div>
             `;
           }
 
@@ -1388,15 +1576,54 @@
     });
   }
 
-  // Initial Supabase sync
+  // Immediate initial render from localStorage or catalog fallback (0ms delay)
+  try {
+    const cached = JSON.parse(localStorage.getItem('trieye_services_matrix'));
+    if (cached && Object.keys(cached).length > 0) {
+      renderPublicServices(cached);
+    } else {
+      renderPublicServices(defaultServices);
+    }
+  } catch (e) {
+    renderPublicServices(defaultServices);
+  }
+
+  // Initial backend/Supabase sync on script run & DOMContentLoaded
   syncFromSupabase();
+  window.addEventListener('DOMContentLoaded', () => {
+    syncFromSupabase();
+  });
+
+  // Cross-tab BroadcastChannel listener for zero-delay live updates
+  try {
+    if (typeof BroadcastChannel !== 'undefined') {
+      const pricingChan = new BroadcastChannel('trieye_pricing_sync');
+      pricingChan.onmessage = (msg) => {
+        if (msg.data && msg.data.type === 'PRICING_UPDATED' && msg.data.matrix) {
+          console.log('⚡ [Pricing synced dynamically via BroadcastChannel]');
+          renderPublicServices(msg.data.matrix);
+        }
+      };
+    }
+  } catch (e) {}
 
   // Establish Supabase Realtime Subscription
   if (window.TrieyeDB) {
-    window.TrieyeDB.subscribeToChanges(() => {
+    window.TrieyeDB.subscribeToChanges((table) => {
+      console.log('⚡ [Realtime Notification received on index.html for table]:', table);
       syncFromSupabase();
     });
   }
+
+  // Cross-tab local storage sync listener
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'trieye_services_matrix') {
+      try {
+        const matrix = JSON.parse(e.newValue);
+        if (matrix) renderPublicServices(matrix);
+      } catch (err) {}
+    }
+  });
 </script>
 
 <!-- NEXT.JS DEV ISSUE INDICATOR PILL -->

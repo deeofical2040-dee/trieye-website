@@ -1,0 +1,13 @@
+{
+  "name": "trieye-website",
+  "version": "1.0.0",
+  "description": "Trieye Studio Website and Admin Dashboard",
+  "main": "server.js",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js",
+    "serve": "npx serve ."
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

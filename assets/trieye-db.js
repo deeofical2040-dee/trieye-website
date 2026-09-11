@@ -28,10 +28,127 @@ const TrieyeDB = {
     );
   },
 
+  // Helper to check for an active Supabase authenticated session
+  async getSession() {
+    const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
+    if (!sb) return null;
+    try {
+      const { data, error } = await sb.auth.getSession();
+      if (error) {
+        console.warn('⚠️ [Supabase Auth] Error getting session:', error.message);
+        return null;
+      }
+      return data ? data.session : null;
+    } catch (err) {
+      console.warn('⚠️ [Supabase Auth] Exception checking session:', err);
+      return null;
+    }
+  },
+
+  // Authenticate Admin User via Supabase Auth
+  async signInAdmin(email, password) {
+    const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
+    if (!sb) {
+      return { success: false, error: 'Supabase client is not configured or unavailable.' };
+    }
+
+    try {
+      console.log(`⚡ [Supabase Auth] Attempting signInWithPassword for: ${email}`);
+      const { data, error } = await sb.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+
+      if (error) {
+        console.error('🚨 [Supabase Auth Failure]:', error.message, `(Code: ${error.status || error.code || 'N/A'})`);
+        return { success: false, error: error.message || 'Invalid email or password.' };
+      }
+
+      if (!data || !data.user) {
+        console.error('🚨 [Supabase Auth Failure]: No user returned from authentication.');
+        return { success: false, error: 'Authentication failed. Please try again.' };
+      }
+
+      console.log('⚡ [Supabase Auth Success] Authenticated user ID:', data.user.id);
+
+      // Verify public.profiles role === 'admin'
+      const roleCheck = await TrieyeDB.verifyAdminRole(data.user.id);
+      if (!roleCheck.isAdmin) {
+        console.warn('⚠️ [Supabase Auth] User authenticated but lacks admin role. Signing out...');
+        await sb.auth.signOut();
+        return { success: false, error: 'Unauthorized admin account.' };
+      }
+
+      console.log('✅ [Supabase Auth & Role Verified] Admin access granted for user:', data.user.email);
+      return { success: true, user: data.user, session: data.session };
+    } catch (err) {
+      console.error('🚨 [Supabase Auth Exception]:', err);
+      return { success: false, error: err.message || 'An unexpected error occurred during sign-in.' };
+    }
+  },
+
+  // Verify that the user has an admin profile in public.profiles
+  async verifyAdminRole(userId) {
+    const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
+    if (!sb || !userId) return { isAdmin: false, role: null };
+
+    try {
+      console.log(`⚡ [Supabase Profile Check] Verifying role in public.profiles for user: ${userId}`);
+      const { data, error } = await sb
+        .from('profiles')
+        .select('id, role')
+        .eq('id', userId)
+        .single();
+
+      if (error) {
+        TrieyeDB.logError('profiles', 'SELECT', error);
+        return { isAdmin: false, role: null, error: error.message };
+      }
+
+      const role = data ? (data.role || '').toLowerCase() : null;
+      console.log(`⚡ [Supabase Profile Check Result] User role is: "${role}"`);
+
+      if (role === 'admin') {
+        return { isAdmin: true, role: 'admin' };
+      } else {
+        return { isAdmin: false, role: role };
+      }
+    } catch (err) {
+      console.error('🚨 [Supabase Profile Exception]:', err);
+      return { isAdmin: false, role: null, error: err.message };
+    }
+  },
+
+  // Sign out user and clear any local caches
+  async signOutAdmin() {
+    const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
+    if (sb) {
+      try {
+        console.log('⚡ [Supabase Auth] Signing out current user...');
+        await sb.auth.signOut();
+      } catch (err) {
+        console.warn('⚠️ [Supabase Auth SignOut Exception]:', err);
+      }
+    }
+    localStorage.removeItem('trieye_bookings');
+    localStorage.removeItem('trieye_customers');
+    localStorage.removeItem('trieye_payments');
+  },
+
   // 1. BOOKINGS & JOBS
   async getBookings() {
     const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
     if (sb) {
+      // Diagnostic check: check whether an authenticated session exists before querying
+      try {
+        const session = await TrieyeDB.getSession();
+        if (session) {
+          console.log('⚡ [TrieyeDB getBookings] Authenticated Supabase session found for user:', session.user ? session.user.id : 'Active User');
+        } else {
+          console.warn('⚠️ [TrieyeDB getBookings] No authenticated Supabase session found (running as anon role).');
+        }
+      } catch (e) {}
+
       try {
         const { data, error } = await sb
           .from('bookings')
@@ -46,7 +163,13 @@ const TrieyeDB = {
           `)
           .order('created_at', { ascending: false });
 
-        if (!error && Array.isArray(data)) {
+        if (error) {
+          TrieyeDB.logError('bookings', 'SELECT', error);
+          // When Supabase is connected and returns an error, do not silently replace with demo data
+          return [];
+        }
+
+        if (Array.isArray(data)) {
           const formatted = data.map(b => {
             const cust = b.customers || {};
             const veh = b.vehicles || {};
@@ -80,14 +203,13 @@ const TrieyeDB = {
           });
           localStorage.setItem('trieye_bookings', JSON.stringify(formatted));
           return formatted;
-        } else if (error) {
-          TrieyeDB.logError('bookings', 'SELECT', error);
         }
       } catch (err) {
         console.error('🚨 [Supabase Network Error on bookings SELECT]:', err);
+        return [];
       }
     }
-    // Fallback to LocalStorage
+    // Fallback to LocalStorage only if Supabase client is not configured
     try {
       return JSON.parse(localStorage.getItem('trieye_bookings')) || [];
     } catch (e) {
@@ -264,20 +386,30 @@ const TrieyeDB = {
             vehicles (id, vehicle_type, reg_number)
           `);
 
-        if (!error && Array.isArray(data)) {
+        if (error) {
+          TrieyeDB.logError('customers', 'SELECT', error);
+          return {};
+        }
+
+        if (Array.isArray(data)) {
           const map = {};
           data.forEach(c => {
             const clean = (c.phone || '').replace(/\D/g, '').slice(-10);
             if (clean) {
-              const veh = (Array.isArray(c.vehicles) && c.vehicles[0]) || c.vehicles || {};
+              const vehList = Array.isArray(c.vehicles) ? c.vehicles : (c.vehicles ? [c.vehicles] : []);
+              const primaryVeh = vehList[0] || {};
               map[clean] = {
                 id: c.id,
                 name: c.name || 'Valued Customer',
                 phone: c.phone,
                 email: c.email || '',
-                vehicleType: veh.vehicle_type || 'Car',
-                model: veh.reg_number ? `${veh.vehicle_type || 'Car'} (${veh.reg_number})` : (veh.vehicle_type || 'Car'),
-                reg: veh.reg_number || '',
+                vehicleType: primaryVeh.vehicle_type || 'Car',
+                model: primaryVeh.reg_number ? `${primaryVeh.vehicle_type || 'Car'} (${primaryVeh.reg_number})` : (primaryVeh.vehicle_type || 'Car'),
+                reg: primaryVeh.reg_number || '',
+                vehicles: vehList.map(v => ({
+                  type: v.vehicle_type || 'Car',
+                  reg: v.reg_number || ''
+                })),
                 visits: 1,
                 spent: 0,
                 lastVisit: c.created_at ? c.created_at.split('T')[0] : '',
@@ -287,11 +419,10 @@ const TrieyeDB = {
           });
           localStorage.setItem('trieye_customers', JSON.stringify(map));
           return map;
-        } else if (error) {
-          TrieyeDB.logError('customers', 'SELECT', error);
         }
       } catch (err) {
         console.error('🚨 [Supabase Network Error on getCustomers]:', err);
+        return {};
       }
     }
     try {
@@ -340,26 +471,74 @@ const TrieyeDB = {
 
   // 3. SERVICES & PRICING
   async getServices(fallbackDefaults) {
+    let localSaved = null;
+    let localUpdatedTime = 0;
+    try {
+      const localStr = localStorage.getItem('trieye_services_matrix');
+      if (localStr) {
+        localSaved = JSON.parse(localStr);
+        localUpdatedTime = Number(localStorage.getItem('trieye_services_last_updated') || 0);
+      }
+    } catch (e) {}
+
+    // 1. Try local/server REST API if hosted with server
+    try {
+      const apiRes = await fetch('/api/services', { method: 'GET', cache: 'no-store' });
+      if (apiRes.ok) {
+        const apiData = await apiRes.json();
+        if (apiData && typeof apiData === 'object' && Object.keys(apiData).length > 0) {
+          localStorage.setItem('trieye_services_matrix', JSON.stringify(apiData));
+          return apiData;
+        }
+      }
+    } catch (e) {}
+
+    // 2. Try Supabase
     const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
     if (sb) {
       try {
-        const { data, error } = await sb.from('services').select('*');
+        const { data, error } = await sb.from('services').select('*').order('created_at', { ascending: true });
         if (!error && Array.isArray(data) && data.length > 0) {
           const map = {};
           data.forEach(s => {
-            const base = Number(s.base_price || 699);
+            const hatch = Number(s.hatchback_price !== null && s.hatchback_price !== undefined ? s.hatchback_price : (s.base_price || 0));
+            const sedan = Number(s.sedan_price !== null && s.sedan_price !== undefined ? s.sedan_price : (s.base_price || 0));
+            const suv = Number(s.suv_price !== null && s.suv_price !== undefined ? s.suv_price : (s.base_price || 0));
+            const bike = Number(s.bike_price !== null && s.bike_price !== undefined ? s.bike_price : (s.base_price || 0));
+            const base = Number(s.base_price !== null && s.base_price !== undefined ? s.base_price : sedan);
+
             map[s.name] = {
               id: s.id,
+              name: s.name,
               desc: s.description || '',
+              base_price: base,
+              hatchback_price: hatch,
+              sedan_price: sedan,
+              suv_price: suv,
+              bike_price: bike,
+              duration_minutes: s.duration_minutes || null,
               pricing: {
-                'Hatchback': Math.round(base * 0.8),
-                'Sedan': base,
-                'SUV / 4x4': Math.round(base * 1.25),
-                'Superbike': Math.round(base * 0.5)
+                'Hatchback': hatch,
+                'Sedan': sedan,
+                'SUV / 4x4': suv,
+                'Superbike': bike
               },
               active: s.active !== false
             };
           });
+
+          // If local has explicit admin edits, merge to preserve latest admin prices
+          if (localSaved && localUpdatedTime > 0) {
+            Object.keys(localSaved).forEach(k => {
+              if (map[k]) {
+                // Merge in any locally saved pricing if remote row wasn't updated
+                map[k] = { ...map[k], ...localSaved[k] };
+              } else {
+                map[k] = localSaved[k];
+              }
+            });
+          }
+
           localStorage.setItem('trieye_services_matrix', JSON.stringify(map));
           return map;
         } else if (error) {
@@ -369,29 +548,77 @@ const TrieyeDB = {
         console.error('🚨 [Supabase Network Error on getServices]:', err);
       }
     }
-    try {
-      const local = JSON.parse(localStorage.getItem('trieye_services_matrix'));
-      if (local && Object.keys(local).length > 0) return local;
-    } catch (e) {}
+
+    if (localSaved && Object.keys(localSaved).length > 0) return localSaved;
     return fallbackDefaults || {};
   },
 
   async saveServices(servicesMap) {
+    const timestamp = Date.now();
     localStorage.setItem('trieye_services_matrix', JSON.stringify(servicesMap));
+    localStorage.setItem('trieye_services_last_updated', String(timestamp));
 
+    // Broadcast across tabs instantly (< 5ms)
+    try {
+      if (typeof BroadcastChannel !== 'undefined') {
+        const channel = new BroadcastChannel('trieye_pricing_sync');
+        channel.postMessage({ type: 'PRICING_UPDATED', matrix: servicesMap, timestamp: timestamp });
+      }
+    } catch (e) {}
+
+    // 1. Persist to REST Backend API if running
+    try {
+      await fetch('/api/services', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(servicesMap)
+      });
+    } catch (e) {}
+
+    // 2. Persist to Supabase
     const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
     if (sb) {
       try {
         for (const k of Object.keys(servicesMap)) {
           const s = servicesMap[k];
-          const base = s.pricing ? (s.pricing['Sedan'] || 699) : 699;
-          const { error } = await sb.from('services').upsert({
-            name: k,
+          const hatch = Number(s.hatchback_price !== undefined ? s.hatchback_price : (s.pricing ? s.pricing['Hatchback'] : 0));
+          const sedan = Number(s.sedan_price !== undefined ? s.sedan_price : (s.pricing ? s.pricing['Sedan'] : 0));
+          const suv = Number(s.suv_price !== undefined ? s.suv_price : (s.pricing ? s.pricing['SUV / 4x4'] : 0));
+          const bike = Number(s.bike_price !== undefined ? s.bike_price : (s.pricing ? s.pricing['Superbike'] : 0));
+          const base = Number(s.base_price !== undefined ? s.base_price : sedan);
+
+          const payload = {
+            name: s.name || k,
             description: s.desc || '',
+            duration_minutes: s.duration_minutes || null,
             base_price: base,
+            hatchback_price: hatch,
+            sedan_price: sedan,
+            suv_price: suv,
+            bike_price: bike,
             active: s.active !== false
-          }, { onConflict: 'name' });
-          if (error) TrieyeDB.logError('services', 'UPSERT', error);
+          };
+
+          if (s.id) {
+            payload.id = s.id;
+          }
+
+          const { error } = await sb.from('services').upsert(payload, { onConflict: 'name' });
+          if (error) {
+            TrieyeDB.logError('services', 'UPSERT', error);
+            // Fallback for schemas with standard columns
+            if (error.message && (error.message.includes('column') || error.code === '42703')) {
+              await sb.from('services').upsert({
+                name: s.name || k,
+                description: s.desc || '',
+                duration_minutes: s.duration_minutes || null,
+                base_price: base,
+                active: s.active !== false
+              }, { onConflict: 'name' });
+            }
+          } else {
+            console.log('⚡ [Supabase Services Saved]', k, payload);
+          }
         }
       } catch (err) {
         console.error('🚨 [Supabase Network Error on saveServices]:', err);
@@ -530,13 +757,16 @@ const TrieyeDB = {
     if (sb) {
       try {
         const { data, error } = await sb.from('payments').select('*').order('created_at', { ascending: false });
-        if (!error && Array.isArray(data)) {
-          return data;
-        } else if (error) {
+        if (error) {
           TrieyeDB.logError('payments', 'SELECT', error);
+          return [];
+        }
+        if (Array.isArray(data)) {
+          return data;
         }
       } catch (err) {
         console.error('🚨 [Supabase Network Error on getPayments]:', err);
+        return [];
       }
     }
     return [];
