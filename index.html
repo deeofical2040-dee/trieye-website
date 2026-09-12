@@ -7,44 +7,52 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg:#0a0a0b;
-    --bg-panel:#131315;
-    --bg-panel-2:#1a1a1d;
-    --bg-panel-3:#242429;
-    --line:#2a2a2e;
-    --pink:#ee2f76;
-    --pink-dim:#ee2f7622;
-    --green:#a6d331;
-    --green-dim:#a6d33122;
-    --white:#f3f3f0;
-    --text-primary:#f3f3f0;
-    --muted:#8d8d92;
-    --red:#ff4d4d;
-    --hero-radial-1: rgba(166,211,49,0.10);
-    --hero-radial-2: rgba(238,47,118,0.12);
-    --grid-line: rgba(255,255,255,0.025);
-    --shadow-pop: rgba(0,0,0,0.5);
+  :root {
+    --bg: #ffffff;
+    --bg-panel: #ffffff;
+    --bg-panel-2: #f8f9fa;
+    --bg-panel-3: #f1f3f5;
+    --line: #e2e8f0;
+    --pink: #ee2f76;
+    --pink-dim: rgba(238, 47, 118, 0.12);
+    --green: #689f0e;
+    --green-dim: rgba(166, 211, 49, 0.22);
+    --green-glow: rgba(104, 159, 14, 0.25);
+    --white: #111827;
+    --text-primary: #111827;
+    --muted: #64748b;
+    --red: #dc2626;
+    --red-dim: rgba(220, 38, 38, 0.12);
+    --amber: #d97706;
+    --amber-dim: rgba(217, 119, 6, 0.12);
+    --hero-radial-1: rgba(166, 211, 49, 0.16);
+    --hero-radial-2: rgba(238, 47, 118, 0.14);
+    --grid-line: rgba(0, 0, 0, 0.04);
+    --shadow-pop: rgba(0, 0, 0, 0.08);
   }
 
-  [data-theme="light"] {
-    --bg:#f8f9fa;
-    --bg-panel:#ffffff;
-    --bg-panel-2:#f1f3f5;
-    --bg-panel-3:#e9ecef;
-    --line:#dee2e6;
-    --pink:#ee2f76;
-    --pink-dim:#ee2f7618;
-    --green:#689f0e;
-    --green-dim:#a6d33130;
-    --white:#1a1a1d;
-    --text-primary:#1a1a1d;
-    --muted:#6c757d;
-    --red:#dc2626;
-    --hero-radial-1: rgba(166,211,49,0.18);
-    --hero-radial-2: rgba(238,47,118,0.15);
-    --grid-line: rgba(0,0,0,0.035);
-    --shadow-pop: rgba(0,0,0,0.08);
+  [data-theme="dark"] {
+    --bg: #0a0a0b;
+    --bg-panel: #131315;
+    --bg-panel-2: #1a1a1d;
+    --bg-panel-3: #242429;
+    --line: #2a2a2e;
+    --pink: #ee2f76;
+    --pink-dim: #ee2f7622;
+    --green: #a6d331;
+    --green-dim: #a6d33122;
+    --green-glow: rgba(166, 211, 49, 0.35);
+    --white: #f3f3f0;
+    --text-primary: #f3f3f0;
+    --muted: #8d8d92;
+    --red: #ff4d4d;
+    --red-dim: rgba(255, 77, 77, 0.15);
+    --amber: #f59e0b;
+    --amber-dim: rgba(245, 158, 11, 0.15);
+    --hero-radial-1: rgba(166, 211, 49, 0.10);
+    --hero-radial-2: rgba(238, 47, 118, 0.12);
+    --grid-line: rgba(255, 255, 255, 0.025);
+    --shadow-pop: rgba(0, 0, 0, 0.5);
   }
 
   *{margin:0;padding:0;box-sizing:border-box;}
@@ -80,17 +88,17 @@
   /* ---------- NAV & LIQUID GLASS HEADER ---------- */
   header{
     position:sticky;top:0;z-index:50;
-    background: linear-gradient(135deg, rgba(22, 22, 28, 0.65) 0%, rgba(10, 10, 14, 0.45) 100%);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.88) 0%, rgba(248, 250, 252, 0.72) 100%);
     backdrop-filter: blur(24px) saturate(190%);
     -webkit-backdrop-filter: blur(24px) saturate(190%);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05), inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
     transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
   }
-  [data-theme="light"] header{
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.75) 0%, rgba(245, 247, 250, 0.55) 100%);
-    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.06), inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
+  [data-theme="dark"] header{
+    background: linear-gradient(135deg, rgba(22, 22, 28, 0.75) 0%, rgba(10, 10, 14, 0.55) 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
   }
   nav{
     display:flex;align-items:center;justify-content:space-between;
@@ -106,10 +114,10 @@
     filter:drop-shadow(0 2px 8px var(--shadow-pop));
     transition: filter 0.25s ease;
   }
-  .logo-dark{display:block;}
-  .logo-light{display:none;}
-  [data-theme="light"] .logo-dark{display:none;}
-  [data-theme="light"] .logo-light{display:block;}
+  .logo-dark{display:none !important;}
+  .logo-light{display:block !important;}
+  [data-theme="dark"] .logo-dark{display:block !important;}
+  [data-theme="dark"] .logo-light{display:none !important;}
 
   .nav-links{display:flex;gap:34px;list-style:none;}
   .nav-links a{
@@ -120,11 +128,12 @@
   .nav-cta{
     display:flex;align-items:center;gap:8px;
     font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:0.08em;
-    text-transform:uppercase;background:var(--green);color:#0a0a0b;
+    text-transform:uppercase;background:var(--green);color:#ffffff;
     padding:9px 18px;clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);
     font-weight:600;transition:transform .2s, box-shadow .2s;
   }
-  .nav-cta:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(166,211,49,0.25);}
+  [data-theme="dark"] .nav-cta{color:#0a0a0b;}
+  .nav-cta:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(104,159,14,0.3);}
   .burger{display:none;background:none;border:none;color:var(--white);font-size:22px;}
 
   @media (max-width:860px){
@@ -138,8 +147,8 @@
     min-height:88vh;
     display:flex;align-items:center;
     background:
-      radial-gradient(ellipse 900px 500px at 82% 18%, rgba(166,211,49,0.10), transparent 60%),
-      radial-gradient(ellipse 700px 500px at 8% 85%, rgba(238,47,118,0.12), transparent 60%),
+      radial-gradient(ellipse 900px 500px at 82% 18%, var(--hero-radial-1), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 8% 85%, var(--hero-radial-2), transparent 60%),
       var(--bg);
     overflow:hidden;
     border-bottom:1px solid var(--line);
@@ -149,18 +158,21 @@
     content:"";
     position:absolute;inset:0;
     background-image:
-      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
     background-size:56px 56px;
     mask-image:radial-gradient(ellipse 70% 60% at 60% 40%, black, transparent 80%);
     pointer-events:none;
   }
   .sweep{
     position:absolute;top:0;left:-30%;width:26%;height:100%;
-    background:linear-gradient(100deg, transparent, rgba(255,255,255,0.06), transparent);
+    background:linear-gradient(100deg, transparent, rgba(255,255,255,0.4), transparent);
     transform:skewX(-16deg);
     animation:sweep 5.5s ease-in-out infinite;
     pointer-events:none;
+  }
+  [data-theme="dark"] .sweep{
+    background:linear-gradient(100deg, transparent, rgba(255,255,255,0.06), transparent);
   }
   @keyframes sweep{
     0%{left:-30%;}
@@ -176,10 +188,6 @@
     filter:drop-shadow(0 8px 24px var(--shadow-pop));
     transition: filter 0.25s ease;
   }
-  .logo-dark{display:block !important;}
-  .logo-light{display:none !important;}
-  [data-theme="light"] .logo-dark{display:none !important;}
-  [data-theme="light"] .logo-light{display:block !important;}
 
   .foot-logo{
     height:38px;
@@ -1678,27 +1686,27 @@
     }
   });
 
-  // Theme Switcher (Dark / Light)
+  // Theme Switcher (Light / Dark)
   const THEME_KEY = 'trieye_theme';
   const themeToggleBtn = document.getElementById('themeToggleBtn');
 
   function applyTheme(theme) {
-    if (theme === 'light') {
-      document.documentElement.setAttribute('data-theme', 'light');
+    if (theme === 'dark') {
+      document.documentElement.setAttribute('data-theme', 'dark');
     } else {
       document.documentElement.removeAttribute('data-theme');
     }
     localStorage.setItem(THEME_KEY, theme);
   }
 
-  // Load saved theme or match system preference
-  const savedTheme = localStorage.getItem(THEME_KEY) || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+  // Load saved theme or default to clean white light theme
+  const savedTheme = localStorage.getItem(THEME_KEY) || 'light';
   applyTheme(savedTheme);
 
   if (themeToggleBtn) {
     themeToggleBtn.addEventListener('click', () => {
-      const current = document.documentElement.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
-      const target = current === 'light' ? 'dark' : 'light';
+      const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+      const target = current === 'dark' ? 'light' : 'dark';
       applyTheme(target);
       showToast(`Switched to ${target.charAt(0).toUpperCase() + target.slice(1)} Mode`);
     });
