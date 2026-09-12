@@ -2598,22 +2598,27 @@
       const occupiedBays = bays.filter(b => b.status === 'Occupied').length;
       const bayRatio = Math.round((occupiedBays / bays.length) * 100) || 0;
 
-      document.getElementById('kpi-today-revenue').innerText = '₹' + revenue.toLocaleString();
-      document.getElementById('kpi-active-vehicles').innerText = activeVehicles;
-      document.getElementById('kpi-today-online').innerText = onlineToday;
-      document.getElementById('kpi-today-walkin').innerText = walkinToday;
-      document.getElementById('kpi-today-completed').innerText = completedToday;
-      document.getElementById('kpi-pending-payments').innerText = '₹' + pendingPay.toLocaleString();
-      document.getElementById('kpi-total-customers').innerText = totalCustCount;
-      document.getElementById('kpi-bay-occupancy').innerText = bayRatio + '%';
-      document.getElementById('kpi-bay-fraction').innerText = `${occupiedBays}/${bays.length} Bays Active`;
+      const setText = (id, val) => {
+        const el = document.getElementById(id);
+        if (el) el.innerText = val;
+      };
 
-      document.getElementById('badge-active-queue').innerText = activeVehicles;
-      document.getElementById('badge-online-count').innerText = bookings.filter(b => (b.source || '').toUpperCase() === 'ONLINE' && b.status !== 'COMPLETED' && b.status !== 'CANCELLED').length;
-      document.getElementById('badge-customers-count').innerText = totalCustCount;
-      document.getElementById('badge-done-count').innerText = bookings.filter(b => b.status === 'COMPLETED').length;
-      document.getElementById('badge-bays-occupied').innerText = `${occupiedBays}/${bays.length}`;
-      document.getElementById('top-bay-pill-text').innerText = `${bays.length} BAYS (${occupiedBays} IN USE)`;
+      setText('kpi-today-revenue', '₹' + revenue.toLocaleString());
+      setText('kpi-active-vehicles', activeVehicles);
+      setText('kpi-today-online', onlineToday);
+      setText('kpi-today-walkin', walkinToday);
+      setText('kpi-today-completed', completedToday);
+      setText('kpi-pending-payments', '₹' + pendingPay.toLocaleString());
+      setText('kpi-total-customers', totalCustCount);
+      setText('kpi-bay-occupancy', bayRatio + '%');
+      setText('kpi-bay-fraction', `${occupiedBays}/${bays.length} Bays Active`);
+
+      setText('badge-active-queue', activeVehicles);
+      setText('badge-online-count', bookings.filter(b => (b.source || '').toUpperCase() === 'ONLINE' && b.status !== 'COMPLETED' && b.status !== 'CANCELLED').length);
+      setText('badge-customers-count', totalCustCount);
+      setText('badge-done-count', bookings.filter(b => b.status === 'COMPLETED').length);
+      setText('badge-bays-occupied', `${occupiedBays}/${bays.length}`);
+      setText('top-bay-pill-text', `${bays.length} BAYS (${occupiedBays} IN USE)`);
 
       // Overview Timeline List
       const timelineContainer = document.getElementById('overview-timeline-list');
@@ -2628,10 +2633,13 @@
             div.innerHTML = `
               <div>
                 <strong style="color:var(--white);">${escapeHtml(b.vehicleModel || b.vehicleType)}</strong> 
-                <span style="color:var(--muted); font-size:0.75rem;">· ${escapeHtml(b.name)}</span>
-                <div style="font-family:'IBM Plex Mono'; font-size:0.7rem; color:var(--green); margin-top:2px;">${escapeHtml(b.slot || 'Express')} · ${escapeHtml(b.service)}</div>
+                <span style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--pink);">(${escapeHtml(b.reg || 'NO REG')})</span>
+                <div style="font-size:0.75rem; color:var(--muted);">${escapeHtml(b.service)} · ${escapeHtml(b.name)}</div>
               </div>
-              <span class="status-badge status-${b.status.toLowerCase().replace(/\s+/g,'')}">${escapeHtml(b.status)}</span>
+              <div style="text-align:right;">
+                <span class="status-badge status-${(b.status || 'CONFIRMED').toLowerCase().replace(/\s+/g,'')}">${escapeHtml(b.status || 'CONFIRMED')}</span>
+                <div style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--green); font-weight:600; margin-top:2px;">₹${(b.price || 0).toLocaleString()}</div>
+              </div>
             `;
             timelineContainer.appendChild(div);
           });
@@ -3379,13 +3387,16 @@
         else if (jobStatus === 'ARRIVED') statusBadgeClass = 'status-arrived';
         else if (jobStatus === 'CANCELLED') statusBadgeClass = 'status-cancelled';
 
-        const displayRef = b.invoice_ref || (b.id && b.id.length > 8 ? `TRI-${b.id.substring(0, 8).toUpperCase()}` : (b.id || 'TRI-INVOICE'));
+        // Keep booking.id as the real UUID, invoice_ref as display only
+        let displayRef = b.invoice_ref;
+        if (!displayRef) {
+          displayRef = (b.id && b.id.length > 8) ? `TRI-${b.id.substring(0, 8).toUpperCase()}` : (b.id || 'TRI-INVOICE');
+        } else if (!displayRef.startsWith('TRI-')) {
+          displayRef = `TRI-${displayRef.toUpperCase()}`;
+        }
         const bookingPrice = Number(b.price !== undefined && b.price !== null ? b.price : (b.total_amount || 0));
 
-        const mapKey = 'hist_' + idx + '_' + (b.id || 'rec');
-        window._historyBookingsMap[mapKey] = b;
         if (b.id) window._historyBookingsMap[b.id] = b;
-        if (displayRef) window._historyBookingsMap[displayRef] = b;
 
         tr.innerHTML = `
           <td><strong class="booking-id-tag">${escapeHtml(displayRef)}</strong></td>
@@ -3401,9 +3412,9 @@
           <td><span class="status-badge ${statusBadgeClass}">${escapeHtml(jobStatus)}</span></td>
           <td>
             <div class="action-btn-group">
-              <button class="action-btn" title="View & Print Bill Invoice" onclick="openBillInvoiceModal('${mapKey}')">🧾 View Bill</button>
-              <button class="action-btn wa" title="Share Bill on WhatsApp" onclick="shareBillWhatsApp('${mapKey}')">💬 WhatsApp Bill</button>
-              <button class="action-btn" title="Print Invoice" onclick="printBillDirect('${mapKey}')">🖨️ Print Bill</button>
+              <button class="action-btn" data-booking-id="${escapeHtml(b.id)}" title="View & Print Bill Invoice" onclick="openBillInvoiceModal(this.getAttribute('data-booking-id'))">🧾 View Bill</button>
+              <button class="action-btn wa" data-booking-id="${escapeHtml(b.id)}" title="Share Bill on WhatsApp" onclick="shareBillWhatsApp(this.getAttribute('data-booking-id'))">💬 WhatsApp Bill</button>
+              <button class="action-btn" data-booking-id="${escapeHtml(b.id)}" title="Print Invoice" onclick="printBillDirect(this.getAttribute('data-booking-id'))">🖨️ Print Bill</button>
             </div>
           </td>
         `;
@@ -3480,7 +3491,7 @@
       if (!bookingOrId) return null;
       if (typeof bookingOrId === 'object') {
         const all = getBookings();
-        if (bookingOrId.id) {
+        if (bookingOrId.id && isUuid(bookingOrId.id)) {
           const found = all.find(x => x.id === bookingOrId.id);
           if (found) return { ...bookingOrId, ...found };
         }
@@ -3493,12 +3504,8 @@
 
       const all = getBookings();
       const cleanStr = String(bookingOrId).trim();
-      let found = all.find(x => x.id === cleanStr || x.invoice_ref === cleanStr);
-      if (found) return found;
-
-      const stripped = cleanStr.replace(/^TRI-|^TR-/i, '').toLowerCase();
-      if (stripped) {
-        found = all.find(x => x.id && x.id.toLowerCase().replace(/-/g, '').startsWith(stripped));
+      if (isUuid(cleanStr)) {
+        const found = all.find(x => x.id === cleanStr);
         if (found) return found;
       }
       return null;
@@ -3514,7 +3521,16 @@
       window.currentInvoiceBooking = originalBooking;
       const b = window.currentInvoiceBooking;
 
-      const displayRef = b.invoice_ref || (b.id && b.id.length > 8 ? `TRI-${b.id.substring(0, 8).toUpperCase()}` : (b.id || 'TRI-INVOICE'));
+      console.log('History action real UUID:', b.id);
+      console.log('History action invoice ref:', b.invoice_ref);
+
+      let displayRef = b.invoice_ref;
+      if (!displayRef) {
+        displayRef = (b.id && b.id.length > 8) ? `TRI-${b.id.substring(0, 8).toUpperCase()}` : (b.id || 'TRI-INVOICE');
+      } else if (!displayRef.startsWith('TRI-')) {
+        displayRef = `TRI-${displayRef.toUpperCase()}`;
+      }
+
       const bookingPrice = Number(b.price !== undefined && b.price !== null ? b.price : (b.total_amount || 0));
 
       const body = document.getElementById('receipt-modal-body');
@@ -3607,6 +3623,9 @@
         return;
       }
 
+      console.log('History action real UUID:', b.id);
+      console.log('History action invoice ref:', b.invoice_ref);
+
       const rawPhone = (b.phone || b.customer_phone || '').trim();
       const digits = rawPhone.replace(/\D/g, '');
 
@@ -3624,7 +3643,13 @@
         normalizedPhone = digits;
       }
 
-      const bookingRef = b.invoice_ref || (b.id && b.id.length > 8 ? `TRI-${b.id.substring(0, 8).toUpperCase()}` : (b.id || 'N/A'));
+      let bookingRef = b.invoice_ref;
+      if (!bookingRef) {
+        bookingRef = (b.id && b.id.length > 8) ? `TRI-${b.id.substring(0, 8).toUpperCase()}` : (b.id || 'N/A');
+      } else if (!bookingRef.startsWith('TRI-')) {
+        bookingRef = `TRI-${bookingRef.toUpperCase()}`;
+      }
+
       const customerName = b.name || b.customer_name || 'Valued Customer';
       const totalAmount = (b.price !== undefined && b.price !== null) ? Number(b.price).toLocaleString('en-IN') : Number(b.total_amount || 0).toLocaleString('en-IN');
       const paymentStatus = (b.payStatus || b.payment_status || 'UNPAID').toUpperCase();
@@ -3670,6 +3695,10 @@ TRIEYE WATERWASH & DETAILING`;
         alert('No active invoice data found.');
         return;
       }
+
+      console.log('History action real UUID:', b.id);
+      console.log('History action invoice ref:', b.invoice_ref);
+
       const token = await getOrFetchShareToken(b);
       if (!token) {
         console.error('Invoice share token could not be resolved for booking UUID:', b.id);
