@@ -449,6 +449,7 @@
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="assets/supabase-config.js"></script>
   <script src="assets/trieye-db.js"></script>
 </head>
@@ -688,8 +689,66 @@
       }
     });
 
-    function downloadInvoice() {
-      window.print();
+    async function downloadInvoice() {
+      const invoiceElement = document.querySelector('.invoice-card');
+      if (!invoiceElement) {
+        alert('Unable to generate invoice PDF. Please try again.');
+        return;
+      }
+
+      if (typeof html2pdf === 'undefined') {
+        // Fallback to window.print if CDN fails to load
+        window.print();
+        return;
+      }
+
+      const invRefEl = document.getElementById('inv-ref');
+      const invoiceRef = (invRefEl ? invRefEl.innerText.trim() : '') || 'TRI-INVOICE';
+      const cleanFilename = `TRIEYE-Invoice-${invoiceRef}.pdf`;
+
+      const downloadBtn = document.querySelector('.btn-download');
+      const cardActions = document.querySelector('.card-actions');
+      const originalBtnText = downloadBtn ? downloadBtn.innerHTML : '⬇ DOWNLOAD INVOICE';
+
+      try {
+        if (downloadBtn) {
+          downloadBtn.disabled = true;
+          downloadBtn.innerText = 'Generating PDF...';
+        }
+        if (cardActions) {
+          cardActions.style.display = 'none';
+        }
+
+        const opt = {
+          margin: [8, 8, 8, 8],
+          filename: cleanFilename,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            backgroundColor: '#131317'
+          },
+          jsPDF: {
+            unit: 'mm',
+            format: 'a4',
+            orientation: 'portrait'
+          }
+        };
+
+        await html2pdf().set(opt).from(invoiceElement).save();
+      } catch (err) {
+        console.error('Invoice PDF download error:', err);
+        alert('Unable to generate invoice PDF. Please try again.');
+      } finally {
+        if (cardActions) {
+          cardActions.style.display = '';
+        }
+        if (downloadBtn) {
+          downloadBtn.disabled = false;
+          downloadBtn.innerHTML = originalBtnText;
+        }
+      }
     }
 
     function escapeHtml(str) {
