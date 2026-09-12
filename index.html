@@ -325,8 +325,15 @@
   .field select, .field input{
     width:100%;background:var(--bg-panel-2);border:1px solid var(--line);color:var(--white);
     padding:12px 14px;font-family:'Inter',sans-serif;font-size:14px;
+    border-radius: 4px;
   }
   .field select:focus, .field input:focus{border-color:var(--green);}
+  .field input.is-invalid{border-color:var(--red) !important;}
+  .field-error-msg{
+    display:none;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--red);
+    margin-top:6px;line-height:1.3;
+  }
+  .field-error-msg.visible{display:block;}
   /* Slot Picker & Legend */
   .slot-picker-wrap { margin-top: 6px; }
   .slot-header {
@@ -886,8 +893,9 @@
           <input type="date" id="dt" required>
         </div>
         <div class="field">
-          <label for="vnum">Vehicle No</label>
-          <input type="text" id="vnum" placeholder="TN 01 AB 1234">
+          <label for="vnum">Vehicle No (Registration)</label>
+          <input type="text" id="vnum" placeholder="TN 01 AB 1234" maxlength="13" autocomplete="off" style="text-transform:uppercase;">
+          <div class="field-error-msg" id="vnum-error">Enter vehicle number in format TN 01 AB 1234</div>
         </div>
       </div>
       <button type="submit" class="btn btn-primary book-submit" id="btnSubmitBooking">Book Now →</button>
@@ -1416,6 +1424,58 @@
   if (modalCloseBtn) modalCloseBtn.addEventListener('click', () => modal.classList.remove('open'));
   if (modalDoneBtn) modalDoneBtn.addEventListener('click', () => modal.classList.remove('open'));
 
+  // Vehicle Registration Number Input Handler & Validation
+  const vnumInput = document.getElementById('vnum');
+  const vnumError = document.getElementById('vnum-error');
+
+  function validateVnumField(showError = true) {
+    if (!vnumInput) return true;
+    const val = vnumInput.value.trim();
+    if (!val) {
+      if (showError && vnumError) {
+        vnumError.classList.add('visible');
+        vnumInput.classList.add('is-invalid');
+      }
+      return false;
+    }
+    const isValid = window.TrieyeDB && typeof window.TrieyeDB.validateVehicleReg === 'function'
+      ? window.TrieyeDB.validateVehicleReg(val)
+      : /^[A-Z]{2}\s\d{2}\s[A-Z]{2}\s\d{4}$/.test(val);
+
+    if (!isValid) {
+      if (showError && vnumError) {
+        vnumError.classList.add('visible');
+        vnumInput.classList.add('is-invalid');
+      }
+      return false;
+    } else {
+      if (vnumError) vnumError.classList.remove('visible');
+      vnumInput.classList.remove('is-invalid');
+      return true;
+    }
+  }
+
+  if (vnumInput) {
+    vnumInput.addEventListener('input', (e) => {
+      const formatted = window.TrieyeDB && typeof window.TrieyeDB.formatVehicleReg === 'function'
+        ? window.TrieyeDB.formatVehicleReg(e.target.value)
+        : e.target.value.toUpperCase();
+      vnumInput.value = formatted;
+      if (vnumError && vnumError.classList.contains('visible')) {
+        if (/^[A-Z]{2}\s\d{2}\s[A-Z]{2}\s\d{4}$/.test(formatted)) {
+          vnumError.classList.remove('visible');
+          vnumInput.classList.remove('is-invalid');
+        }
+      }
+    });
+
+    vnumInput.addEventListener('blur', () => {
+      if (vnumInput.value.trim().length > 0) {
+        validateVnumField(true);
+      }
+    });
+  }
+
   // Booking Form Submission via Secure Supabase RPC
   const bookForm = document.getElementById('bookForm');
   if (bookForm) {
@@ -1427,7 +1487,13 @@
       const veh = (document.getElementById('vt') ? document.getElementById('vt').value : 'Car');
       const svc = (document.getElementById('svc') ? document.getElementById('svc').value : 'Foam Wash');
       const date = (document.getElementById('dt') ? document.getElementById('dt').value : todayStr);
-      const vnum = (document.getElementById('vnum') ? document.getElementById('vnum').value.trim() : '') || 'Standard';
+      
+      const isVnumValid = validateVnumField(true);
+      if (!isVnumValid) {
+        vnumInput?.focus();
+        return;
+      }
+      const vnum = vnumInput ? vnumInput.value.trim().toUpperCase() : 'TN 01 AB 1234';
 
       if (!phone || phone.replace(/\D/g, '').length < 10) {
         alert('Please enter a valid 10-digit mobile number.');
@@ -1479,7 +1545,7 @@
           }
 
           if (modalWhatsAppBtn) {
-            const waText = encodeURIComponent(`Hi Trieye Studio, I have confirmed online booking ${bookingRef} for ${name} (${veh} - ${svc}) on ${date}. Please confirm!`);
+            const waText = encodeURIComponent(`Hi Trieye Studio, I have confirmed online booking ${bookingRef} for ${name} (${veh} - ${svc} | ${vnum}) on ${date}. Please confirm!`);
             modalWhatsAppBtn.href = `https://wa.me/919840012345?text=${waText}`;
           }
 
@@ -1489,7 +1555,11 @@
           // Reset form fields
           if (document.getElementById('cname')) document.getElementById('cname').value = '';
           if (document.getElementById('ph')) document.getElementById('ph').value = '';
-          if (document.getElementById('vnum')) document.getElementById('vnum').value = '';
+          if (vnumInput) {
+            vnumInput.value = '';
+            vnumInput.classList.remove('is-invalid');
+          }
+          if (vnumError) vnumError.classList.remove('visible');
         } else {
           // Show safe error returned by RPC or network handler
           const errMsg = (result && result.error) || 'Could not complete booking. Please try again or contact the studio.';

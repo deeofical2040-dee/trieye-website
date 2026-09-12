@@ -913,6 +913,44 @@ const TrieyeDB = {
       console.warn('⚠️ [Trieye] Realtime subscription error:', err);
       return null;
     }
+  },
+
+  // 8. INDIAN VEHICLE REGISTRATION FORMATTER & VALIDATOR
+  formatVehicleReg(raw) {
+    if (!raw) return '';
+    const clean = String(raw).toUpperCase().replace(/[^A-Z0-9]/g, '');
+    let res = '';
+    for (let i = 0; i < clean.length; i++) {
+      const char = clean[i];
+      const normLen = res.replace(/ /g, '').length;
+      if (normLen === 10) break;
+      if (normLen < 2) {
+        if (/[A-Z]/.test(char)) res += char;
+        else break;
+      } else if (normLen < 4) {
+        if (/[0-9]/.test(char)) {
+          if (normLen === 2 && !res.endsWith(' ')) res += ' ';
+          res += char;
+        } else break;
+      } else if (normLen < 6) {
+        if (/[A-Z]/.test(char)) {
+          if (normLen === 4 && !res.endsWith(' ')) res += ' ';
+          res += char;
+        } else break;
+      } else if (normLen < 10) {
+        if (/[0-9]/.test(char)) {
+          if (normLen === 6 && !res.endsWith(' ')) res += ' ';
+          res += char;
+        } else break;
+      }
+    }
+    return res.trim();
+  },
+
+  validateVehicleReg(val) {
+    if (!val) return false;
+    const regex = /^[A-Z]{2}\s\d{2}\s[A-Z]{2}\s\d{4}$/;
+    return regex.test(String(val).trim());
   }
 };
 
