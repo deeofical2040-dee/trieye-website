@@ -1721,6 +1721,7 @@
                   <th>Total Price</th>
                   <th>Payment</th>
                   <th>Completed Date</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody id="completed-tbody">
@@ -2263,21 +2264,32 @@
     function cleanPhone(p) {
       return (p || '').replace(/\D/g, '').slice(-10);
     }
+    function isUuid(str) {
+      if (!str || typeof str !== 'string') return false;
+      return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str.trim());
+    }
+
     async function getOrFetchShareToken(booking) {
       if (!booking) return null;
 
-      // Temporary console diagnostics
-      console.log('Invoice booking UUID:', booking.id);
-      console.log('Existing share token:', booking.share_token);
+      // Temporary debugging logs required by specification (Do NOT log the actual token)
+      console.log('History booking UUID:', booking.id);
+      console.log('History has share_token:', Boolean(booking.share_token));
 
-      // 1. If it exists on the client object, return immediately
-      if (booking.share_token) {
-        return booking.share_token;
+      // 1. First return booking.share_token if valid
+      if (booking.share_token && typeof booking.share_token === 'string' && booking.share_token.trim().length >= 16) {
+        return booking.share_token.trim();
       }
 
-      // 2. Fetch from Supabase using booking.id UUID
+      // 2. Before the query, validate that booking.id is a UUID
+      if (!isUuid(booking.id)) {
+        console.error('Invoice share failed: invalid booking UUID', booking);
+        return null;
+      }
+
+      // 3. Otherwise use booking.id REAL UUID to query Supabase
       const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
-      if (sb && booking.id) {
+      if (sb) {
         try {
           const { data, error } = await sb
             .from('bookings')
@@ -2286,13 +2298,13 @@
             .single();
 
           if (error) {
-            console.error('Share token fetch error:', error);
+            console.error('Share token query error from Supabase:', error);
           } else if (data && data.share_token) {
             booking.share_token = data.share_token;
             return data.share_token;
           }
         } catch (err) {
-          console.error('Share token fetch error:', err);
+          console.error('Share token fetch network exception:', err);
         }
       }
       return null;
@@ -2810,7 +2822,8 @@
           <td>
             <div class="action-btn-group">
               ${(b.status || '').toUpperCase() === 'CONFIRMED' ? `<button class="action-btn arrive" onclick="changeJobStatus('${b.id}', 'ARRIVED')" title="Mark Vehicle Arrived">🚗 Arrived</button>` : ''}
-              ${b.phone ? `<a href="https://wa.me/${cleanPhone(b.phone)}?text=Hi%20${encodeURIComponent(b.name || 'Customer')},%20confirming%20your%20Trieye%20booking%20for%20${encodeURIComponent(b.service)}%20on%20${encodeURIComponent(b.date)}" target="_blank" class="action-btn wa" title="Message on WhatsApp">💬 WA</a>` : ''}
+              <button class="action-btn" title="View & Print Bill Invoice" onclick="openBillInvoiceModal('${b.id}')">🧾 Bill</button>
+              <button class="action-btn wa" title="Share Bill on WhatsApp" onclick="shareBillWhatsApp('${b.id}')">💬 WA Bill</button>
               ${b.phone ? `<a href="tel:${cleanPhone(b.phone)}" class="action-btn call" title="Call Customer">📞 Call</a>` : ''}
             </div>
           </td>
@@ -3366,15 +3379,18 @@
         else if (jobStatus === 'ARRIVED') statusBadgeClass = 'status-arrived';
         else if (jobStatus === 'CANCELLED') statusBadgeClass = 'status-cancelled';
 
+        const displayRef = b.invoice_ref || (b.id && b.id.length > 8 ? `TRI-${b.id.substring(0, 8).toUpperCase()}` : (b.id || 'TRI-INVOICE'));
+        const bookingPrice = Number(b.price !== undefined && b.price !== null ? b.price : (b.total_amount || 0));
+
         tr.innerHTML = `
-          <td><strong class="booking-id-tag">${escapeHtml(b.id)}</strong></td>
-          <td><span style="font-family:'IBM Plex Mono'; font-size:0.8rem; color:var(--muted);">${escapeHtml(b.date || 'Today')}</span></td>
+          <td><strong class="booking-id-tag">${escapeHtml(displayRef)}</strong></td>
+          <td><span style="font-family:'IBM Plex Mono'; font-size:0.8rem; color:var(--muted);">${escapeHtml(b.date || b.booking_date || 'Today')}</span></td>
           <td>
             <div style="font-weight:600;">${escapeHtml(b.vehicleModel || b.vehicleType || 'Car')}</div>
             <div style="font-family:'IBM Plex Mono'; font-size:0.72rem; color:var(--pink);">${escapeHtml(b.reg || 'NO REG')}</div>
           </td>
           <td><strong>${escapeHtml(b.service || 'Foam Wash')}</strong></td>
-          <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${(b.price || 0).toLocaleString()}</strong></td>
+          <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${bookingPrice.toLocaleString()}</strong></td>
           <td><span class="pay-badge ${payBadgeClass}">${escapeHtml(payStatus)}</span></td>
           <td><span style="font-family:'IBM Plex Mono'; font-size:0.75rem;">${escapeHtml(payMethod)}</span></td>
           <td><span class="status-badge ${statusBadgeClass}">${escapeHtml(jobStatus)}</span></td>
@@ -3456,13 +3472,21 @@
     let currentInvoiceBooking = null;
 
     // Bill & Invoice Modal with TRIEYE Branding & WhatsApp Generation
-    function openBillInvoiceModal(bookingId) {
-      const b = getBookings().find(x => x.id === bookingId);
+    function openBillInvoiceModal(bookingOrId) {
+      let b = null;
+      if (bookingOrId && typeof bookingOrId === 'object') {
+        b = bookingOrId;
+      } else if (bookingOrId) {
+        b = getBookings().find(x => x.id === bookingOrId || x.invoice_ref === bookingOrId);
+      }
       if (!b) {
         showToast('Booking details not found');
         return;
       }
       currentInvoiceBooking = b;
+
+      const displayRef = b.invoice_ref || (b.id && b.id.length > 8 ? `TRI-${b.id.substring(0, 8).toUpperCase()}` : (b.id || 'TRI-INVOICE'));
+      const bookingPrice = Number(b.price !== undefined && b.price !== null ? b.price : (b.total_amount || 0));
 
       const body = document.getElementById('receipt-modal-body');
       body.innerHTML = `
@@ -3480,11 +3504,11 @@
           <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.8rem; font-family:'IBM Plex Mono';">
             <div>
               <span style="color:var(--muted);">INVOICE / REF:</span><br>
-              <strong style="color:var(--pink); font-size:0.95rem;">${escapeHtml(b.id)}</strong>
+              <strong style="color:var(--pink); font-size:0.95rem;">${escapeHtml(displayRef)}</strong>
             </div>
             <div style="text-align:right;">
               <span style="color:var(--muted);">DATE:</span><br>
-              <strong style="color:var(--white);">${escapeHtml(b.date || formatDateIso(new Date()))}</strong>
+              <strong style="color:var(--white);">${escapeHtml(b.date || b.booking_date || formatDateIso(new Date()))}</strong>
             </div>
           </div>
 
@@ -3519,7 +3543,7 @@
                 <strong>${escapeHtml(b.service || 'Foam Wash')}</strong>
                 <div style="font-size:0.72rem; color:var(--muted);">${escapeHtml(b.bay || 'Detailing Bay 01')}</div>
               </div>
-              <strong style="font-family:'IBM Plex Mono'; font-size:1rem; color:var(--white);">₹${(b.price || 0).toLocaleString()}</strong>
+              <strong style="font-family:'IBM Plex Mono'; font-size:1rem; color:var(--white);">₹${bookingPrice.toLocaleString()}</strong>
             </div>
           </div>
 
@@ -3532,7 +3556,7 @@
             </div>
             <div style="text-align:right;">
               <div style="font-size:0.75rem; color:var(--muted); font-family:'IBM Plex Mono'; text-transform:uppercase;">Final Total</div>
-              <div style="font-family:'Oswald', sans-serif; font-size:1.6rem; color:var(--green); font-weight:700;">₹${(b.price || 0).toLocaleString()}</div>
+              <div style="font-family:'Oswald', sans-serif; font-size:1.6rem; color:var(--green); font-weight:700;">₹${bookingPrice.toLocaleString()}</div>
             </div>
           </div>
 
@@ -3570,7 +3594,7 @@
         normalizedPhone = digits;
       }
 
-      const bookingRef = b.id || b.ref || 'N/A';
+      const bookingRef = b.invoice_ref || (b.id && b.id.length > 8 ? `TRI-${b.id.substring(0, 8).toUpperCase()}` : (b.id || 'N/A'));
       const customerName = b.name || b.customer_name || 'Valued Customer';
       const totalAmount = (b.price !== undefined && b.price !== null) ? Number(b.price).toLocaleString('en-IN') : Number(b.total_amount || 0).toLocaleString('en-IN');
       const paymentStatus = (b.payStatus || b.payment_status || 'UNPAID').toUpperCase();
@@ -3647,8 +3671,13 @@ TRIEYE WATERWASH & DETAILING`;
       }
     }
 
-    function shareBillWhatsApp(bookingId) {
-      const b = getBookings().find(x => x.id === bookingId);
+    function shareBillWhatsApp(bookingOrId) {
+      let b = null;
+      if (bookingOrId && typeof bookingOrId === 'object') {
+        b = bookingOrId;
+      } else if (bookingOrId) {
+        b = getBookings().find(x => x.id === bookingOrId || x.invoice_ref === bookingOrId);
+      }
       if (!b) {
         showToast('Booking details not found');
         return;
@@ -3657,8 +3686,8 @@ TRIEYE WATERWASH & DETAILING`;
       shareCurrentInvoiceWhatsApp();
     }
 
-    function printBillDirect(bookingId) {
-      openBillInvoiceModal(bookingId);
+    function printBillDirect(bookingOrId) {
+      openBillInvoiceModal(bookingOrId);
       setTimeout(() => {
         window.print();
       }, 350);
@@ -3947,14 +3976,17 @@ TRIEYE WATERWASH & DETAILING`;
       });
 
       if (completed.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:2rem; color:var(--muted);">No completed wash jobs archived yet.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:2rem; color:var(--muted);">No completed wash jobs archived yet.</td></tr>`;
         return;
       }
 
       completed.forEach(b => {
         const tr = document.createElement('tr');
+        const displayRef = b.invoice_ref || (b.id && b.id.length > 8 ? `TRI-${b.id.substring(0, 8).toUpperCase()}` : (b.id || 'TRI-INVOICE'));
+        const bookingPrice = Number(b.price !== undefined && b.price !== null ? b.price : (b.total_amount || 0));
+
         tr.innerHTML = `
-          <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">${escapeHtml(b.id)}</strong></td>
+          <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">${escapeHtml(displayRef)}</strong></td>
           <td>
             <div style="font-weight:600;">${escapeHtml(b.vehicleModel || b.vehicleType)}</div>
             <div style="font-family:'IBM Plex Mono'; font-size:0.72rem; color:var(--pink);">${escapeHtml(b.reg || 'NO REG')}</div>
@@ -3962,9 +3994,15 @@ TRIEYE WATERWASH & DETAILING`;
           <td>${escapeHtml(b.name)}</td>
           <td>${escapeHtml(b.service)}</td>
           <td>${escapeHtml(b.bay || 'Bay 01')}</td>
-          <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${(b.price || 0).toLocaleString()}</strong></td>
+          <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${bookingPrice.toLocaleString()}</strong></td>
           <td><span class="pay-badge pay-${(b.payStatus||'paid').toLowerCase()}">${escapeHtml(b.payStatus||'PAID')}</span></td>
-          <td><span style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--muted);">${escapeHtml(b.date || 'Today')}</span></td>
+          <td><span style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--muted);">${escapeHtml(b.date || b.booking_date || 'Today')}</span></td>
+          <td>
+            <div class="action-btn-group">
+              <button class="action-btn" title="View & Print Bill Invoice" onclick="openBillInvoiceModal('${b.id}')">🧾 Receipt</button>
+              <button class="action-btn wa" title="Share Bill on WhatsApp" onclick="shareBillWhatsApp('${b.id}')">💬 WA Bill</button>
+            </div>
+          </td>
         `;
         tbody.appendChild(tr);
       });

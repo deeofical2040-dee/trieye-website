@@ -190,9 +190,22 @@ const TrieyeDB = {
             const slot = b.slots || {};
             const pay = (Array.isArray(b.payments) && b.payments[0]) || b.payments || {};
 
+            const shortRef = b.id && b.id.length > 8 ? `TRI-${b.id.substring(0, 8).toUpperCase()}` : (b.id || 'TRI-INVOICE');
+            const totalAmt = Number(b.total_amount !== null && b.total_amount !== undefined ? b.total_amount : (svc.base_price || 0));
+
             return {
               id: b.id,
               share_token: b.share_token,
+              invoice_ref: shortRef,
+              booking_date: b.booking_date || '',
+              total_amount: totalAmt,
+              status: (b.status || 'CONFIRMED').toUpperCase(),
+              source: (b.source || 'ONLINE').toUpperCase(),
+              customer_id: b.customer_id,
+              vehicle_id: b.vehicle_id,
+              service_id: b.service_id,
+              bay_id: b.bay_id,
+              slot_id: b.slot_id,
               name: cust.name || 'Valued Customer',
               phone: cust.phone || '',
               vehicleType: veh.vehicle_type || 'Car',
@@ -202,16 +215,18 @@ const TrieyeDB = {
               date: b.booking_date || '',
               bookingTime: b.booking_time || null,
               slot: slot.slot_time || null,
-              price: Number(b.total_amount || svc.base_price || 0),
-              status: (b.status || 'CONFIRMED').toUpperCase(),
+              price: totalAmt,
               bay: bay.name || null,
               bayId: b.bay_id || null,
               slotId: b.slot_id || null,
-              source: (b.source || 'ONLINE').toUpperCase(),
               payStatus: (pay.status || 'UNPAID').toUpperCase(),
               payMethod: pay.method || 'Pending',
               checkInTime: '',
-              created: b.created_at || new Date().toISOString()
+              created: b.created_at || new Date().toISOString(),
+              customers: cust,
+              vehicles: veh,
+              services: svc,
+              payments: pay
             };
           });
           localStorage.setItem('trieye_bookings', JSON.stringify(formatted));
