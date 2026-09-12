@@ -153,7 +153,19 @@ const TrieyeDB = {
         const { data, error } = await sb
           .from('bookings')
           .select(`
-            *,
+            id,
+            share_token,
+            customer_id,
+            vehicle_id,
+            service_id,
+            bay_id,
+            slot_id,
+            booking_date,
+            booking_time,
+            status,
+            total_amount,
+            source,
+            created_at,
             customers (id, name, phone, email, notes),
             vehicles (id, vehicle_type, reg_number),
             services (id, name, description, base_price),
@@ -180,6 +192,7 @@ const TrieyeDB = {
 
             return {
               id: b.id,
+              share_token: b.share_token,
               name: cust.name || 'Valued Customer',
               phone: cust.phone || '',
               vehicleType: veh.vehicle_type || 'Car',
@@ -214,6 +227,35 @@ const TrieyeDB = {
       return JSON.parse(localStorage.getItem('trieye_bookings')) || [];
     } catch (e) {
       return [];
+    }
+  },
+
+  // Public Secure Invoice Retrieval via Token RPC ONLY
+  async getPublicInvoiceByToken(token) {
+    if (!token || typeof token !== 'string' || token.trim().length < 16) {
+      return { success: false, error: 'Invalid or missing invoice token.' };
+    }
+    const cleanToken = token.trim();
+    const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
+
+    if (!sb) {
+      return { success: false, error: 'Database service is unavailable.' };
+    }
+
+    try {
+      console.log('⚡ [TrieyeDB] Calling RPC get_public_invoice_by_token...');
+      const { data, error } = await sb.rpc('get_public_invoice_by_token', { p_token: cleanToken });
+      if (error) {
+        TrieyeDB.logError('rpc:get_public_invoice_by_token', 'EXECUTE', error);
+        return { success: false, error: error.message || 'Invoice unavailable.' };
+      }
+      if (data && typeof data === 'object') {
+        return data;
+      }
+      return { success: false, error: 'This invoice link is invalid or no longer available.' };
+    } catch (err) {
+      console.error('🚨 [TrieyeDB RPC network exception]:', err);
+      return { success: false, error: 'Network error while retrieving invoice.' };
     }
   },
 

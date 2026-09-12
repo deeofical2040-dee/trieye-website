@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trieye Studio — Official Invoice</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0d;
+      --bg-card: #131317;
+      --bg-card-subtle: #1a1a20;
+      --line: #282832;
+      --line-subtle: #202028;
+      --text: #f3f3f0;
+      --muted: #8d8d96;
+      --pink: #ee2f76;
+      --green: #a6d331;
+      --red: #ef4444;
+      --shadow: 0 16px 40px rgba(0, 0, 0, 0.55);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.5;
+      min-height: 100vh;
+      padding-bottom: 48px;
+    }
+
+    .mono { font-family: 'IBM Plex Mono', monospace; }
+    .display { font-family: 'Oswald', sans-serif; text-transform: uppercase; }
+
+    /* Top Action Bar (hidden in print) */
+    .top-actions-bar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(16, 16, 22, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--line);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .top-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text);
+    }
+    .top-brand img {
+      height: 28px;
+      width: auto;
+    }
+    .top-actions-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .btn {
+      font-family: 'Oswald', sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 8px 16px;
+      font-weight: 600;
+      border-radius: 4px;
+      border: 1px solid var(--line);
+      background: var(--bg-card-subtle);
+      color: var(--text);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .btn:hover {
+      border-color: var(--pink);
+      color: #ffffff;
+      transform: translateY(-1px);
+    }
+    .btn-primary {
+      background: var(--pink);
+      border-color: var(--pink);
+      color: #ffffff;
+    }
+    .btn-primary:hover {
+      background: #d61f63;
+      box-shadow: 0 4px 14px rgba(238, 47, 118, 0.35);
+    }
+    .btn-green {
+      background: var(--green);
+      border-color: var(--green);
+      color: #0a0a0d;
+    }
+    .btn-green:hover {
+      background: #95be2b;
+      box-shadow: 0 4px 14px rgba(166, 211, 49, 0.35);
+    }
+
+    /* Invoice Container */
+    .invoice-wrapper {
+      max-width: 780px;
+      margin: 32px auto 0;
+      padding: 0 20px;
+    }
+    .invoice-card {
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 36px 40px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+    @media (max-width: 640px) {
+      .invoice-card {
+        padding: 24px 20px;
+        gap: 22px;
+      }
+    }
+
+    /* Header Section */
+    .invoice-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 24px;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .studio-logo-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .studio-logo {
+      height: 38px;
+      width: auto;
+      object-fit: contain;
+    }
+    .studio-name {
+      font-family: 'Oswald', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--text);
+    }
+    .studio-address {
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1.5;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+    .invoice-meta-badge {
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    @media (max-width: 600px) {
+      .invoice-meta-badge { text-align: left; }
+    }
+    .invoice-title-tag {
+      font-family: 'Oswald', sans-serif;
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: var(--pink);
+      text-transform: uppercase;
+    }
+    .invoice-meta-row {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .invoice-meta-row strong {
+      color: var(--text);
+    }
+
+    /* Info Grid (Bill To & Vehicle) */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .info-grid { grid-template-columns: 1fr; }
+    }
+    .info-box {
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--line-subtle);
+      border-radius: 8px;
+      padding: 16px 18px;
+    }
+    .info-box-title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--pink);
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    .info-box-line {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13.5px;
+      margin-bottom: 6px;
+    }
+    .info-box-line:last-child { margin-bottom: 0; }
+    .info-box-lbl { color: var(--muted); }
+    .info-box-val { font-weight: 600; color: var(--text); }
+    .info-box-val.highlight { color: var(--green); font-family: 'IBM Plex Mono', monospace; }
+
+    /* Service Table */
+    .table-wrap {
+      overflow-x: auto;
+    }
+    .invoice-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    .invoice-table th {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-bottom: 1px solid var(--line);
+      padding: 10px 14px;
+      background: var(--bg-card-subtle);
+    }
+    .invoice-table th:last-child, .invoice-table td:last-child {
+      text-align: right;
+    }
+    .invoice-table td {
+      padding: 14px 14px;
+      border-bottom: 1px solid var(--line-subtle);
+      font-size: 14px;
+    }
+    .item-service-name {
+      font-weight: 600;
+      color: var(--text);
+    }
+    .item-service-desc {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* Calculation & Summary */
+    .summary-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      flex-wrap: wrap;
+      padding-top: 8px;
+    }
+    .payment-badge-box {
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--line-subtle);
+      border-radius: 8px;
+      padding: 14px 18px;
+      min-width: 220px;
+    }
+    .badge-status {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+    .status-paid {
+      background: rgba(166, 211, 49, 0.18);
+      color: var(--green);
+      border: 1px solid rgba(166, 211, 49, 0.4);
+    }
+    .status-unpaid {
+      background: rgba(239, 68, 68, 0.18);
+      color: var(--red);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+    }
+
+    .totals-box {
+      min-width: 240px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13.5px;
+      color: var(--muted);
+    }
+    .total-row.grand-total {
+      border-top: 1px solid var(--line);
+      padding-top: 10px;
+      margin-top: 4px;
+      color: var(--text);
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .grand-total-num {
+      font-family: 'Oswald', sans-serif;
+      font-size: 32px;
+      color: var(--green);
+      letter-spacing: 0.02em;
+    }
+
+    /* Action Buttons in Card (Mobile Friendly) */
+    .card-actions {
+      display: flex;
+      gap: 12px;
+      border-top: 1px solid var(--line);
+      padding-top: 20px;
+      flex-wrap: wrap;
+    }
+    .card-actions .btn {
+      flex: 1;
+      min-width: 140px;
+      justify-content: center;
+      padding: 10px 16px;
+    }
+
+    /* Footer Note */
+    .invoice-footer {
+      border-top: 1px dashed var(--line);
+      padding-top: 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .invoice-footer-thanks {
+      font-family: 'Oswald', sans-serif;
+      font-size: 15px;
+      letter-spacing: 0.06em;
+      color: var(--text);
+    }
+    .invoice-footer-meta {
+      font-size: 12px;
+      color: var(--muted);
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    /* Loading / Error States */
+    .state-container {
+      max-width: 500px;
+      margin: 80px auto;
+      text-align: center;
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 48px 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      box-shadow: var(--shadow);
+    }
+    .state-icon { font-size: 42px; }
+    .state-title { font-family: 'Oswald', sans-serif; font-size: 22px; color: var(--text); }
+    .state-msg { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+    /* =========================================================================
+       PRINT STYLESHEET (A4 Optimized)
+       ========================================================================= */
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        padding: 0 !important;
+      }
+      .top-actions-bar, .card-actions {
+        display: none !important;
+      }
+      .invoice-wrapper {
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .invoice-card {
+        background: #ffffff !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 24px !important;
+        color: #000000 !important;
+      }
+      .invoice-header, .info-box, .invoice-table th, .invoice-table td, .payment-badge-box, .invoice-footer {
+        border-color: #d1d5db !important;
+        color: #000000 !important;
+        background: transparent !important;
+      }
+      .studio-name, .invoice-title-tag, .info-box-val, .item-service-name, .total-row.grand-total, .invoice-footer-thanks {
+        color: #000000 !important;
+      }
+      .studio-address, .invoice-meta-row, .info-box-lbl, .item-service-desc, .total-row, .invoice-footer-meta {
+        color: #4b5563 !important;
+      }
+      .info-box-val.highlight, .grand-total-num {
+        color: #111827 !important;
+      }
+      .badge-status {
+        border: 1px solid #000000 !important;
+        color: #000000 !important;
+        background: transparent !important;
+      }
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="assets/supabase-config.js"></script>
+  <script src="assets/trieye-db.js"></script>
+</head>
+<body>
+
+  <!-- Top Action Bar -->
+  <header class="top-actions-bar">
+    <a href="index.html" class="top-brand" title="Back to Trieye Studio">
+      <img src="assets/trieye-logo-dark.png" alt="Trieye Studio" onerror="this.style.display='none'">
+      <span class="display" style="font-size:16px; font-weight:700;">TRIEYE</span>
+    </a>
+    <div class="top-actions-group">
+      <button class="btn" onclick="window.print()">🖨 Print / Save PDF</button>
+      <a href="https://wa.me/919876543210?text=Hi%20Trieye%20Studio,%20I%20have%20a%20query%20about%20my%20invoice" target="_blank" class="btn btn-green">💬 WhatsApp</a>
+      <a href="tel:+919876543210" class="btn">📞 Call Studio</a>
+      <a href="index.html" class="btn">← Home</a>
+    </div>
+  </header>
+
+  <!-- Loading State -->
+  <div id="invoice-loading" class="state-container">
+    <div class="state-icon">⏳</div>
+    <div class="state-title">Loading Invoice...</div>
+    <div class="state-msg">Verifying secure invoice token and fetching details from Trieye Studio.</div>
+  </div>
+
+  <!-- Error State (Invoice unavailable / link invalid) -->
+  <div id="invoice-error" class="state-container" style="display:none;">
+    <div class="state-icon">🔒</div>
+    <div class="state-title" id="error-title">Invoice unavailable</div>
+    <div class="state-msg" id="error-message">This invoice link is invalid or no longer available.</div>
+    <a href="index.html" class="btn btn-primary" style="margin-top:12px;">Go to Trieye Homepage</a>
+  </div>
+
+  <!-- Main Invoice Presentation -->
+  <main class="invoice-wrapper" id="invoice-container" style="display:none;">
+    <div class="invoice-card">
+      
+      <!-- Header / Branding -->
+      <div class="invoice-header">
+        <div class="studio-logo-group">
+          <img src="assets/trieye-logo-dark.png" alt="Trieye Studio" class="studio-logo" onerror="this.style.display='none'">
+          <div class="studio-name" id="biz-name">TRIEYE WATERWASH &amp; DETAILING</div>
+          <div class="studio-address" id="biz-address">
+            OMR Road, Sholinganallur, Chennai — 600119<br>
+            Phone: +91 98765 43210 · GSTIN: 33AAAAA0000A1Z5
+          </div>
+        </div>
+        <div class="invoice-meta-badge">
+          <div class="invoice-title-tag">TAX INVOICE</div>
+          <div class="invoice-meta-row">INVOICE / REF: <strong id="inv-ref">TRI-XXXXXX</strong></div>
+          <div class="invoice-meta-row">DATE: <strong id="inv-date">YYYY-MM-DD</strong></div>
+        </div>
+      </div>
+
+      <!-- Customer & Vehicle Details Grid -->
+      <div class="info-grid">
+        <div class="info-box">
+          <div class="info-box-title">👤 Customer Information</div>
+          <div class="info-box-line">
+            <span class="info-box-lbl">Customer Name:</span>
+            <span class="info-box-val" id="cust-name">Customer</span>
+          </div>
+          <div class="info-box-line">
+            <span class="info-box-lbl">Mobile Number:</span>
+            <span class="info-box-val mono" id="cust-phone">+91 XXXXXXXXXX</span>
+          </div>
+        </div>
+
+        <div class="info-box">
+          <div class="info-box-title">🚗 Vehicle Details</div>
+          <div class="info-box-line">
+            <span class="info-box-lbl">Vehicle Type:</span>
+            <span class="info-box-val" id="veh-type">Car</span>
+          </div>
+          <div class="info-box-line">
+            <span class="info-box-lbl">Registration Number:</span>
+            <span class="info-box-val highlight" id="veh-reg">TN 01 NO REG</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Itemized Service Table -->
+      <div class="table-wrap">
+        <table class="invoice-table">
+          <thead>
+            <tr>
+              <th style="width:45px;">#</th>
+              <th>Service Name &amp; Description</th>
+              <th style="width:70px; text-align:center;">Qty</th>
+              <th style="width:120px; text-align:right;">Rate (₹)</th>
+              <th style="width:130px;">Total (₹)</th>
+            </tr>
+          </thead>
+          <tbody id="invoice-items-tbody">
+            <tr>
+              <td>1</td>
+              <td>
+                <div class="item-service-name" id="item-title">Foam Wash &amp; Detailing</div>
+                <div class="item-service-desc" id="item-desc">Precision wash and detailing package</div>
+              </td>
+              <td style="text-align:center;">1</td>
+              <td style="text-align:right;" class="mono" id="item-rate">₹0</td>
+              <td class="mono" style="font-weight:600; color:var(--text);" id="item-total">₹0</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Summary & Payment Badge -->
+      <div class="summary-section">
+        <div class="payment-badge-box">
+          <div style="font-size:11px; color:var(--muted); font-family:'IBM Plex Mono'; text-transform:uppercase;">PAYMENT METHOD</div>
+          <div style="font-weight:600; font-size:14px; margin-top:2px;" id="pay-method">UPI / QR Code</div>
+          <div style="font-size:11px; color:var(--muted); font-family:'IBM Plex Mono'; margin-top:10px; text-transform:uppercase;">PAYMENT STATUS</div>
+          <span class="badge-status status-paid" id="pay-status">PAID</span>
+        </div>
+
+        <div class="totals-box">
+          <div class="total-row">
+            <span>Subtotal</span>
+            <span class="mono" id="subtotal-amount">₹0</span>
+          </div>
+          <div class="total-row">
+            <span>GST / Taxes</span>
+            <span class="mono">Inclusive</span>
+          </div>
+          <div class="total-row grand-total">
+            <span>Grand Total</span>
+            <span class="grand-total-num mono" id="grand-total">₹0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Action Buttons on Card -->
+      <div class="card-actions">
+        <button class="btn" onclick="window.print()">🖨 Print / Save PDF</button>
+        <a href="https://wa.me/919876543210?text=Hi%20Trieye%20Studio,%20I%20have%20a%20query%20about%20my%20invoice" target="_blank" class="btn btn-green">💬 WhatsApp</a>
+        <a href="tel:+919876543210" class="btn">📞 Call Studio</a>
+      </div>
+
+      <!-- Footer & Terms -->
+      <div class="invoice-footer">
+        <div class="invoice-footer-thanks">Thank you for choosing Trieye Waterwash &amp; Detailing!</div>
+        <div class="invoice-footer-meta">
+          For any questions or queries, call <strong>+91 98765 43210</strong> or visit <strong>trieyestudio.com</strong>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const loadingEl = document.getElementById('invoice-loading');
+      const errorEl = document.getElementById('invoice-error');
+      const containerEl = document.getElementById('invoice-container');
+      const errorTitle = document.getElementById('error-title');
+      const errorMsg = document.getElementById('error-message');
+
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get('token');
+
+      if (!token || token.trim().length < 10) {
+        loadingEl.style.display = 'none';
+        errorTitle.innerText = 'Invoice unavailable';
+        errorMsg.innerText = 'This invoice link is invalid or no longer available.';
+        errorEl.style.display = 'flex';
+        return;
+      }
+
+      try {
+        let res = null;
+        if (window.TrieyeDB && typeof window.TrieyeDB.getPublicInvoiceByToken === 'function') {
+          res = await window.TrieyeDB.getPublicInvoiceByToken(token);
+        }
+
+        if (!res || !res.success || !res.invoice) {
+          loadingEl.style.display = 'none';
+          errorTitle.innerText = 'Invoice unavailable';
+          errorMsg.innerText = 'This invoice link is invalid or no longer available.';
+          errorEl.style.display = 'flex';
+          return;
+        }
+
+        const inv = res.invoice;
+        const biz = inv.business || {};
+
+        // Populate business details
+        if (biz.name) document.getElementById('biz-name').innerText = biz.name;
+        if (biz.address) {
+          document.getElementById('biz-address').innerHTML = `
+            ${escapeHtml(biz.address)}<br>
+            Phone: ${escapeHtml(biz.phone || '+91 98765 43210')} ${biz.gstin ? `· GSTIN: ${escapeHtml(biz.gstin)}` : ''}
+          `;
+        }
+
+        // Meta
+        document.getElementById('inv-ref').innerText = inv.invoice_ref || 'TRI-INVOICE';
+        document.getElementById('inv-date').innerText = inv.invoice_date || new Date().toISOString().split('T')[0];
+
+        // Customer & Vehicle
+        document.getElementById('cust-name').innerText = inv.customer_name || 'Valued Customer';
+        document.getElementById('cust-phone').innerText = inv.customer_phone || 'N/A';
+        document.getElementById('veh-type').innerText = inv.vehicle_type || 'Car';
+        document.getElementById('veh-reg').innerText = (inv.reg_number || 'N/A').toUpperCase();
+
+        // Service Table
+        document.getElementById('item-title').innerText = inv.service_name || 'Detailing & Foam Wash';
+        document.getElementById('item-desc').innerText = inv.service_description || (inv.bay_name ? `Serviced at ${inv.bay_name}` : 'Precision vehicle detailing package');
+        
+        // Exact saved booking total amount (never recalculated from services table)
+        const priceNum = Number(inv.total_amount || inv.rate || 0);
+        const formattedPrice = '₹' + priceNum.toLocaleString('en-IN');
+        document.getElementById('item-rate').innerText = formattedPrice;
+        document.getElementById('item-total').innerText = formattedPrice;
+        document.getElementById('subtotal-amount').innerText = formattedPrice;
+        document.getElementById('grand-total').innerText = formattedPrice;
+
+        // Payment Info
+        document.getElementById('pay-method').innerText = inv.payment_method || 'Counter / UPI';
+        const payStatusEl = document.getElementById('pay-status');
+        const isPaid = (inv.payment_status || '').toUpperCase() === 'PAID';
+        payStatusEl.innerText = (inv.payment_status || 'PAID').toUpperCase();
+        payStatusEl.className = isPaid ? 'badge-status status-paid' : 'badge-status status-unpaid';
+
+        // Set document title
+        document.title = `Invoice #${inv.invoice_ref} — Trieye Studio`;
+
+        loadingEl.style.display = 'none';
+        containerEl.style.display = 'block';
+      } catch (err) {
+        console.error('Invoice load error:', err);
+        loadingEl.style.display = 'none';
+        errorTitle.innerText = 'Invoice unavailable';
+        errorMsg.innerText = 'This invoice link is invalid or no longer available.';
+        errorEl.style.display = 'flex';
+      }
+    });
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+</html>

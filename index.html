@@ -67,78 +67,6 @@
   .wrap{max-width:1180px;margin:0 auto;padding:0 28px;}
   ::selection{background:var(--pink);color:#000;}
 
-  /* Theme Toggle Pill Switch */
-  .theme-toggle-btn {
-    position: relative;
-    width: 62px;
-    height: 32px;
-    border-radius: 9999px;
-    background: #1c1c1f;
-    border: 2px solid #2e2e34;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    padding: 2px;
-    box-sizing: border-box;
-    transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-    outline: none;
-  }
-  .theme-toggle-btn:hover {
-    border-color: var(--pink);
-    box-shadow: 0 0 12px rgba(238, 47, 118, 0.25);
-  }
-  .theme-toggle-thumb {
-    width: 24px;
-    height: 24px;
-    border-radius: 50%;
-    background: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transform: translateX(30px);
-    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.3s ease, box-shadow 0.3s ease;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
-    color: #111111;
-  }
-  .theme-toggle-thumb svg {
-    width: 14px;
-    height: 14px;
-    stroke: currentColor;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    fill: none;
-    transition: opacity 0.2s ease, transform 0.3s ease;
-  }
-  .icon-moon {
-    display: block;
-  }
-  .icon-sun {
-    display: none;
-  }
-
-  /* Light Theme Pill State (Thumb slides to left/right accordingly) */
-  [data-theme="light"] .theme-toggle-btn {
-    background: #e9ecef;
-    border-color: #ced4da;
-  }
-  [data-theme="light"] .theme-toggle-btn:hover {
-    border-color: var(--pink);
-    box-shadow: 0 0 12px rgba(238, 47, 118, 0.2);
-  }
-  [data-theme="light"] .theme-toggle-thumb {
-    transform: translateX(0px);
-    background: #ffffff;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
-    color: #111111;
-  }
-  [data-theme="light"] .icon-moon {
-    display: none;
-  }
-  [data-theme="light"] .icon-sun {
-    display: block;
-  }
-
   /* focus visibility */
   a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible{
     outline:2px solid var(--green);
@@ -149,16 +77,27 @@
     *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important;}
   }
 
-  /* ---------- NAV ---------- */
+  /* ---------- NAV & LIQUID GLASS HEADER ---------- */
   header{
     position:sticky;top:0;z-index:50;
-    background:rgba(10,10,11,0.88);
-    backdrop-filter:blur(10px);
-    border-bottom:1px solid var(--line);
+    background: linear-gradient(135deg, rgba(22, 22, 28, 0.65) 0%, rgba(10, 10, 14, 0.45) 100%);
+    backdrop-filter: blur(24px) saturate(190%);
+    -webkit-backdrop-filter: blur(24px) saturate(190%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+    transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  [data-theme="light"] header{
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.75) 0%, rgba(245, 247, 250, 0.55) 100%);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.06), inset 0 1px 0 0 rgba(255, 255, 255, 0.9);
   }
   nav{
     display:flex;align-items:center;justify-content:space-between;
     padding:14px 28px;max-width:1180px;margin:0 auto;
+  }
+  .nav-actions{
+    display:flex;align-items:center;gap:16px;
   }
   .nav-logo{
     height:34px;
@@ -768,22 +707,6 @@
       <li><a href="#contact">Contact</a></li>
     </ul>
     <div class="nav-actions">
-      <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Dark / Light Theme" aria-label="Toggle Theme">
-        <div class="theme-toggle-thumb">
-          <!-- Sun Icon for Light Mode (Day) -->
-          <svg class="icon-sun" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="4"></circle>
-            <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
-          </svg>
-          <!-- Moon + Stars Icon for Dark Mode (Night) matching reference -->
-          <svg class="icon-moon" viewBox="0 0 24 24">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-            <!-- sparkle dots / stars -->
-            <circle cx="19" cy="5" r="1" fill="currentColor" stroke="none"></circle>
-            <circle cx="16" cy="3" r="0.75" fill="currentColor" stroke="none"></circle>
-          </svg>
-        </div>
-      </button>
       <a href="#booking" class="nav-cta">Book a slot</a>
       <button class="burger" id="burgerBtn" aria-label="Toggle navigation">☰</button>
     </div>

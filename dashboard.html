@@ -1976,7 +1976,7 @@
 
   <!-- RECEIPT MODAL -->
   <div class="dash-modal-backdrop" id="modalReceipt">
-    <div class="dash-modal" style="max-width:440px;">
+    <div class="dash-modal" style="max-width:520px;">
       <div class="dash-modal-header">
         <div class="dash-modal-title"><span>🧾</span> Trieye Studio Invoice</div>
         <button class="dash-modal-close" onclick="closeModal('modalReceipt')">&times;</button>
@@ -1985,7 +1985,9 @@
         <!-- Injected via JS -->
       </div>
       <div class="dash-modal-footer">
-        <button class="btn" onclick="window.print()">🖨️ Print Receipt</button>
+        <button class="btn" onclick="window.print()">🖨 Print Receipt</button>
+        <button class="btn btn-green" onclick="shareCurrentInvoiceWhatsApp()">💬 Share WhatsApp</button>
+        <button class="btn" onclick="shareCurrentInvoiceNative()">🔗 Share Invoice</button>
         <button class="btn btn-primary" onclick="closeModal('modalReceipt')">Done</button>
       </div>
     </div>
@@ -2260,6 +2262,45 @@
     }
     function cleanPhone(p) {
       return (p || '').replace(/\D/g, '').slice(-10);
+    }
+    async function getOrFetchShareToken(booking) {
+      if (!booking) return null;
+
+      // Temporary console diagnostics
+      console.log('Invoice booking UUID:', booking.id);
+      console.log('Existing share token:', booking.share_token);
+
+      // 1. If it exists on the client object, return immediately
+      if (booking.share_token) {
+        return booking.share_token;
+      }
+
+      // 2. Fetch from Supabase using booking.id UUID
+      const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
+      if (sb && booking.id) {
+        try {
+          const { data, error } = await sb
+            .from('bookings')
+            .select('share_token')
+            .eq('id', booking.id)
+            .single();
+
+          if (error) {
+            console.error('Share token fetch error:', error);
+          } else if (data && data.share_token) {
+            booking.share_token = data.share_token;
+            return data.share_token;
+          }
+        } catch (err) {
+          console.error('Share token fetch error:', err);
+        }
+      }
+      return null;
+    }
+    function getPublicInvoiceUrl(shareToken) {
+      const origin = window.location.origin;
+      const path = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
+      return `${origin}${path || '/'}invoice.html?token=${encodeURIComponent(shareToken)}`;
     }
     function showToast(msg) {
       const container = document.getElementById('toastContainer');
@@ -3412,6 +3453,8 @@
       });
     }
 
+    let currentInvoiceBooking = null;
+
     // Bill & Invoice Modal with TRIEYE Branding & WhatsApp Generation
     function openBillInvoiceModal(bookingId) {
       const b = getBookings().find(x => x.id === bookingId);
@@ -3419,6 +3462,7 @@
         showToast('Booking details not found');
         return;
       }
+      currentInvoiceBooking = b;
 
       const body = document.getElementById('receipt-modal-body');
       body.innerHTML = `
@@ -3502,44 +3546,115 @@
       openModal('modalReceipt');
     }
 
+    async function shareCurrentInvoiceWhatsApp() {
+      if (!currentInvoiceBooking) {
+        alert('No active invoice data found.');
+        return;
+      }
+
+      const b = currentInvoiceBooking;
+      const rawPhone = (b.phone || b.customer_phone || '').trim();
+      const digits = rawPhone.replace(/\D/g, '');
+
+      if (!digits || digits.length < 10) {
+        alert('Customer phone number is unavailable or invalid.');
+        return;
+      }
+
+      let normalizedPhone = digits;
+      if (digits.length === 10) {
+        normalizedPhone = '91' + digits;
+      } else if (digits.length === 11 && digits.startsWith('0')) {
+        normalizedPhone = '91' + digits.slice(1);
+      } else if (digits.length === 12 && digits.startsWith('91')) {
+        normalizedPhone = digits;
+      }
+
+      const bookingRef = b.id || b.ref || 'N/A';
+      const customerName = b.name || b.customer_name || 'Valued Customer';
+      const totalAmount = (b.price !== undefined && b.price !== null) ? Number(b.price).toLocaleString('en-IN') : Number(b.total_amount || 0).toLocaleString('en-IN');
+      const paymentStatus = (b.payStatus || b.payment_status || 'UNPAID').toUpperCase();
+
+      // Retrieve existing secure share token from Supabase
+      const token = await getOrFetchShareToken(b);
+      if (!token) {
+        alert('Invoice share token is unavailable from database. Please verify your Supabase connection or refresh the page.');
+        return;
+      }
+
+      const secureInvoiceUrl = getPublicInvoiceUrl(token);
+
+      const msg = 
+`🧾 TRIEYE STUDIO — INVOICE
+
+Hi ${customerName},
+
+Thank you for choosing Trieye Waterwash & Detailing.
+
+Your invoice is ready.
+
+Invoice: ${bookingRef}
+Amount: ₹${totalAmount}
+Status: ${paymentStatus}
+
+View Invoice:
+${secureInvoiceUrl}
+
+Thank you,
+TRIEYE WATERWASH & DETAILING`;
+
+      const encoded = encodeURIComponent(msg);
+      window.open(`https://wa.me/${normalizedPhone}?text=${encoded}`, '_blank');
+      showToast('Opening WhatsApp...');
+    }
+
+    async function shareCurrentInvoiceNative() {
+      if (!currentInvoiceBooking) {
+        alert('No active invoice data found.');
+        return;
+      }
+      const b = currentInvoiceBooking;
+      const token = await getOrFetchShareToken(b);
+      if (!token) {
+        alert('Invoice share token is unavailable from database. Please verify your Supabase connection or refresh the page.');
+        return;
+      }
+
+      const invoiceUrl = getPublicInvoiceUrl(token);
+
+      if (navigator.share) {
+        try {
+          await navigator.share({
+            title: 'TRIEYE Studio Invoice',
+            text: 'Your TRIEYE Studio invoice is ready.',
+            url: invoiceUrl
+          });
+          showToast('Invoice shared successfully');
+          return;
+        } catch (err) {
+          if (err.name !== 'AbortError') {
+            console.warn('Navigator share error:', err);
+          }
+        }
+      }
+
+      // Fallback: Copy to clipboard
+      try {
+        await navigator.clipboard.writeText(invoiceUrl);
+        showToast('✓ Invoice link copied to clipboard!');
+      } catch (e) {
+        prompt('Copy invoice link:', invoiceUrl);
+      }
+    }
+
     function shareBillWhatsApp(bookingId) {
       const b = getBookings().find(x => x.id === bookingId);
       if (!b) {
         showToast('Booking details not found');
         return;
       }
-
-      const cleanP = cleanPhone(b.phone);
-      if (!cleanP || cleanP.length < 10) {
-        alert('Customer mobile number is not available or invalid.');
-        return;
-      }
-
-      const msg = 
-`✨ *TRIEYE WATERWASH & DETAILING STUDIO* ✨
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-📄 *SERVICE INVOICE & RECEIPT*
-
-*Invoice Ref:* #${b.id}
-*Date:* ${b.date || formatDateIso(new Date())}
-*Customer:* ${b.name || 'Valued Customer'}
-*Vehicle:* ${b.vehicleType || b.vehicleModel || 'Car'} (${b.reg || 'NO REG'})
-
-*Service Rendered:* ${b.service || 'Foam Wash'}
-*Payment Method:* ${b.payMethod || 'UPI / Cash'}
-*Payment Status:* ${b.payStatus || 'PAID'}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-💰 *TOTAL AMOUNT:* ₹${(b.price || 0).toLocaleString()}
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-Thank you for choosing Trieye Studio! 🚗✨
-📍 OMR Road, Sholinganallur, Chennai
-📞 Helpdesk: +91 98765 43210`;
-
-      const encoded = encodeURIComponent(msg);
-      window.open(`https://wa.me/91${cleanP}?text=${encoded}`, '_blank');
-      showToast('Opening WhatsApp Bill...');
+      currentInvoiceBooking = b;
+      shareCurrentInvoiceWhatsApp();
     }
 
     function printBillDirect(bookingId) {
