@@ -338,9 +338,29 @@
     }
     .card-actions .btn {
       flex: 1;
-      min-width: 140px;
+      min-width: 160px;
+      min-height: 44px;
       justify-content: center;
-      padding: 10px 16px;
+      padding: 12px 18px;
+      font-size: 14px;
+      letter-spacing: 0.06em;
+    }
+    .card-actions .btn-download {
+      flex: 1.4;
+      font-weight: 700;
+    }
+    .card-actions .btn-call {
+      flex: 1;
+    }
+    @media (max-width: 520px) {
+      .card-actions {
+        flex-direction: column;
+        gap: 10px;
+      }
+      .card-actions .btn {
+        width: 100%;
+        min-width: 100%;
+      }
     }
 
     /* Footer Note */
@@ -565,9 +585,8 @@
 
       <!-- Interactive Action Buttons on Card -->
       <div class="card-actions">
-        <button class="btn" onclick="window.print()">🖨 Print / Save PDF</button>
-        <a href="https://wa.me/919876543210?text=Hi%20Trieye%20Studio,%20I%20have%20a%20query%20about%20my%20invoice" target="_blank" class="btn btn-green">💬 WhatsApp</a>
-        <a href="tel:+919876543210" class="btn">📞 Call Studio</a>
+        <button class="btn btn-green btn-download" onclick="downloadInvoice()">⬇ DOWNLOAD INVOICE</button>
+        <a href="tel:+919876543210" class="btn btn-call">☎ CALL STUDIO</a>
       </div>
 
       <!-- Footer & Terms -->
@@ -668,6 +687,10 @@
         errorEl.style.display = 'flex';
       }
     });
+
+    function downloadInvoice() {
+      window.print();
+    }
 
     function escapeHtml(str) {
       if (!str) return '';
