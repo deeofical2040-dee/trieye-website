@@ -42,5 +42,8 @@ if (typeof supabase !== 'undefined') {
 
 // Global accessor
 window.getTrieyeSupabase = function () {
+  if (!supabaseClient) {
+    initSupabaseClient();
+  }
   return supabaseClient;
 };

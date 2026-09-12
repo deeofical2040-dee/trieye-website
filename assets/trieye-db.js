@@ -245,6 +245,46 @@ const TrieyeDB = {
     }
   },
 
+  // Authoritative Database Share Token Query by UUID
+  async getBookingShareToken(bookingId) {
+    if (!bookingId) return null;
+    const cleanId = String(bookingId).trim();
+    // Validate UUID format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(cleanId)) {
+      console.error('Invoice share failed: invalid booking UUID', bookingId);
+      return null;
+    }
+
+    const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
+    if (!sb) {
+      console.error('Booking share-token query failed: Supabase client is not available');
+      return null;
+    }
+
+    try {
+      const { data, error } = await sb
+        .from('bookings')
+        .select('id, share_token')
+        .eq('id', cleanId)
+        .maybeSingle();
+
+      if (error) {
+        console.error('Booking share-token query failed:', error);
+        return null;
+      }
+
+      if (data && data.share_token) {
+        return data.share_token;
+      }
+      console.warn('Booking share-token query returned no record or empty token for UUID:', cleanId);
+      return null;
+    } catch (err) {
+      console.error('Booking share-token query failed:', err);
+      return null;
+    }
+  },
+
   // Public Secure Invoice Retrieval via Token RPC ONLY
   async getPublicInvoiceByToken(token) {
     if (!token || typeof token !== 'string' || token.trim().length < 16) {

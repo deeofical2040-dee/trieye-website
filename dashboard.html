@@ -2270,43 +2270,34 @@
     }
 
     async function getOrFetchShareToken(booking) {
-      if (!booking) return null;
+      if (!booking) {
+        console.error('Invoice share failed: booking object is missing');
+        return null;
+      }
 
-      // Temporary debugging logs required by specification (Do NOT log the actual token)
-      console.log('History booking UUID:', booking.id);
-      console.log('History has share_token:', Boolean(booking.share_token));
+      // Safe diagnostic logging as requested (do NOT print the token itself)
+      console.log('Invoice share booking UUID:', booking?.id);
+      console.log('Invoice share has token:', Boolean(booking?.share_token));
 
-      // 1. First return booking.share_token if valid
+      // 1. If share_token is already present and valid (e.g. 48 chars)
       if (booking.share_token && typeof booking.share_token === 'string' && booking.share_token.trim().length >= 16) {
         return booking.share_token.trim();
       }
 
-      // 2. Before the query, validate that booking.id is a UUID
-      if (!isUuid(booking.id)) {
-        console.error('Invoice share failed: invalid booking UUID', booking);
-        return null;
-      }
-
-      // 3. Otherwise use booking.id REAL UUID to query Supabase
-      const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
-      if (sb) {
-        try {
-          const { data, error } = await sb
-            .from('bookings')
-            .select('share_token')
-            .eq('id', booking.id)
-            .single();
-
-          if (error) {
-            console.error('Share token query error from Supabase:', error);
-          } else if (data && data.share_token) {
-            booking.share_token = data.share_token;
-            return data.share_token;
+      // 2. Authoritative query via TrieyeDB.getBookingShareToken using real UUID
+      if (window.TrieyeDB && typeof window.TrieyeDB.getBookingShareToken === 'function') {
+        const fetchedToken = await window.TrieyeDB.getBookingShareToken(booking.id);
+        if (fetchedToken) {
+          booking.share_token = fetchedToken;
+          if (window.currentInvoiceBooking && window.currentInvoiceBooking.id === booking.id) {
+            window.currentInvoiceBooking.share_token = fetchedToken;
           }
-        } catch (err) {
-          console.error('Share token fetch network exception:', err);
+          return fetchedToken;
         }
+      } else {
+        console.error('Invoice share failed: window.TrieyeDB.getBookingShareToken is not defined');
       }
+
       return null;
     }
     function getPublicInvoiceUrl(shareToken) {
@@ -3469,21 +3460,34 @@
       });
     }
 
-    let currentInvoiceBooking = null;
+    window.currentInvoiceBooking = null;
+
+    function resolveOriginalBooking(bookingOrId) {
+      const all = getBookings();
+      if (!bookingOrId) return null;
+      if (typeof bookingOrId === 'object') {
+        if (bookingOrId.id) {
+          const found = all.find(x => x.id === bookingOrId.id);
+          if (found) return found;
+        }
+        if (bookingOrId.invoice_ref) {
+          const found = all.find(x => x.invoice_ref === bookingOrId.invoice_ref);
+          if (found) return found;
+        }
+        return bookingOrId;
+      }
+      return all.find(x => x.id === bookingOrId || x.invoice_ref === bookingOrId) || null;
+    }
 
     // Bill & Invoice Modal with TRIEYE Branding & WhatsApp Generation
     function openBillInvoiceModal(bookingOrId) {
-      let b = null;
-      if (bookingOrId && typeof bookingOrId === 'object') {
-        b = bookingOrId;
-      } else if (bookingOrId) {
-        b = getBookings().find(x => x.id === bookingOrId || x.invoice_ref === bookingOrId);
-      }
-      if (!b) {
+      const originalBooking = resolveOriginalBooking(bookingOrId);
+      if (!originalBooking) {
         showToast('Booking details not found');
         return;
       }
-      currentInvoiceBooking = b;
+      window.currentInvoiceBooking = originalBooking;
+      const b = window.currentInvoiceBooking;
 
       const displayRef = b.invoice_ref || (b.id && b.id.length > 8 ? `TRI-${b.id.substring(0, 8).toUpperCase()}` : (b.id || 'TRI-INVOICE'));
       const bookingPrice = Number(b.price !== undefined && b.price !== null ? b.price : (b.total_amount || 0));
@@ -3571,12 +3575,13 @@
     }
 
     async function shareCurrentInvoiceWhatsApp() {
-      if (!currentInvoiceBooking) {
+      const b = window.currentInvoiceBooking;
+      if (!b) {
+        console.error('Invoice share failed: window.currentInvoiceBooking is null');
         alert('No active invoice data found.');
         return;
       }
 
-      const b = currentInvoiceBooking;
       const rawPhone = (b.phone || b.customer_phone || '').trim();
       const digits = rawPhone.replace(/\D/g, '');
 
@@ -3602,7 +3607,8 @@
       // Retrieve existing secure share token from Supabase
       const token = await getOrFetchShareToken(b);
       if (!token) {
-        alert('Invoice share token is unavailable from database. Please verify your Supabase connection or refresh the page.');
+        console.error('Invoice share token could not be resolved for booking UUID:', b.id);
+        alert('Invoice share token is unavailable from database. Please check the browser console for details.');
         return;
       }
 
@@ -3633,14 +3639,16 @@ TRIEYE WATERWASH & DETAILING`;
     }
 
     async function shareCurrentInvoiceNative() {
-      if (!currentInvoiceBooking) {
+      const b = window.currentInvoiceBooking;
+      if (!b) {
+        console.error('Invoice share failed: window.currentInvoiceBooking is null');
         alert('No active invoice data found.');
         return;
       }
-      const b = currentInvoiceBooking;
       const token = await getOrFetchShareToken(b);
       if (!token) {
-        alert('Invoice share token is unavailable from database. Please verify your Supabase connection or refresh the page.');
+        console.error('Invoice share token could not be resolved for booking UUID:', b.id);
+        alert('Invoice share token is unavailable from database. Please check the browser console for details.');
         return;
       }
 
@@ -3672,22 +3680,23 @@ TRIEYE WATERWASH & DETAILING`;
     }
 
     function shareBillWhatsApp(bookingOrId) {
-      let b = null;
-      if (bookingOrId && typeof bookingOrId === 'object') {
-        b = bookingOrId;
-      } else if (bookingOrId) {
-        b = getBookings().find(x => x.id === bookingOrId || x.invoice_ref === bookingOrId);
-      }
-      if (!b) {
+      const originalBooking = resolveOriginalBooking(bookingOrId);
+      if (!originalBooking) {
         showToast('Booking details not found');
         return;
       }
-      currentInvoiceBooking = b;
+      window.currentInvoiceBooking = originalBooking;
       shareCurrentInvoiceWhatsApp();
     }
 
     function printBillDirect(bookingOrId) {
-      openBillInvoiceModal(bookingOrId);
+      const originalBooking = resolveOriginalBooking(bookingOrId);
+      if (!originalBooking) {
+        showToast('Booking details not found');
+        return;
+      }
+      window.currentInvoiceBooking = originalBooking;
+      openBillInvoiceModal(originalBooking);
       setTimeout(() => {
         window.print();
       }, 350);
