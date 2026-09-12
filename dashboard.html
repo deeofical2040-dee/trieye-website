@@ -3342,6 +3342,8 @@
       }
     }
 
+    window._historyBookingsMap = {};
+
     function renderCustomerHistoryTable(customerBookings, customerObj, phoneKey) {
       const historyPanel = document.getElementById('customer-history-panel');
       const historyTbody = document.getElementById('customer-history-tbody');
@@ -3357,7 +3359,9 @@
         return;
       }
 
-      customerBookings.forEach(b => {
+      window._historyBookingsMap = window._historyBookingsMap || {};
+
+      customerBookings.forEach((b, idx) => {
         const tr = document.createElement('tr');
         const payStatus = (b.payStatus || 'UNPAID').toUpperCase();
         const payMethod = b.payMethod || 'UPI / QR';
@@ -3373,6 +3377,11 @@
         const displayRef = b.invoice_ref || (b.id && b.id.length > 8 ? `TRI-${b.id.substring(0, 8).toUpperCase()}` : (b.id || 'TRI-INVOICE'));
         const bookingPrice = Number(b.price !== undefined && b.price !== null ? b.price : (b.total_amount || 0));
 
+        const mapKey = 'hist_' + idx + '_' + (b.id || 'rec');
+        window._historyBookingsMap[mapKey] = b;
+        if (b.id) window._historyBookingsMap[b.id] = b;
+        if (displayRef) window._historyBookingsMap[displayRef] = b;
+
         tr.innerHTML = `
           <td><strong class="booking-id-tag">${escapeHtml(displayRef)}</strong></td>
           <td><span style="font-family:'IBM Plex Mono'; font-size:0.8rem; color:var(--muted);">${escapeHtml(b.date || b.booking_date || 'Today')}</span></td>
@@ -3387,9 +3396,9 @@
           <td><span class="status-badge ${statusBadgeClass}">${escapeHtml(jobStatus)}</span></td>
           <td>
             <div class="action-btn-group">
-              <button class="action-btn" title="View & Print Bill Invoice" onclick="openBillInvoiceModal('${b.id}')">🧾 View Bill</button>
-              <button class="action-btn wa" title="Share Bill on WhatsApp" onclick="shareBillWhatsApp('${b.id}')">💬 WhatsApp Bill</button>
-              <button class="action-btn" title="Print Invoice" onclick="printBillDirect('${b.id}')">🖨️ Print Bill</button>
+              <button class="action-btn" title="View & Print Bill Invoice" onclick="openBillInvoiceModal('${mapKey}')">🧾 View Bill</button>
+              <button class="action-btn wa" title="Share Bill on WhatsApp" onclick="shareBillWhatsApp('${mapKey}')">💬 WhatsApp Bill</button>
+              <button class="action-btn" title="Print Invoice" onclick="printBillDirect('${mapKey}')">🖨️ Print Bill</button>
             </div>
           </td>
         `;
@@ -3463,20 +3472,31 @@
     window.currentInvoiceBooking = null;
 
     function resolveOriginalBooking(bookingOrId) {
-      const all = getBookings();
       if (!bookingOrId) return null;
       if (typeof bookingOrId === 'object') {
+        const all = getBookings();
         if (bookingOrId.id) {
           const found = all.find(x => x.id === bookingOrId.id);
-          if (found) return found;
-        }
-        if (bookingOrId.invoice_ref) {
-          const found = all.find(x => x.invoice_ref === bookingOrId.invoice_ref);
-          if (found) return found;
+          if (found) return { ...bookingOrId, ...found };
         }
         return bookingOrId;
       }
-      return all.find(x => x.id === bookingOrId || x.invoice_ref === bookingOrId) || null;
+
+      if (window._historyBookingsMap && window._historyBookingsMap[bookingOrId]) {
+        return window._historyBookingsMap[bookingOrId];
+      }
+
+      const all = getBookings();
+      const cleanStr = String(bookingOrId).trim();
+      let found = all.find(x => x.id === cleanStr || x.invoice_ref === cleanStr);
+      if (found) return found;
+
+      const stripped = cleanStr.replace(/^TRI-|^TR-/i, '').toLowerCase();
+      if (stripped) {
+        found = all.find(x => x.id && x.id.toLowerCase().replace(/-/g, '').startsWith(stripped));
+        if (found) return found;
+      }
+      return null;
     }
 
     // Bill & Invoice Modal with TRIEYE Branding & WhatsApp Generation

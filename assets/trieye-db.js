@@ -245,16 +245,10 @@ const TrieyeDB = {
     }
   },
 
-  // Authoritative Database Share Token Query by UUID
+  // Authoritative Database Share Token Query by UUID or Reference
   async getBookingShareToken(bookingId) {
     if (!bookingId) return null;
     const cleanId = String(bookingId).trim();
-    // Validate UUID format
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-    if (!uuidRegex.test(cleanId)) {
-      console.error('Invoice share failed: invalid booking UUID', bookingId);
-      return null;
-    }
 
     const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
     if (!sb) {
@@ -262,27 +256,55 @@ const TrieyeDB = {
       return null;
     }
 
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    
+    // 1. Direct query if it is a valid UUID
+    if (uuidRegex.test(cleanId)) {
+      try {
+        const { data, error } = await sb
+          .from('bookings')
+          .select('id, share_token')
+          .eq('id', cleanId)
+          .maybeSingle();
+
+        if (error) {
+          console.error('Booking share-token query failed:', error);
+          return null;
+        }
+
+        if (data && data.share_token) {
+          return data.share_token;
+        }
+      } catch (err) {
+        console.error('Booking share-token query exception:', err);
+      }
+    }
+
+    // 2. If cleanId is a display reference (e.g. TRI-49D2), match against recent Supabase bookings
     try {
-      const { data, error } = await sb
+      const { data: allBookings, error: listErr } = await sb
         .from('bookings')
         .select('id, share_token')
-        .eq('id', cleanId)
-        .maybeSingle();
+        .order('created_at', { ascending: false })
+        .limit(50);
 
-      if (error) {
-        console.error('Booking share-token query failed:', error);
-        return null;
+      if (!listErr && Array.isArray(allBookings)) {
+        const stripped = cleanId.replace(/^TRI-|^TR-/i, '').toLowerCase();
+        const match = allBookings.find(b => {
+          if (!b.id) return false;
+          const bClean = b.id.toLowerCase().replace(/-/g, '');
+          return bClean.startsWith(stripped);
+        });
+        if (match && match.share_token) {
+          return match.share_token;
+        }
       }
-
-      if (data && data.share_token) {
-        return data.share_token;
-      }
-      console.warn('Booking share-token query returned no record or empty token for UUID:', cleanId);
-      return null;
-    } catch (err) {
-      console.error('Booking share-token query failed:', err);
-      return null;
+    } catch (e) {
+      console.warn('Booking share-token fallback search exception:', e);
     }
+
+    console.warn('Booking share-token query returned no record for UUID or reference:', cleanId);
+    return null;
   },
 
   // Public Secure Invoice Retrieval via Token RPC ONLY
@@ -355,9 +377,13 @@ const TrieyeDB = {
         
         // Optimistically record in local cache with returned reference
         if (data && (data.booking_id || data.booking_ref)) {
+          const realId = data.booking_id || data.id;
+          const refCode = data.booking_ref || (realId && String(realId).length > 8 ? `TRI-${realId.substring(0, 8).toUpperCase()}` : (realId || 'TRI-ONLINE'));
           const localBooking = {
-            id: data.booking_ref || ('TRI-' + String(data.booking_id || Math.random()).slice(0, 8).toUpperCase()),
-            supabaseId: data.booking_id || null,
+            id: realId || refCode,
+            share_token: data.share_token || null,
+            invoice_ref: refCode,
+            supabaseId: realId || null,
             name: params.name,
             phone: params.phone,
             vehicleType: params.vehicleType,
