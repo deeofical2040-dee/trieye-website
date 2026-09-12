@@ -245,65 +245,44 @@ const TrieyeDB = {
     }
   },
 
-  // Authoritative Database Share Token Query by UUID or Reference
+  // Authoritative Database Share Token Query by UUID
   async getBookingShareToken(bookingId) {
     if (!bookingId) return null;
     const cleanId = String(bookingId).trim();
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+    if (!uuidRegex.test(cleanId)) {
+      console.error('BUG: display invoice_ref or invalid identifier used as booking UUID for getBookingShareToken:', cleanId);
+      throw new Error('Invalid booking UUID');
+    }
 
     const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
     if (!sb) {
       console.error('Booking share-token query failed: Supabase client is not available');
       return null;
     }
-
-    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     
-    // 1. Direct query if it is a valid UUID
-    if (uuidRegex.test(cleanId)) {
-      try {
-        const { data, error } = await sb
-          .from('bookings')
-          .select('id, share_token')
-          .eq('id', cleanId)
-          .maybeSingle();
-
-        if (error) {
-          console.error('Booking share-token query failed:', error);
-          return null;
-        }
-
-        if (data && data.share_token) {
-          return data.share_token;
-        }
-      } catch (err) {
-        console.error('Booking share-token query exception:', err);
-      }
-    }
-
-    // 2. If cleanId is a display reference (e.g. TRI-49D2), match against recent Supabase bookings
+    // Direct query using valid UUID
     try {
-      const { data: allBookings, error: listErr } = await sb
+      const { data, error } = await sb
         .from('bookings')
         .select('id, share_token')
-        .order('created_at', { ascending: false })
-        .limit(50);
+        .eq('id', cleanId)
+        .maybeSingle();
 
-      if (!listErr && Array.isArray(allBookings)) {
-        const stripped = cleanId.replace(/^TRI-|^TR-/i, '').toLowerCase();
-        const match = allBookings.find(b => {
-          if (!b.id) return false;
-          const bClean = b.id.toLowerCase().replace(/-/g, '');
-          return bClean.startsWith(stripped);
-        });
-        if (match && match.share_token) {
-          return match.share_token;
-        }
+      if (error) {
+        console.error('Booking share-token query failed:', error);
+        return null;
       }
-    } catch (e) {
-      console.warn('Booking share-token fallback search exception:', e);
+
+      if (data && data.share_token) {
+        return data.share_token;
+      }
+    } catch (err) {
+      console.error('Booking share-token query exception:', err);
     }
 
-    console.warn('Booking share-token query returned no record for UUID or reference:', cleanId);
+    console.warn('Booking share-token query returned no record for UUID:', cleanId);
     return null;
   },
 

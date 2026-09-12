@@ -2275,9 +2275,14 @@
         return null;
       }
 
+      if (!isUuid(booking.id)) {
+        console.error('BUG: display invoice_ref used as booking UUID', booking);
+        throw new Error('Invalid booking UUID');
+      }
+
       // Safe diagnostic logging as requested (do NOT print the token itself)
-      console.log('Invoice share booking UUID:', booking?.id);
-      console.log('Invoice share has token:', Boolean(booking?.share_token));
+      console.log('Invoice share booking UUID:', booking.id);
+      console.log('Invoice share has token:', Boolean(booking.share_token));
 
       // 1. If share_token is already present and valid (e.g. 48 chars)
       if (booking.share_token && typeof booking.share_token === 'string' && booking.share_token.trim().length >= 16) {
