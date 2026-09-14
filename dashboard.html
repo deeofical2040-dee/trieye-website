@@ -2262,7 +2262,7 @@
       '07:30 PM - 09:30 PM'
     ];
 
-    let currentSelectedDate = new Date().toISOString().split('T')[0];
+    let currentSelectedDate = formatDateIso(new Date());
     let onlineFilterState = 'TODAY';
 
     // Helper functions
@@ -2589,16 +2589,33 @@
     // 1. UPDATE KPI CARDS & OVERVIEW
     function updateKPICards() {
       const bookings = getBookings();
-      const todayStr = formatDateIso(new Date());
+      const now = new Date();
+      const todayYear = now.getFullYear();
+      const todayMonth = String(now.getMonth() + 1).padStart(2, '0');
+      const todayDay = String(now.getDate()).padStart(2, '0');
+      const localToday = `${todayYear}-${todayMonth}-${todayDay}`;
 
-      const todayBookings = bookings.filter(b => b.date === todayStr || (b.date && b.date.includes('Today')));
+      const allOnline = bookings.filter(b => (b.source || '').toUpperCase() === 'ONLINE');
+      const todayOnline = allOnline.filter(b => {
+        const bDate = (b.booking_date || b.date || '').trim().slice(0, 10);
+        return bDate === localToday;
+      });
+
+      console.log('Total online bookings:', allOnline.length);
+      console.log('Today local date:', localToday);
+      console.log('Today online bookings:', todayOnline.length);
+
+      const todayBookings = bookings.filter(b => {
+        const bDate = (b.booking_date || b.date || '').trim().slice(0, 10);
+        return bDate === localToday || (b.date && b.date.includes('Today'));
+      });
       
       const revenue = todayBookings
         .filter(b => b.status === 'IN PROGRESS' || b.status === 'COMPLETED' || b.status === 'CONFIRMED')
         .reduce((sum, b) => sum + (Number(b.price) || 0), 0);
 
       const activeVehicles = bookings.filter(b => b.status === 'IN PROGRESS' || b.status === 'ARRIVED' || b.status === 'QUALITY CHECK').length;
-      const onlineToday = todayBookings.filter(b => (b.source || '').toUpperCase() === 'ONLINE').length;
+      const onlineToday = todayOnline.length;
       const walkinToday = todayBookings.filter(b => (b.source || '').toUpperCase() !== 'ONLINE').length;
       const completedToday = todayBookings.filter(b => b.status === 'COMPLETED').length;
 
@@ -2629,7 +2646,7 @@
       setText('kpi-bay-fraction', `${occupiedBays}/${bays.length} Bays Active`);
 
       setText('badge-active-queue', activeVehicles);
-      setText('badge-online-count', bookings.filter(b => (b.source || '').toUpperCase() === 'ONLINE' && b.status !== 'COMPLETED' && b.status !== 'CANCELLED').length);
+      setText('badge-online-count', onlineToday);
       setText('badge-customers-count', totalCustCount);
       setText('badge-done-count', bookings.filter(b => b.status === 'COMPLETED').length);
       setText('badge-bays-occupied', `${occupiedBays}/${bays.length}`);
@@ -2787,7 +2804,7 @@
         if (!isOnline) return false;
 
         // Treat booking_date strictly as a date-only YYYY-MM-DD string
-        const bDate = (b.date || '').trim().slice(0, 10);
+        const bDate = (b.booking_date || b.date || '').trim().slice(0, 10);
 
         if (onlineFilterState === 'TODAY') {
           return bDate === localToday;
