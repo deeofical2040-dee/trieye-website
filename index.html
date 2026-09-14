@@ -2020,41 +2020,18 @@
   console.log('Initial theme:', selectedTheme);
 
   // ==========================================================================
-  // SPLASH SCREEN CONTROLLER
+  // SPLASH SCREEN CONTROLLER (HOLD / PREVIEW MODE)
   // ==========================================================================
   (function initSplashScreen() {
     const splashEl = document.getElementById('trieyeSplash');
     if (!splashEl) return;
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const forceSplash = urlParams.get('splash') === '1';
-    const splashSeen = sessionStorage.getItem('trieye_splash_seen');
-
-    // If user has already seen splash in this session and no ?splash=1 override
-    if (splashSeen && !forceSplash) {
-      splashEl.style.display = 'none';
-      splashEl.classList.add('splash-hidden');
-      return;
-    }
-
-    // Set flag in sessionStorage so it only shows once per session/tab
-    try {
-      sessionStorage.setItem('trieye_splash_seen', 'true');
-    } catch (e) {
-      // Ignore private browsing / quota errors
-    }
-
-    // Check prefers-reduced-motion
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const duration = prefersReducedMotion ? 600 : 2900;
-
-    // Trigger smooth exit transition after splash sequence completes
-    setTimeout(() => {
-      splashEl.classList.add('splash-hidden');
-      setTimeout(() => {
-        splashEl.style.display = 'none';
-      }, 700);
-    }, duration);
+    // Keep splash screen visible and held on screen for review
+    splashEl.style.display = 'flex';
+    splashEl.classList.remove('splash-hidden');
+    document.documentElement.classList.remove('splash-already-seen');
+    
+    console.log('[Splash Screen] Holding visible for inspection.');
   })();
 </script>
 
