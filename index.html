@@ -934,165 +934,287 @@
   }
 
   /* ==========================================================================
-     10 SPLASH SCREEN STYLES & PREVIEW CONTROLLER
+     OBSIDIAN BASE WITH 10 CAR ENTRANCE ANIMATION DEMOS
      ========================================================================== */
-  /* Style 1: Cinematic Blue Glow (Default) */
-  #trieyeSplash[data-style="1"] {
-    background-color: #030305;
-    background-image: radial-gradient(circle at 50% 45%, #0b1528 0%, #030305 75%);
-  }
-
-  /* Style 2: Midnight Cyber Pulse (Neon Pink & Lime Accent) */
-  #trieyeSplash[data-style="2"] {
-    background-color: #060509;
-    background-image: radial-gradient(ellipse at 30% 40%, rgba(238,47,118,0.2) 0%, transparent 60%),
-                      radial-gradient(ellipse at 70% 50%, rgba(166,211,49,0.2) 0%, transparent 60%),
-                      #060509;
-  }
-  #trieyeSplash[data-style="2"] .splash-car-art {
-    filter: drop-shadow(0 0 35px rgba(238,47,118,0.5)) drop-shadow(0 0 25px rgba(166,211,49,0.4));
-  }
-
-  /* Style 3: Minimal Pure Obsidian & Crisp White Lighting */
-  #trieyeSplash[data-style="3"] {
+  /* Pure Obsidian Dark Background */
+  #trieyeSplash {
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
     background: #000000;
-  }
-  #trieyeSplash[data-style="3"] .splash-ambient-glow { display: none; }
-  #trieyeSplash[data-style="3"] .splash-car-art {
-    filter: drop-shadow(0 15px 30px rgba(0,0,0,0.95)) drop-shadow(0 0 20px rgba(255,255,255,0.25));
-  }
-  #trieyeSplash[data-style="3"] .splash-tagline {
-    color: #94a3b8;
-    letter-spacing: 0.45em;
-  }
-
-  /* Style 4: Dynamic Water Foam Burst & Active Bubbles */
-  #trieyeSplash[data-style="4"] {
-    background: radial-gradient(circle at 50% 50%, #082138 0%, #020b14 85%);
-  }
-  #trieyeSplash[data-style="4"] .splash-bubble {
-    opacity: 0.9;
-    box-shadow: 0 0 16px rgba(56,189,248,0.8), inset 0 0 6px #fff;
-  }
-  #trieyeSplash[data-style="4"] .splash-car-art {
-    filter: drop-shadow(0 0 45px rgba(14,165,233,0.85));
+    z-index: 9999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    overflow: hidden;
+    pointer-events: all;
+    opacity: 1;
+    transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.65s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
-  /* Style 5: Frosted Glass Panel Studio */
-  #trieyeSplash[data-style="5"] {
-    background: radial-gradient(circle at 50% 30%, #151a24 0%, #090a0f 80%);
-  }
-  #trieyeSplash[data-style="5"] .splash-stage {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 24px;
-    padding: 36px 32px 32px;
-    box-shadow: 0 30px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.15);
+  html.splash-already-seen #trieyeSplash,
+  #trieyeSplash.splash-hidden {
+    opacity: 0;
+    visibility: hidden;
+    display: none !important;
+    pointer-events: none !important;
   }
 
-  /* Style 6: High-Contrast Light Mode Studio (Clean Luxury White) */
-  #trieyeSplash[data-style="6"] {
-    background-color: #ffffff;
-    background-image: radial-gradient(circle at 50% 45%, #f1f5f9 0%, #ffffff 80%);
+  /* --------------------------------------------------------------------------
+     10 DISTINCT CAR ENTRANCE ANIMATIONS (data-anim="1" to "10")
+     -------------------------------------------------------------------------- */
+
+  /* DEMO 1: Drive-In Precision (Smooth Left-to-Center Glide & Deceleration) */
+  #trieyeSplash[data-anim="1"] .splash-car-art {
+    animation: carDriveIn 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
-  #trieyeSplash[data-style="6"] .splash-car-art {
-    filter: drop-shadow(0 20px 40px rgba(14,165,233,0.3)) drop-shadow(0 8px 20px rgba(0,0,0,0.15));
-  }
-  #trieyeSplash[data-style="6"] .splash-ambient-glow {
-    background: radial-gradient(circle, rgba(14, 165, 233, 0.12) 0%, rgba(238, 47, 118, 0.08) 50%, transparent 70%);
-  }
-  #trieyeSplash[data-style="6"] .splash-tagline {
-    color: #475569;
-    font-weight: 600;
-    text-shadow: none;
+  @keyframes carDriveIn {
+    0% {
+      opacity: 0;
+      transform: translateX(-160px) scale(0.92);
+      filter: drop-shadow(0 0 35px rgba(14,165,233,0.9)) blur(6px);
+    }
+    60% {
+      opacity: 1;
+      transform: translateX(12px) scale(1.02);
+      filter: drop-shadow(0 0 45px rgba(14,165,233,0.7)) blur(0px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0) scale(1);
+      filter: drop-shadow(0 0 30px rgba(14,165,233,0.55));
+    }
   }
 
-  /* Style 7: Deep Carbon & Brushed Metallic Grid */
-  #trieyeSplash[data-style="7"] {
-    background-color: #0d0e12;
-    background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-                      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-    background-size: 32px 32px;
+  /* DEMO 2: Vertical Lift & Rise (Subtle Upward Float from Floor) */
+  #trieyeSplash[data-anim="2"] .splash-car-art {
+    animation: carVerticalLift 1.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
-  #trieyeSplash[data-style="7"] .splash-car-art {
-    filter: drop-shadow(0 0 30px rgba(56,189,248,0.5)) drop-shadow(0 15px 30px rgba(0,0,0,0.9));
-  }
-  #trieyeSplash[data-style="7"] .splash-tagline {
-    color: #38bdf8;
-    background: rgba(56,189,248,0.08);
-    padding: 6px 14px 6px calc(14px + 0.32em);
-    border-radius: 99px;
-    border: 1px solid rgba(56,189,248,0.25);
-  }
-
-  /* Style 8: Trieye Hyper Glow (Pink & Lime Atmospheric Aurora) */
-  #trieyeSplash[data-style="8"] {
-    background: #050608;
-  }
-  #trieyeSplash[data-style="8"] .splash-ambient-glow {
-    width: 650px;
-    height: 650px;
-    background: radial-gradient(circle, rgba(166,211,49,0.3) 0%, rgba(238,47,118,0.28) 40%, rgba(14,165,233,0.15) 60%, transparent 75%);
-    filter: blur(70px);
-  }
-  #trieyeSplash[data-style="8"] .splash-logo-img {
-    filter: drop-shadow(0 0 25px rgba(238,47,118,0.7)) drop-shadow(0 0 35px rgba(166,211,49,0.7));
+  @keyframes carVerticalLift {
+    0% {
+      opacity: 0;
+      transform: translateY(70px) scale(0.88);
+      filter: blur(8px) drop-shadow(0 0 10px rgba(14,165,233,0.2));
+    }
+    70% {
+      opacity: 1;
+      transform: translateY(-8px) scale(1.03);
+      filter: blur(0px) drop-shadow(0 0 50px rgba(14,165,233,0.8));
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      filter: blur(0px) drop-shadow(0 0 32px rgba(14,165,233,0.6));
+    }
   }
 
-  /* Style 9: Luxury Precision Monogram (Gold & Platinum Ambient) */
-  #trieyeSplash[data-style="9"] {
-    background-color: #07080a;
-    background-image: radial-gradient(circle at 50% 40%, #16181f 0%, #07080a 75%);
+  /* DEMO 3: Laser Wipe / Light Beam Sweep (Left-to-Right Reveal) */
+  #trieyeSplash[data-anim="3"] .splash-car-art {
+    animation: carLaserWipe 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
   }
-  #trieyeSplash[data-style="9"] .splash-car-art {
-    filter: drop-shadow(0 0 35px rgba(251,191,36,0.35)) drop-shadow(0 0 20px rgba(14,165,233,0.4));
-  }
-  #trieyeSplash[data-style="9"] .splash-tagline {
-    color: #f1f5f9;
-    border-top: 1px solid rgba(255,255,255,0.15);
-    border-bottom: 1px solid rgba(255,255,255,0.15);
-    padding: 8px 18px 8px calc(18px + 0.32em);
-    letter-spacing: 0.4em;
-  }
-
-  /* Style 10: Smooth Stage Spotlight (Vertical Beam Focus) */
-  #trieyeSplash[data-style="10"] {
-    background: #040507;
-    background-image: linear-gradient(180deg, rgba(14,165,233,0.18) 0%, rgba(3,4,6,0) 65%);
-  }
-  #trieyeSplash[data-style="10"] .splash-car-art {
-    filter: drop-shadow(0 0 45px rgba(14,165,233,0.7)) drop-shadow(0 25px 40px rgba(0,0,0,0.95));
-  }
-  #trieyeSplash[data-style="10"] .splash-stage::before {
-    content: '';
-    position: absolute;
-    top: -80px;
-    width: 220px;
-    height: 120px;
-    background: radial-gradient(ellipse at top, rgba(255,255,255,0.3) 0%, transparent 70%);
-    pointer-events: none;
+  @keyframes carLaserWipe {
+    0% {
+      opacity: 0;
+      clip-path: inset(0 100% 0 0);
+      filter: drop-shadow(0 0 50px #38bdf8) brightness(2.2);
+    }
+    30% {
+      opacity: 1;
+      clip-path: inset(0 60% 0 0);
+      filter: drop-shadow(0 0 60px #38bdf8) brightness(1.8);
+    }
+    100% {
+      opacity: 1;
+      clip-path: inset(0 0% 0 0);
+      filter: drop-shadow(0 0 30px rgba(14,165,233,0.55)) brightness(1);
+    }
   }
 
-  /* Interactive Style Switcher Dock for User Testing */
+  /* DEMO 4: 3D Perspective Turbo Zoom (Deep Z-Axis Launch) */
+  #trieyeSplash[data-anim="4"] .splash-car-art {
+    animation: carTurboZoom 1.4s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+  }
+  @keyframes carTurboZoom {
+    0% {
+      opacity: 0;
+      transform: scale(0.25) perspective(600px) rotateX(15deg);
+      filter: blur(14px) brightness(0.3);
+    }
+    65% {
+      opacity: 1;
+      transform: scale(1.08) perspective(600px) rotateX(-2deg);
+      filter: blur(0px) brightness(1.3) drop-shadow(0 0 60px rgba(14,165,233,0.9));
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1) perspective(600px) rotateX(0deg);
+      filter: blur(0px) brightness(1) drop-shadow(0 0 30px rgba(14,165,233,0.55));
+    }
+  }
+
+  /* DEMO 5: Water Spray Power Pulse (Gun Shoots First -> Foam Expands) */
+  #trieyeSplash[data-anim="5"] .splash-car-art {
+    animation: carSprayPulse 1.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    transform-origin: left center;
+  }
+  @keyframes carSprayPulse {
+    0% {
+      opacity: 0;
+      transform: scale(0.85);
+      filter: drop-shadow(0 0 5px rgba(255,255,255,0.1));
+    }
+    35% {
+      opacity: 0.6;
+      transform: scale(0.95);
+      filter: drop-shadow(-30px 0 30px #38bdf8);
+    }
+    70% {
+      opacity: 1;
+      transform: scale(1.04);
+      filter: drop-shadow(0 0 65px #0284c7) drop-shadow(0 0 30px #38bdf8);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+      filter: drop-shadow(0 0 30px rgba(14,165,233,0.55));
+    }
+  }
+
+  /* DEMO 6: Holographic Spark & Flash (Electric Arc Materialization) */
+  #trieyeSplash[data-anim="6"] .splash-car-art {
+    animation: carHoloSpark 1.3s steps(1, end), carHoloSettle 1.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  @keyframes carHoloSpark {
+    0% { opacity: 0; }
+    15% { opacity: 0.8; filter: brightness(3) drop-shadow(0 0 50px #fff); }
+    25% { opacity: 0.2; }
+    40% { opacity: 1; filter: brightness(2.2) drop-shadow(0 0 60px #38bdf8); }
+    60% { opacity: 0.7; }
+    75% { opacity: 1; }
+  }
+  @keyframes carHoloSettle {
+    0% { transform: scale(0.9) translateY(15px); }
+    100% { transform: scale(1) translateY(0); filter: drop-shadow(0 0 30px rgba(14,165,233,0.55)); }
+  }
+
+  /* DEMO 7: Fast Sports Drift & Tilt (Angular Entrance with Spring Return) */
+  #trieyeSplash[data-anim="7"] .splash-car-art {
+    animation: carDriftTilt 1.5s cubic-bezier(0.2, 0.9, 0.3, 1.2) forwards;
+  }
+  @keyframes carDriftTilt {
+    0% {
+      opacity: 0;
+      transform: translateX(180px) rotate(-6deg) scale(0.85);
+      filter: drop-shadow(-40px 0 40px rgba(14,165,233,0.8)) blur(5px);
+    }
+    60% {
+      opacity: 1;
+      transform: translateX(-15px) rotate(2deg) scale(1.04);
+      filter: drop-shadow(0 0 45px rgba(14,165,233,0.7)) blur(0px);
+    }
+    85% {
+      transform: translateX(6px) rotate(-0.5deg) scale(0.99);
+    }
+    100% {
+      opacity: 1;
+      transform: translateX(0) rotate(0deg) scale(1);
+      filter: drop-shadow(0 0 30px rgba(14,165,233,0.55));
+    }
+  }
+
+  /* DEMO 8: Ultra Studio Lens Blur Focus (Optical Bokeh to Tack Sharp) */
+  #trieyeSplash[data-anim="8"] .splash-car-art {
+    animation: carLensBokeh 1.5s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+  }
+  @keyframes carLensBokeh {
+    0% {
+      opacity: 0;
+      filter: blur(28px) brightness(0.2) contrast(1.5);
+      transform: scale(1.22);
+    }
+    50% {
+      opacity: 0.75;
+      filter: blur(10px) brightness(1.2);
+      transform: scale(1.06);
+    }
+    100% {
+      opacity: 1;
+      filter: blur(0px) brightness(1) drop-shadow(0 0 30px rgba(14,165,233,0.55));
+      transform: scale(1);
+    }
+  }
+
+  /* DEMO 9: Neon Contour Ignition (Outline Ignites First then Foam Glows) */
+  #trieyeSplash[data-anim="9"] .splash-car-art {
+    animation: carNeonIgnite 1.6s ease-out forwards;
+  }
+  @keyframes carNeonIgnite {
+    0% {
+      opacity: 0;
+      filter: drop-shadow(0 0 0px #fff) brightness(0);
+      transform: translateY(20px) scale(0.94);
+    }
+    30% {
+      opacity: 0.5;
+      filter: drop-shadow(0 0 20px #fff) drop-shadow(0 0 40px #38bdf8) brightness(3);
+    }
+    60% {
+      opacity: 0.9;
+      filter: drop-shadow(0 0 35px #0284c7) brightness(1.5);
+      transform: translateY(-4px) scale(1.02);
+    }
+    100% {
+      opacity: 1;
+      filter: drop-shadow(0 0 30px rgba(14,165,233,0.55)) brightness(1);
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  /* DEMO 10: Ripple Waveform Shockwave (Concentric Elastic Entrance) */
+  #trieyeSplash[data-anim="10"] .splash-car-art {
+    animation: carRippleShock 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  }
+  @keyframes carRippleShock {
+    0% {
+      opacity: 0;
+      transform: scale(0.4);
+      filter: drop-shadow(0 0 80px #38bdf8) blur(10px);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.15);
+      filter: drop-shadow(0 0 60px #0284c7) blur(0px);
+    }
+    75% {
+      transform: scale(0.96);
+    }
+    100% {
+      opacity: 1;
+      transform: scale(1);
+      filter: drop-shadow(0 0 30px rgba(14,165,233,0.55));
+    }
+  }
+
+  /* Interactive Demo Switcher Dock */
   .splash-demo-bar {
     position: fixed;
     bottom: 24px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 99999999;
-    background: rgba(15, 17, 23, 0.92);
+    background: rgba(15, 17, 23, 0.94);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 16px 40px rgba(0,0,0,0.8), 0 0 0 1px rgba(0,0,0,0.5);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.9), 0 0 0 1px rgba(0,0,0,0.6);
     border-radius: 99px;
     padding: 6px 10px;
     display: flex;
     align-items: center;
-    gap: 6px;
-    max-width: 95vw;
+    gap: 5px;
+    max-width: 96vw;
     overflow-x: auto;
     scrollbar-width: none;
   }
@@ -1113,7 +1235,7 @@
     content: "";
     width: 1px;
     height: 16px;
-    background: rgba(255,255,255,0.15);
+    background: rgba(255,255,255,0.18);
   }
   .splash-demo-btn {
     background: transparent;
@@ -1122,28 +1244,28 @@
     font-family: 'Oswald', sans-serif;
     font-size: 12px;
     letter-spacing: 0.05em;
-    padding: 6px 12px;
+    padding: 6px 11px;
     border-radius: 99px;
     cursor: pointer;
     white-space: nowrap;
-    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
   }
   .splash-demo-btn:hover {
     color: #fff;
-    background: rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.12);
   }
   .splash-demo-btn.active {
     background: #ee2f76;
     color: #fff;
     font-weight: 600;
-    box-shadow: 0 0 14px rgba(238,47,118,0.6);
+    box-shadow: 0 0 14px rgba(238,47,118,0.7);
   }
   .splash-play-btn {
     background: #689f0e;
     color: #fff;
     font-family: 'Oswald', sans-serif;
     font-size: 12px;
-    padding: 6px 14px;
+    padding: 6px 13px;
     border-radius: 99px;
     border: none;
     cursor: pointer;
@@ -1152,12 +1274,12 @@
     text-transform: uppercase;
     margin-left: 6px;
     transition: transform 0.2s, box-shadow 0.2s;
-    box-shadow: 0 0 12px rgba(104,159,14,0.5);
+    box-shadow: 0 0 12px rgba(104,159,14,0.55);
     white-space: nowrap;
   }
   .splash-play-btn:hover {
     transform: scale(1.04);
-    box-shadow: 0 0 18px rgba(104,159,14,0.8);
+    box-shadow: 0 0 18px rgba(104,159,14,0.85);
   }
 </style>
   <!-- Official Supabase JavaScript Client -->
@@ -1168,8 +1290,8 @@
 </head>
 <body>
 
-<!-- PREMIUM CINEMATIC SPLASH SCREEN (Public Website Only) -->
-<div id="trieyeSplash" data-style="1" aria-hidden="true">
+<!-- PREMIUM CINEMATIC SPLASH SCREEN (Public Website Only - Obsidian Dark) -->
+<div id="trieyeSplash" data-anim="1" aria-hidden="true">
   <div class="splash-ambient-glow"></div>
   
   <div class="splash-bubbles" aria-hidden="true">
@@ -1184,29 +1306,29 @@
 
   <div class="splash-stage">
     <!-- STEP A: Car Wash Graphic / Illustration -->
-    <img src="assets/car-wash-splash.png" alt="Trieye Car Wash Illustration" class="splash-car-art">
+    <img src="assets/car-wash-splash.png" alt="Trieye Car Wash Illustration" class="splash-car-art" id="splashCarImg">
 
     <!-- STEP B: TRIEYE Logo & Tagline -->
-    <div class="splash-brand-wrap">
+    <div class="splash-brand-wrap" id="splashBrandWrap">
       <img src="assets/trieye-logo-clean.png" alt="TRIEYE" class="splash-logo-img">
       <div class="splash-tagline">DETAIL &bull; PRECISION &bull; PROTECTION</div>
     </div>
   </div>
 
-  <!-- Live 10-Style Interactive Switcher Dock -->
+  <!-- Live 10 Entrance Animation Demo Switcher Dock -->
   <div class="splash-demo-bar" id="splashDemoDock">
-    <span class="splash-demo-label">Styles</span>
-    <button class="splash-demo-btn active" data-style-id="1">1. Blue Glow</button>
-    <button class="splash-demo-btn" data-style-id="2">2. Cyber Pink</button>
-    <button class="splash-demo-btn" data-style-id="3">3. Obsidian</button>
-    <button class="splash-demo-btn" data-style-id="4">4. Foam Burst</button>
-    <button class="splash-demo-btn" data-style-id="5">5. Glass Studio</button>
-    <button class="splash-demo-btn" data-style-id="6">6. Luxury Light</button>
-    <button class="splash-demo-btn" data-style-id="7">7. Carbon Grid</button>
-    <button class="splash-demo-btn" data-style-id="8">8. Aurora Glow</button>
-    <button class="splash-demo-btn" data-style-id="9">9. Monogram</button>
-    <button class="splash-demo-btn" data-style-id="10">10. Spotlight</button>
-    <button class="splash-play-btn" id="splashReplayBtn">&#9654; Replay Exit</button>
+    <span class="splash-demo-label">Entrance</span>
+    <button class="splash-demo-btn active" data-anim-id="1">1. Drive-In</button>
+    <button class="splash-demo-btn" data-anim-id="2">2. Rise & Lift</button>
+    <button class="splash-demo-btn" data-anim-id="3">3. Laser Wipe</button>
+    <button class="splash-demo-btn" data-anim-id="4">4. Turbo Zoom</button>
+    <button class="splash-demo-btn" data-anim-id="5">5. Spray Pulse</button>
+    <button class="splash-demo-btn" data-anim-id="6">6. Holo Spark</button>
+    <button class="splash-demo-btn" data-anim-id="7">7. Sports Drift</button>
+    <button class="splash-demo-btn" data-anim-id="8">8. Lens Bokeh</button>
+    <button class="splash-demo-btn" data-anim-id="9">9. Neon Ignite</button>
+    <button class="splash-demo-btn" data-anim-id="10">10. Shockwave</button>
+    <button class="splash-play-btn" id="splashReplayBtn">&#8634; Re-Trigger</button>
   </div>
 </div>
 
@@ -2263,49 +2385,59 @@
   console.log('Initial theme:', selectedTheme);
 
   // ==========================================================================
-  // SPLASH SCREEN CONTROLLER & 10-STYLE INTERACTIVE PREVIEW
+  // SPLASH SCREEN CONTROLLER & 10 CAR ENTRANCE ANIMATION DEMOS
   // ==========================================================================
   (function initSplashScreen() {
     const splashEl = document.getElementById('trieyeSplash');
+    const carImg = document.getElementById('splashCarImg');
+    const brandWrap = document.getElementById('splashBrandWrap');
     if (!splashEl) return;
 
-    // Keep splash screen visible and held on screen for review
+    // Ensure Obsidian black background and hold visible for interactive testing
     splashEl.style.display = 'flex';
     splashEl.classList.remove('splash-hidden');
     document.documentElement.classList.remove('splash-already-seen');
-    
-    // Style Switcher Event Handlers
+
+    function triggerAnimation(animId) {
+      splashEl.setAttribute('data-anim', animId);
+      
+      // Reset animation on car and brand elements to see clean entrance
+      if (carImg) {
+        carImg.style.animation = 'none';
+        carImg.offsetHeight; /* trigger reflow */
+        carImg.style.animation = '';
+      }
+      if (brandWrap) {
+        brandWrap.style.animation = 'none';
+        brandWrap.offsetHeight; /* trigger reflow */
+        brandWrap.style.animation = '';
+      }
+    }
+
+    // Animation Demo Switcher Event Handlers
     const demoBtns = document.querySelectorAll('.splash-demo-btn');
     demoBtns.forEach(btn => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         demoBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-        const styleId = btn.getAttribute('data-style-id');
-        splashEl.setAttribute('data-style', styleId);
+        const animId = btn.getAttribute('data-anim-id');
+        triggerAnimation(animId);
       });
     });
 
-    // Replay / Test Exit Animation
+    // Re-Trigger Current Entrance Animation
     const replayBtn = document.getElementById('splashReplayBtn');
     if (replayBtn) {
       replayBtn.addEventListener('click', (e) => {
         e.stopPropagation();
-        replayBtn.innerText = 'Revealing site...';
-        splashEl.classList.add('splash-hidden');
-        setTimeout(() => {
-          splashEl.style.display = 'none';
-          setTimeout(() => {
-            // Bring back for further testing
-            splashEl.style.display = 'flex';
-            splashEl.classList.remove('splash-hidden');
-            replayBtn.innerText = '▶ Replay Exit';
-          }, 1800);
-        }, 800);
+        const activeBtn = document.querySelector('.splash-demo-btn.active');
+        const currentAnim = activeBtn ? activeBtn.getAttribute('data-anim-id') : '1';
+        triggerAnimation(currentAnim);
       });
     }
     
-    console.log('[Splash Screen] 10 styles loaded & holding visible for inspection.');
+    console.log('[Splash Screen] Obsidian Base with 10 Car Entrance Demos Active.');
   })();
 </script>
 
