@@ -13,7 +13,7 @@
   <script>
     (function() {
       try {
-        var saved = localStorage.getItem('trieye_theme');
+        var saved = localStorage.getItem('trieye_admin_theme');
         if (saved === 'dark') {
           document.documentElement.setAttribute('data-theme', 'dark');
         } else {
@@ -2189,7 +2189,7 @@
     const SCHEDULE_KEY = 'trieye_custom_schedules';
     const SETTINGS_KEY = 'trieye_studio_settings';
     const AUTH_PIN_KEY = 'trieye_admin_pin';
-    const THEME_KEY = 'trieye_theme';
+    const ADMIN_THEME_KEY = 'trieye_admin_theme';
 
     // Default Seed Data Matrix matching live catalog
     const defaultServices = {
@@ -4488,7 +4488,7 @@ TRIEYE WATERWASH & DETAILING`;
       a.click();
     }
 
-    // THEME SWITCHER (Light / Dark)
+    // THEME SWITCHER (Light / Dark - Admin Console Only)
     const dashThemeToggleBtn = document.getElementById('dashThemeToggleBtn');
     function applyDashboardTheme(theme) {
       const activeTheme = (theme === 'dark') ? 'dark' : 'light';
@@ -4497,14 +4497,14 @@ TRIEYE WATERWASH & DETAILING`;
       } else {
         document.documentElement.removeAttribute('data-theme');
       }
-      localStorage.setItem(THEME_KEY, activeTheme);
+      localStorage.setItem(ADMIN_THEME_KEY, activeTheme);
     }
 
-    // Priority: If localStorage contains explicit saved theme use it, otherwise default to clean LIGHT theme
-    const savedTheme = localStorage.getItem(THEME_KEY);
-    const selectedTheme = (savedTheme === 'dark') ? 'dark' : 'light';
+    // Priority: If localStorage contains explicit saved admin theme use it, otherwise default to clean LIGHT theme
+    const savedAdminTheme = localStorage.getItem(ADMIN_THEME_KEY);
+    const selectedTheme = (savedAdminTheme === 'dark') ? 'dark' : 'light';
 
-    // Temporary diagnostic logging
+    // Diagnostic logging
     console.log('Initial theme:', selectedTheme);
 
     applyDashboardTheme(selectedTheme);
@@ -4550,7 +4550,7 @@ TRIEYE WATERWASH & DETAILING`;
         if (e.key === BOOKINGS_KEY || e.key === SCHEDULE_KEY || e.key === CUSTOMERS_KEY || e.key === SERVICES_KEY) {
           renderAll();
         }
-        if (e.key === THEME_KEY) {
+        if (e.key === ADMIN_THEME_KEY) {
           applyDashboardTheme(e.newValue);
         }
       });

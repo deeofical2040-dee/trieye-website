@@ -8,16 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script>
-  (function() {
-    try {
-      var saved = localStorage.getItem('trieye_theme');
-      if (saved === 'dark') {
-        document.documentElement.setAttribute('data-theme', 'dark');
-      } else {
-        document.documentElement.removeAttribute('data-theme');
-      }
-    } catch (e) {}
-  })();
+  // Customer Public Website: Always enforce clean LIGHT theme
+  document.documentElement.removeAttribute('data-theme');
 </script>
 <style>
   :root {
@@ -1769,39 +1761,10 @@
     }
   });
 
-  // Theme Switcher (Light / Dark)
-  const THEME_KEY = 'trieye_theme';
-  const themeToggleBtn = document.getElementById('themeToggleBtn');
-
-  function applyTheme(theme) {
-    const activeTheme = (theme === 'dark') ? 'dark' : 'light';
-    if (activeTheme === 'dark') {
-      document.documentElement.setAttribute('data-theme', 'dark');
-    } else {
-      document.documentElement.removeAttribute('data-theme');
-    }
-    localStorage.setItem(THEME_KEY, activeTheme);
-  }
-
-  // Priority: If localStorage contains explicit saved theme use it, otherwise default to clean LIGHT theme
-  const savedTheme = localStorage.getItem(THEME_KEY);
-  const selectedTheme = (savedTheme === 'dark') ? 'dark' : 'light';
-
-  // Temporary diagnostic logging
+  // Customer Public Website: Always strictly LIGHT theme by default (isolated from admin theme)
+  document.documentElement.removeAttribute('data-theme');
+  const selectedTheme = 'light';
   console.log('Initial theme:', selectedTheme);
-
-  applyTheme(selectedTheme);
-
-  if (themeToggleBtn) {
-    themeToggleBtn.addEventListener('click', () => {
-      const current = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
-      const target = current === 'dark' ? 'light' : 'dark';
-      applyTheme(target);
-      if (typeof showToast === 'function') {
-        showToast(`Switched to ${target.charAt(0).toUpperCase() + target.slice(1)} Mode`);
-      }
-    });
-  }
 </script>
 
 </body>
