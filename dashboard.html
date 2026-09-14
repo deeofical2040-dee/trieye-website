@@ -10,6 +10,18 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/supabase-config.js"></script>
   <script src="assets/trieye-db.js"></script>
+  <script>
+    (function() {
+      try {
+        var saved = localStorage.getItem('trieye_theme');
+        if (saved === 'dark') {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+          document.documentElement.removeAttribute('data-theme');
+        }
+      } catch (e) {}
+    })();
+  </script>
   <style>
     :root {
       --bg: #f8f9fa;
@@ -4479,15 +4491,23 @@ TRIEYE WATERWASH & DETAILING`;
     // THEME SWITCHER (Light / Dark)
     const dashThemeToggleBtn = document.getElementById('dashThemeToggleBtn');
     function applyDashboardTheme(theme) {
-      if (theme === 'dark') {
+      const activeTheme = (theme === 'dark') ? 'dark' : 'light';
+      if (activeTheme === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
       } else {
         document.documentElement.removeAttribute('data-theme');
       }
-      localStorage.setItem(THEME_KEY, theme);
+      localStorage.setItem(THEME_KEY, activeTheme);
     }
-    const savedTheme = localStorage.getItem(THEME_KEY) || 'light';
-    applyDashboardTheme(savedTheme);
+
+    // Priority: If localStorage contains explicit saved theme use it, otherwise default to clean LIGHT theme
+    const savedTheme = localStorage.getItem(THEME_KEY);
+    const selectedTheme = (savedTheme === 'dark') ? 'dark' : 'light';
+
+    // Temporary diagnostic logging
+    console.log('Initial theme:', selectedTheme);
+
+    applyDashboardTheme(selectedTheme);
 
     if (dashThemeToggleBtn) {
       dashThemeToggleBtn.addEventListener('click', () => {
