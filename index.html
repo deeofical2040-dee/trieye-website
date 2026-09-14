@@ -813,7 +813,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    margin-top: 28px;
+    margin-top: 14px;
     opacity: 0;
     transform: scale(0.92);
     filter: blur(10px);
@@ -821,25 +821,25 @@
   }
 
   .splash-logo-img {
-    width: min(340px, 78vw);
+    width: min(320px, 76vw);
     height: auto;
-    max-height: 80px;
+    max-height: 52px;
     object-fit: contain;
-    filter: drop-shadow(0 0 18px rgba(238, 47, 118, 0.4)) drop-shadow(0 0 28px rgba(166, 211, 49, 0.4));
+    filter: drop-shadow(0 0 16px rgba(238, 47, 118, 0.45)) drop-shadow(0 0 24px rgba(166, 211, 49, 0.45));
   }
 
   .splash-tagline {
     font-family: 'IBM Plex Mono', monospace;
-    font-size: clamp(10px, 2.4vw, 12px);
+    font-size: clamp(10px, 2.2vw, 11.5px);
     font-weight: 500;
     color: #e2e8f0;
-    letter-spacing: 0.36em;
+    letter-spacing: 0.32em;
     text-transform: uppercase;
-    margin-top: 14px;
+    margin-top: 10px;
     text-align: center;
-    padding-left: 0.36em; /* compensate for letter spacing */
+    padding-left: 0.32em; /* compensate for letter spacing */
     opacity: 0;
-    transform: translateY(6px);
+    transform: translateY(4px);
     animation: splashTaglineReveal 0.9s cubic-bezier(0.16, 1, 0.3, 1) 1.4s forwards;
     text-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
   }
@@ -932,6 +932,233 @@
       display: none !important;
     }
   }
+
+  /* ==========================================================================
+     10 SPLASH SCREEN STYLES & PREVIEW CONTROLLER
+     ========================================================================== */
+  /* Style 1: Cinematic Blue Glow (Default) */
+  #trieyeSplash[data-style="1"] {
+    background-color: #030305;
+    background-image: radial-gradient(circle at 50% 45%, #0b1528 0%, #030305 75%);
+  }
+
+  /* Style 2: Midnight Cyber Pulse (Neon Pink & Lime Accent) */
+  #trieyeSplash[data-style="2"] {
+    background-color: #060509;
+    background-image: radial-gradient(ellipse at 30% 40%, rgba(238,47,118,0.2) 0%, transparent 60%),
+                      radial-gradient(ellipse at 70% 50%, rgba(166,211,49,0.2) 0%, transparent 60%),
+                      #060509;
+  }
+  #trieyeSplash[data-style="2"] .splash-car-art {
+    filter: drop-shadow(0 0 35px rgba(238,47,118,0.5)) drop-shadow(0 0 25px rgba(166,211,49,0.4));
+  }
+
+  /* Style 3: Minimal Pure Obsidian & Crisp White Lighting */
+  #trieyeSplash[data-style="3"] {
+    background: #000000;
+  }
+  #trieyeSplash[data-style="3"] .splash-ambient-glow { display: none; }
+  #trieyeSplash[data-style="3"] .splash-car-art {
+    filter: drop-shadow(0 15px 30px rgba(0,0,0,0.95)) drop-shadow(0 0 20px rgba(255,255,255,0.25));
+  }
+  #trieyeSplash[data-style="3"] .splash-tagline {
+    color: #94a3b8;
+    letter-spacing: 0.45em;
+  }
+
+  /* Style 4: Dynamic Water Foam Burst & Active Bubbles */
+  #trieyeSplash[data-style="4"] {
+    background: radial-gradient(circle at 50% 50%, #082138 0%, #020b14 85%);
+  }
+  #trieyeSplash[data-style="4"] .splash-bubble {
+    opacity: 0.9;
+    box-shadow: 0 0 16px rgba(56,189,248,0.8), inset 0 0 6px #fff;
+  }
+  #trieyeSplash[data-style="4"] .splash-car-art {
+    filter: drop-shadow(0 0 45px rgba(14,165,233,0.85));
+  }
+
+  /* Style 5: Frosted Glass Panel Studio */
+  #trieyeSplash[data-style="5"] {
+    background: radial-gradient(circle at 50% 30%, #151a24 0%, #090a0f 80%);
+  }
+  #trieyeSplash[data-style="5"] .splash-stage {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 36px 32px 32px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.15);
+  }
+
+  /* Style 6: High-Contrast Light Mode Studio (Clean Luxury White) */
+  #trieyeSplash[data-style="6"] {
+    background-color: #ffffff;
+    background-image: radial-gradient(circle at 50% 45%, #f1f5f9 0%, #ffffff 80%);
+  }
+  #trieyeSplash[data-style="6"] .splash-car-art {
+    filter: drop-shadow(0 20px 40px rgba(14,165,233,0.3)) drop-shadow(0 8px 20px rgba(0,0,0,0.15));
+  }
+  #trieyeSplash[data-style="6"] .splash-ambient-glow {
+    background: radial-gradient(circle, rgba(14, 165, 233, 0.12) 0%, rgba(238, 47, 118, 0.08) 50%, transparent 70%);
+  }
+  #trieyeSplash[data-style="6"] .splash-tagline {
+    color: #475569;
+    font-weight: 600;
+    text-shadow: none;
+  }
+
+  /* Style 7: Deep Carbon & Brushed Metallic Grid */
+  #trieyeSplash[data-style="7"] {
+    background-color: #0d0e12;
+    background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                      linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+  #trieyeSplash[data-style="7"] .splash-car-art {
+    filter: drop-shadow(0 0 30px rgba(56,189,248,0.5)) drop-shadow(0 15px 30px rgba(0,0,0,0.9));
+  }
+  #trieyeSplash[data-style="7"] .splash-tagline {
+    color: #38bdf8;
+    background: rgba(56,189,248,0.08);
+    padding: 6px 14px 6px calc(14px + 0.32em);
+    border-radius: 99px;
+    border: 1px solid rgba(56,189,248,0.25);
+  }
+
+  /* Style 8: Trieye Hyper Glow (Pink & Lime Atmospheric Aurora) */
+  #trieyeSplash[data-style="8"] {
+    background: #050608;
+  }
+  #trieyeSplash[data-style="8"] .splash-ambient-glow {
+    width: 650px;
+    height: 650px;
+    background: radial-gradient(circle, rgba(166,211,49,0.3) 0%, rgba(238,47,118,0.28) 40%, rgba(14,165,233,0.15) 60%, transparent 75%);
+    filter: blur(70px);
+  }
+  #trieyeSplash[data-style="8"] .splash-logo-img {
+    filter: drop-shadow(0 0 25px rgba(238,47,118,0.7)) drop-shadow(0 0 35px rgba(166,211,49,0.7));
+  }
+
+  /* Style 9: Luxury Precision Monogram (Gold & Platinum Ambient) */
+  #trieyeSplash[data-style="9"] {
+    background-color: #07080a;
+    background-image: radial-gradient(circle at 50% 40%, #16181f 0%, #07080a 75%);
+  }
+  #trieyeSplash[data-style="9"] .splash-car-art {
+    filter: drop-shadow(0 0 35px rgba(251,191,36,0.35)) drop-shadow(0 0 20px rgba(14,165,233,0.4));
+  }
+  #trieyeSplash[data-style="9"] .splash-tagline {
+    color: #f1f5f9;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    border-bottom: 1px solid rgba(255,255,255,0.15);
+    padding: 8px 18px 8px calc(18px + 0.32em);
+    letter-spacing: 0.4em;
+  }
+
+  /* Style 10: Smooth Stage Spotlight (Vertical Beam Focus) */
+  #trieyeSplash[data-style="10"] {
+    background: #040507;
+    background-image: linear-gradient(180deg, rgba(14,165,233,0.18) 0%, rgba(3,4,6,0) 65%);
+  }
+  #trieyeSplash[data-style="10"] .splash-car-art {
+    filter: drop-shadow(0 0 45px rgba(14,165,233,0.7)) drop-shadow(0 25px 40px rgba(0,0,0,0.95));
+  }
+  #trieyeSplash[data-style="10"] .splash-stage::before {
+    content: '';
+    position: absolute;
+    top: -80px;
+    width: 220px;
+    height: 120px;
+    background: radial-gradient(ellipse at top, rgba(255,255,255,0.3) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  /* Interactive Style Switcher Dock for User Testing */
+  .splash-demo-bar {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 99999999;
+    background: rgba(15, 17, 23, 0.92);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 16px 40px rgba(0,0,0,0.8), 0 0 0 1px rgba(0,0,0,0.5);
+    border-radius: 99px;
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    max-width: 95vw;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .splash-demo-bar::-webkit-scrollbar { display: none; }
+  .splash-demo-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    padding: 0 8px 0 12px;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .splash-demo-label::after {
+    content: "";
+    width: 1px;
+    height: 16px;
+    background: rgba(255,255,255,0.15);
+  }
+  .splash-demo-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    color: #cbd5e1;
+    font-family: 'Oswald', sans-serif;
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    padding: 6px 12px;
+    border-radius: 99px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .splash-demo-btn:hover {
+    color: #fff;
+    background: rgba(255,255,255,0.1);
+  }
+  .splash-demo-btn.active {
+    background: #ee2f76;
+    color: #fff;
+    font-weight: 600;
+    box-shadow: 0 0 14px rgba(238,47,118,0.6);
+  }
+  .splash-play-btn {
+    background: #689f0e;
+    color: #fff;
+    font-family: 'Oswald', sans-serif;
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 99px;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-left: 6px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 0 12px rgba(104,159,14,0.5);
+    white-space: nowrap;
+  }
+  .splash-play-btn:hover {
+    transform: scale(1.04);
+    box-shadow: 0 0 18px rgba(104,159,14,0.8);
+  }
 </style>
   <!-- Official Supabase JavaScript Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -942,7 +1169,7 @@
 <body>
 
 <!-- PREMIUM CINEMATIC SPLASH SCREEN (Public Website Only) -->
-<div id="trieyeSplash" aria-hidden="true">
+<div id="trieyeSplash" data-style="1" aria-hidden="true">
   <div class="splash-ambient-glow"></div>
   
   <div class="splash-bubbles" aria-hidden="true">
@@ -961,9 +1188,25 @@
 
     <!-- STEP B: TRIEYE Logo & Tagline -->
     <div class="splash-brand-wrap">
-      <img src="assets/trieye-logo.png" alt="TRIEYE" class="splash-logo-img">
-      <div class="splash-tagline">Detail &bull; Precision &bull; Protection</div>
+      <img src="assets/trieye-logo-clean.png" alt="TRIEYE" class="splash-logo-img">
+      <div class="splash-tagline">DETAIL &bull; PRECISION &bull; PROTECTION</div>
     </div>
+  </div>
+
+  <!-- Live 10-Style Interactive Switcher Dock -->
+  <div class="splash-demo-bar" id="splashDemoDock">
+    <span class="splash-demo-label">Styles</span>
+    <button class="splash-demo-btn active" data-style-id="1">1. Blue Glow</button>
+    <button class="splash-demo-btn" data-style-id="2">2. Cyber Pink</button>
+    <button class="splash-demo-btn" data-style-id="3">3. Obsidian</button>
+    <button class="splash-demo-btn" data-style-id="4">4. Foam Burst</button>
+    <button class="splash-demo-btn" data-style-id="5">5. Glass Studio</button>
+    <button class="splash-demo-btn" data-style-id="6">6. Luxury Light</button>
+    <button class="splash-demo-btn" data-style-id="7">7. Carbon Grid</button>
+    <button class="splash-demo-btn" data-style-id="8">8. Aurora Glow</button>
+    <button class="splash-demo-btn" data-style-id="9">9. Monogram</button>
+    <button class="splash-demo-btn" data-style-id="10">10. Spotlight</button>
+    <button class="splash-play-btn" id="splashReplayBtn">&#9654; Replay Exit</button>
   </div>
 </div>
 
@@ -2020,7 +2263,7 @@
   console.log('Initial theme:', selectedTheme);
 
   // ==========================================================================
-  // SPLASH SCREEN CONTROLLER (HOLD / PREVIEW MODE)
+  // SPLASH SCREEN CONTROLLER & 10-STYLE INTERACTIVE PREVIEW
   // ==========================================================================
   (function initSplashScreen() {
     const splashEl = document.getElementById('trieyeSplash');
@@ -2031,7 +2274,38 @@
     splashEl.classList.remove('splash-hidden');
     document.documentElement.classList.remove('splash-already-seen');
     
-    console.log('[Splash Screen] Holding visible for inspection.');
+    // Style Switcher Event Handlers
+    const demoBtns = document.querySelectorAll('.splash-demo-btn');
+    demoBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        demoBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const styleId = btn.getAttribute('data-style-id');
+        splashEl.setAttribute('data-style', styleId);
+      });
+    });
+
+    // Replay / Test Exit Animation
+    const replayBtn = document.getElementById('splashReplayBtn');
+    if (replayBtn) {
+      replayBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        replayBtn.innerText = 'Revealing site...';
+        splashEl.classList.add('splash-hidden');
+        setTimeout(() => {
+          splashEl.style.display = 'none';
+          setTimeout(() => {
+            // Bring back for further testing
+            splashEl.style.display = 'flex';
+            splashEl.classList.remove('splash-hidden');
+            replayBtn.innerText = '▶ Replay Exit';
+          }, 1800);
+        }, 800);
+      });
+    }
+    
+    console.log('[Splash Screen] 10 styles loaded & holding visible for inspection.');
   })();
 </script>
 
