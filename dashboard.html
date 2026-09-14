@@ -1951,25 +1951,26 @@
           <div class="form-group">
             <label class="form-label">Payment Method</label>
             <select class="form-select" id="pay-modal-method">
-              <option value="UPI / QR">UPI / QR Code</option>
-              <option value="Cash">Cash at Counter</option>
-              <option value="Card">Card POS</option>
-              <option value="Bank Transfer">Bank Transfer</option>
+              <option value="CASH">CASH</option>
+              <option value="UPI">UPI</option>
+              <option value="CARD">CARD</option>
+              <option value="BANK TRANSFER">BANK TRANSFER</option>
             </select>
           </div>
         </div>
         <div class="form-group">
           <label class="form-label">Payment Status</label>
           <select class="form-select" id="pay-modal-status">
-            <option value="PAID">Full Paid</option>
-            <option value="PARTIAL">Partial Payment</option>
-            <option value="REFUNDED">Refunded</option>
+            <option value="PAID">PAID</option>
+            <option value="PARTIAL">PARTIAL</option>
+            <option value="UNPAID">UNPAID</option>
+            <option value="REFUNDED">REFUNDED</option>
           </select>
         </div>
       </div>
       <div class="dash-modal-footer">
         <button class="btn" onclick="closeModal('modalPayment')">Cancel</button>
-        <button class="btn btn-green" onclick="savePaymentModal()">✓ Record Transaction</button>
+        <button class="btn btn-green" onclick="savePaymentModal()">✓ Save Payment</button>
       </div>
     </div>
   </div>
@@ -2262,6 +2263,15 @@
     }
     function cleanPhone(p) {
       return (p || '').replace(/\D/g, '').slice(-10);
+    }
+    function formatPaymentMethod(m) {
+      if (!m || m.toUpperCase() === 'PENDING') return 'Pending';
+      const upper = m.toUpperCase().trim();
+      if (upper === 'CASH') return 'Cash';
+      if (upper === 'UPI' || upper.includes('UPI') || upper.includes('QR')) return 'UPI';
+      if (upper === 'CARD' || upper.includes('CARD') || upper.includes('POS')) return 'Card';
+      if (upper === 'BANK TRANSFER' || upper.includes('BANK') || upper.includes('TRANSFER')) return 'Bank Transfer';
+      return m;
     }
     function isUuid(str) {
       if (!str || typeof str !== 'string') return false;
@@ -2719,10 +2729,14 @@
             </select>
           </td>
           <td>
-            <span class="pay-badge ${payClass}">${escapeHtml(b.payStatus || 'UNPAID')}</span>
+            <div style="cursor:pointer;" onclick="openMarkPaidModal('${b.id}')" title="Click to Record / Update Payment">
+              <span class="pay-badge ${payClass}">${escapeHtml(b.payStatus || 'UNPAID')}</span>
+              <div style="font-size:0.68rem; color:var(--muted); font-family:'IBM Plex Mono'; margin-top:2px;">${escapeHtml(formatPaymentMethod(b.payMethod))}</div>
+            </div>
           </td>
           <td>
             <div style="display:flex; gap:0.3rem;">
+              <button class="btn-icon-sm" title="View Bill" onclick="openBillInvoiceModal('${b.id}')">🧾 Bill</button>
               <button class="btn-icon-sm" title="Reassign Bay" onclick="openReassignBayModal('${b.id}')">🚗 Bay</button>
               <button class="btn-icon-sm delete" title="Cancel/Delete" onclick="deleteJob('${b.id}')">✕</button>
             </div>
@@ -2841,6 +2855,7 @@
           </td>
           <td>
             <div class="action-btn-group">
+              ${(b.payStatus || 'UNPAID').toUpperCase() !== 'PAID' ? `<button class="action-btn" style="background:rgba(0,230,118,0.12); color:var(--green); border-color:var(--green);" title="Record Payment" onclick="openMarkPaidModal('${b.id}')">💳 Pay</button>` : ''}
               ${(b.status || '').toUpperCase() === 'CONFIRMED' ? `<button class="action-btn arrive" onclick="changeJobStatus('${b.id}', 'ARRIVED')" title="Mark Vehicle Arrived">🚗 Arrived</button>` : ''}
               <button class="action-btn" title="View & Print Bill Invoice" onclick="openBillInvoiceModal('${b.id}')">🧾 Bill</button>
               <button class="action-btn wa" title="Share Bill on WhatsApp" onclick="shareBillWhatsApp('${b.id}')">💬 WA Bill</button>
@@ -3461,8 +3476,10 @@
 
       customerBookings.forEach((b, idx) => {
         const tr = document.createElement('tr');
-        const payStatus = (b.payStatus || 'UNPAID').toUpperCase();
-        const payMethod = b.payMethod || 'UPI / QR';
+        const isPaid = (b.payStatus || '').toUpperCase() === 'PAID';
+        const payStatus = isPaid ? 'PAID' : 'UNPAID';
+        const rawMethod = b.payMethod;
+        const displayMethod = isPaid ? (rawMethod ? formatPaymentMethod(rawMethod) : 'Cash') : (rawMethod && rawMethod.toUpperCase() !== 'PENDING' ? formatPaymentMethod(rawMethod) : 'Pending');
         const jobStatus = (b.status || 'CONFIRMED').toUpperCase();
         const payBadgeClass = 'pay-' + payStatus.toLowerCase();
         
@@ -3492,11 +3509,12 @@
           </td>
           <td><strong>${escapeHtml(b.service || 'Foam Wash')}</strong></td>
           <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${bookingPrice.toLocaleString()}</strong></td>
-          <td><span class="pay-badge ${payBadgeClass}">${escapeHtml(payStatus)}</span></td>
-          <td><span style="font-family:'IBM Plex Mono'; font-size:0.75rem;">${escapeHtml(payMethod)}</span></td>
+          <td><span class="pay-badge ${payBadgeClass}" style="cursor:pointer;" onclick="openMarkPaidModal('${b.id}')" title="Click to Record / Update Payment">${escapeHtml(payStatus)}</span></td>
+          <td><span style="font-family:'IBM Plex Mono'; font-size:0.75rem;">${escapeHtml(displayMethod)}</span></td>
           <td><span class="status-badge ${statusBadgeClass}">${escapeHtml(jobStatus)}</span></td>
           <td>
             <div class="action-btn-group">
+              ${!isPaid ? `<button class="action-btn-sm" style="background:rgba(0,230,118,0.15); color:var(--green); border-color:var(--green);" data-booking-id="${escapeHtml(b.id)}" onclick="openMarkPaidModal(this.getAttribute('data-booking-id'))">💳 Mark Paid</button>` : ''}
               <button class="action-btn" data-booking-id="${escapeHtml(b.id)}" title="View & Print Bill Invoice" onclick="openBillInvoiceModal(this.getAttribute('data-booking-id'))">🧾 View Bill</button>
               <button class="action-btn wa" data-booking-id="${escapeHtml(b.id)}" title="Share Bill on WhatsApp" onclick="shareBillWhatsApp(this.getAttribute('data-booking-id'))">💬 WhatsApp Bill</button>
               <button class="action-btn" data-booking-id="${escapeHtml(b.id)}" title="Print Invoice" onclick="printBillDirect(this.getAttribute('data-booking-id'))">🖨️ Print Bill</button>
@@ -3617,6 +3635,11 @@
       }
 
       const bookingPrice = Number(b.price !== undefined && b.price !== null ? b.price : (b.total_amount || 0));
+      const isPaid = (b.payStatus || '').toUpperCase() === 'PAID';
+      const payStatus = isPaid ? 'PAID' : 'UNPAID';
+      const rawMethod = b.payMethod;
+      const displayMethod = isPaid ? (rawMethod ? formatPaymentMethod(rawMethod) : 'Cash') : (rawMethod && rawMethod.toUpperCase() !== 'PENDING' ? formatPaymentMethod(rawMethod) : 'Pending');
+      const payColor = isPaid ? 'var(--green)' : 'var(--red)';
 
       const body = document.getElementById('receipt-modal-body');
       body.innerHTML = `
@@ -3681,14 +3704,24 @@
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <div>
               <div style="font-size:0.72rem; color:var(--muted); font-family:'IBM Plex Mono';">PAYMENT METHOD</div>
-              <div style="font-size:0.85rem; font-weight:600; font-family:'IBM Plex Mono';">${escapeHtml(b.payMethod || 'UPI / QR')}</div>
-              <div style="font-size:0.72rem; color:var(--muted); font-family:'IBM Plex Mono'; margin-top:2px;">STATUS: <b style="color:var(--green);">${escapeHtml(b.payStatus || 'PAID')}</b></div>
+              <div style="font-size:0.85rem; font-weight:600; font-family:'IBM Plex Mono';">${escapeHtml(displayMethod)}</div>
+              <div style="font-size:0.72rem; color:var(--muted); font-family:'IBM Plex Mono'; margin-top:2px;">STATUS: <b style="color:${payColor};">${escapeHtml(payStatus)}</b></div>
             </div>
             <div style="text-align:right;">
               <div style="font-size:0.75rem; color:var(--muted); font-family:'IBM Plex Mono'; text-transform:uppercase;">Final Total</div>
               <div style="font-family:'Oswald', sans-serif; font-size:1.6rem; color:var(--green); font-weight:700;">₹${bookingPrice.toLocaleString()}</div>
             </div>
           </div>
+
+          ${!isPaid ? `
+            <div style="display:flex; justify-content:flex-end; padding-top:0.35rem;">
+              <button class="btn btn-green btn-sm" style="font-size:0.78rem; padding:0.4rem 0.85rem;" onclick="openMarkPaidModal(window.currentInvoiceBooking)">💳 Settle / Mark Paid →</button>
+            </div>
+          ` : `
+            <div style="display:flex; justify-content:flex-end; padding-top:0.35rem;">
+              <button class="btn btn-sm" style="font-size:0.72rem; padding:0.3rem 0.65rem;" onclick="openMarkPaidModal(window.currentInvoiceBooking)">✏️ Edit Payment</button>
+            </div>
+          `}
 
           <!-- Footer Note -->
           <div style="text-align:center; font-size:0.72rem; color:var(--muted); font-family:'IBM Plex Mono'; border-top:1px dashed var(--line); padding-top:0.6rem;">
@@ -4034,22 +4067,37 @@ TRIEYE WATERWASH & DETAILING`;
       if (!tbody) return;
       tbody.innerHTML = '';
 
+      if (bookings.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:2rem; color:var(--muted);">No bookings or payments recorded yet.</td></tr>`;
+        return;
+      }
+
       bookings.forEach(b => {
         const tr = document.createElement('tr');
-        const payClass = 'pay-' + (b.payStatus || 'unpaid').toLowerCase();
+        const isPaid = (b.payStatus || '').toUpperCase() === 'PAID';
+        const payStatus = isPaid ? 'PAID' : 'UNPAID';
+        const payClass = 'pay-' + payStatus.toLowerCase();
+        const rawMethod = b.payMethod;
+        const displayMethod = isPaid ? (rawMethod ? formatPaymentMethod(rawMethod) : 'Cash') : (rawMethod && rawMethod.toUpperCase() !== 'PENDING' ? formatPaymentMethod(rawMethod) : 'Pending');
+        const displayRef = b.invoice_ref || ((b.id && b.id.length > 8) ? `TRI-${b.id.substring(0, 8).toUpperCase()}` : (b.id || 'TRI-INVOICE'));
+        const bookingPrice = Number(b.price !== undefined && b.price !== null ? b.price : (b.total_amount || 0));
+
         tr.innerHTML = `
-          <td><strong style="font-family:'IBM Plex Mono'; color:var(--pink);">${escapeHtml(b.id)}</strong></td>
+          <td><strong style="font-family:'IBM Plex Mono'; color:var(--pink);">${escapeHtml(displayRef)}</strong></td>
           <td>
-            <div style="font-weight:600;">${escapeHtml(b.name)}</div>
-            <div style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--muted);">${escapeHtml(b.reg || b.vehicleModel || b.vehicleType)}</div>
+            <div style="font-weight:600;">${escapeHtml(b.name || 'Valued Customer')}</div>
+            <div style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--muted);">${escapeHtml(b.reg || b.vehicleModel || b.vehicleType || 'Car')}</div>
           </td>
-          <td>${escapeHtml(b.service)}</td>
-          <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${(b.price || 0).toLocaleString()}</strong></td>
-          <td><span style="font-family:'IBM Plex Mono'; font-size:0.75rem;">${escapeHtml(b.payMethod || 'UPI / QR')}</span></td>
-          <td><span class="pay-badge ${payClass}">${escapeHtml(b.payStatus || 'UNPAID')}</span></td>
-          <td><span style="font-size:0.75rem; color:var(--muted); font-family:'IBM Plex Mono';">${escapeHtml(b.date || 'Today')}</span></td>
+          <td>${escapeHtml(b.service || 'Foam Wash')}</td>
+          <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${bookingPrice.toLocaleString()}</strong></td>
+          <td><span style="font-family:'IBM Plex Mono'; font-size:0.75rem;">${escapeHtml(displayMethod)}</span></td>
+          <td><span class="pay-badge ${payClass}">${escapeHtml(payStatus)}</span></td>
+          <td><span style="font-size:0.75rem; color:var(--muted); font-family:'IBM Plex Mono';">${escapeHtml(b.date || b.booking_date || 'Today')}</span></td>
           <td>
-            <button class="btn-icon-sm" onclick="openReceiptModal('${b.id}')">🧾 Receipt</button>
+            <div class="action-btn-group">
+              ${!isPaid ? `<button class="action-btn-sm" style="background:rgba(0,230,118,0.15); color:var(--green); border-color:var(--green);" onclick="openMarkPaidModal('${b.id}')">💳 Mark Paid</button>` : `<button class="action-btn-sm" onclick="openMarkPaidModal('${b.id}')">✏️ Edit Pay</button>`}
+              <button class="btn-icon-sm" onclick="openReceiptModal('${b.id}')">🧾 Receipt</button>
+            </div>
           </td>
         `;
         tbody.appendChild(tr);
@@ -4059,33 +4107,97 @@ TRIEYE WATERWASH & DETAILING`;
     function openRecordPaymentModal() {
       const bookings = getBookings();
       const select = document.getElementById('pay-modal-job-select');
-      select.innerHTML = '';
-
-      bookings.forEach(b => {
-        const opt = document.createElement('option');
-        opt.value = b.id;
-        opt.innerText = `${b.id} — ${b.name} (${b.reg || b.vehicleType}) - ₹${b.price}`;
-        select.appendChild(opt);
-      });
+      if (select) {
+        select.innerHTML = '';
+        bookings.forEach(b => {
+          const opt = document.createElement('option');
+          opt.value = b.id;
+          const shortId = b.id && b.id.length > 8 ? b.id.slice(0, 8) : b.id;
+          opt.innerText = `${shortId} — ${b.name} (${b.reg || b.vehicleType}) - ₹${b.price || b.total_amount || 0}`;
+          select.appendChild(opt);
+        });
+      }
 
       onPayModalJobSelect();
       openModal('modalPayment');
     }
 
+    function openMarkPaidModal(bookingOrId) {
+      const b = resolveOriginalBooking(bookingOrId);
+      if (!b) {
+        openRecordPaymentModal();
+        return;
+      }
+
+      const bookings = getBookings();
+      const select = document.getElementById('pay-modal-job-select');
+      if (select) {
+        select.innerHTML = '';
+        bookings.forEach(item => {
+          const opt = document.createElement('option');
+          opt.value = item.id;
+          const shortId = item.id && item.id.length > 8 ? item.id.slice(0, 8) : item.id;
+          opt.innerText = `${shortId} — ${item.name} (${item.reg || item.vehicleType}) - ₹${item.price || item.total_amount || 0}`;
+          if (item.id === b.id) opt.selected = true;
+          select.appendChild(opt);
+        });
+        select.value = b.id;
+      }
+
+      const bookingPrice = Number(b.price !== undefined && b.price !== null ? b.price : (b.total_amount || 0));
+      const amtInput = document.getElementById('pay-modal-amount');
+      if (amtInput) amtInput.value = bookingPrice;
+
+      const methodSelect = document.getElementById('pay-modal-method');
+      if (methodSelect) {
+        const currMethod = (b.payMethod || 'CASH').toUpperCase();
+        if (currMethod === 'UPI' || currMethod.includes('UPI') || currMethod.includes('QR')) methodSelect.value = 'UPI';
+        else if (currMethod === 'CARD' || currMethod.includes('CARD') || currMethod.includes('POS')) methodSelect.value = 'CARD';
+        else if (currMethod.includes('BANK') || currMethod.includes('TRANSFER')) methodSelect.value = 'BANK TRANSFER';
+        else methodSelect.value = 'CASH';
+      }
+
+      const statusSelect = document.getElementById('pay-modal-status');
+      if (statusSelect) statusSelect.value = 'PAID';
+
+      openModal('modalPayment');
+    }
+
     function onPayModalJobSelect() {
-      const id = document.getElementById('pay-modal-job-select').value;
+      const select = document.getElementById('pay-modal-job-select');
+      if (!select) return;
+      const id = select.value;
       const b = getBookings().find(x => x.id === id);
       if (b) {
-        document.getElementById('pay-modal-amount').value = b.price;
-        document.getElementById('pay-modal-status').value = b.payStatus || 'PAID';
+        const bookingPrice = Number(b.price !== undefined && b.price !== null ? b.price : (b.total_amount || 0));
+        const amtInput = document.getElementById('pay-modal-amount');
+        if (amtInput) amtInput.value = bookingPrice;
+
+        const statusSelect = document.getElementById('pay-modal-status');
+        if (statusSelect) statusSelect.value = (b.payStatus || 'PAID').toUpperCase();
+
+        const methodSelect = document.getElementById('pay-modal-method');
+        if (methodSelect && b.payMethod) {
+          const currMethod = b.payMethod.toUpperCase();
+          if (currMethod === 'UPI' || currMethod.includes('UPI') || currMethod.includes('QR')) methodSelect.value = 'UPI';
+          else if (currMethod === 'CARD' || currMethod.includes('CARD') || currMethod.includes('POS')) methodSelect.value = 'CARD';
+          else if (currMethod.includes('BANK') || currMethod.includes('TRANSFER')) methodSelect.value = 'BANK TRANSFER';
+          else methodSelect.value = 'CASH';
+        }
       }
     }
 
-    function savePaymentModal() {
-      const id = document.getElementById('pay-modal-job-select').value;
-      const amt = Number(document.getElementById('pay-modal-amount').value);
+    async function savePaymentModal() {
+      const select = document.getElementById('pay-modal-job-select');
+      const id = select ? select.value : null;
+      const amt = Number(document.getElementById('pay-modal-amount').value || 0);
       const method = document.getElementById('pay-modal-method').value;
       const status = document.getElementById('pay-modal-status').value;
+
+      if (!id) {
+        showToast('Please select a booking/job');
+        return;
+      }
 
       const bookings = getBookings();
       const target = bookings.find(b => b.id === id);
@@ -4093,16 +4205,38 @@ TRIEYE WATERWASH & DETAILING`;
         target.payStatus = status;
         target.payMethod = method;
         saveBookings(bookings);
-        if (window.TrieyeDB && typeof window.TrieyeDB.recordPayment === 'function') {
-          window.TrieyeDB.recordPayment({
+      }
+
+      if (window.TrieyeDB && typeof window.TrieyeDB.recordPayment === 'function') {
+        try {
+          await window.TrieyeDB.recordPayment({
             bookingId: id,
             amount: amt,
             method: method,
             status: status
-          }).catch(() => {});
+          });
+        } catch (e) {
+          console.error('Record payment exception:', e);
         }
-        closeModal('modalPayment');
-        showToast(`Payment of ₹${amt} recorded for ${id}`);
+      }
+
+      closeModal('modalPayment');
+      showToast(`Payment of ₹${amt.toLocaleString()} recorded (${formatPaymentMethod(method)})`);
+
+      // Refresh data from Supabase & re-render dashboard
+      await syncFromSupabase();
+      renderAll();
+
+      // Refresh the receipt / bill modal if open
+      const receiptModal = document.getElementById('modalReceipt');
+      if (receiptModal && receiptModal.classList.contains('open') && window.currentInvoiceBooking) {
+        const updatedBooking = getBookings().find(b => b.id === id) || { ...window.currentInvoiceBooking, payStatus: status, payMethod: method };
+        openBillInvoiceModal(updatedBooking);
+      }
+
+      // Refresh customer history bill data if open
+      if (selectedCustomerPhone) {
+        showCustomerProfile(selectedCustomerPhone);
       }
     }
 

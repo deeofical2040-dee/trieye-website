@@ -188,10 +188,17 @@ const TrieyeDB = {
             const svc = b.services || {};
             const bay = b.bays || {};
             const slot = b.slots || {};
-            const pay = (Array.isArray(b.payments) && b.payments[0]) || b.payments || {};
+            const paymentsArr = Array.isArray(b.payments) ? b.payments : (b.payments ? [b.payments] : []);
+            let pay = {};
+            if (paymentsArr.length > 0) {
+              const sorted = paymentsArr.slice().sort((p1, p2) => new Date(p2.created_at || 0) - new Date(p1.created_at || 0));
+              pay = sorted[0] || {};
+            }
 
             const shortRef = b.id && b.id.length > 8 ? `TRI-${b.id.substring(0, 8).toUpperCase()}` : (b.id || 'TRI-INVOICE');
             const totalAmt = Number(b.total_amount !== null && b.total_amount !== undefined ? b.total_amount : (svc.base_price || 0));
+            const payStatus = (pay.status || 'UNPAID').toUpperCase();
+            const payMethod = pay.method ? (pay.method.toUpperCase() === 'PENDING' ? 'Pending' : pay.method) : 'Pending';
 
             return {
               id: b.id,
@@ -219,8 +226,8 @@ const TrieyeDB = {
               bay: bay.name || null,
               bayId: b.bay_id || null,
               slotId: b.slot_id || null,
-              payStatus: (pay.status || 'UNPAID').toUpperCase(),
-              payMethod: pay.method || 'Pending',
+              payStatus: payStatus,
+              payMethod: payMethod,
               checkInTime: '',
               created: b.created_at || new Date().toISOString(),
               customers: cust,
@@ -876,19 +883,65 @@ const TrieyeDB = {
 
   async recordPayment(paymentObj) {
     const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
-    if (sb) {
+    const bookingId = paymentObj.bookingId || paymentObj.booking_id;
+    const amount = Number(paymentObj.amount || 0);
+    const method = (paymentObj.method || 'CASH').toUpperCase();
+    const status = (paymentObj.status || 'PAID').toUpperCase();
+
+    if (sb && bookingId) {
       try {
-        const { error } = await sb.from('payments').insert({
-          booking_id: paymentObj.bookingId,
-          amount: Number(paymentObj.amount || 0),
-          method: paymentObj.method || 'UPI / QR',
-          status: (paymentObj.status || 'PAID').toUpperCase()
-        });
-        if (error) TrieyeDB.logError('payments', 'INSERT', error);
+        // Check if an existing payment record exists for this booking
+        const { data: existingPayments, error: selErr } = await sb
+          .from('payments')
+          .select('id, created_at')
+          .eq('booking_id', bookingId)
+          .order('created_at', { ascending: false })
+          .limit(1);
+
+        if (selErr) {
+          TrieyeDB.logError('payments', 'SELECT existing', selErr);
+        }
+
+        if (Array.isArray(existingPayments) && existingPayments.length > 0) {
+          const existingId = existingPayments[0].id;
+          const { data, error } = await sb
+            .from('payments')
+            .update({
+              amount: amount,
+              method: method,
+              status: status
+            })
+            .eq('id', existingId)
+            .select();
+
+          if (error) {
+            TrieyeDB.logError('payments', 'UPDATE', error);
+            return { success: false, error: error.message };
+          }
+          return { success: true, payment: data ? data[0] : null };
+        } else {
+          const { data, error } = await sb
+            .from('payments')
+            .insert({
+              booking_id: bookingId,
+              amount: amount,
+              method: method,
+              status: status
+            })
+            .select();
+
+          if (error) {
+            TrieyeDB.logError('payments', 'INSERT', error);
+            return { success: false, error: error.message };
+          }
+          return { success: true, payment: data ? data[0] : null };
+        }
       } catch (err) {
         console.error('🚨 [Supabase Network Error on recordPayment]:', err);
+        return { success: false, error: err.message };
       }
     }
+    return { success: false, error: 'Database unavailable or missing booking ID' };
   },
 
   // 7. REAL-TIME SUBSCRIPTION LISTENER

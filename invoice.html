@@ -671,10 +671,13 @@
         document.getElementById('grand-total').innerText = formattedPrice;
 
         // Payment Info
-        document.getElementById('pay-method').innerText = inv.payment_method || 'Counter / UPI';
-        const payStatusEl = document.getElementById('pay-status');
         const isPaid = (inv.payment_status || '').toUpperCase() === 'PAID';
-        payStatusEl.innerText = (inv.payment_status || 'PAID').toUpperCase();
+        const rawMethod = inv.payment_method;
+        const displayMethod = isPaid ? (rawMethod ? formatPaymentMethod(rawMethod) : 'Cash') : (rawMethod && rawMethod.toUpperCase() !== 'PENDING' ? formatPaymentMethod(rawMethod) : 'Pending');
+
+        document.getElementById('pay-method').innerText = displayMethod;
+        const payStatusEl = document.getElementById('pay-status');
+        payStatusEl.innerText = isPaid ? 'PAID' : 'UNPAID';
         payStatusEl.className = isPaid ? 'badge-status status-paid' : 'badge-status status-unpaid';
 
         // Set document title
@@ -751,6 +754,16 @@
           downloadBtn.innerHTML = originalBtnText;
         }
       }
+    }
+
+    function formatPaymentMethod(m) {
+      if (!m || m.toUpperCase() === 'PENDING') return 'Pending';
+      const upper = m.toUpperCase().trim();
+      if (upper === 'CASH') return 'Cash';
+      if (upper === 'UPI' || upper.includes('UPI') || upper.includes('QR')) return 'UPI';
+      if (upper === 'CARD' || upper.includes('CARD') || upper.includes('POS')) return 'Card';
+      if (upper === 'BANK TRANSFER' || upper.includes('BANK') || upper.includes('TRANSFER')) return 'Bank Transfer';
+      return m;
     }
 
     function escapeHtml(str) {

@@ -50,8 +50,8 @@ BEGIN
       'quantity', 1,
       'rate', COALESCE(b.total_amount, s.base_price, 0),
       'total_amount', COALESCE(b.total_amount, s.base_price, 0),
-      'payment_method', COALESCE(p.method, 'Counter / UPI'),
-      'payment_status', COALESCE(p.status, b.status, 'PAID'),
+      'payment_method', COALESCE(p.method, 'Pending'),
+      'payment_status', COALESCE(p.status, 'UNPAID'),
       'business', jsonb_build_object(
         'name', 'TRIEYE WATERWASH & DETAILING',
         'tagline', 'Premium Car Spa, Ceramic Coating & Paint Protection Studio',
@@ -68,7 +68,11 @@ BEGIN
   LEFT JOIN public.services s ON b.service_id = s.id
   LEFT JOIN public.bays by ON b.bay_id = by.id
   LEFT JOIN public.slots sl ON b.slot_id = sl.id
-  LEFT JOIN public.payments p ON p.booking_id = b.id
+  LEFT JOIN (
+    SELECT DISTINCT ON (booking_id) booking_id, method, status
+    FROM public.payments
+    ORDER BY booking_id, created_at DESC
+  ) p ON p.booking_id = b.id
   WHERE b.share_token = trim(p_token);
 
   IF v_result IS NULL THEN
