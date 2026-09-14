@@ -1249,31 +1249,15 @@
           <button class="btn" onclick="openRecordPaymentModal()">💳 Record Payment</button>
         </div>
 
-        <!-- Overview Two-Column: Bay Live Status & Today's Timeline -->
-        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:1.25rem;">
-          <!-- Detailing Bays Overview -->
-          <div class="panel">
-            <div class="panel-header">
-              <div class="panel-title"><span>🚗</span> Active Detailing Bays</div>
-              <button class="btn" onclick="showSection('bays-sec')" style="font-size:0.72rem;">Manage Bays →</button>
-            </div>
-            <div style="padding:1rem;">
-              <div class="bays-grid" id="overview-bays-grid">
-                <!-- Injected via JS -->
-              </div>
-            </div>
+        <!-- Today's Schedule & Timeline -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><span>⏰</span> Today's Job Timeline</div>
+            <button class="btn" onclick="showSection('queue-sec')" style="font-size:0.72rem;">View All Queue →</button>
           </div>
-
-          <!-- Today's Schedule & Timeline -->
-          <div class="panel">
-            <div class="panel-header">
-              <div class="panel-title"><span>⏰</span> Today's Job Timeline</div>
-              <button class="btn" onclick="showSection('queue-sec')" style="font-size:0.72rem;">View All Queue →</button>
-            </div>
-            <div style="padding:1rem;">
-              <div id="overview-timeline-list" style="display:flex; flex-direction:column; gap:0.65rem;">
-                <!-- Injected via JS -->
-              </div>
+          <div style="padding:1rem;">
+            <div id="overview-timeline-list" style="display:flex; flex-direction:column; gap:0.65rem;">
+              <!-- Injected via JS -->
             </div>
           </div>
         </div>
