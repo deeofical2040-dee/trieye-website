@@ -13,13 +13,6 @@
 <script>
   // Customer Public Website: Always enforce clean LIGHT theme
   document.documentElement.removeAttribute('data-theme');
-  // Early check to avoid splash screen flash if already seen in current session
-  try {
-    const force = new URLSearchParams(window.location.search).get('splash') === '1';
-    if (sessionStorage.getItem('trieye_splash_seen') && !force) {
-      document.documentElement.classList.add('splash-already-seen');
-    }
-  } catch(e) {}
 </script>
 <style>
   :root {
@@ -717,75 +710,8 @@
   }
 
   /* ==========================================================================
-     CINEMATIC SPLASH SCREEN (Public Customer Website Only)
+     CINEMATIC SPLASH SCREEN (Public Customer Website Only - Pure Pitch Black)
      ========================================================================== */
-  #trieyeSplash {
-    position: fixed;
-    inset: 0;
-    width: 100vw;
-    height: 100vh;
-    background-color: #030305;
-    background-image: radial-gradient(circle at 50% 45%, #0b1528 0%, #030305 75%);
-    z-index: 9999999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    overflow: hidden;
-    pointer-events: all;
-    opacity: 1;
-    transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.65s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  html.splash-already-seen #trieyeSplash,
-  #trieyeSplash.splash-hidden {
-    opacity: 0;
-    visibility: hidden;
-    display: none !important;
-    pointer-events: none !important;
-  }
-
-  /* Ambient cinematic background glow */
-  .splash-ambient-glow {
-    position: absolute;
-    width: 500px;
-    height: 500px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(14, 165, 233, 0.22) 0%, rgba(238, 47, 118, 0.12) 45%, transparent 70%);
-    filter: blur(50px);
-    pointer-events: none;
-    z-index: 1;
-    animation: splashAmbientPulse 3s ease-in-out infinite alternate;
-  }
-
-  /* Pure CSS floating bubble / foam particles */
-  .splash-bubbles {
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    z-index: 2;
-    overflow: hidden;
-  }
-  .splash-bubble {
-    position: absolute;
-    border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.9), rgba(56, 189, 248, 0.4) 60%, rgba(14, 165, 233, 0.1) 100%);
-    box-shadow: 0 0 12px rgba(56, 189, 248, 0.5), inset 0 0 4px rgba(255,255,255,0.8);
-    opacity: 0;
-    animation: splashFloatUp 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
-  }
-  .splash-bubble:nth-child(1) { width: 14px; height: 14px; left: 46%; bottom: 42%; animation-delay: 0.3s; animation-duration: 2.2s; }
-  .splash-bubble:nth-child(2) { width: 22px; height: 22px; left: 54%; bottom: 45%; animation-delay: 0.5s; animation-duration: 2.5s; }
-  .splash-bubble:nth-child(3) { width: 10px; height: 10px; left: 42%; bottom: 48%; animation-delay: 0.2s; animation-duration: 2.0s; }
-  .splash-bubble:nth-child(4) { width: 18px; height: 18px; left: 58%; bottom: 40%; animation-delay: 0.7s; animation-duration: 2.4s; }
-  .splash-bubble:nth-child(5) { width: 12px; height: 12px; left: 50%; bottom: 52%; animation-delay: 0.9s; animation-duration: 2.1s; }
-  .splash-bubble:nth-child(6) { width: 8px;  height: 8px;  left: 38%; bottom: 44%; animation-delay: 0.4s; animation-duration: 1.9s; }
-  .splash-bubble:nth-child(7) { width: 16px; height: 16px; left: 62%; bottom: 46%; animation-delay: 0.8s; animation-duration: 2.3s; }
-
-  /* ==========================================================================
-     UNIFIED SPLASH SCREEN COMPOSITION & 10 CAR ENTRANCE ANIMATIONS
-     ========================================================================== */
-  /* Pure Obsidian Pitch-Black Canvas */
   #trieyeSplash {
     position: fixed;
     inset: 0;
@@ -800,7 +726,28 @@
     overflow: hidden;
     pointer-events: all;
     opacity: 1;
-    transition: opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: scale(1);
+    transition: opacity 0.85s cubic-bezier(0.16, 1, 0.3, 1), transform 0.85s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.85s;
+    cursor: pointer;
+  }
+
+  /* Smooth Exit Transition to Main Website */
+  #trieyeSplash.splash-exiting {
+    opacity: 0;
+    transform: scale(1.04);
+    pointer-events: none;
+  }
+
+  #trieyeSplash.splash-exiting .splash-content {
+    opacity: 0;
+    transform: scale(0.96);
+    filter: blur(6px);
+    transition: opacity 0.75s cubic-bezier(0.16, 1, 0.3, 1), transform 0.75s cubic-bezier(0.16, 1, 0.3, 1), filter 0.75s;
+  }
+
+  #trieyeSplash.splash-exiting .splash-bubble {
+    opacity: 0;
+    transition: opacity 0.4s ease-out;
   }
 
   html.splash-already-seen #trieyeSplash,
@@ -811,20 +758,9 @@
     pointer-events: none !important;
   }
 
-  /* Ambient cinematic background glow */
-  .splash-ambient-glow {
-    position: absolute;
-    width: 550px;
-    height: 550px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(14, 165, 233, 0.18) 0%, rgba(238, 47, 118, 0.08) 45%, transparent 70%);
-    filter: blur(60px);
-    pointer-events: none;
-    z-index: 1;
-    animation: splashAmbientPulse 3s ease-in-out infinite alternate;
-  }
-
-  /* Pure CSS floating bubble / foam particles */
+  /* --------------------------------------------------------------------------
+     REALISTIC TRANSLUCENT SOAP BUBBLES WITH IRIDESCENT SHEEN & SPECULAR GLINTS
+     -------------------------------------------------------------------------- */
   .splash-bubbles {
     position: absolute;
     inset: 0;
@@ -832,25 +768,123 @@
     z-index: 2;
     overflow: hidden;
   }
+
   .splash-bubble {
     position: absolute;
     border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.9), rgba(56, 189, 248, 0.4) 60%, rgba(14, 165, 233, 0.1) 100%);
-    box-shadow: 0 0 12px rgba(56, 189, 248, 0.5), inset 0 0 4px rgba(255,255,255,0.8);
+    /* Translucent 3D spherical soap bubble body with iridescent rainbow rim */
+    background: radial-gradient(circle at 30% 26%, 
+      rgba(255, 255, 255, 0.90) 0%, 
+      rgba(255, 255, 255, 0.30) 18%, 
+      rgba(56, 189, 248, 0.16) 45%, 
+      rgba(236, 72, 153, 0.18) 72%, 
+      rgba(163, 230, 53, 0.20) 88%, 
+      rgba(255, 255, 255, 0.55) 100%
+    );
+    border: 1px solid rgba(255, 255, 255, 0.45);
+    box-shadow: 
+      inset 0 0 8px rgba(56, 189, 248, 0.35),
+      inset -3px -3px 7px rgba(236, 72, 153, 0.30),
+      inset 2px 2px 6px rgba(255, 255, 255, 0.85),
+      0 4px 14px rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(1.5px);
+    -webkit-backdrop-filter: blur(1.5px);
     opacity: 0;
-    animation: splashFloatUp 2.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    animation: soapBubbleFloat 3.8s cubic-bezier(0.35, 0, 0.25, 1) infinite, soapBubbleWobble 2.4s ease-in-out infinite alternate;
   }
-  .splash-bubble:nth-child(1) { width: 14px; height: 14px; left: 46%; bottom: 42%; animation-delay: 0.3s; animation-duration: 2.2s; }
-  .splash-bubble:nth-child(2) { width: 22px; height: 22px; left: 54%; bottom: 45%; animation-delay: 0.5s; animation-duration: 2.5s; }
-  .splash-bubble:nth-child(3) { width: 10px; height: 10px; left: 42%; bottom: 48%; animation-delay: 0.2s; animation-duration: 2.0s; }
-  .splash-bubble:nth-child(4) { width: 18px; height: 18px; left: 58%; bottom: 40%; animation-delay: 0.7s; animation-duration: 2.4s; }
-  .splash-bubble:nth-child(5) { width: 12px; height: 12px; left: 50%; bottom: 52%; animation-delay: 0.9s; animation-duration: 2.1s; }
-  .splash-bubble:nth-child(6) { width: 8px;  height: 8px;  left: 38%; bottom: 44%; animation-delay: 0.4s; animation-duration: 1.9s; }
-  .splash-bubble:nth-child(7) { width: 16px; height: 16px; left: 62%; bottom: 46%; animation-delay: 0.8s; animation-duration: 2.3s; }
+
+  /* Soap Bubble Primary Curved Specular Glint (Top-Left Highlight) */
+  .splash-bubble::before {
+    content: '';
+    position: absolute;
+    top: 14%;
+    left: 18%;
+    width: 36%;
+    height: 22%;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0) 75%);
+    transform: rotate(-35deg);
+    filter: blur(0.3px);
+  }
+
+  /* Soap Bubble Secondary Specular Reflection (Bottom-Right) */
+  .splash-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: 14%;
+    right: 18%;
+    width: 22%;
+    height: 14%;
+    border-radius: 50%;
+    background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0) 70%);
+    transform: rotate(35deg);
+  }
+
+  /* Four-point Sparkle Star for Soap Bubbles */
+  .splash-bubble .bubble-star {
+    position: absolute;
+    top: 10%;
+    left: 12%;
+    width: 9px;
+    height: 9px;
+    background: #ffffff;
+    clip-path: polygon(50% 0%, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0% 50%, 38% 38%);
+    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.95));
+    animation: soapStarGleam 2.2s ease-in-out infinite;
+  }
+
+  @keyframes soapStarGleam {
+    0%, 100% { transform: scale(0.6) rotate(0deg); opacity: 0.35; }
+    50% { transform: scale(1.25) rotate(45deg); opacity: 1; }
+  }
+
+  @keyframes soapBubbleFloat {
+    0% {
+      opacity: 0;
+      transform: translate3d(0, 30px, 0) scale(0.4);
+    }
+    18% {
+      opacity: 0.95;
+    }
+    82% {
+      opacity: 0.90;
+    }
+    100% {
+      opacity: 0;
+      transform: translate3d(var(--drift-x, 0px), -100px, 0) scale(1.15);
+    }
+  }
+
+  @keyframes soapBubbleWobble {
+    0% {
+      border-radius: 50% 48% 52% 49% / 49% 52% 48% 51%;
+    }
+    50% {
+      border-radius: 48% 52% 49% 51% / 52% 48% 51% 49%;
+    }
+    100% {
+      border-radius: 52% 49% 48% 52% / 48% 51% 52% 48%;
+    }
+  }
+
+  /* Specific bubble placements, sizes, and physics */
+  .splash-bubble:nth-child(1)  { width: 22px; height: 22px; left: 45%; bottom: 38%; --drift-x: -20px; animation-delay: 0.1s; animation-duration: 3.4s; }
+  .splash-bubble:nth-child(2)  { width: 30px; height: 30px; left: 56%; bottom: 44%; --drift-x: 22px;  animation-delay: 0.4s; animation-duration: 3.8s; }
+  .splash-bubble:nth-child(3)  { width: 13px; height: 13px; left: 40%; bottom: 50%; --drift-x: -14px; animation-delay: 0.2s; animation-duration: 2.8s; }
+  .splash-bubble:nth-child(4)  { width: 26px; height: 26px; left: 62%; bottom: 36%; --drift-x: 28px;  animation-delay: 0.7s; animation-duration: 3.6s; }
+  .splash-bubble:nth-child(5)  { width: 18px; height: 18px; left: 49%; bottom: 56%; --drift-x: 12px;  animation-delay: 0.9s; animation-duration: 3.1s; }
+  .splash-bubble:nth-child(6)  { width: 11px; height: 11px; left: 36%; bottom: 42%; --drift-x: -22px; animation-delay: 0.3s; animation-duration: 2.6s; }
+  .splash-bubble:nth-child(7)  { width: 22px; height: 22px; left: 66%; bottom: 48%; --drift-x: 18px;  animation-delay: 0.8s; animation-duration: 3.3s; }
+  .splash-bubble:nth-child(8)  { width: 34px; height: 34px; left: 52%; bottom: 48%; --drift-x: -10px; animation-delay: 1.2s; animation-duration: 4.2s; }
+  .splash-bubble:nth-child(9)  { width: 14px; height: 14px; left: 42%; bottom: 34%; --drift-x: -12px; animation-delay: 0.5s; animation-duration: 3.0s; }
+  .splash-bubble:nth-child(10) { width: 27px; height: 27px; left: 58%; bottom: 54%; --drift-x: 15px;  animation-delay: 1.5s; animation-duration: 3.7s; }
+  .splash-bubble:nth-child(11) { width: 10px; height: 10px; left: 48%; bottom: 62%; --drift-x: -6px;  animation-delay: 1.0s; animation-duration: 2.4s; }
+  .splash-bubble:nth-child(12) { width: 16px; height: 16px; left: 38%; bottom: 58%; --drift-x: -18px; animation-delay: 1.4s; animation-duration: 3.2s; }
+  .splash-bubble:nth-child(13) { width: 24px; height: 24px; left: 64%; bottom: 60%; --drift-x: 24px;  animation-delay: 1.7s; animation-duration: 3.9s; }
+  .splash-bubble:nth-child(14) { width: 12px; height: 12px; left: 53%; bottom: 66%; --drift-x: 8px;   animation-delay: 0.6s; animation-duration: 2.7s; }
 
   /* --------------------------------------------------------------------------
-     1. ONE UNIFIED PARENT WRAPPER: .splash-content
-     Centering all items along a single exact vertical axis
+     1. UNIFIED PARENT WRAPPER: .splash-content
      -------------------------------------------------------------------------- */
   .splash-content {
     position: relative;
@@ -861,126 +895,31 @@
     justify-content: center;
     text-align: center;
     width: 100%;
-    max-width: 850px;
-    padding: 0 24px;
+    max-width: 640px;
+    padding: 0 20px;
     box-sizing: border-box;
     margin: 0 auto;
   }
 
   /* --------------------------------------------------------------------------
-     2. CAR GRAPHIC
+     2. CAR GRAPHIC (Pure obsidian contrast, NO blue glow behind car)
      -------------------------------------------------------------------------- */
   .car-graphic {
     display: block;
-    width: min(680px, 88vw);
+    width: min(580px, 84vw);
     height: auto;
-    max-height: 38vh;
+    max-height: 44vh;
     object-fit: contain;
     margin: 0 auto;
-    filter: drop-shadow(0 0 35px rgba(14, 165, 233, 0.65)) drop-shadow(0 14px 38px rgba(0, 0, 0, 0.7));
+    filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.7));
     transform-origin: center center;
   }
 
   /* --------------------------------------------------------------------------
-     3. BRAND BLOCK (TRIEYE LOGO + TAGLINE)
-     Centered directly relative to the car above
-     -------------------------------------------------------------------------- */
-  .brand-block {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    width: 100%;
-    margin-top: 10px; /* Reduced vertical gap for unified single mark */
-    opacity: 0;
-    transform: scale(0.94);
-    filter: blur(8px);
-    animation: splashBrandReveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) 1.0s forwards;
-  }
-
-  .trieye-logo {
-    display: block;
-    width: min(390px, 62vw);
-    height: auto;
-    max-height: 56px;
-    object-fit: contain;
-    margin: 0 auto;
-    filter: drop-shadow(0 0 16px rgba(238, 47, 118, 0.45)) drop-shadow(0 0 24px rgba(166, 211, 49, 0.45));
-  }
-
-  .tagline {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: clamp(9.5px, 2.0vw, 11px);
-    font-weight: 500;
-    color: #e2e8f0;
-    letter-spacing: 0.32em;
-    text-transform: uppercase;
-    margin-top: 8px;
-    margin-bottom: 0;
-    text-align: center;
-    padding-left: 0.32em; /* Optical balance for letter-spacing */
-    opacity: 0;
-    transform: translateY(4px);
-    animation: splashTaglineReveal 0.8s cubic-bezier(0.16, 1, 0.3, 1) 1.3s forwards;
-    text-shadow: 0 0 12px rgba(255, 255, 255, 0.3);
-    white-space: nowrap;
-  }
-
-  /* --------------------------------------------------------------------------
-     BRAND KEYFRAME ANIMATIONS (Always settle to perfectly centered 0 0)
-     -------------------------------------------------------------------------- */
-  @keyframes splashBrandReveal {
-    0% {
-      opacity: 0;
-      transform: scale(0.90) translateY(8px);
-      filter: blur(12px);
-    }
-    50% {
-      opacity: 0.85;
-      filter: blur(2px);
-    }
-    100% {
-      opacity: 1;
-      transform: scale(1) translateY(0);
-      filter: blur(0px);
-    }
-  }
-
-  @keyframes splashTaglineReveal {
-    0% {
-      opacity: 0;
-      transform: translateY(6px);
-    }
-    100% {
-      opacity: 0.90;
-      transform: translateY(0);
-    }
-  }
-
-  @keyframes splashAmbientPulse {
-    0% { transform: scale(0.85); opacity: 0.7; }
-    100% { transform: scale(1.15); opacity: 1; }
-  }
-
-  @keyframes splashFloatUp {
-    0% {
-      opacity: 0;
-      transform: translate(0, 0) scale(0.6);
-    }
-    30% { opacity: 0.85; }
-    80% { opacity: 0.6; }
-    100% {
-      opacity: 0;
-      transform: translate(calc((var(--i, 0) - 0.5) * 40px), -60px) scale(1.1);
-    }
-  }
-
-  /* --------------------------------------------------------------------------
-     10 CAR ENTRANCE ANIMATIONS (All ending strictly at transform: none / 0,0)
+     10 CAR ENTRANCE ANIMATIONS (Ending strictly at clean neutral transform/shadow)
      -------------------------------------------------------------------------- */
 
-  /* DEMO 1: Drive-In Precision (Smooth Left-to-Center Glide & Deceleration) */
+  /* DEMO 1: Drive-In Precision */
   #trieyeSplash[data-anim="1"] .car-graphic {
     animation: carDriveIn 1.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
@@ -988,21 +927,21 @@
     0% {
       opacity: 0;
       transform: translateX(-140px) scale(0.92);
-      filter: drop-shadow(0 0 35px rgba(14,165,233,0.9)) blur(6px);
+      filter: blur(4px);
     }
     65% {
       opacity: 1;
       transform: translateX(8px) scale(1.01);
-      filter: drop-shadow(0 0 45px rgba(14,165,233,0.7)) blur(0px);
+      filter: blur(0px);
     }
     100% {
       opacity: 1;
       transform: translateX(0) scale(1);
-      filter: drop-shadow(0 0 30px rgba(14,165,233,0.55));
+      filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.7));
     }
   }
 
-  /* DEMO 2: Rise & Lift (Subtle Upward Float from Floor) */
+  /* DEMO 2: Rise & Lift */
   #trieyeSplash[data-anim="2"] .car-graphic {
     animation: carVerticalLift 1.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
@@ -1010,21 +949,21 @@
     0% {
       opacity: 0;
       transform: translateY(60px) scale(0.90);
-      filter: blur(8px) drop-shadow(0 0 10px rgba(14,165,233,0.2));
+      filter: blur(6px);
     }
     70% {
       opacity: 1;
       transform: translateY(-6px) scale(1.02);
-      filter: blur(0px) drop-shadow(0 0 45px rgba(14,165,233,0.8));
+      filter: blur(0px);
     }
     100% {
       opacity: 1;
       transform: translateY(0) scale(1);
-      filter: blur(0px) drop-shadow(0 0 30px rgba(14,165,233,0.55));
+      filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.7));
     }
   }
 
-  /* DEMO 3: Laser Wipe (Left-to-Right Reveal) */
+  /* DEMO 3: Laser Wipe */
   #trieyeSplash[data-anim="3"] .car-graphic {
     animation: carLaserWipe 1.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
   }
@@ -1032,21 +971,21 @@
     0% {
       opacity: 0;
       clip-path: inset(0 100% 0 0);
-      filter: drop-shadow(0 0 50px #38bdf8) brightness(2.2);
+      filter: brightness(1.8);
     }
     30% {
       opacity: 1;
       clip-path: inset(0 60% 0 0);
-      filter: drop-shadow(0 0 60px #38bdf8) brightness(1.8);
+      filter: brightness(1.3);
     }
     100% {
       opacity: 1;
       clip-path: inset(0 0% 0 0);
-      filter: drop-shadow(0 0 30px rgba(14,165,233,0.55)) brightness(1);
+      filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.7)) brightness(1);
     }
   }
 
-  /* DEMO 4: 3D Perspective Turbo Zoom */
+  /* DEMO 4: 3D Turbo Zoom */
   #trieyeSplash[data-anim="4"] .car-graphic {
     animation: carTurboZoom 1.4s cubic-bezier(0.19, 1, 0.22, 1) forwards;
   }
@@ -1054,21 +993,21 @@
     0% {
       opacity: 0;
       transform: scale(0.28) perspective(600px) rotateX(12deg);
-      filter: blur(12px) brightness(0.3);
+      filter: blur(10px) brightness(0.5);
     }
     65% {
       opacity: 1;
       transform: scale(1.06) perspective(600px) rotateX(-2deg);
-      filter: blur(0px) brightness(1.2) drop-shadow(0 0 50px rgba(14,165,233,0.9));
+      filter: blur(0px) brightness(1.1);
     }
     100% {
       opacity: 1;
       transform: scale(1) perspective(600px) rotateX(0deg);
-      filter: blur(0px) brightness(1) drop-shadow(0 0 30px rgba(14,165,233,0.55));
+      filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.7));
     }
   }
 
-  /* DEMO 5: Water Spray Power Pulse */
+  /* DEMO 5: Power Pulse */
   #trieyeSplash[data-anim="5"] .car-graphic {
     animation: carSprayPulse 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
@@ -1076,43 +1015,42 @@
     0% {
       opacity: 0;
       transform: scale(0.88);
-      filter: drop-shadow(0 0 5px rgba(255,255,255,0.1));
     }
     35% {
-      opacity: 0.6;
+      opacity: 0.7;
       transform: scale(0.96);
-      filter: drop-shadow(-20px 0 30px #38bdf8);
+      filter: brightness(1.2);
     }
     70% {
       opacity: 1;
       transform: scale(1.03);
-      filter: drop-shadow(0 0 55px #0284c7) drop-shadow(0 0 25px #38bdf8);
+      filter: brightness(1.1);
     }
     100% {
       opacity: 1;
       transform: scale(1);
-      filter: drop-shadow(0 0 30px rgba(14,165,233,0.55));
+      filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.7));
     }
   }
 
-  /* DEMO 6: Holographic Spark & Flash */
+  /* DEMO 6: Studio Flash */
   #trieyeSplash[data-anim="6"] .car-graphic {
     animation: carHoloSpark 1.2s steps(1, end), carHoloSettle 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
   @keyframes carHoloSpark {
     0% { opacity: 0; }
-    15% { opacity: 0.8; filter: brightness(3) drop-shadow(0 0 50px #fff); }
+    15% { opacity: 0.8; filter: brightness(2.5); }
     25% { opacity: 0.2; }
-    40% { opacity: 1; filter: brightness(2.2) drop-shadow(0 0 60px #38bdf8); }
+    40% { opacity: 1; filter: brightness(1.8); }
     60% { opacity: 0.7; }
     75% { opacity: 1; }
   }
   @keyframes carHoloSettle {
     0% { transform: scale(0.92) translateY(12px); }
-    100% { transform: scale(1) translateY(0); filter: drop-shadow(0 0 30px rgba(14,165,233,0.55)); }
+    100% { transform: scale(1) translateY(0); filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.7)); }
   }
 
-  /* DEMO 7: Sports Drift & Tilt */
+  /* DEMO 7: Sports Drift */
   #trieyeSplash[data-anim="7"] .car-graphic {
     animation: carDriftTilt 1.4s cubic-bezier(0.2, 0.9, 0.3, 1.2) forwards;
   }
@@ -1120,12 +1058,12 @@
     0% {
       opacity: 0;
       transform: translateX(150px) rotate(-4deg) scale(0.88);
-      filter: drop-shadow(-30px 0 35px rgba(14,165,233,0.8)) blur(5px);
+      filter: blur(4px);
     }
     60% {
       opacity: 1;
       transform: translateX(-10px) rotate(1.5deg) scale(1.03);
-      filter: drop-shadow(0 0 40px rgba(14,165,233,0.7)) blur(0px);
+      filter: blur(0px);
     }
     85% {
       transform: translateX(4px) rotate(-0.3deg) scale(0.99);
@@ -1133,59 +1071,59 @@
     100% {
       opacity: 1;
       transform: translateX(0) rotate(0deg) scale(1);
-      filter: drop-shadow(0 0 30px rgba(14,165,233,0.55));
+      filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.7));
     }
   }
 
-  /* DEMO 8: Ultra Studio Lens Blur Focus */
+  /* DEMO 8: Studio Lens Focus */
   #trieyeSplash[data-anim="8"] .car-graphic {
     animation: carLensBokeh 1.4s cubic-bezier(0.25, 1, 0.5, 1) forwards;
   }
   @keyframes carLensBokeh {
     0% {
       opacity: 0;
-      filter: blur(24px) brightness(0.2) contrast(1.5);
+      filter: blur(20px) brightness(0.4);
       transform: scale(1.18);
     }
     50% {
       opacity: 0.8;
-      filter: blur(8px) brightness(1.2);
+      filter: blur(6px) brightness(1.1);
       transform: scale(1.05);
     }
     100% {
       opacity: 1;
-      filter: blur(0px) brightness(1) drop-shadow(0 0 30px rgba(14,165,233,0.55));
+      filter: blur(0px) brightness(1) drop-shadow(0 14px 28px rgba(0, 0, 0, 0.7));
       transform: scale(1);
     }
   }
 
-  /* DEMO 9: Neon Contour Ignition */
+  /* DEMO 9: Neon Ignite */
   #trieyeSplash[data-anim="9"] .car-graphic {
     animation: carNeonIgnite 1.5s ease-out forwards;
   }
   @keyframes carNeonIgnite {
     0% {
       opacity: 0;
-      filter: drop-shadow(0 0 0px #fff) brightness(0);
+      filter: brightness(0);
       transform: translateY(16px) scale(0.95);
     }
     30% {
       opacity: 0.5;
-      filter: drop-shadow(0 0 20px #fff) drop-shadow(0 0 40px #38bdf8) brightness(2.8);
+      filter: brightness(2.2);
     }
     60% {
       opacity: 0.9;
-      filter: drop-shadow(0 0 35px #0284c7) brightness(1.4);
+      filter: brightness(1.3);
       transform: translateY(-3px) scale(1.02);
     }
     100% {
       opacity: 1;
-      filter: drop-shadow(0 0 30px rgba(14,165,233,0.55)) brightness(1);
+      filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.7)) brightness(1);
       transform: translateY(0) scale(1);
     }
   }
 
-  /* DEMO 10: Ripple Waveform Shockwave */
+  /* DEMO 10: Ripple Shockwave */
   #trieyeSplash[data-anim="10"] .car-graphic {
     animation: carRippleShock 1.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
   }
@@ -1193,12 +1131,12 @@
     0% {
       opacity: 0;
       transform: scale(0.45);
-      filter: drop-shadow(0 0 70px #38bdf8) blur(8px);
+      filter: blur(6px);
     }
     50% {
       opacity: 1;
-      transform: scale(1.12);
-      filter: drop-shadow(0 0 50px #0284c7) blur(0px);
+      transform: scale(1.08);
+      filter: blur(0px);
     }
     75% {
       transform: scale(0.97);
@@ -1206,7 +1144,7 @@
     100% {
       opacity: 1;
       transform: scale(1);
-      filter: drop-shadow(0 0 30px rgba(14,165,233,0.55));
+      filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.7));
     }
   }
 
@@ -1216,9 +1154,6 @@
       transition: opacity 0.3s ease, visibility 0.3s ease;
     }
     .car-graphic,
-    .brand-block,
-    .tagline,
-    .splash-ambient-glow,
     .splash-bubble {
       animation: none !important;
       opacity: 1 !important;
@@ -1230,90 +1165,6 @@
     }
   }
 
-  /* Interactive Demo Switcher Dock */
-  .splash-demo-bar {
-    position: fixed;
-    bottom: 24px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 99999999;
-    background: rgba(15, 17, 23, 0.94);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    box-shadow: 0 16px 40px rgba(0,0,0,0.9), 0 0 0 1px rgba(0,0,0,0.6);
-    border-radius: 99px;
-    padding: 6px 10px;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    max-width: 96vw;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .splash-demo-bar::-webkit-scrollbar { display: none; }
-  .splash-demo-label {
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 11px;
-    color: #94a3b8;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    padding: 0 8px 0 12px;
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .splash-demo-label::after {
-    content: "";
-    width: 1px;
-    height: 16px;
-    background: rgba(255,255,255,0.18);
-  }
-  .splash-demo-btn {
-    background: transparent;
-    border: 1px solid transparent;
-    color: #cbd5e1;
-    font-family: 'Oswald', sans-serif;
-    font-size: 12px;
-    letter-spacing: 0.05em;
-    padding: 6px 11px;
-    border-radius: 99px;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-  .splash-demo-btn:hover {
-    color: #fff;
-    background: rgba(255,255,255,0.12);
-  }
-  .splash-demo-btn.active {
-    background: #ee2f76;
-    color: #fff;
-    font-weight: 600;
-    box-shadow: 0 0 14px rgba(238,47,118,0.7);
-  }
-  .splash-play-btn {
-    background: #689f0e;
-    color: #fff;
-    font-family: 'Oswald', sans-serif;
-    font-size: 12px;
-    padding: 6px 13px;
-    border-radius: 99px;
-    border: none;
-    cursor: pointer;
-    font-weight: 600;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    margin-left: 6px;
-    transition: transform 0.2s, box-shadow 0.2s;
-    box-shadow: 0 0 12px rgba(104,159,14,0.55);
-    white-space: nowrap;
-  }
-  .splash-play-btn:hover {
-    transform: scale(1.04);
-    box-shadow: 0 0 18px rgba(104,159,14,0.85);
-  }
 </style>
   <!-- Official Supabase JavaScript Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1323,46 +1174,30 @@
 </head>
 <body>
 
-<!-- PREMIUM CINEMATIC SPLASH SCREEN (Public Website Only - Obsidian Dark) -->
-<div id="trieyeSplash" data-anim="1" aria-hidden="true">
-  <div class="splash-ambient-glow"></div>
-  
+<!-- PREMIUM CINEMATIC SPLASH SCREEN (Sports Drift Auto-Transition to Website) -->
+<div id="trieyeSplash" data-anim="7" aria-hidden="true">
+  <!-- Translucent Realistic Soap Bubbles (No blue glow behind car) -->
   <div class="splash-bubbles" aria-hidden="true">
+    <div class="splash-bubble"><span class="bubble-star"></span></div>
+    <div class="splash-bubble"></div>
+    <div class="splash-bubble"><span class="bubble-star"></span></div>
     <div class="splash-bubble"></div>
     <div class="splash-bubble"></div>
+    <div class="splash-bubble"><span class="bubble-star"></span></div>
+    <div class="splash-bubble"></div>
+    <div class="splash-bubble"><span class="bubble-star"></span></div>
+    <div class="splash-bubble"></div>
+    <div class="splash-bubble"><span class="bubble-star"></span></div>
     <div class="splash-bubble"></div>
     <div class="splash-bubble"></div>
-    <div class="splash-bubble"></div>
-    <div class="splash-bubble"></div>
+    <div class="splash-bubble"><span class="bubble-star"></span></div>
     <div class="splash-bubble"></div>
   </div>
 
   <!-- Unified Parent Splash Content Wrapper -->
   <div class="splash-content">
-    <!-- CAR GRAPHIC -->
-    <img src="assets/car-wash-splash.png" alt="Trieye Car Wash Illustration" class="car-graphic" id="splashCarImg">
-
-    <!-- BRAND BLOCK: Directly Centered Below Car -->
-    <div class="brand-block" id="splashBrandWrap">
-      <img src="assets/trieye-logo-clean.png" alt="TRIEYE" class="trieye-logo">
-      <div class="tagline">DETAIL &bull; PRECISION &bull; PROTECTION</div>
-    </div>
-  </div>
-
-  <!-- Live 10 Entrance Animation Demo Switcher Dock -->
-  <div class="splash-demo-bar" id="splashDemoDock">
-    <span class="splash-demo-label">Entrance</span>
-    <button class="splash-demo-btn active" data-anim-id="1">1. Drive-In</button>
-    <button class="splash-demo-btn" data-anim-id="2">2. Rise & Lift</button>
-    <button class="splash-demo-btn" data-anim-id="3">3. Laser Wipe</button>
-    <button class="splash-demo-btn" data-anim-id="4">4. Turbo Zoom</button>
-    <button class="splash-demo-btn" data-anim-id="5">5. Spray Pulse</button>
-    <button class="splash-demo-btn" data-anim-id="6">6. Holo Spark</button>
-    <button class="splash-demo-btn" data-anim-id="7">7. Sports Drift</button>
-    <button class="splash-demo-btn" data-anim-id="8">8. Lens Bokeh</button>
-    <button class="splash-demo-btn" data-anim-id="9">9. Neon Ignite</button>
-    <button class="splash-demo-btn" data-anim-id="10">10. Shockwave</button>
-    <button class="splash-play-btn" id="splashReplayBtn">&#8634; Re-Trigger</button>
+    <!-- HIGH RESOLUTION UNIFIED SPLASH EMBLEM -->
+    <img src="assets/car-wash-splash.png" alt="Trieye — Detail · Precision · Protection" class="car-graphic" id="splashCarImg">
   </div>
 </div>
 
@@ -2419,59 +2254,41 @@
   console.log('Initial theme:', selectedTheme);
 
   // ==========================================================================
-  // SPLASH SCREEN CONTROLLER & 10 CAR ENTRANCE ANIMATION DEMOS
+  // SPLASH SCREEN CONTROLLER (Always Plays 1st, then Smoothly Opens Main Site)
   // ==========================================================================
   (function initSplashScreen() {
     const splashEl = document.getElementById('trieyeSplash');
-    const carImg = document.getElementById('splashCarImg');
-    const brandWrap = document.getElementById('splashBrandWrap');
     if (!splashEl) return;
 
-    // Ensure Obsidian black background and hold visible for interactive testing
+    // Always ensure splash screen displays 1st on visit with clean Obsidian state
     splashEl.style.display = 'flex';
-    splashEl.classList.remove('splash-hidden');
+    splashEl.classList.remove('splash-hidden', 'splash-exiting');
     document.documentElement.classList.remove('splash-already-seen');
+    splashEl.setAttribute('data-anim', '7');
 
-    function triggerAnimation(animId) {
-      splashEl.setAttribute('data-anim', animId);
-      
-      // Reset animation on car and brand elements to see clean entrance
-      if (carImg) {
-        carImg.style.animation = 'none';
-        carImg.offsetHeight; /* trigger reflow */
-        carImg.style.animation = '';
-      }
-      if (brandWrap) {
-        brandWrap.style.animation = 'none';
-        brandWrap.offsetHeight; /* trigger reflow */
-        brandWrap.style.animation = '';
-      }
+    let dismissed = false;
+    function dismissSplash() {
+      if (dismissed) return;
+      dismissed = true;
+
+      // Initiate silky-smooth curtain exit transition to reveal main website
+      splashEl.classList.add('splash-exiting');
+
+      setTimeout(() => {
+        splashEl.classList.add('splash-hidden');
+        splashEl.style.display = 'none';
+        document.documentElement.classList.add('splash-already-seen');
+      }, 850);
     }
 
-    // Animation Demo Switcher Event Handlers
-    const demoBtns = document.querySelectorAll('.splash-demo-btn');
-    demoBtns.forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        demoBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        const animId = btn.getAttribute('data-anim-id');
-        triggerAnimation(animId);
-      });
+    // Automatically transition to main website once Sports Drift finishes (1.4s drift + 0.8s logo appreciation)
+    const autoDismissTimer = setTimeout(dismissSplash, 2200);
+
+    // Optional user click anywhere for instant skip
+    splashEl.addEventListener('click', () => {
+      clearTimeout(autoDismissTimer);
+      dismissSplash();
     });
-
-    // Re-Trigger Current Entrance Animation
-    const replayBtn = document.getElementById('splashReplayBtn');
-    if (replayBtn) {
-      replayBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const activeBtn = document.querySelector('.splash-demo-btn.active');
-        const currentAnim = activeBtn ? activeBtn.getAttribute('data-anim-id') : '1';
-        triggerAnimation(currentAnim);
-      });
-    }
-    
-    console.log('[Splash Screen] Obsidian Base with 10 Car Entrance Demos Active.');
   })();
 </script>
 
