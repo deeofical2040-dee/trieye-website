@@ -692,31 +692,68 @@
   @media (max-width:860px){.contact-grid{grid-template-columns:1fr;gap:28px;}}
   .contact-grid > div{min-width:0;width:100%;box-sizing:border-box;}
   .map-box{
-    aspect-ratio:16/9;
-    min-height:180px;
+    position:relative;
     width:100%;
     max-width:100%;
-    min-width:0;
-    box-sizing:border-box;
-    background:
-      repeating-linear-gradient(45deg, #1a1a1d, #1a1a1d 10px, #161618 10px, #161618 20px);
+    min-height:300px;
+    aspect-ratio:16/10;
     border:1px solid var(--line);
-    border-radius:8px;
+    border-radius:10px;
+    overflow:hidden;
     display:flex;
     flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    color:var(--muted);
-    font-family:'IBM Plex Mono',monospace;
-    font-size:12px;
-    letter-spacing:0.1em;
-    text-transform:uppercase;
-    padding:16px;
-    text-align:center;
+    justify-content:flex-end;
+    box-sizing:border-box;
+    box-shadow:0 10px 30px -10px var(--shadow-pop);
   }
-  .map-box h4{color:var(--white);font-size:15px;margin:6px 0 3px;}
-  .map-box p{color:var(--muted);font-size:12.5px;text-transform:none;}
-  .map-box-pin svg{width:26px;height:26px;stroke:var(--pink);}
+  .map-box .map-img{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    object-position:center;
+    transition:transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .map-box:hover .map-img{
+    transform:scale(1.03);
+  }
+  .map-box .map-content{
+    position:relative;
+    z-index:2;
+    padding:clamp(14px, 3vw, 20px);
+    background:linear-gradient(180deg, rgba(10, 10, 12, 0.15) 0%, rgba(10, 10, 12, 0.85) 45%, rgba(10, 10, 12, 0.95) 100%);
+    backdrop-filter:blur(6px);
+    -webkit-backdrop-filter:blur(6px);
+    border-top:1px solid rgba(255, 255, 255, 0.08);
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+  }
+  [data-theme="light"] .map-box .map-content{
+    background:linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.9) 45%, rgba(255, 255, 255, 0.97) 100%);
+    border-top:1px solid rgba(0, 0, 0, 0.08);
+  }
+  .map-box .map-content h4{
+    color:var(--white);
+    font-size:15px;
+    margin:0 0 3px;
+    letter-spacing:0.04em;
+  }
+  [data-theme="light"] .map-box .map-content h4{
+    color:var(--text-primary);
+  }
+  .map-box .map-content p{
+    color:var(--muted);
+    font-size:12.5px;
+    margin:1px 0;
+    line-height:1.35;
+  }
+  .map-box .map-content .btn{
+    margin-top:12px;
+    padding:8px 16px;
+    font-size:12px;
+  }
   .contact-list{list-style:none;width:100%;min-width:0;}
   .contact-list li{
     display:flex;gap:12px;padding:clamp(12px, 2.5vw, 18px) 0;border-top:1px solid var(--line);
@@ -1924,13 +1961,13 @@
 <section id="contact">
   <div class="wrap contact-grid">
     <div class="map-box">
-      <div class="map-box-pin">
-        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+      <img src="assets/trieye-studio-map.png" alt="TRIEYE Detailing Studio Location Map" class="map-img" loading="lazy">
+      <div class="map-content">
+        <h4>TRIEYE DETAILING STUDIO</h4>
+        <p>Baba Nagar, Villivakkam</p>
+        <p>Chennai, Tamil Nadu 600049</p>
+        <a href="https://www.google.com/maps/search/?api=1&query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="btn btn-outline">Open in Google Maps ↗</a>
       </div>
-      <h4>TRIEYE DETAILING STUDIO</h4>
-      <p style="margin:2px 0;line-height:1.35;">Baba Nagar, Villivakkam</p>
-      <p style="margin:2px 0;line-height:1.35;">Chennai, Tamil Nadu 600049</p>
-      <a href="https://www.google.com/maps/search/?api=1&query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="btn btn-outline" style="margin-top:14px;padding:8px 16px;font-size:12px;text-align:center;">Open in Google Maps ↗</a>
     </div>
     <div>
       <div class="sec-head" style="margin-bottom:24px;">
