@@ -1,18 +1,19 @@
 {
   "Foam Wash": {
+    "id": null,
     "name": "Foam Wash",
     "desc": "Snow Foam Pre-Wash & Decontamination detailing",
+    "base_price": 9,
+    "hatchback_price": 6,
+    "sedan_price": 9,
+    "suv_price": 4,
+    "bike_price": 50,
     "duration_minutes": 45,
-    "base_price": 699,
-    "hatchback_price": 566,
-    "sedan_price": 699,
-    "suv_price": 874,
-    "bike_price": 350,
     "pricing": {
-      "Hatchback": 566,
-      "Sedan": 699,
-      "SUV / 4x4": 874,
-      "Superbike": 350
+      "Hatchback": 6,
+      "Sedan": 9,
+      "SUV / 4x4": 4,
+      "Superbike": 50
     },
     "active": true
   },

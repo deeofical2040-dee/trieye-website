@@ -1122,9 +1122,6 @@
     </div>
 
     <div class="top-actions">
-      <div class="live-status-pill">
-        <span class="pulse-dot"></span> <span id="top-bay-pill-text">4 BAYS ONLINE</span>
-      </div>
       <button class="theme-toggle-btn" id="dashThemeToggleBtn" title="Toggle Dark / Light Theme" aria-label="Toggle Theme">
         <div class="theme-toggle-thumb">
           <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
@@ -1208,7 +1205,7 @@
           </div>
         </div>
 
-        <!-- 8 Summary Cards -->
+        <!-- Summary Cards -->
         <div class="kpi-grid">
           <div class="kpi-card green">
             <div class="kpi-label">Today Revenue <span>💰</span></div>
@@ -1225,11 +1222,6 @@
             <div class="kpi-value" id="kpi-today-online">0</div>
             <div class="kpi-subtext">Booked via customer portal</div>
           </div>
-          <div class="kpi-card amber">
-            <div class="kpi-label">Walk-Ins Today <span>⚡</span></div>
-            <div class="kpi-value" id="kpi-today-walkin">0</div>
-            <div class="kpi-subtext">Direct express check-ins</div>
-          </div>
           <div class="kpi-card green">
             <div class="kpi-label">Completed Today <span>✅</span></div>
             <div class="kpi-value" id="kpi-today-completed">0</div>
@@ -1244,11 +1236,6 @@
             <div class="kpi-label">Total Customers <span>👥</span></div>
             <div class="kpi-value" id="kpi-total-customers">0</div>
             <div class="kpi-subtext">Registered in studio CRM</div>
-          </div>
-          <div class="kpi-card amber">
-            <div class="kpi-label">Bay Occupancy <span>🛡️</span></div>
-            <div class="kpi-value" id="kpi-bay-occupancy">0%</div>
-            <div class="kpi-subtext" id="kpi-bay-fraction">0/4 Bays Active</div>
           </div>
         </div>
 
@@ -1934,9 +1921,12 @@
           </div>
         </div>
       </div>
-      <div class="dash-modal-footer">
-        <button class="btn" onclick="closeModal('modalService')">Cancel</button>
-        <button class="btn btn-primary" onclick="saveServiceModal()">Save Package</button>
+      <div class="dash-modal-footer" style="display:flex; justify-content:space-between; align-items:center; width:100%;">
+        <button class="btn" id="btn-delete-service" onclick="deleteServiceModal()" style="color:var(--red); border-color:rgba(220,38,38,0.4); background:rgba(220,38,38,0.08); display:none;">🗑️ Delete Package</button>
+        <div style="display:flex; gap:0.5rem; margin-left:auto;">
+          <button class="btn" onclick="closeModal('modalService')">Cancel</button>
+          <button class="btn btn-primary" onclick="saveServiceModal()">Save Package</button>
+        </div>
       </div>
     </div>
   </div>
@@ -1997,10 +1987,11 @@
       <div class="dash-modal-body" id="receipt-modal-body">
         <!-- Injected via JS -->
       </div>
-      <div class="dash-modal-footer">
+      <div class="dash-modal-footer" style="flex-wrap:wrap; gap:8px;">
+        <button class="btn" onclick="openCurrentInvoicePage()">🌐 Open Web Bill</button>
         <button class="btn" onclick="window.print()">🖨 Print Receipt</button>
         <button class="btn btn-green" onclick="shareCurrentInvoiceWhatsApp()">💬 Share WhatsApp</button>
-        <button class="btn" onclick="shareCurrentInvoiceNative()">🔗 Share Invoice</button>
+        <button class="btn" onclick="shareCurrentInvoiceNative()">🔗 Share Link</button>
         <button class="btn btn-primary" onclick="closeModal('modalReceipt')">Done</button>
       </div>
     </div>
@@ -3818,6 +3809,21 @@ TRIEYE WATERWASH & DETAILING`;
       showToast('Opening WhatsApp...');
     }
 
+    async function openCurrentInvoicePage() {
+      const b = window.currentInvoiceBooking;
+      if (!b) {
+        alert('No active invoice data found.');
+        return;
+      }
+      const token = await getOrFetchShareToken(b);
+      if (!token) {
+        alert('Invoice share token could not be loaded from database.');
+        return;
+      }
+      const invoiceUrl = getPublicInvoiceUrl(token);
+      window.open(invoiceUrl, '_blank');
+    }
+
     async function shareCurrentInvoiceNative() {
       const b = window.currentInvoiceBooking;
       if (!b) {
@@ -3965,13 +3971,10 @@ TRIEYE WATERWASH & DETAILING`;
         const suvPrice = s.pricing && s.pricing['SUV / 4x4'] !== undefined ? s.pricing['SUV / 4x4'] : basePrice;
         const bikePrice = s.pricing && s.pricing['Superbike'] !== undefined ? s.pricing['Superbike'] : basePrice;
 
-        const durationBadge = s.duration_minutes ? `<span style="font-family:'IBM Plex Mono'; font-size:0.7rem; color:var(--blue); margin-left:4px;">⏱️ ${s.duration_minutes}m</span>` : '';
-
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>
             <strong style="color:var(--white);">${escapeHtml(k)}</strong>
-            ${durationBadge}
           </td>
           <td><span style="font-size:0.75rem; color:var(--muted);">${escapeHtml(s.desc || 'Standard Studio Service')}</span></td>
           <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${hatchPrice.toLocaleString()}</strong></td>
@@ -3980,7 +3983,10 @@ TRIEYE WATERWASH & DETAILING`;
           <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${bikePrice.toLocaleString()}</strong></td>
           <td><span class="status-badge ${s.active !== false ? 'status-done' : 'status-cancelled'}">${s.active !== false ? 'ACTIVE' : 'INACTIVE'}</span></td>
           <td>
-            <button class="btn-icon-sm" onclick="editServiceModal('${escapeHtml(k)}')">✏️ Edit</button>
+            <div style="display:flex; gap:0.35rem;">
+              <button class="btn-icon-sm" onclick="editServiceModal('${escapeHtml(k)}')">✏️ Edit</button>
+              <button class="btn-icon-sm" onclick="deleteServiceDirect('${escapeHtml(k)}')" style="color:var(--red);" title="Delete service package">🗑️</button>
+            </div>
           </td>
         `;
         tbody.appendChild(tr);
@@ -4011,6 +4017,8 @@ TRIEYE WATERWASH & DETAILING`;
       document.getElementById('svc-modal-price-sedan').value = 699;
       document.getElementById('svc-modal-price-suv').value = 799;
       document.getElementById('svc-modal-price-bike').value = 299;
+      const delBtn = document.getElementById('btn-delete-service');
+      if (delBtn) delBtn.style.display = 'none';
       openModal('modalService');
     }
 
@@ -4034,7 +4042,47 @@ TRIEYE WATERWASH & DETAILING`;
       document.getElementById('svc-modal-price-sedan').value = sedan;
       document.getElementById('svc-modal-price-suv').value = suv;
       document.getElementById('svc-modal-price-bike').value = bike;
+      const delBtn = document.getElementById('btn-delete-service');
+      if (delBtn) delBtn.style.display = 'inline-flex';
       openModal('modalService');
+    }
+
+    function deleteServiceModal() {
+      const orig = document.getElementById('svc-modal-orig-name').value;
+      const name = document.getElementById('svc-modal-name').value.trim() || orig;
+      if (!orig && !name) {
+        closeModal('modalService');
+        return;
+      }
+      const targetName = orig || name;
+      if (!confirm(`Are you sure you want to permanently delete the service package "${targetName}"?`)) {
+        return;
+      }
+
+      const svcs = getServices();
+      if (svcs[targetName]) {
+        delete svcs[targetName];
+      }
+      if (orig && svcs[orig]) {
+        delete svcs[orig];
+      }
+
+      saveServices(svcs);
+      closeModal('modalService');
+      showToast(`Service package "${targetName}" deleted successfully`);
+    }
+
+    function deleteServiceDirect(targetName) {
+      if (!targetName) return;
+      if (!confirm(`Are you sure you want to permanently delete the service package "${targetName}"?`)) {
+        return;
+      }
+      const svcs = getServices();
+      if (svcs[targetName]) {
+        delete svcs[targetName];
+        saveServices(svcs);
+        showToast(`Service package "${targetName}" deleted`);
+      }
     }
 
     function saveServiceModal() {
