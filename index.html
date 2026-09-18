@@ -1234,29 +1234,188 @@
     .contact-ctas .btn{width:100%;justify-content:center;min-height:46px;}
   }
 
-  /* ---------- FOOTER RESPONSIVENESS ---------- */
-  footer{width:100%;max-width:100%;overflow:hidden;box-sizing:border-box;}
-  @media (max-width:768px){
-    .foot-grid{
-      flex-direction:column;
-      align-items:center;
-      text-align:center;
-      gap:18px;
-      padding:24px 0 18px;
-      width:100%;
+  /* ---------- PREMIUM FOOTER ---------- */
+  .site-footer{
+    width:100%;
+    max-width:100%;
+    background:#ffffff;
+    border-top:1px solid var(--line);
+    box-sizing:border-box;
+    overflow:hidden;
+  }
+  [data-theme="dark"] .site-footer{
+    background:var(--bg-panel);
+  }
+
+  .footer-container{
+    max-width:1200px;
+    margin:0 auto;
+    padding:60px 24px 32px;
+    width:100%;
+    box-sizing:border-box;
+  }
+
+  .footer-grid{
+    display:grid;
+    grid-template-columns:1.3fr 1fr 1.2fr;
+    gap:clamp(32px, 5vw, 64px);
+    align-items:start;
+    padding-bottom:44px;
+    width:100%;
+    box-sizing:border-box;
+  }
+
+  .footer-col{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    min-width:0;
+  }
+
+  .footer-logo-link{
+    display:inline-block;
+    margin-bottom:14px;
+    text-decoration:none;
+  }
+
+  .footer-logo{
+    display:block;
+    width:180px;
+    max-width:100%;
+    height:auto;
+    object-fit:contain;
+    filter:drop-shadow(0 2px 8px var(--shadow-pop));
+    transition:filter 0.25s ease;
+  }
+
+  .footer-tagline{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    font-weight:600;
+    letter-spacing:0.16em;
+    color:var(--muted);
+    text-transform:uppercase;
+    margin:0;
+  }
+
+  .footer-heading{
+    font-family:'Oswald', sans-serif;
+    font-size:16px;
+    font-weight:600;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--white);
+    margin:0 0 18px;
+  }
+
+  .footer-nav-list{
+    list-style:none !important;
+    margin:0 !important;
+    padding:0 !important;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    width:100%;
+  }
+
+  .footer-nav-list li{
+    list-style:none !important;
+    margin:0 !important;
+    padding:0 !important;
+  }
+
+  .footer-nav-list a{
+    font-family:'Inter', sans-serif;
+    font-size:14px;
+    font-weight:500;
+    color:var(--muted);
+    text-decoration:none;
+    transition:color 0.2s ease, transform 0.2s ease;
+    display:inline-block;
+  }
+
+  .footer-nav-list a:hover{
+    color:var(--pink);
+    transform:translateX(3px);
+  }
+
+  .footer-info-text{
+    font-family:'Inter', sans-serif;
+    font-size:14px;
+    color:var(--muted);
+    margin:0 0 6px;
+    line-height:1.5;
+  }
+
+  .footer-directions-btn{
+    margin-top:14px;
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    background:rgba(166, 211, 49, 0.12);
+    color:var(--green);
+    border:1px solid rgba(166, 211, 49, 0.35);
+    padding:9px 18px;
+    border-radius:6px;
+    font-family:'Oswald', sans-serif;
+    font-size:13.5px;
+    font-weight:600;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    text-decoration:none;
+    transition:all 0.2s ease;
+  }
+
+  .footer-directions-btn:hover{
+    background:var(--green);
+    color:#000000;
+    border-color:var(--green);
+    box-shadow:0 4px 14px rgba(166, 211, 49, 0.3);
+    transform:translateY(-1px);
+  }
+
+  .footer-bottom{
+    padding-top:24px;
+    border-top:1px solid var(--line);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    flex-wrap:wrap;
+    gap:14px;
+    width:100%;
+    box-sizing:border-box;
+  }
+
+  .footer-copy{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--muted);
+  }
+
+  .footer-sub-tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+    color:var(--muted);
+    text-transform:uppercase;
+  }
+
+  @media (max-width: 768px){
+    .footer-container{
+      padding:44px 20px 28px;
     }
-    .foot-links{
-      justify-content:center;
-      gap:12px 18px;
-      width:100%;
+    .footer-grid{
+      grid-template-columns:1fr;
+      gap:32px;
+      padding-bottom:32px;
     }
-    .foot-copy{
+    .footer-logo{
+      width:150px;
+    }
+    .footer-bottom{
       flex-direction:column;
-      align-items:center;
-      text-align:center;
-      gap:6px;
-      padding:18px 0 24px;
-      width:100%;
+      align-items:flex-start;
+      gap:8px;
     }
   }
 
@@ -2439,23 +2598,50 @@
   </div>
 </section>
 
-<footer>
-  <div class="wrap foot-grid">
-    <div class="foot-brand">
-      <img src="assets/trieye-logo-dark.png" alt="Trieye" class="foot-logo logo-dark">
-      <img src="assets/trieye-logo-light.png" alt="Trieye" class="foot-logo logo-light">
+<footer class="site-footer">
+  <div class="footer-container">
+    <div class="footer-grid">
+      <!-- Left Column: Brand & Tagline -->
+      <div class="footer-col footer-col-brand">
+        <a href="#" class="footer-logo-link" aria-label="Trieye Home">
+          <img src="assets/trieye-logo-dark.png" alt="Trieye Detail Studio" class="footer-logo logo-dark">
+          <img src="assets/trieye-logo-light.png" alt="Trieye Detail Studio" class="footer-logo logo-light">
+        </a>
+        <p class="footer-tagline">DETAIL • PRECISION • PROTECTION</p>
+      </div>
+
+      <!-- Center Column: Quick Links -->
+      <div class="footer-col footer-col-links">
+        <h4 class="footer-heading">QUICK LINKS</h4>
+        <ul class="footer-nav-list">
+          <li><a href="#services">Services</a></li>
+          <li><a href="#booking">Booking</a></li>
+          <li><a href="#gallery">Gallery</a></li>
+          <li><a href="#about">About Us</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </div>
+
+      <!-- Right Column: Studio Info -->
+      <div class="footer-col footer-col-info">
+        <h4 class="footer-heading">TRIEYE DETAILING STUDIO</h4>
+        <p class="footer-info-text">Chennai, Tamil Nadu</p>
+        <p class="footer-info-text">Open Daily: 7:00 AM – 9:00 PM</p>
+        <a href="https://www.google.com/maps/search/?api=1&query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="footer-directions-btn">
+          <span>GET DIRECTIONS</span>
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M7 17L17 7"/>
+            <path d="M7 7h10v10"/>
+          </svg>
+        </a>
+      </div>
     </div>
-    <ul class="foot-links">
-      <li><a href="#services">Services</a></li>
-      <li><a href="#booking">Booking</a></li>
-      <li><a href="#gallery">Gallery</a></li>
-      <li><a href="#about">About Us</a></li>
-      <li><a href="#contact">Contact</a></li>
-    </ul>
-  </div>
-  <div class="wrap foot-copy">
-    <div>© 2026 Trieye Detail Studio. All rights reserved. Detail · Precision · Protection.</div>
-    <div>Chennai, Tamil Nadu · Open daily 7:00 AM – 9:00 PM</div>
+
+    <!-- Bottom Footer -->
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2026 Trieye Detail Studio. All rights reserved.</div>
+      <div class="footer-sub-tag">DETAIL • PRECISION • PROTECTION</div>
+    </div>
   </div>
 </footer>
 
