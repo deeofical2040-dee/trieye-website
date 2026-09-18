@@ -797,32 +797,32 @@
     box-shadow: 0 12px 36px -8px rgba(0, 0, 0, 0.5);
   }
 
-  /* 1. Map Background Layer */
+  /* 1. Map Background Layer (Full opacity with subtle desaturation) */
   .loc-card-map-layer{
     position: absolute;
     inset: 0;
     background-image: url('assets/trieye-map-bg.png');
     background-size: cover;
     background-position: center;
-    filter: grayscale(100%) contrast(80%) opacity(0.35);
+    filter: grayscale(80%) contrast(92%) brightness(0.97);
     pointer-events: none;
     z-index: 1;
     transform: scale(1.02);
   }
   [data-theme="dark"] .loc-card-map-layer{
-    filter: grayscale(100%) invert(90%) contrast(75%) opacity(0.12);
+    filter: grayscale(100%) invert(92%) contrast(80%) opacity(0.35);
   }
 
-  /* 2. White Translucent Readability Overlay */
+  /* 2. White Translucent Readability Overlay (88% white overlay) */
   .loc-card-overlay{
     position: absolute;
     inset: 0;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.93) 0%, rgba(255, 255, 255, 0.88) 55%, rgba(255, 255, 255, 0.94) 100%);
+    background: rgba(255, 255, 255, 0.88);
     pointer-events: none;
     z-index: 2;
   }
   [data-theme="dark"] .loc-card-overlay{
-    background: linear-gradient(135deg, rgba(20, 20, 23, 0.94) 0%, rgba(20, 20, 23, 0.88) 55%, rgba(20, 20, 23, 0.95) 100%);
+    background: rgba(18, 18, 22, 0.90);
   }
 
   /* Subtle Decorative Pin Graphic on Right */
