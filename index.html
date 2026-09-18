@@ -691,68 +691,159 @@
   .contact-grid{display:grid;grid-template-columns:minmax(0, 1fr) minmax(0, 1fr);gap:clamp(28px, 4.5vw, 60px);width:100%;min-width:0;box-sizing:border-box;}
   @media (max-width:860px){.contact-grid{grid-template-columns:1fr;gap:28px;}}
   .contact-grid > div{min-width:0;width:100%;box-sizing:border-box;}
-  .map-box{
-    position:relative;
-    width:100%;
-    max-width:100%;
-    min-height:300px;
-    aspect-ratio:16/10;
-    border:1px solid var(--line);
-    border-radius:10px;
-    overflow:hidden;
-    display:flex;
-    flex-direction:column;
-    justify-content:flex-end;
-    box-sizing:border-box;
-    box-shadow:0 10px 30px -10px var(--shadow-pop);
+  /* ---------- REDESIGNED PREMIUM LOCATION CARD ---------- */
+  .studio-loc-card{
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 20px;
+    padding: clamp(22px, 4vw, 32px);
+    box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.02);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: clamp(18px, 3vw, 24px);
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
   }
-  .map-box .map-img{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-    object-fit:cover;
-    object-position:center;
-    transition:transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  [data-theme="dark"] .studio-loc-card{
+    background: #141417;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 12px 36px -8px rgba(0, 0, 0, 0.5);
   }
-  .map-box:hover .map-img{
-    transform:scale(1.03);
+  .loc-card-body{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    min-width: 0;
   }
-  .map-box .map-content{
-    position:relative;
-    z-index:2;
-    padding:clamp(14px, 3vw, 20px);
-    background:linear-gradient(180deg, rgba(10, 10, 12, 0.15) 0%, rgba(10, 10, 12, 0.85) 45%, rgba(10, 10, 12, 0.95) 100%);
-    backdrop-filter:blur(6px);
-    -webkit-backdrop-filter:blur(6px);
-    border-top:1px solid rgba(255, 255, 255, 0.08);
-    display:flex;
-    flex-direction:column;
-    align-items:flex-start;
+  .loc-card-badge{
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: clamp(12px, 2.2vw, 16px);
   }
-  [data-theme="light"] .map-box .map-content{
-    background:linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.9) 45%, rgba(255, 255, 255, 0.97) 100%);
-    border-top:1px solid rgba(0, 0, 0, 0.08);
+  .loc-pin-icon{
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(238, 47, 118, 0.12);
+    color: var(--pink, #ee2f76);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
   }
-  .map-box .map-content h4{
-    color:var(--white);
-    font-size:15px;
-    margin:0 0 3px;
-    letter-spacing:0.04em;
+  .loc-pin-icon svg{
+    width: 18px;
+    height: 18px;
   }
-  [data-theme="light"] .map-box .map-content h4{
-    color:var(--text-primary);
+  .loc-tag{
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--pink, #ee2f76);
   }
-  .map-box .map-content p{
-    color:var(--muted);
-    font-size:12.5px;
-    margin:1px 0;
-    line-height:1.35;
+  .loc-title{
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(20px, 3.2vw, 26px);
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: #111827;
+    line-height: 1.25;
+    margin: 0 0 clamp(10px, 2vw, 14px);
+    word-break: break-word;
   }
-  .map-box .map-content .btn{
-    margin-top:12px;
-    padding:8px 16px;
-    font-size:12px;
+  [data-theme="dark"] .loc-title{
+    color: #f3f3f0;
+  }
+  .loc-address{
+    font-style: normal;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    color: #4b5563;
+    font-size: clamp(13.5px, 2.2vw, 14.5px);
+    line-height: 1.45;
+    margin-bottom: clamp(12px, 2.2vw, 16px);
+  }
+  [data-theme="dark"] .loc-address{
+    color: #9ca3af;
+  }
+  .loc-region{
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #6b7280;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  [data-theme="dark"] .loc-region{
+    color: #8d8d92;
+  }
+  .loc-sep{
+    color: var(--pink, #ee2f76);
+  }
+  .loc-card-action{
+    width: 100%;
+    margin-top: auto;
+  }
+  .btn-get-directions{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    min-height: 54px;
+    padding: 0 22px;
+    background: var(--green, #a6d331);
+    color: #0a0a0b;
+    font-family: 'Oswald', sans-serif;
+    font-size: 14.5px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    border-radius: 10px;
+    text-decoration: none;
+    box-shadow: 0 4px 16px rgba(166, 211, 49, 0.28);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-sizing: border-box;
+    cursor: pointer;
+  }
+  .btn-get-directions:hover{
+    background: #97c427;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(166, 211, 49, 0.42);
+    color: #000;
+  }
+  .btn-get-directions:active{
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(166, 211, 49, 0.25);
+  }
+  .btn-dir-pin{
+    font-size: 16px;
+    line-height: 1;
+  }
+  .btn-dir-text{
+    font-size: 14.5px;
+    letter-spacing: 0.06em;
+  }
+  .btn-dir-arrow{
+    width: 17px;
+    height: 17px;
+    transition: transform 0.2s ease;
+  }
+  .btn-get-directions:hover .btn-dir-arrow{
+    transform: translate(2px, -2px);
   }
   .contact-list{list-style:none;width:100%;min-width:0;}
   .contact-list li{
@@ -1960,13 +2051,42 @@
 
 <section id="contact">
   <div class="wrap contact-grid">
-    <div class="map-box">
-      <img src="assets/trieye-studio-map.png" alt="TRIEYE Detailing Studio Location Map" class="map-img" loading="lazy">
-      <div class="map-content">
-        <h4>TRIEYE DETAILING STUDIO</h4>
-        <p>Baba Nagar, Villivakkam</p>
-        <p>Chennai, Tamil Nadu 600049</p>
-        <a href="https://www.google.com/maps/search/?api=1&query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="btn btn-outline">Open in Google Maps ↗</a>
+    <div class="studio-loc-card">
+      <div class="loc-card-body">
+        <div class="loc-card-badge">
+          <div class="loc-pin-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+              <circle cx="12" cy="10" r="3"/>
+            </svg>
+          </div>
+          <span class="loc-tag">VISIT OUR STUDIO</span>
+        </div>
+
+        <h3 class="loc-title">TRIEYE DETAILING STUDIO</h3>
+
+        <address class="loc-address">
+          <span>1st, 19, 6th Street, Main Rd</span>
+          <span>Baba Nagar, Villivakkam</span>
+          <span>Chennai, Tamil Nadu 600049</span>
+        </address>
+
+        <div class="loc-region">
+          <span>Chennai</span>
+          <span class="loc-sep">•</span>
+          <span>Tamil Nadu</span>
+        </div>
+      </div>
+
+      <div class="loc-card-action">
+        <a href="https://www.google.com/maps/search/?api=1&query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="btn-get-directions">
+          <span class="btn-dir-pin">📍</span>
+          <span class="btn-dir-text">GET DIRECTIONS</span>
+          <svg class="btn-dir-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M7 17L17 7"/>
+            <path d="M7 7h10v10"/>
+          </svg>
+        </a>
       </div>
     </div>
     <div>
