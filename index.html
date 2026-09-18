@@ -1234,6 +1234,180 @@
     .contact-ctas .btn{width:100%;justify-content:center;min-height:46px;}
   }
 
+  /* ---------- PREMIUM FAQ ACCORDION ---------- */
+  .faq-section{
+    width:100%;
+    max-width:100%;
+    background:#ffffff;
+    border-top:1px solid var(--line);
+    box-sizing:border-box;
+    overflow:hidden;
+  }
+  [data-theme="dark"] .faq-section{
+    background:var(--bg);
+  }
+
+  .faq-container{
+    max-width:1100px;
+    margin:0 auto;
+    padding:90px 24px;
+    width:100%;
+    box-sizing:border-box;
+  }
+
+  .faq-header{
+    text-align:center;
+    margin-bottom:clamp(36px, 5vw, 56px);
+  }
+
+  .faq-title{
+    font-family:'Oswald', sans-serif;
+    font-size:clamp(36px, 4.8vw, 58px);
+    font-weight:700;
+    color:var(--white);
+    letter-spacing:0.01em;
+    text-transform:uppercase;
+    margin:10px 0 0;
+  }
+
+  .faq-list{
+    display:flex;
+    flex-direction:column;
+    width:100%;
+    box-sizing:border-box;
+  }
+
+  .faq-item{
+    width:100%;
+    border-bottom:1px solid #e5e7eb;
+    box-sizing:border-box;
+  }
+  [data-theme="dark"] .faq-item{
+    border-bottom-color:var(--line);
+  }
+
+  .faq-question{
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+    padding:clamp(22px, 3vw, 32px) 0;
+    background:none;
+    border:none;
+    cursor:pointer;
+    text-align:left;
+    font-family:'Oswald', sans-serif;
+    font-size:clamp(20px, 2.4vw, 30px);
+    font-weight:600;
+    color:var(--white);
+    letter-spacing:0.01em;
+    text-transform:uppercase;
+    transition:color 0.2s ease;
+    box-sizing:border-box;
+  }
+
+  .faq-question:hover,
+  .faq-question:focus-visible{
+    color:var(--pink);
+    outline:none;
+  }
+
+  .faq-question-text{
+    flex:1;
+    min-width:0;
+  }
+
+  .faq-icon{
+    width:32px;
+    height:32px;
+    min-width:32px;
+    min-height:32px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:var(--green, #a6d331);
+    stroke:var(--green, #a6d331);
+    flex-shrink:0;
+    transition:transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .faq-icon svg{
+    width:28px;
+    height:28px;
+  }
+
+  .faq-icon-v{
+    transition:transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease;
+    transform-origin:center center;
+  }
+
+  .faq-item.active .faq-icon{
+    transform:rotate(45deg);
+  }
+
+  .faq-answer-wrapper{
+    display:grid;
+    grid-template-rows:0fr;
+    transition:grid-template-rows 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow:hidden;
+  }
+
+  .faq-item.active .faq-answer-wrapper{
+    grid-template-rows:1fr;
+  }
+
+  .faq-answer-content{
+    min-height:0;
+  }
+
+  .faq-answer-content p{
+    font-family:'Inter', sans-serif;
+    font-size:clamp(15px, 1.15vw, 17px);
+    line-height:1.68;
+    color:var(--muted);
+    max-width:820px;
+    padding:0 0 clamp(22px, 3vw, 32px);
+    margin:0;
+    opacity:0;
+    transform:translateY(-6px);
+    transition:opacity 0.3s ease 0.05s, transform 0.3s ease 0.05s;
+  }
+
+  .faq-item.active .faq-answer-content p{
+    opacity:1;
+    transform:translateY(0);
+  }
+
+  @media (max-width: 768px){
+    .faq-container{
+      padding:60px 20px;
+    }
+    .faq-question{
+      padding:18px 0;
+      gap:14px;
+    }
+    .faq-icon{
+      width:26px;
+      height:26px;
+      min-width:26px;
+      min-height:26px;
+    }
+    .faq-icon svg{
+      width:24px;
+      height:24px;
+    }
+    .faq-answer-content p{
+      padding-bottom:18px;
+    }
+  }
+
+  @media (max-width: 480px){
+    .faq-container{
+      padding:48px 16px;
+    }
+  }
+
   /* ---------- PREMIUM FOOTER ---------- */
   .site-footer{
     width:100%;
@@ -2515,6 +2689,108 @@
   </div>
 </section>
 
+<!-- FREQUENTLY ASKED QUESTIONS (FAQ) -->
+<section class="faq-section" id="faq">
+  <div class="faq-container">
+    <div class="faq-header">
+      <div class="sec-tag">// Got Questions?</div>
+      <h2 class="faq-title">Frequently Asked Questions</h2>
+    </div>
+
+    <div class="faq-list">
+      <!-- FAQ Item 1 -->
+      <div class="faq-item">
+        <button type="button" class="faq-question" aria-expanded="false" aria-controls="faq-ans-1" id="faq-q-1">
+          <span class="faq-question-text">How often should I detail my car?</span>
+          <span class="faq-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19" class="faq-icon-v"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </span>
+        </button>
+        <div class="faq-answer-wrapper" id="faq-ans-1" role="region" aria-labelledby="faq-q-1" hidden>
+          <div class="faq-answer-content">
+            <p>For regular daily-use vehicles, professional detailing every 3–6 months helps maintain the exterior finish and interior condition. The ideal interval depends on usage, parking and driving conditions.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- FAQ Item 2 -->
+      <div class="faq-item">
+        <button type="button" class="faq-question" aria-expanded="false" aria-controls="faq-ans-2" id="faq-q-2">
+          <span class="faq-question-text">How long does ceramic coating last?</span>
+          <span class="faq-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19" class="faq-icon-v"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </span>
+        </button>
+        <div class="faq-answer-wrapper" id="faq-ans-2" role="region" aria-labelledby="faq-q-2" hidden>
+          <div class="faq-answer-content">
+            <p>The durability depends on the coating package, vehicle usage and maintenance. Contact Trieye Studio for the recommended protection package for your vehicle.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- FAQ Item 3 -->
+      <div class="faq-item">
+        <button type="button" class="faq-question" aria-expanded="false" aria-controls="faq-ans-3" id="faq-q-3">
+          <span class="faq-question-text">What are the benefits of Paint Protection Film (PPF)?</span>
+          <span class="faq-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19" class="faq-icon-v"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </span>
+        </button>
+        <div class="faq-answer-wrapper" id="faq-ans-3" role="region" aria-labelledby="faq-q-3" hidden>
+          <div class="faq-answer-content">
+            <p>PPF helps protect painted surfaces from minor scratches, stone chips, road debris and everyday wear while preserving the vehicle’s original finish.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- FAQ Item 4 -->
+      <div class="faq-item">
+        <button type="button" class="faq-question" aria-expanded="false" aria-controls="faq-ans-4" id="faq-q-4">
+          <span class="faq-question-text">How long does a detailing service take?</span>
+          <span class="faq-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19" class="faq-icon-v"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </span>
+        </button>
+        <div class="faq-answer-wrapper" id="faq-ans-4" role="region" aria-labelledby="faq-q-4" hidden>
+          <div class="faq-answer-content">
+            <p>Service time depends on the selected package and vehicle condition. Basic services may take a few hours, while intensive detailing and protection treatments can require more time.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- FAQ Item 5 -->
+      <div class="faq-item">
+        <button type="button" class="faq-question" aria-expanded="false" aria-controls="faq-ans-5" id="faq-q-5">
+          <span class="faq-question-text">Do I need to book an appointment?</span>
+          <span class="faq-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19" class="faq-icon-v"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </span>
+        </button>
+        <div class="faq-answer-wrapper" id="faq-ans-5" role="region" aria-labelledby="faq-q-5" hidden>
+          <div class="faq-answer-content">
+            <p>Booking in advance is recommended so we can prepare for your vehicle and selected service. Customers can use the Book Now / Book an Appointment option on this website.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <footer class="site-footer">
   <div class="footer-container">
     <div class="footer-brand-wrap">
@@ -2560,6 +2836,43 @@
 
 
 <script>
+  // FAQ Accordion Controller
+  document.querySelectorAll('.faq-question').forEach(button => {
+    button.addEventListener('click', () => {
+      const item = button.closest('.faq-item');
+      const wrapper = item.querySelector('.faq-answer-wrapper');
+      const isExpanded = button.getAttribute('aria-expanded') === 'true';
+
+      // Close all other FAQ items (single-open behavior)
+      document.querySelectorAll('.faq-item').forEach(otherItem => {
+        if (otherItem !== item && otherItem.classList.contains('active')) {
+          otherItem.classList.remove('active');
+          const otherBtn = otherItem.querySelector('.faq-question');
+          const otherWrapper = otherItem.querySelector('.faq-answer-wrapper');
+          if (otherBtn) otherBtn.setAttribute('aria-expanded', 'false');
+          if (otherWrapper) otherWrapper.setAttribute('hidden', '');
+        }
+      });
+
+      // Toggle current item
+      if (isExpanded) {
+        item.classList.remove('active');
+        button.setAttribute('aria-expanded', 'false');
+        setTimeout(() => {
+          if (!item.classList.contains('active')) {
+            wrapper.setAttribute('hidden', '');
+          }
+        }, 350);
+      } else {
+        wrapper.removeAttribute('hidden');
+        // Force reflow for smooth grid transition
+        wrapper.offsetHeight;
+        item.classList.add('active');
+        button.setAttribute('aria-expanded', 'true');
+      }
+    });
+  });
+
   // Set default date to today
   const dtInput = document.getElementById('dt');
   const todayStr = new Date().toISOString().split('T')[0];
