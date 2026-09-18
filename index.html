@@ -774,6 +774,7 @@
   .contact-grid > div{min-width:0;width:100%;box-sizing:border-box;}
   /* ---------- REDESIGNED PREMIUM LOCATION CARD ---------- */
   .studio-loc-card{
+    position: relative;
     background: #ffffff;
     border: 1px solid #e5e7eb;
     border-radius: 20px;
@@ -787,6 +788,7 @@
     max-width: 100%;
     min-width: 0;
     box-sizing: border-box;
+    overflow: hidden;
     transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
   }
   [data-theme="dark"] .studio-loc-card{
@@ -794,7 +796,61 @@
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 12px 36px -8px rgba(0, 0, 0, 0.5);
   }
+
+  /* 1. Map Background Layer */
+  .loc-card-map-layer{
+    position: absolute;
+    inset: 0;
+    background-image: url('assets/trieye-map-bg.png');
+    background-size: cover;
+    background-position: center;
+    filter: grayscale(100%) contrast(80%) opacity(0.35);
+    pointer-events: none;
+    z-index: 1;
+    transform: scale(1.02);
+  }
+  [data-theme="dark"] .loc-card-map-layer{
+    filter: grayscale(100%) invert(90%) contrast(75%) opacity(0.12);
+  }
+
+  /* 2. White Translucent Readability Overlay */
+  .loc-card-overlay{
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.93) 0%, rgba(255, 255, 255, 0.88) 55%, rgba(255, 255, 255, 0.94) 100%);
+    pointer-events: none;
+    z-index: 2;
+  }
+  [data-theme="dark"] .loc-card-overlay{
+    background: linear-gradient(135deg, rgba(20, 20, 23, 0.94) 0%, rgba(20, 20, 23, 0.88) 55%, rgba(20, 20, 23, 0.95) 100%);
+  }
+
+  /* Subtle Decorative Pin Graphic on Right */
+  .loc-card-deco-pin{
+    position: absolute;
+    right: 7%;
+    top: 34%;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(238, 47, 118, 0.14) 0%, rgba(238, 47, 118, 0) 70%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    z-index: 2;
+    opacity: 0.65;
+  }
+  .loc-card-deco-pin svg{
+    width: 22px;
+    height: 22px;
+    stroke: var(--pink, #ee2f76);
+  }
+
+  /* 3. Card Content (Above Map & Overlay) */
   .loc-card-body{
+    position: relative;
+    z-index: 3;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
@@ -875,6 +931,8 @@
     color: var(--pink, #ee2f76);
   }
   .loc-card-action{
+    position: relative;
+    z-index: 3;
     width: 100%;
     margin-top: auto;
   }
@@ -2075,6 +2133,15 @@
 <section id="contact">
   <div class="wrap contact-grid">
     <div class="studio-loc-card">
+      <div class="loc-card-map-layer" aria-hidden="true"></div>
+      <div class="loc-card-overlay" aria-hidden="true"></div>
+      <div class="loc-card-deco-pin" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
+          <circle cx="12" cy="10" r="3"/>
+        </svg>
+      </div>
+
       <div class="loc-card-body">
         <div class="loc-card-badge">
           <div class="loc-pin-icon" aria-hidden="true">
