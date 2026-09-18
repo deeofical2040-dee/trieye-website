@@ -356,11 +356,11 @@
   .hero{
     position:relative;
     width:100%;max-width:100%;
-    min-height:clamp(500px, 78vh, 88vh);
+    min-height:clamp(560px, 86vh, 90vh);
     display:flex;align-items:center;
     background:
-      radial-gradient(ellipse 900px 500px at 82% 18%, var(--hero-radial-1), transparent 60%),
-      radial-gradient(ellipse 700px 500px at 8% 85%, var(--hero-radial-2), transparent 60%),
+      radial-gradient(ellipse 900px 500px at 85% 25%, var(--hero-radial-1), transparent 65%),
+      radial-gradient(ellipse 700px 500px at 10% 80%, var(--hero-radial-2), transparent 60%),
       var(--bg);
     overflow:hidden;
     contain:paint;
@@ -375,7 +375,7 @@
       linear-gradient(var(--grid-line) 1px, transparent 1px),
       linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
     background-size:56px 56px;
-    mask-image:radial-gradient(ellipse 70% 60% at 60% 40%, black, transparent 80%);
+    mask-image:radial-gradient(ellipse 75% 65% at 60% 45%, black, transparent 80%);
     pointer-events:none;
   }
   .sweep{
@@ -387,9 +387,9 @@
   .sweep::before{
     content:"";
     position:absolute;top:0;left:-35%;width:26%;height:100%;
-    background:linear-gradient(100deg, transparent, rgba(255,255,255,0.4), transparent);
+    background:linear-gradient(100deg, transparent, rgba(255,255,255,0.45), transparent);
     transform:skewX(-16deg);
-    animation:sweep 5.5s ease-in-out infinite;
+    animation:sweep 6s ease-in-out infinite;
   }
   [data-theme="dark"] .sweep::before{
     background:linear-gradient(100deg, transparent, rgba(255,255,255,0.06), transparent);
@@ -399,59 +399,177 @@
     38%{left:120%;}
     100%{left:120%;}
   }
-  .hero-inner{position:relative;z-index:2;padding:clamp(36px, 6vw, 80px) 0 clamp(32px, 5vw, 70px);width:100%;min-width:0;}
-  .hero-logo-wrap{margin-bottom:clamp(16px, 3.5vw, 28px);width:100%;}
-  .hero-logo{
-    width:min(440px, 82vw);
-    max-height:clamp(60px, 14vw, 110px);
+  .hero-inner{
+    position:relative;z-index:2;
+    padding:clamp(40px, 6vw, 64px) 0;
+    width:100%;min-width:0;
+  }
+  .hero-grid{
+    display:grid;
+    grid-template-columns:1.05fr 1.25fr;
+    align-items:center;
+    gap:clamp(28px, 4.5vw, 60px);
+    width:100%;min-width:0;
+  }
+  .hero-content{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    text-align:left;
+    width:100%;min-width:0;
+  }
+  .hero-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:6px 14px;
+    border-radius:100px;
+    border:1px solid rgba(255, 43, 120, 0.35);
+    background:rgba(255, 43, 120, 0.05);
+    color:var(--pink);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:clamp(11px, 2.2vw, 12.5px);
+    font-weight:600;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    margin-bottom:clamp(14px, 2.5vw, 20px);
+    box-shadow:0 2px 10px rgba(255, 43, 120, 0.06);
+  }
+  .hero-title{
+    font-family:'Oswald', sans-serif;
+    font-size:clamp(32px, 5.2vw, 64px);
+    line-height:1.08;
+    font-weight:700;
+    color:var(--white);
+    letter-spacing:-0.01em;
+    text-transform:uppercase;
+    margin:0 0 clamp(14px, 2.8vw, 22px);
+    width:100%;min-width:0;
+  }
+  .hero-accent{
+    color:var(--pink);
+    position:relative;
+    display:inline-block;
+  }
+  .hero-desc{
+    font-size:clamp(14px, 2.8vw, 17px);
+    line-height:1.6;
+    color:var(--muted);
+    max-width:540px;
+    margin:0 0 clamp(24px, 4vw, 36px);
+    width:100%;min-width:0;
+  }
+  .hero-ctas{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    flex-wrap:wrap;
+    width:100%;min-width:0;
+  }
+  .btn-hero-primary{
+    background:#a6d331 !important;
+    color:#0a0c10 !important;
+    font-family:'Oswald', sans-serif;
+    font-size:14.5px;
+    font-weight:700;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    padding:14px 28px;
+    min-height:48px;
+    border-radius:6px;
+    clip-path:none;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    transition:all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow:0 8px 24px rgba(166, 211, 49, 0.35);
+    border:none;
+    cursor:pointer;
+    text-decoration:none;
+  }
+  .btn-hero-primary:hover{
+    transform:translateY(-2px);
+    background:#b5e638 !important;
+    box-shadow:0 12px 30px rgba(166, 211, 49, 0.45);
+  }
+  .btn-hero-secondary{
+    background:transparent !important;
+    color:var(--white) !important;
+    font-family:'Oswald', sans-serif;
+    font-size:14.5px;
+    font-weight:600;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    padding:13px 24px;
+    min-height:48px;
+    border-radius:6px;
+    border:1px solid var(--line);
+    clip-path:none;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    transition:all 0.2s ease;
+    text-decoration:none;
+  }
+  .btn-hero-secondary:hover{
+    border-color:var(--pink);
+    color:var(--pink) !important;
+    background:rgba(255, 43, 120, 0.04) !important;
+  }
+  .hero-visual{
+    position:relative;
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .hero-car-wrapper{
+    position:relative;
+    width:100%;
+    max-width:680px;
+    border-radius:20px;
+    padding:clamp(10px, 2vw, 18px);
+    background:radial-gradient(circle at center, rgba(255,255,255,0.9), rgba(243,244,246,0.6));
+    border:1px solid rgba(0,0,0,0.06);
+    box-shadow:0 20px 50px -15px rgba(0,0,0,0.08), 0 0 40px rgba(166, 211, 49, 0.08);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+  }
+  [data-theme="dark"] .hero-car-wrapper{
+    background:radial-gradient(circle at center, rgba(30,41,59,0.8), rgba(15,23,42,0.9));
+    border-color:rgba(255,255,255,0.08);
+    box-shadow:0 20px 50px -15px rgba(0,0,0,0.6), 0 0 40px rgba(255, 43, 120, 0.12);
+  }
+  .hero-car-img{
+    width:100%;
     height:auto;
-    object-fit:contain;
-    filter:drop-shadow(0 8px 24px var(--shadow-pop));
-    transition: filter 0.25s ease;
+    max-height:clamp(260px, 45vh, 440px);
+    object-fit:cover;
+    border-radius:14px;
+    display:block;
+    filter:drop-shadow(0 12px 28px rgba(0,0,0,0.12));
+    transition:transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   }
-
-  .foot-logo{
-    height:clamp(28px, 5.5vw, 38px);
-    width:auto;
-    max-width:140px;
-    object-fit:contain;
-    filter:drop-shadow(0 2px 8px var(--shadow-pop));
+  .hero-car-wrapper:hover .hero-car-img{
+    transform:scale(1.02);
   }
-  .foot-grid{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:32px 0 24px;border-bottom:1px solid var(--line);flex-wrap:wrap;width:100%;min-width:0;}
-  .foot-links{display:flex;gap:clamp(14px, 3vw, 24px);list-style:none;flex-wrap:wrap;}
-  .foot-links a{font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);transition:color .2s;}
-  .foot-links a:hover{color:var(--green);}
-  .foot-copy{display:flex;justify-content:space-between;padding:24px 0 32px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:var(--muted);flex-wrap:wrap;gap:12px;width:100%;}
-  .eyebrow{
-    font-family:'IBM Plex Mono',monospace;font-size:clamp(11px, 2.5vw, 12.5px);letter-spacing:0.18em;
-    color:var(--green);text-transform:uppercase;margin-bottom:clamp(10px, 2.5vw, 18px);display:flex;align-items:center;gap:10px;
-    flex-wrap:wrap;width:100%;min-width:0;
+  @media (max-width: 960px){
+    .hero{min-height:auto;}
+    .hero-grid{grid-template-columns:1fr;gap:36px;}
+    .hero-content{align-items:center;text-align:center;}
+    .hero-desc{margin-left:auto;margin-right:auto;}
+    .hero-ctas{justify-content:center;}
   }
-  .eyebrow::before{content:"";width:22px;height:1px;background:var(--green);flex-shrink:0;}
-  .hero h1{
-    font-size:clamp(25px, 6vw, 52px);
-    line-height:1.12;max-width:760px;margin-bottom:clamp(14px, 3vw, 20px);font-weight:600;
-    width:100%;min-width:0;
+  @media (max-width: 480px){
+    .hero-grid{gap:28px;}
+    .hero-ctas{flex-direction:column;width:100%;gap:10px;}
+    .btn-hero-primary, .btn-hero-secondary{width:100%;}
+    .hero-car-wrapper{border-radius:14px;padding:8px;}
+    .hero-car-img{border-radius:10px;}
   }
-  .hero h1 em{font-style:normal;color:var(--pink);}
-  .hero p{
-    font-size:clamp(14px, 3.6vw, 16.5px);color:var(--muted);max-width:520px;margin-bottom:clamp(22px, 4vw, 34px);
-    width:100%;min-width:0;
-  }
-  .hero-ctas{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:clamp(26px, 4.5vw, 46px);width:100%;min-width:0;}
-  .btn{
-    font-family:'Oswald',sans-serif;font-size:14px;letter-spacing:0.08em;text-transform:uppercase;
-    padding:13px 24px;font-weight:600;
-    min-height:46px;
-    clip-path:polygon(10px 0,100% 0,calc(100% - 10px) 100%,0 100%);
-    transition:transform .2s, box-shadow .2s, background .2s;
-    display:inline-flex;align-items:center;justify-content:center;gap:10px;
-    border:none;cursor:pointer;white-space:nowrap;box-sizing:border-box;
-  }
-  .btn-primary{background:var(--pink);color:#fff;}
-  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(238,47,118,0.3);}
-  .btn-outline{background:transparent;color:var(--white);border:1px solid var(--line);clip-path:none;padding:12px 23px;}
-  .btn-outline:hover{border-color:var(--green);color:var(--green);}
 
   .hero-stats{
     display:flex;gap:0;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:20px;max-width:640px;width:100%;min-width:0;
@@ -1883,24 +2001,24 @@
   </div>
 </div>
 
-<section class="hero">
+<section class="hero" id="home">
   <div class="sweep" aria-hidden="true"></div>
   <div class="wrap hero-inner">
-    <div class="hero-logo-wrap">
-      <img src="assets/trieye-logo-dark.png" alt="Trieye — Detail, Precision, Protection" class="hero-logo logo-dark">
-      <img src="assets/trieye-logo-light.png" alt="Trieye — Detail, Precision, Protection" class="hero-logo logo-light">
-    </div>
-    <div class="eyebrow">Chennai · Car &amp; Bike Wash Studio</div>
-    <h1>Your car doesn't get <em>washed</em> here.<br>It gets detailed.</h1>
-    <p>Foam wash, rubbing polish and deep interior cleaning for hatchbacks, sedans and SUVs — done with the same precision every single time.</p>
-    <div class="hero-ctas">
-      <a href="#booking" class="btn btn-primary">Book your slot →</a>
-      <a href="#services" class="btn btn-outline">See pricing</a>
-    </div>
-    <div class="hero-stats">
-      <div><div class="num">3</div><div class="lbl">Vehicle classes</div></div>
-      <div><div class="num">9</div><div class="lbl">Service tiers</div></div>
-      <div><div class="num">7am–9pm</div><div class="lbl">Open daily</div></div>
+    <div class="hero-grid">
+      <div class="hero-content">
+        <div class="hero-badge">PREMIUM CAR &amp; BIKE DETAILING</div>
+        <h1 class="hero-title">YOUR RIDE DESERVES<br><span class="hero-accent">MORE THAN A WASH.</span></h1>
+        <p class="hero-desc">Professional car &amp; bike washing, paint correction, interior detailing and protection — delivered with precision at our Chennai studio.</p>
+        <div class="hero-ctas">
+          <a href="#booking" class="btn btn-hero-primary">BOOK AN APPOINTMENT →</a>
+          <a href="#services" class="btn btn-hero-secondary">VIEW SERVICES</a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="hero-car-wrapper">
+          <img src="assets/trieye-hero-car.jpg" alt="Trieye Premium Detailing" class="hero-car-img" loading="eager" width="700" height="420">
+        </div>
+      </div>
     </div>
   </div>
 </section>
