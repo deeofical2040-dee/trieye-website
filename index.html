@@ -356,11 +356,10 @@
   .hero{
     position:relative;
     width:100%;max-width:100%;
-    min-height:clamp(560px, 86vh, 90vh);
-    display:flex;align-items:center;
+    min-height:calc(100vh - 68px);
+    display:flex;align-items:stretch;
     background:
-      radial-gradient(ellipse 900px 500px at 85% 25%, var(--hero-radial-1), transparent 65%),
-      radial-gradient(ellipse 700px 500px at 10% 80%, var(--hero-radial-2), transparent 60%),
+      radial-gradient(ellipse 900px 500px at 20% 30%, var(--hero-radial-1), transparent 70%),
       var(--bg);
     overflow:hidden;
     contain:paint;
@@ -375,7 +374,7 @@
       linear-gradient(var(--grid-line) 1px, transparent 1px),
       linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
     background-size:56px 56px;
-    mask-image:radial-gradient(ellipse 75% 65% at 60% 45%, black, transparent 80%);
+    mask-image:radial-gradient(ellipse 75% 65% at 30% 45%, black, transparent 80%);
     pointer-events:none;
   }
   .sweep{
@@ -383,6 +382,7 @@
     overflow:hidden;
     pointer-events:none;
     contain:paint;
+    z-index:3;
   }
   .sweep::before{
     content:"";
@@ -399,89 +399,94 @@
     38%{left:120%;}
     100%{left:120%;}
   }
-  .hero-inner{
+
+  .hero-full-container{
     position:relative;z-index:2;
-    padding:clamp(40px, 6vw, 64px) 0;
-    width:100%;min-width:0;
-  }
-  .hero-grid{
+    width:100%;
+    min-height:calc(100vh - 68px);
     display:grid;
-    grid-template-columns:1.05fr 1.25fr;
-    align-items:center;
-    gap:clamp(28px, 4.5vw, 60px);
-    width:100%;min-width:0;
+    grid-template-columns:43% 57%;
+    align-items:stretch;
   }
-  .hero-content{
+
+  .hero-content-col{
     display:flex;
     flex-direction:column;
+    justify-content:center;
     align-items:flex-start;
-    text-align:left;
+    padding:clamp(40px, 6vh, 80px) clamp(24px, 4.5vw, 64px) clamp(40px, 6vh, 80px) max(clamp(20px, 5vw, 72px), calc((100vw - 1440px) / 2 + 24px));
+    box-sizing:border-box;
     width:100%;min-width:0;
+    z-index:4;
   }
+
   .hero-badge{
     display:inline-flex;
     align-items:center;
     gap:8px;
-    padding:6px 14px;
+    padding:6px 16px;
     border-radius:100px;
     border:1px solid rgba(255, 43, 120, 0.35);
     background:rgba(255, 43, 120, 0.05);
     color:var(--pink);
     font-family:'IBM Plex Mono', monospace;
-    font-size:clamp(11px, 2.2vw, 12.5px);
+    font-size:clamp(11.5px, 1.1vw, 13px);
     font-weight:600;
-    letter-spacing:0.12em;
+    letter-spacing:0.14em;
     text-transform:uppercase;
-    margin-bottom:clamp(14px, 2.5vw, 20px);
+    margin-bottom:clamp(16px, 2.5vh, 24px);
     box-shadow:0 2px 10px rgba(255, 43, 120, 0.06);
   }
+
   .hero-title{
     font-family:'Oswald', sans-serif;
-    font-size:clamp(32px, 5.2vw, 64px);
-    line-height:1.08;
+    font-size:clamp(40px, 5.2vw, 76px);
+    line-height:1.02;
     font-weight:700;
     color:var(--white);
-    letter-spacing:-0.01em;
+    letter-spacing:-0.015em;
     text-transform:uppercase;
-    margin:0 0 clamp(14px, 2.8vw, 22px);
+    margin:0 0 clamp(16px, 2.8vh, 26px);
     width:100%;min-width:0;
   }
   .hero-accent{
     color:var(--pink);
-    position:relative;
-    display:inline-block;
+    display:inline;
   }
+
   .hero-desc{
-    font-size:clamp(14px, 2.8vw, 17px);
+    font-size:clamp(15px, 1.2vw, 18px);
     line-height:1.6;
     color:var(--muted);
-    max-width:540px;
-    margin:0 0 clamp(24px, 4vw, 36px);
+    max-width:480px;
+    margin:0 0 clamp(28px, 4.5vh, 42px);
     width:100%;min-width:0;
   }
+
   .hero-ctas{
     display:flex;
     align-items:center;
-    gap:14px;
+    gap:16px;
     flex-wrap:wrap;
     width:100%;min-width:0;
   }
+
   .btn-hero-primary{
     background:#a6d331 !important;
     color:#0a0c10 !important;
     font-family:'Oswald', sans-serif;
-    font-size:14.5px;
+    font-size:15px;
     font-weight:700;
     letter-spacing:0.08em;
     text-transform:uppercase;
-    padding:14px 28px;
-    min-height:48px;
+    padding:16px 32px;
+    min-height:52px;
     border-radius:6px;
     clip-path:none;
     display:inline-flex;
     align-items:center;
     justify-content:center;
-    gap:8px;
+    gap:10px;
     transition:all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
     box-shadow:0 8px 24px rgba(166, 211, 49, 0.35);
     border:none;
@@ -493,16 +498,17 @@
     background:#b5e638 !important;
     box-shadow:0 12px 30px rgba(166, 211, 49, 0.45);
   }
+
   .btn-hero-secondary{
     background:transparent !important;
     color:var(--white) !important;
     font-family:'Oswald', sans-serif;
-    font-size:14.5px;
+    font-size:15px;
     font-weight:600;
     letter-spacing:0.08em;
     text-transform:uppercase;
-    padding:13px 24px;
-    min-height:48px;
+    padding:15px 28px;
+    min-height:52px;
     border-radius:6px;
     border:1px solid var(--line);
     clip-path:none;
@@ -517,58 +523,79 @@
     color:var(--pink) !important;
     background:rgba(255, 43, 120, 0.04) !important;
   }
-  .hero-visual{
+
+  /* Right Visual: Full bleed continuous studio background */
+  .hero-visual-col{
     position:relative;
     width:100%;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-  }
-  .hero-car-wrapper{
-    position:relative;
-    width:100%;
-    max-width:680px;
-    border-radius:20px;
-    padding:clamp(10px, 2vw, 18px);
-    background:radial-gradient(circle at center, rgba(255,255,255,0.9), rgba(243,244,246,0.6));
-    border:1px solid rgba(0,0,0,0.06);
-    box-shadow:0 20px 50px -15px rgba(0,0,0,0.08), 0 0 40px rgba(166, 211, 49, 0.08);
-    display:flex;
-    align-items:center;
-    justify-content:center;
+    height:100%;
+    min-height:100%;
     overflow:hidden;
+    display:flex;
   }
-  [data-theme="dark"] .hero-car-wrapper{
-    background:radial-gradient(circle at center, rgba(30,41,59,0.8), rgba(15,23,42,0.9));
-    border-color:rgba(255,255,255,0.08);
-    box-shadow:0 20px 50px -15px rgba(0,0,0,0.6), 0 0 40px rgba(255, 43, 120, 0.12);
-  }
-  .hero-car-img{
+
+  .hero-edge-img{
     width:100%;
-    height:auto;
-    max-height:clamp(260px, 45vh, 440px);
+    height:100%;
     object-fit:cover;
-    border-radius:14px;
+    object-position:center center;
     display:block;
-    filter:drop-shadow(0 12px 28px rgba(0,0,0,0.12));
-    transition:transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  .hero-car-wrapper:hover .hero-car-img{
-    transform:scale(1.02);
+
+  .hero-visual-overlay{
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    background:linear-gradient(to right, var(--bg) 0%, rgba(255,255,255,0.4) 12%, transparent 35%);
   }
-  @media (max-width: 960px){
+  [data-theme="dark"] .hero-visual-overlay{
+    background:linear-gradient(to right, var(--bg) 0%, rgba(15,23,42,0.6) 12%, transparent 35%);
+  }
+
+  @media (max-width: 1024px){
     .hero{min-height:auto;}
-    .hero-grid{grid-template-columns:1fr;gap:36px;}
-    .hero-content{align-items:center;text-align:center;}
+    .hero-full-container{
+      grid-template-columns:1fr;
+      min-height:auto;
+    }
+    .hero-content-col{
+      padding:clamp(36px, 6vw, 56px) 24px clamp(24px, 4vw, 36px);
+      align-items:center;
+      text-align:center;
+    }
     .hero-desc{margin-left:auto;margin-right:auto;}
     .hero-ctas{justify-content:center;}
+    .hero-visual-col{
+      height:clamp(320px, 50vh, 520px);
+      min-height:320px;
+    }
+    .hero-visual-overlay{
+      background:linear-gradient(to bottom, var(--bg) 0%, transparent 25%, transparent 75%, var(--bg) 100%);
+    }
+    [data-theme="dark"] .hero-visual-overlay{
+      background:linear-gradient(to bottom, var(--bg) 0%, transparent 25%, transparent 75%, var(--bg) 100%);
+    }
   }
+
   @media (max-width: 480px){
-    .hero-grid{gap:28px;}
-    .hero-ctas{flex-direction:column;width:100%;gap:10px;}
-    .btn-hero-primary, .btn-hero-secondary{width:100%;}
-    .hero-car-wrapper{border-radius:14px;padding:8px;}
-    .hero-car-img{border-radius:10px;}
+    .hero-content-col{
+      padding:28px 16px 20px;
+    }
+    .hero-title{
+      font-size:clamp(32px, 8.8vw, 42px);
+    }
+    .hero-ctas{
+      flex-direction:column;
+      width:100%;
+      gap:12px;
+    }
+    .btn-hero-primary, .btn-hero-secondary{
+      width:100%;
+    }
+    .hero-visual-col{
+      height:260px;
+      min-height:260px;
+    }
   }
 
   .hero-stats{
@@ -2003,22 +2030,23 @@
 
 <section class="hero" id="home">
   <div class="sweep" aria-hidden="true"></div>
-  <div class="wrap hero-inner">
-    <div class="hero-grid">
-      <div class="hero-content">
-        <div class="hero-badge">PREMIUM CAR &amp; BIKE DETAILING</div>
-        <h1 class="hero-title">YOUR RIDE DESERVES<br><span class="hero-accent">MORE THAN A WASH.</span></h1>
-        <p class="hero-desc">Professional car &amp; bike washing, paint correction, interior detailing and protection — delivered with precision at our Chennai studio.</p>
-        <div class="hero-ctas">
-          <a href="#booking" class="btn btn-hero-primary">BOOK AN APPOINTMENT →</a>
-          <a href="#services" class="btn btn-hero-secondary">VIEW SERVICES</a>
-        </div>
+  <div class="hero-full-container">
+    <div class="hero-content-col">
+      <div class="hero-badge">PREMIUM CAR &amp; BIKE DETAILING</div>
+      <h1 class="hero-title">
+        YOUR RIDE<br>
+        DESERVES<br>
+        <span class="hero-accent">MORE THAN A<br>WASH.</span>
+      </h1>
+      <p class="hero-desc">Professional car &amp; bike washing, paint correction, interior detailing and protection — delivered with precision at our Chennai studio.</p>
+      <div class="hero-ctas">
+        <a href="#booking" class="btn btn-hero-primary">BOOK AN APPOINTMENT →</a>
+        <a href="#services" class="btn btn-hero-secondary">VIEW SERVICES</a>
       </div>
-      <div class="hero-visual">
-        <div class="hero-car-wrapper">
-          <img src="assets/trieye-hero-car.jpg" alt="Trieye Premium Detailing" class="hero-car-img" loading="eager" width="700" height="420">
-        </div>
-      </div>
+    </div>
+    <div class="hero-visual-col">
+      <img src="assets/trieye-hero-car.jpg" alt="Trieye Premium Detailing Studio" class="hero-edge-img" loading="eager">
+      <div class="hero-visual-overlay" aria-hidden="true"></div>
     </div>
   </div>
 </section>
