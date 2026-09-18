@@ -622,69 +622,150 @@
   .testi p{color:var(--white);font-size:14px;margin-bottom:16px;}
   .testi .who{font-family:'Oswald',sans-serif;font-size:13px;color:var(--muted);letter-spacing:0.05em;text-transform:uppercase;}
 
-  /* ---------- BRAND LOGOS SECTION (Clean, Unboxed, Full Color) ---------- */
-  .brands-section{
-    padding:clamp(44px, 6vw, 76px) 0;
+  /* ---------- ABOUT US SECTION ---------- */
+  .about-section{
+    padding:clamp(54px, 7vw, 92px) 0;
     background:var(--bg-panel-2);
     border-top:1px solid var(--line);
     border-bottom:1px solid var(--line);
     position:relative;
     overflow:hidden;
     width:100%;
+    box-sizing:border-box;
   }
-  .brands-header{
-    text-align:center;
-    max-width:700px;
-    margin:0 auto clamp(20px, 3.5vw, 40px);
-    width:100%;min-width:0;
-  }
-  .brands-header .sec-tag{
-    justify-content:center;
-    display:inline-flex;
-  }
-  .brands-header h2{
-    font-size:clamp(21px, 3.8vw, 34px);
-    margin-bottom:8px;
-  }
-  .brands-header p{
-    color:var(--muted);
-    font-size:14px;
-  }
-  .brands-cloud{
-    display:flex;
-    flex-wrap:wrap;
-    justify-content:center;
+  .about-grid{
+    display:grid;
+    grid-template-columns:1.15fr 0.85fr;
+    gap:clamp(32px, 5vw, 60px);
     align-items:center;
-    gap:clamp(12px, 2.5vw, 24px) clamp(14px, 3.5vw, 40px);
-    max-width:1120px;
-    margin:0 auto;
     width:100%;
     box-sizing:border-box;
   }
-  .brand-item{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    opacity:0.92;
-    transition:all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    cursor:pointer;
-    padding:4px 8px;
+  @media (max-width:960px){
+    .about-grid{
+      grid-template-columns:1fr;
+      gap:clamp(28px, 4vw, 44px);
+    }
+  }
+  .about-content{
+    width:100%;
+    min-width:0;
+  }
+  .about-content h2{
+    font-size:clamp(24px, 4vw, 38px);
+    line-height:1.15;
+    margin-bottom:16px;
+    letter-spacing:0.02em;
+  }
+  .about-content .about-lead{
+    color:var(--white);
+    font-size:clamp(14.5px, 2.2vw, 16px);
+    line-height:1.65;
+    margin-bottom:14px;
+    font-weight:500;
+  }
+  [data-theme="light"] .about-content .about-lead{
+    color:#1f2937;
+  }
+  .about-content .about-body{
+    color:var(--muted);
+    font-size:14px;
+    line-height:1.6;
+    margin-bottom:24px;
+  }
+  .about-features{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:14px;
+    width:100%;
     box-sizing:border-box;
   }
-  .brand-item img{
-    height:clamp(24px, 4.8vw, 40px);
-    width:auto;
-    max-width:clamp(70px, 18vw, 130px);
-    object-fit:contain;
-    display:block;
-    transition:transform 0.25s ease;
+  @media (max-width:540px){
+    .about-features{
+      grid-template-columns:1fr;
+      gap:10px;
+    }
   }
-  .brand-item:hover{
-    opacity:1;
-    transform:translateY(-2px) scale(1.08);
+  .about-feat-card{
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:16px;
+    box-sizing:border-box;
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    transition:transform 0.2s ease, border-color 0.2s ease;
   }
-  [data-theme="dark"] .brand-item img{
-    filter: brightness(1.1) drop-shadow(0 2px 8px rgba(255,255,255,0.08));
+  .about-feat-card:hover{
+    border-color:var(--green);
+    transform:translateY(-2px);
+  }
+  .about-feat-header{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .about-feat-icon{
+    font-size:18px;
+    line-height:1;
+  }
+  .about-feat-title{
+    font-family:'Oswald',sans-serif;
+    font-size:14px;
+    font-weight:600;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    color:var(--white);
+  }
+  [data-theme="light"] .about-feat-title{
+    color:#111827;
+  }
+  .about-feat-desc{
+    font-size:12.5px;
+    color:var(--muted);
+    line-height:1.45;
+  }
+  .about-stats-panel{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:14px;
+    width:100%;
+    box-sizing:border-box;
+  }
+  .about-stat-box{
+    background:var(--bg);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:clamp(20px, 3.5vw, 28px) clamp(16px, 2.5vw, 20px);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    text-align:center;
+    box-sizing:border-box;
+    box-shadow:0 8px 24px -6px var(--shadow-pop);
+    transition:transform 0.2s ease, border-color 0.2s ease;
+  }
+  .about-stat-box:hover{
+    border-color:var(--green);
+    transform:translateY(-2px);
+  }
+  .about-stat-num{
+    font-family:'Oswald',sans-serif;
+    font-size:clamp(30px, 5vw, 44px);
+    font-weight:700;
+    color:var(--green);
+    line-height:1.1;
+    margin-bottom:4px;
+    letter-spacing:0.02em;
+  }
+  .about-stat-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--muted);
+    font-weight:600;
   }
 
   /* ---------- CONTACT ---------- */
@@ -1644,7 +1725,7 @@
       <li><a href="#services">Services</a></li>
       <li><a href="#booking">Booking</a></li>
       <li><a href="#gallery">Gallery</a></li>
-      <li><a href="#brands">Brands</a></li>
+      <li><a href="#about">About Us</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
     <div class="nav-actions">
@@ -1668,7 +1749,7 @@
     <li><a href="#services"><span class="m-num">01</span> Services &amp; Pricing</a></li>
     <li><a href="#booking"><span class="m-num">02</span> Direct Booking</a></li>
     <li><a href="#gallery"><span class="m-num">03</span> Studio Gallery</a></li>
-    <li><a href="#brands"><span class="m-num">04</span> Supported Makes</a></li>
+    <li><a href="#about"><span class="m-num">04</span> About Studio</a></li>
     <li><a href="#contact"><span class="m-num">05</span> Studio Contact</a></li>
   </ul>
   <div class="mobile-drawer-footer">
@@ -1927,123 +2008,66 @@
   </div>
 </section>
 
-<!-- BRAND LOGOS (Clean, Unboxed Luxury Presentation) -->
-<section class="brands-section" id="brands">
-  <div class="wrap">
-    <div class="brands-header">
-      <div class="sec-tag">// Precision Service For All Makes</div>
-      <h2>Every Marque · Detailed to Perfection</h2>
-      <p>From daily commuters to luxury imports, our bespoke products and foam chemistry are tailored for every vehicle manufacturer.</p>
+<!-- ABOUT TRIEYE STUDIO -->
+<section class="about-section" id="about">
+  <div class="wrap about-grid">
+    <div class="about-content">
+      <div class="sec-tag">// The Trieye Standard</div>
+      <h2>Obsessive Detailing &amp; Clear-Coat Protection</h2>
+      <p class="about-lead">Founded in Chennai, Trieye is engineered around a singular philosophy: treating every car and bike as a bespoke piece of rolling artwork.</p>
+      <p class="about-body">We eliminate harsh acidic chemicals and outdated swirl-inducing sponge washes. In our Villivakkam studio, our master detailers apply pH-neutral snow foams, filtered pressure rinses, zero-touch warm air drying, and multi-stage rotary paint restoration with certified ceramic quartz finishes.</p>
+      
+      <div class="about-features">
+        <div class="about-feat-card">
+          <div class="about-feat-header">
+            <span class="about-feat-icon">🔬</span>
+            <div class="about-feat-title">Precision Chemistry</div>
+          </div>
+          <p class="about-feat-desc">pH-neutral snow foams, iron decontamination, and premium wax protection.</p>
+        </div>
+
+        <div class="about-feat-card">
+          <div class="about-feat-header">
+            <span class="about-feat-icon">🛡️</span>
+            <div class="about-feat-title">Swirl-Free Craft</div>
+          </div>
+          <p class="about-feat-desc">Ultra-plush 1200 GSM microfibers and twin-bucket grit guard systems.</p>
+        </div>
+
+        <div class="about-feat-card">
+          <div class="about-feat-header">
+            <span class="about-feat-icon">⚡</span>
+            <div class="about-feat-title">Dedicated Wash Bays</div>
+          </div>
+          <p class="about-feat-desc">Equipped with filtered high-pressure water and climate-controlled curing.</p>
+        </div>
+
+        <div class="about-feat-card">
+          <div class="about-feat-header">
+            <span class="about-feat-icon">📱</span>
+            <div class="about-feat-title">Transparent Pricing</div>
+          </div>
+          <p class="about-feat-desc">Digital bills, WhatsApp job updates, and on-time guaranteed delivery.</p>
+        </div>
+      </div>
     </div>
-    <div class="brands-cloud">
-      <!-- Maruti Suzuki -->
-      <div class="brand-item" title="Maruti Suzuki">
-        <img src="assets/brands/maruti-suzuki.png" alt="Maruti Suzuki" loading="lazy">
-      </div>
 
-      <!-- Hyundai -->
-      <div class="brand-item" title="Hyundai">
-        <img src="assets/brands/hyundai.svg" alt="Hyundai" loading="lazy">
+    <div class="about-stats-panel">
+      <div class="about-stat-box">
+        <div class="about-stat-num">5,000+</div>
+        <div class="about-stat-label">Vehicles Detailed</div>
       </div>
-
-      <!-- Tata Motors -->
-      <div class="brand-item" title="Tata Motors">
-        <img src="assets/brands/tata.svg" alt="Tata Motors" loading="lazy">
+      <div class="about-stat-box">
+        <div class="about-stat-num">100%</div>
+        <div class="about-stat-label">Swirl-Free Guarantee</div>
       </div>
-
-      <!-- Mahindra -->
-      <div class="brand-item" title="Mahindra">
-        <img src="assets/brands/mahindra.png" alt="Mahindra" loading="lazy">
+      <div class="about-stat-box">
+        <div class="about-stat-num">4.9 ★</div>
+        <div class="about-stat-label">Customer Rating</div>
       </div>
-
-      <!-- Kia -->
-      <div class="brand-item" title="Kia">
-        <img src="assets/brands/kia.svg" alt="Kia" loading="lazy">
-      </div>
-
-      <!-- Toyota -->
-      <div class="brand-item" title="Toyota">
-        <img src="assets/brands/toyota.svg" alt="Toyota" loading="lazy">
-      </div>
-
-      <!-- Honda -->
-      <div class="brand-item" title="Honda">
-        <img src="assets/brands/honda.svg" alt="Honda" loading="lazy">
-      </div>
-
-      <!-- Renault -->
-      <div class="brand-item" title="Renault">
-        <img src="assets/brands/renault.svg" alt="Renault" loading="lazy">
-      </div>
-
-      <!-- Nissan -->
-      <div class="brand-item" title="Nissan">
-        <img src="assets/brands/nissan.svg" alt="Nissan" loading="lazy">
-      </div>
-
-      <!-- Skoda -->
-      <div class="brand-item" title="Škoda">
-        <img src="assets/brands/skoda.svg" alt="Škoda" loading="lazy">
-      </div>
-
-      <!-- Volkswagen -->
-      <div class="brand-item" title="Volkswagen">
-        <img src="assets/brands/volkswagen.svg" alt="Volkswagen" loading="lazy">
-      </div>
-
-      <!-- MG Motor -->
-      <div class="brand-item" title="MG Motor">
-        <img src="assets/brands/mg.svg" alt="MG Motor" loading="lazy">
-      </div>
-
-      <!-- Jeep -->
-      <div class="brand-item" title="Jeep">
-        <img src="assets/brands/jeep.svg" alt="Jeep" loading="lazy">
-      </div>
-
-      <!-- Isuzu -->
-      <div class="brand-item" title="Isuzu">
-        <img src="assets/brands/isuzu.svg" alt="Isuzu" loading="lazy">
-      </div>
-
-      <!-- Audi -->
-      <div class="brand-item" title="Audi">
-        <img src="assets/brands/audi.svg" alt="Audi" loading="lazy">
-      </div>
-
-      <!-- BMW -->
-      <div class="brand-item" title="BMW">
-        <img src="assets/brands/bmw.svg" alt="BMW" loading="lazy">
-      </div>
-
-      <!-- Mercedes-Benz -->
-      <div class="brand-item" title="Mercedes-Benz">
-        <img src="assets/brands/mercedes-benz.svg" alt="Mercedes-Benz" loading="lazy">
-      </div>
-
-      <!-- Jaguar -->
-      <div class="brand-item" title="Jaguar">
-        <img src="assets/brands/jaguar.svg" alt="Jaguar" loading="lazy">
-      </div>
-
-      <!-- Land Rover -->
-      <div class="brand-item" title="Land Rover">
-        <img src="assets/brands/land-rover.svg" alt="Land Rover" loading="lazy">
-      </div>
-
-      <!-- Volvo -->
-      <div class="brand-item" title="Volvo">
-        <img src="assets/brands/volvo.svg" alt="Volvo" loading="lazy">
-      </div>
-
-      <!-- Porsche -->
-      <div class="brand-item" title="Porsche">
-        <img src="assets/brands/porsche.svg" alt="Porsche" loading="lazy">
-      </div>
-
-      <!-- Fiat -->
-      <div class="brand-item" title="Fiat">
-        <img src="assets/brands/fiat.svg" alt="Fiat" loading="lazy">
+      <div class="about-stat-box">
+        <div class="about-stat-num">7am–9pm</div>
+        <div class="about-stat-label">Open 7 Days A Week</div>
       </div>
     </div>
   </div>
@@ -2126,7 +2150,7 @@
       <li><a href="#services">Services</a></li>
       <li><a href="#booking">Booking</a></li>
       <li><a href="#gallery">Gallery</a></li>
-      <li><a href="#brands">Brands</a></li>
+      <li><a href="#about">About Us</a></li>
       <li><a href="#contact">Contact</a></li>
     </ul>
   </div>
