@@ -10,6 +10,7 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="assets/supabase-config.js"></script>
   <script src="assets/trieye-db.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script>
     (function() {
       try {
@@ -371,12 +372,14 @@
     /* Main Content Area */
     .main-content {
       flex: 1;
+      min-width: 0;
       padding: 1.5rem 1.75rem;
       background: var(--bg);
       display: flex;
       flex-direction: column;
       gap: 1.5rem;
       overflow-y: auto;
+      overflow-x: hidden;
     }
 
     /* Content Sections (Tab-like View) */
@@ -536,12 +539,11 @@
       font-weight: 600;
       letter-spacing: 0.08em;
       text-transform: uppercase;
-      padding: 0.9rem 1.15rem;
+      padding: 0.9rem 0.75rem;
       border-bottom: 1px solid var(--line);
-      white-space: nowrap;
     }
     table.data-table td {
-      padding: 1rem 1.15rem;
+      padding: 0.8rem 0.75rem;
       border-bottom: 1px solid var(--line-subtle);
       vertical-align: middle;
       font-size: 0.85rem;
@@ -1084,6 +1086,54 @@
       }
     }
   </style>
+
+  <style>
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #invoiceModal, #invoiceModal * {
+        visibility: visible;
+      }
+      #invoiceModal {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        box-shadow: none;
+        transform: none;
+      }
+      #invoiceModal > div:first-child {
+        display: none !important; /* Hide header buttons during print */
+      }
+    }
+  </style>
+
+  <style>
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #invoiceModal, #invoiceModal * {
+        visibility: visible;
+      }
+      #invoiceModal {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        box-shadow: none;
+        transform: none;
+      }
+      #invoiceModal > div:first-child {
+        display: none !important; /* Hide header buttons during print */
+      }
+    }
+  </style>
 </head>
 <body>
 
@@ -1153,7 +1203,7 @@
             <a><span>🌐 Online Bookings</span><span class="nav-counter" id="badge-online-count">0</span></a>
           </li>
           <li class="nav-item" id="nav-walkin" onclick="showSection('walkin-sec')">
-            <a><span>⚡ Walk-In Entry</span></a>
+            <a><span>⚡ Walk-In Billing</span></a>
           </li>
         </ul>
       </div>
@@ -1199,8 +1249,12 @@
             <div class="section-title"><span>📊</span> Dashboard Overview</div>
             <div class="section-subtitle">Real-time studio health, bay telemetry &amp; booking statistics</div>
           </div>
-          <div style="display:flex; gap:0.5rem;">
-            <button class="btn" onclick="exportBookingsJSON()">📥 Export JSON</button>
+          <div style="display:flex; gap:0.5rem; align-items:center;">
+            <div style="display:flex; align-items:center; gap:0.75rem; background: var(--bg-panel-2); border: 1px solid var(--line); padding: 0.4rem 0.75rem; border-radius: 6px;">
+               <input type="date" id="overview-date-picker" style="background: transparent; border: none; color: inherit; font-family: inherit; font-size: 0.85rem; outline: none; cursor: pointer;" onchange="updateDateBookingsCount()">
+               <div style="width: 1px; height: 18px; background: var(--line);"></div>
+               <span id="overview-date-count" style="font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; font-weight: 600; color: var(--green);">0 Bookings</span>
+            </div>
             <button class="btn btn-green" onclick="showSection('walkin-sec')">+ Quick Walk-In</button>
           </div>
         </div>
@@ -1239,13 +1293,30 @@
           </div>
         </div>
 
-        <!-- Quick Action Buttons Bar -->
-        <div class="quick-actions-bar">
-          <span style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--muted); font-weight:600; text-transform:uppercase;">Quick Actions:</span>
-          <button class="btn btn-primary" onclick="showSection('walkin-sec')">+ Add Walk-In</button>
-          <button class="btn" onclick="openNewBookingModal()">+ Add Booking</button>
-          <button class="btn" onclick="openAddCustomerModal()">👥 Add Customer</button>
-          <button class="btn" onclick="openRecordPaymentModal()">💳 Record Payment</button>
+
+
+        <!-- Selected Date Bookings Panel -->
+        <div class="panel" id="date-bookings-panel">
+          <div class="panel-header">
+            <div class="panel-title"><span>📅</span> Selected Date Bookings (<span id="overview-panel-date-display">Today</span>)</div>
+          </div>
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Job ID</th>
+                  <th>Vehicle &amp; Reg</th>
+                  <th>Customer</th>
+                  <th>Service Package</th>
+                  <th>Total Price</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="overview-date-bookings-tbody">
+                <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
         </div>
 
         <!-- Today's Schedule & Timeline -->
@@ -1347,109 +1418,273 @@
       </section>
 
       <!-- 4. EXPRESS WALKIN ENTRY SECTION -->
-      <section class="content-section" id="walkin-sec">
-        <div class="section-header">
-          <div>
-            <div class="section-title"><span>⚡</span> Express Walk-In Entry</div>
-            <div class="section-subtitle">Two-step customer lookup and vehicle bay assignment</div>
+      <!-- NEW WALK-IN POS SECTION -->
+<!-- NEW WALK-IN POS SECTION -->
+<section class="content-section" id="walkin-sec">
+  <div class="section-header">
+    <div>
+      <div class="section-title"><span>⚡</span> Make Bill</div>
+      <div class="section-subtitle">Simplified Walk-In Billing Workflow</div>
+    </div>
+  </div>
+
+  <div class="panel" style="max-width:800px;">
+    <div class="panel-header">
+      <div class="panel-title" style="font-size:1.2rem; font-weight:700;">MAKE BILL</div>
+    </div>
+    <form class="form-body" id="make-bill-form" onsubmit="event.preventDefault(); makeBill();">
+      
+      <!-- 1. CUSTOMER & VEHICLE DETAILS -->
+      <div style="margin-bottom:1.5rem;">
+        <div class="form-label" style="margin-bottom:0.8rem; color:var(--white); font-weight:600;">1. CUSTOMER & VEHICLE DETAILS</div>
+        <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
+          <div class="form-group">
+            <label class="form-label">Customer Name *</label>
+            <input type="text" id="mb-name" class="form-input" placeholder="e.g. John Doe" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone Number *</label>
+            <input type="tel" id="mb-phone" class="form-input" placeholder="e.g. 9840123456" pattern="[0-9]{10}" maxlength="10" title="Phone number must be exactly 10 digits" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Vehicle Number *</label>
+            <input type="text" id="mb-reg" class="form-input" placeholder="e.g. TN 01 AB 1234" pattern="^[A-Za-z]{2}\s*[0-9]{2}\s*[A-Za-z]{2}\s*[0-9]{4}$" title="Format: 2 letters, 2 numbers, 2 letters, 4 numbers (e.g. TN 01 AB 1234)" style="text-transform:uppercase;" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Vehicle Type *</label>
+            <select class="form-select" id="mb-vtype" onchange="mbUpdateAllPrices()">
+              <option value="Hatchback">Hatchback</option>
+              <option value="Sedan" selected>Sedan</option>
+              <option value="SUV / 4x4">SUV</option>
+              <option value="Bike">Bike</option>
+            </select>
           </div>
         </div>
+      </div>
 
-        <div class="panel" style="max-width:850px;">
-          <div class="panel-header">
-            <div class="panel-title"><span>🚗</span> Vehicle Check-In Form</div>
+      <!-- 2. SELECT SERVICES -->
+      <div style="margin-bottom:1.5rem; background:var(--bg-panel-2); padding:1.2rem; border-radius:8px; border:1px solid var(--line);">
+        <div class="form-label" style="margin-bottom:0.8rem; color:var(--white); font-weight:600;">2. SERVICES</div>
+        <div id="mb-services-container">
+          <!-- Populated by JS -->
+        </div>
+        <button type="button" class="btn btn-outline" style="padding:0.5rem 1rem; margin-top:0.5rem;" onclick="mbAddServiceRow()">+ ADD SERVICE</button>
+      </div>
+
+      <!-- 3. TOTALS & DISCOUNT -->
+      <div style="margin-bottom:1.5rem; display:flex; justify-content:flex-end;">
+        <div style="width:300px; background:rgba(255,255,255,0.02); padding:1rem; border-radius:8px; border:1px solid var(--line);">
+          <div style="display:flex; justify-content:space-between; margin-bottom:0.8rem; align-items:center;">
+            <span style="color:var(--text-muted);">Subtotal:</span>
+            <span id="mb-subtotal" style="font-family:'IBM Plex Mono'; font-weight:700;">₹0</span>
           </div>
-          <div class="form-body">
-            <!-- Step 1: Customer Lookup -->
-            <div style="background:var(--bg-panel-2); padding:1rem; border-radius:8px; border:1px solid var(--line);">
-              <div class="form-label" style="margin-bottom:0.5rem; color:var(--white);">Step 1: Customer Phone Search &amp; Identification</div>
-              <div style="display:grid; grid-template-columns: 1.2fr 1fr auto; gap:0.65rem;">
-                <input type="tel" id="walkin-phone" class="form-input" placeholder="Phone Number (e.g. 98401 23456)" required>
-                <input type="text" id="walkin-name" class="form-input" placeholder="Customer Name">
-                <button type="button" class="btn btn-primary" onclick="handleCustomerLookup()">🔍 Find Customer</button>
-              </div>
-              <div id="lookup-banner" style="display:none; margin-top:0.65rem; padding:0.6rem 0.85rem; border-radius:6px; font-family:'IBM Plex Mono'; font-size:0.75rem; justify-content:space-between; align-items:center;">
-                <!-- Populated via JS -->
-              </div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:0.8rem; align-items:center;">
+            <span style="color:var(--text-muted);">Discount:</span>
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+              <span>₹</span>
+              <input type="number" id="mb-discount" class="form-input" style="width:80px; text-align:right; padding:0.4rem;" value="0" min="0" oninput="mbCalcTotals()">
             </div>
-
-            <!-- Step 2: Vehicle & Service Assignment -->
-            <form id="walkin-step2-form" onsubmit="handleWalkinSubmit(event)" style="display:none; flex-direction:column; gap:1rem;">
-              <div class="form-label" style="color:var(--white);">Step 2: Vehicle &amp; Service Package Details</div>
-              
-              <div class="form-grid">
-                <div class="form-group">
-                  <label class="form-label">Vehicle Category</label>
-                  <select class="form-select" id="walkin-vehicle" onchange="updateWalkinCalculatedPrice()">
-                    <option value="Hatchback">Hatchback (Swift, i20, Polo)</option>
-                    <option value="Sedan" selected>Sedan (City, Verna, BMW 3)</option>
-                    <option value="SUV / 4x4">SUV / 4x4 (Fortuner, Creta, XUV)</option>
-                    <option value="Superbike">Superbike / Motorcycle</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Vehicle Brand &amp; Model</label>
-                  <input type="text" id="walkin-model" class="form-input" placeholder="e.g. BMW 330Li (Portimao Blue)" required>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Vehicle Number (Reg)</label>
-                  <input type="text" id="walkin-reg" class="form-input" placeholder="TN 01 AB 1234" maxlength="13" autocomplete="off" required style="text-transform:uppercase;">
-                  <div class="form-error-msg" id="walkin-reg-error">Enter vehicle number in format TN 01 AB 1234</div>
-                </div>
-              </div>
-
-              <div class="form-grid">
-                <div class="form-group">
-                  <label class="form-label">Primary Service</label>
-                  <select class="form-select" id="walkin-service" onchange="updateWalkinCalculatedPrice()">
-                    <!-- Populated dynamically from Services Database -->
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Assign Detailing Bay</label>
-                  <select class="form-select" id="walkin-bay">
-                    <option value="Bay 01">Bay 01 (Detailing &amp; Foam)</option>
-                    <option value="Bay 02">Bay 02 (Wash &amp; Underbody)</option>
-                    <option value="Bay 03">Bay 03 (Interior Steam &amp; Decon)</option>
-                    <option value="Bay 04">Bay 04 (Ceramic &amp; Coating)</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Estimated Service Price</label>
-                  <input type="text" id="walkin-price-disp" class="form-input" readonly style="font-family:'IBM Plex Mono'; font-weight:700; color:var(--green);">
-                </div>
-              </div>
-
-              <div class="form-grid">
-                <div class="form-group">
-                  <label class="form-label">Payment Collection</label>
-                  <select class="form-select" id="walkin-pay-status">
-                    <option value="PAID">Paid in Advance</option>
-                    <option value="UNPAID" selected>Pay on Delivery (Unpaid)</option>
-                    <option value="PARTIAL">Partial Advance</option>
-                  </select>
-                </div>
-                <div class="form-group">
-                  <label class="form-label">Payment Method</label>
-                  <select class="form-select" id="walkin-pay-method">
-                    <option value="UPI / QR">UPI / QR (GooglePay/PhonePe)</option>
-                    <option value="Cash">Cash at Counter</option>
-                    <option value="Card">Credit/Debit Card POS</option>
-                    <option value="Bank Transfer">Bank Transfer</option>
-                  </select>
-                </div>
-              </div>
-
-              <div style="display:flex; gap:0.65rem; margin-top:0.5rem;">
-                <button type="submit" class="btn btn-green" style="flex:1; justify-content:center; padding:0.75rem; font-size:0.9rem;">
-                  🚗 Check-In Vehicle to Bay Now
-                </button>
-                <button type="button" class="btn" onclick="resetWalkinForm()">↺ Reset</button>
-              </div>
-            </form>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--line); padding-top:0.8rem; margin-top:0.5rem;">
+            <span style="font-weight:700; color:var(--green);">Grand Total:</span>
+            <span id="mb-grandtotal" style="font-family:'IBM Plex Mono'; font-weight:700; font-size:1.2rem; color:var(--green);">₹0</span>
           </div>
         </div>
-      </section>
+      </div>
+
+      <!-- 4. PAYMENT -->
+      <div style="margin-bottom:1.5rem;">
+        <div class="form-label" style="margin-bottom:0.8rem; color:var(--white); font-weight:600;">3. PAYMENT</div>
+        <div class="form-grid" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
+          <div class="form-group">
+            <label class="form-label">Payment Status</label>
+            <select class="form-select" id="mb-pay-status" onchange="mbHandlePaymentChange()">
+              <option value="PAID">Fully Paid</option>
+              <option value="PARTIAL">Partial</option>
+              <option value="UNPAID" selected>Unpaid</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Payment Method</label>
+            <select class="form-select" id="mb-pay-method">
+              <option value="CASH" selected>Cash</option>
+              <option value="UPI">UPI / QR</option>
+              <option value="CARD">Credit/Debit Card</option>
+              <option value="BANK_TRANSFER">Bank Transfer</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Amount Paid</label>
+            <input type="number" id="mb-pay-amount" class="form-input" value="0" min="0" oninput="mbCalcTotals()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Balance Due</label>
+            <input type="text" id="mb-balance-due" class="form-input" value="₹0" readonly style="background:rgba(255,255,255,0.05); font-weight:700;">
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. SUBMIT -->
+      <div style="display:flex; justify-content:flex-end; align-items:center; gap:1rem; border-top:1px solid var(--line); padding-top:1.5rem;">
+        <span id="mb-error" style="color:var(--red); font-weight:600; display:none;"></span>
+        <button type="submit" class="btn btn-green" id="mb-submit-btn" style="padding:1rem 2.5rem; font-size:1.2rem; font-weight:700; width:100%;">
+          GENERATE BILL
+        </button>
+      </div>
+
+    </form>
+  </div>
+</section>
+<section class="content-section" id="invoices-sec" style="display:none;">
+  <div class="section-header">
+    <div>
+      <div class="section-title"><span>🧾</span> Invoices &amp; Bills</div>
+      <div class="section-subtitle">Manage offline billing history and generated invoices</div>
+    </div>
+    <div style="display:flex; gap:0.5rem;">
+      <button class="btn btn-primary" onclick="showSection('walkin-sec')">+ New Bill</button>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header">
+      <div class="panel-title">Recent Invoices</div>
+      <div class="search-bar">
+        <input type="text" id="invoice-search" placeholder="Search by Invoice #, Phone or Reg" onkeyup="filterInvoices()">
+      </div>
+    </div>
+    <div class="table-container">
+      <table class="trieye-table">
+        <thead>
+          <tr>
+            <th>Invoice #</th>
+            <th>Date</th>
+            <th>Customer</th>
+            <th>Vehicle</th>
+            <th>Amount</th>
+            <th>Payment</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="invoices-tbody">
+          <!-- Populated via JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- PRINTABLE A4 INVOICE MODAL -->
+<div class="modal-backdrop" id="invoiceModalBackdrop" style="display:none; z-index:999998; position:fixed; inset:0; background:rgba(0,0,0,0.8);"></div>
+<div class="modal" id="invoiceModal" style="display:none; z-index:999999; position:fixed; top:5%; left:50%; transform:translate(-50%, 0); width:210mm; max-height:90vh; overflow-y:auto; background:white; color:black; padding:0; border-radius:8px;">
+  <div style="padding:10px 20px; background:#111; display:flex; justify-content:space-between; align-items:center; color:white; border-top-left-radius:8px; border-top-right-radius:8px; position:sticky; top:0;">
+    <h3 style="margin:0;">Invoice Preview</h3>
+    <div style="display:flex; gap:10px;">
+      <button class="btn btn-primary" onclick="printInvoice()">🖨️ PRINT</button>
+      <button class="btn btn-primary" onclick="downloadInvoice()">⬇️ DOWNLOAD PDF</button>
+      <button class="btn btn-outline" style="border-color:#25D366; color:#25D366;" onclick="shareInvoiceWhatsApp()">💬 WHATSAPP</button>
+      <button class="btn" style="background:#333; color:white;" onclick="closeInvoiceModal()">NEW BILL</button>
+      <button class="btn btn-outline" style="border-color:#ff4d4f; color:#ff4d4f;" onclick="closeInvoiceModal()">❌ CLOSE</button>
+    </div>
+  </div>
+  
+  <!-- A4 PRINTABLE CONTENT (Strict styling to match trieye branding) -->
+  <div id="printable-invoice" style="padding: 15mm; background: white; font-family: 'Inter', sans-serif; color: #000;">
+    <!-- Header -->
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10mm; border-bottom:2px solid #000; padding-bottom:5mm;">
+      <div>
+        <!-- Use logo-dark because invoice background is white -->
+        <img src="assets/trieye-logo-dark.png" alt="Trieye" style="height:40px; margin-bottom:5px;">
+        <div style="font-family:'Oswald', sans-serif; font-size:12px; letter-spacing:1px; color:#555;">DETAIL • PRECISION • PROTECTION</div>
+        <div style="margin-top:10px; font-size:12px; color:#333;">
+          OMR Road, Sholinganallur, Chennai — 600119<br>
+          +91 98765 43210 | care@trieyestudio.com<br>
+          GSTIN: 33AAAAA0000A1Z5
+        </div>
+      </div>
+      <div style="text-align:right;">
+        <h1 style="margin:0; font-family:'Oswald', sans-serif; font-size:32px; letter-spacing:2px; color:#000;">TAX INVOICE</h1>
+        <div style="margin-top:5px; font-size:14px; font-weight:600;" id="inv-num">TR-2026-000000</div>
+        <div style="font-size:13px; color:#555;" id="inv-date">Date: 2026-01-01 10:00 AM</div>
+      </div>
+    </div>
+    
+    <!-- Customer & Vehicle -->
+    <div style="display:flex; justify-content:space-between; margin-bottom:10mm;">
+      <div style="width:48%; background:#f9f9f9; padding:10px; border-left:4px solid #000;">
+        <div style="font-size:11px; color:#777; font-weight:600; text-transform:uppercase; margin-bottom:5px;">Billed To</div>
+        <div style="font-size:16px; font-weight:700; margin-bottom:2px;" id="inv-cust-name">Customer Name</div>
+        <div style="font-size:13px; color:#333;" id="inv-cust-phone">+91 0000000000</div>
+      </div>
+      <div style="width:48%; background:#f9f9f9; padding:10px; border-left:4px solid #a3e635;">
+        <div style="font-size:11px; color:#777; font-weight:600; text-transform:uppercase; margin-bottom:5px;">Vehicle Details</div>
+        <div style="font-size:16px; font-weight:700; margin-bottom:2px;" id="inv-veh-reg">TN 00 0000</div>
+        <div style="font-size:13px; color:#333;" id="inv-veh-model">Sedan</div>
+      </div>
+    </div>
+    
+    <!-- Items Table -->
+    <table style="width:100%; border-collapse:collapse; margin-bottom:10mm; font-size:14px;">
+      <thead>
+        <tr style="background:#000; color:#fff;">
+          <th style="padding:10px; text-align:left;">Service Description</th>
+          <th style="padding:10px; text-align:center; width:15%;">Qty</th>
+          <th style="padding:10px; text-align:right; width:20%;">Rate (₹)</th>
+          <th style="padding:10px; text-align:right; width:20%;">Amount (₹)</th>
+        </tr>
+      </thead>
+      <tbody id="inv-items-tbody">
+        <!-- JS fills this -->
+      </tbody>
+    </table>
+    
+    <!-- Totals -->
+    <div style="display:flex; justify-content:flex-end; margin-bottom:10mm;">
+      <div style="width:40%;">
+        <div style="display:flex; justify-content:space-between; padding:5px 0;">
+          <span style="color:#555;">Subtotal</span>
+          <span id="inv-subtotal" style="font-weight:600;">₹0</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding:5px 0;">
+          <span style="color:#555;">Discount</span>
+          <span id="inv-discount" style="font-weight:600; color:#e11d48;">- ₹0</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding:10px 0; border-top:2px solid #000; border-bottom:2px solid #000; margin-top:5px; font-size:18px; font-weight:700;">
+          <span>Grand Total</span>
+          <span id="inv-grandtotal">₹0</span>
+        </div>
+        
+        <!-- Payment Info -->
+        <div style="margin-top:10px; padding:10px; background:#f0fdf4; border:1px solid #a3e635; font-size:13px;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
+            <span style="color:#555;">Amount Paid:</span>
+            <span id="inv-amt-paid" style="font-weight:600;">₹0</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:5px; border-bottom:1px solid #ddd; padding-bottom:5px;">
+            <span style="color:#555;">Balance Due:</span>
+            <span id="inv-balance" style="font-weight:600; color:#e11d48;">₹0</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:3px; padding-top:2px;">
+            <span>Payment Status:</span>
+            <span id="inv-pay-status" style="font-weight:700; color:#15803d;">PAID</span>
+          </div>
+          <div style="display:flex; justify-content:space-between;">
+            <span>Method:</span>
+            <span id="inv-pay-method" style="font-weight:700;">UPI</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Footer -->
+    <div style="text-align:center; border-top:1px solid #eee; padding-top:10mm; font-size:13px; color:#555;">
+      <div style="font-weight:600; font-size:16px; color:#000; margin-bottom:5px;">Thank you for choosing TRIEYE</div>
+      <div>Follow us on Instagram @trieye_studio</div>
+    </div>
+  </div>
+</div>
+
+
 
       <!-- 5. BAY MANAGEMENT SECTION -->
       <section class="content-section" id="bays-sec">
@@ -1715,7 +1950,6 @@
                   <th>Vehicle &amp; Reg</th>
                   <th>Customer</th>
                   <th>Service Package</th>
-                  <th>Bay Finished</th>
                   <th>Total Price</th>
                   <th>Payment</th>
                   <th>Completed Date</th>
@@ -4318,7 +4552,7 @@ TRIEYE WATERWASH & DETAILING`;
       });
 
       if (completed.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:2rem; color:var(--muted);">No completed wash jobs archived yet.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:2rem; color:var(--muted);">No completed wash jobs archived yet.</td></tr>`;
         return;
       }
 
@@ -4335,7 +4569,6 @@ TRIEYE WATERWASH & DETAILING`;
           </td>
           <td>${escapeHtml(b.name)}</td>
           <td>${escapeHtml(b.service)}</td>
-          <td>${escapeHtml(b.bay || 'Bay 01')}</td>
           <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${bookingPrice.toLocaleString()}</strong></td>
           <td><span class="pay-badge pay-${(b.payStatus||'paid').toLowerCase()}">${escapeHtml(b.payStatus||'PAID')}</span></td>
           <td><span style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--muted);">${escapeHtml(b.date || b.booking_date || 'Today')}</span></td>
@@ -4525,16 +4758,62 @@ TRIEYE WATERWASH & DETAILING`;
       showToast('Logged out of Admin Console.');
     }
 
-    // Export System Data
-    function exportBookingsJSON() {
-      const data = JSON.stringify(getBookings(), null, 2);
-      const blob = new Blob([data], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'trieye-bookings-' + formatDateIso(new Date()) + '.json';
-      a.click();
+    // Date Bookings Count Feature
+    function updateDateBookingsCount() {
+      const datePicker = document.getElementById('overview-date-picker');
+      const countSpan = document.getElementById('overview-date-count');
+      if (!datePicker || !countSpan) return;
+      
+      const selectedDate = datePicker.value;
+      const bookings = getBookings();
+      const filteredBookings = bookings.filter(b => (b.date || b.booking_date) === selectedDate);
+      const count = filteredBookings.length;
+      
+      countSpan.innerText = count + (count === 1 ? ' Booking' : ' Bookings');
+
+      // Update Panel Details
+      const tbody = document.getElementById('overview-date-bookings-tbody');
+      const dateDisplay = document.getElementById('overview-panel-date-display');
+      if (dateDisplay) {
+         const parts = selectedDate.split('-');
+         dateDisplay.innerText = parts.length === 3 ? `${parts[2]}/${parts[1]}/${parts[0]}` : selectedDate;
+      }
+
+      if (tbody) {
+        tbody.innerHTML = '';
+        if (filteredBookings.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:1.5rem; color:var(--muted);">No bookings found for this date.</td></tr>`;
+        } else {
+          filteredBookings.forEach(b => {
+            const displayRef = b.invoice_ref || (b.id && b.id.length > 8 ? `TRI-${b.id.substring(0, 8).toUpperCase()}` : (b.id || 'TRI-INVOICE'));
+            const price = Number(b.price !== undefined && b.price !== null ? b.price : (b.total_amount || 0));
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td><strong style="color:var(--pink); font-family:'IBM Plex Mono';">${escapeHtml(displayRef)}</strong></td>
+              <td>
+                <div style="font-weight:600;">${escapeHtml(b.vehicleModel || b.vehicleType || 'Car')}</div>
+                <div style="font-family:'IBM Plex Mono'; font-size:0.72rem; color:var(--muted);">${escapeHtml(b.reg || 'NO REG')}</div>
+              </td>
+              <td>${escapeHtml(b.name || 'Walk-In')}</td>
+              <td>${escapeHtml(b.service || 'Standard')}</td>
+              <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${price.toLocaleString()}</strong></td>
+              <td><span class="status-badge status-${(b.status || 'waiting').toLowerCase().replace(' ', '-')}">${escapeHtml(b.status || 'WAITING')}</span></td>
+            `;
+            tbody.appendChild(tr);
+          });
+        }
+      }
     }
+
+    // Initialize Date Picker
+    document.addEventListener('DOMContentLoaded', () => {
+      const datePicker = document.getElementById('overview-date-picker');
+      if (datePicker) {
+        const today = new Date().toISOString().split('T')[0];
+        datePicker.value = today;
+        updateDateBookingsCount();
+      }
+    });
 
     // THEME SWITCHER (Light / Dark - Admin Console Only)
     const dashThemeToggleBtn = document.getElementById('dashThemeToggleBtn');
@@ -4604,5 +4883,517 @@ TRIEYE WATERWASH & DETAILING`;
       });
     });
   </script>
+
+
+
+<script>
+// ==== TRIEYE POS / INVOICING LOGIC ====
+
+// Global State
+let posServices = [];
+let allInvoices = [];
+
+// 1. Init POS
+async function initPOS() {
+  const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
+  if (!sb) {
+    console.warn('Database disconnected. Operating in local mode for POS.');
+  }
+}
+
+// 2. Customer & Vehicle Live Search
+function posLiveSearch() {
+  const phone = document.getElementById('pos-phone').value.replace(/\D/g, '').slice(-10);
+  const name = document.getElementById('pos-name').value.toLowerCase();
+  const reg = document.getElementById('pos-reg').value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+  if (phone.length < 3 && name.length < 3 && reg.length < 4) {
+    document.getElementById('pos-customer-banner').style.display = 'none';
+    return;
+  }
+
+  // Use cached customers/vehicles for instant lookup
+  const custMap = JSON.parse(localStorage.getItem('trieye_customers')) || {};
+  let match = null;
+
+  for (const key in custMap) {
+    const c = custMap[key];
+    const cPhone = c.phone ? c.phone.replace(/\D/g, '').slice(-10) : '';
+    const cName = (c.name || '').toLowerCase();
+    const cReg = (c.reg || c.vehicle_reg || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    
+    if (
+      (phone && phone.length >= 10 && cPhone === phone) ||
+      (reg && reg.length >= 4 && cReg.includes(reg))
+    ) {
+      match = c;
+      break; // Found exact match or strong reg match
+    }
+  }
+
+  const banner = document.getElementById('pos-customer-banner');
+  if (match) {
+    // Only auto-fill if fields are empty to not annoy the user, OR if it's a strong phone match
+    if (phone.length >= 10) {
+      document.getElementById('pos-name').value = match.name || document.getElementById('pos-name').value;
+      if (match.vehicleType) document.getElementById('pos-vehicle-type').value = match.vehicleType;
+      if (match.reg || match.vehicle_reg) document.getElementById('pos-reg').value = match.reg || match.vehicle_reg;
+    }
+    
+    banner.style.display = 'block';
+    banner.innerHTML = `<span><strong>Existing Customer Found:</strong> ${match.name} (${match.phone || ''})</span>`;
+    
+    // Auto-update prices in rows if vehicle type changed
+    posUpdateAllRowPrices();
+  } else {
+    banner.style.display = 'none';
+  }
+}
+
+// ==========================================
+// NEW "MAKE BILL" JAVASCRIPT LOGIC
+// ==========================================
+
+function mbGetServices() {
+  const map = JSON.parse(localStorage.getItem('trieye_services_matrix')) || {};
+  return Object.values(map).filter(s => s.active !== false);
+}
+
+function mbAddServiceRow() {
+  const container = document.getElementById('mb-services-container');
+  const rowId = `mb-row-${Date.now()}`;
+  
+  const services = mbGetServices();
+  let optionsHtml = '<option value="">-- Select Service --</option>';
+  services.forEach(s => {
+    optionsHtml += `<option value="${s.id || ''}" data-name="${s.name}" data-base="${s.base_price}" data-hatch="${s.hatchback_price}" data-sedan="${s.sedan_price}" data-suv="${s.suv_price}" data-bike="${s.bike_price}">${s.name}</option>`;
+  });
+
+  const rowDiv = document.createElement('div');
+  rowDiv.id = rowId;
+  rowDiv.style.cssText = "display:grid; grid-template-columns: 2fr 1fr 1fr 1fr 40px; gap:0.5rem; align-items:center; margin-bottom:0.8rem;";
+  rowDiv.innerHTML = `
+    <select class="form-select mb-svc-select" onchange="mbServiceSelected('${rowId}')">
+      ${optionsHtml}
+    </select>
+    <div style="display:flex; align-items:center; gap:0.5rem;">
+      <span style="color:var(--text-muted); font-size:0.8rem;">Qty</span>
+      <input type="number" class="form-input mb-svc-qty" value="1" min="1" oninput="mbCalcTotals()" style="padding:0.4rem;">
+    </div>
+    <div style="display:flex; align-items:center; gap:0.5rem;">
+      <span style="color:var(--text-muted); font-size:0.8rem;">₹</span>
+      <input type="number" class="form-input mb-svc-price" value="0" min="0" oninput="mbCalcTotals()" style="padding:0.4rem;">
+    </div>
+    <div style="font-family:'IBM Plex Mono'; font-weight:700; text-align:right;" class="mb-svc-total">₹0</div>
+    <button class="btn btn-outline" style="padding:0.4rem; color:var(--red); border-color:var(--red);" onclick="document.getElementById('${rowId}').remove(); mbCalcTotals();">✕</button>
+  `;
+  container.appendChild(rowDiv);
+}
+
+function mbServiceSelected(rowId) {
+  const rowDiv = document.getElementById(rowId);
+  const select = rowDiv.querySelector('.mb-svc-select');
+  const priceInput = rowDiv.querySelector('.mb-svc-price');
+  
+  const opt = select.options[select.selectedIndex];
+  if (!opt.dataset.name) {
+    priceInput.value = 0;
+    mbCalcTotals();
+    return;
+  }
+  
+  const vType = document.getElementById('mb-vtype').value;
+  let price = 0;
+  
+  if (vType === 'Hatchback') price = opt.dataset.hatch || opt.dataset.base;
+  else if (vType === 'Sedan') price = opt.dataset.sedan || opt.dataset.base;
+  else if (vType === 'SUV / 4x4' || vType === 'SUV') price = opt.dataset.suv || opt.dataset.base;
+  else if (vType === 'Bike') price = opt.dataset.bike || opt.dataset.base;
+  else price = opt.dataset.base;
+  
+  priceInput.value = price;
+  mbCalcTotals();
+}
+
+function mbUpdateAllPrices() {
+  const container = document.getElementById('mb-services-container');
+  const rows = container.querySelectorAll('div[id^="mb-row-"]');
+  rows.forEach(row => {
+    mbServiceSelected(row.id);
+  });
+}
+
+function mbCalcTotals() {
+  const container = document.getElementById('mb-services-container');
+  const rows = container.querySelectorAll('div[id^="mb-row-"]');
+  let subtotal = 0;
+  
+  rows.forEach(row => {
+    const qty = parseInt(row.querySelector('.mb-svc-qty').value) || 1;
+    const price = parseFloat(row.querySelector('.mb-svc-price').value) || 0;
+    const rowTotal = qty * price;
+    row.querySelector('.mb-svc-total').innerText = '₹' + rowTotal;
+    subtotal += rowTotal;
+  });
+  
+  document.getElementById('mb-subtotal').innerText = '₹' + subtotal;
+  
+  const discountInput = document.getElementById('mb-discount');
+  let discount = parseFloat(discountInput.value) || 0;
+  if (discount > subtotal) {
+    discount = subtotal;
+    discountInput.value = discount;
+  }
+  
+  const grandTotal = subtotal - discount;
+  document.getElementById('mb-grandtotal').innerText = '₹' + grandTotal;
+  
+  // Payment calculations
+  const payStatus = document.getElementById('mb-pay-status').value;
+  const payAmtInput = document.getElementById('mb-pay-amount');
+  
+  if (payStatus === 'PAID') {
+    payAmtInput.value = grandTotal;
+    payAmtInput.disabled = true;
+  } else if (payStatus === 'UNPAID') {
+    payAmtInput.value = 0;
+    payAmtInput.disabled = true;
+  } else {
+    payAmtInput.disabled = false; // Partial
+  }
+  
+  let payAmt = parseFloat(payAmtInput.value) || 0;
+  if (payAmt > grandTotal && payStatus !== 'PARTIAL') {
+      payAmt = grandTotal;
+      payAmtInput.value = grandTotal;
+  }
+  
+  const balanceDue = grandTotal - payAmt;
+  document.getElementById('mb-balance-due').value = '₹' + Math.max(0, balanceDue);
+  
+  return { subtotal, discount, grandTotal, balanceDue, payAmt };
+}
+
+function mbHandlePaymentChange() {
+  const payStatus = document.getElementById('mb-pay-status').value;
+  const payAmtInput = document.getElementById('mb-pay-amount');
+  if (payStatus === 'PAID') {
+    payAmtInput.disabled = true;
+  } else if (payStatus === 'UNPAID') {
+    payAmtInput.disabled = true;
+  } else {
+    payAmtInput.disabled = false;
+    payAmtInput.focus();
+  }
+  mbCalcTotals();
+}
+
+async function makeBill() {
+  const name = document.getElementById('mb-name').value.trim();
+  let phone = document.getElementById('mb-phone').value.trim();
+  const reg = document.getElementById('mb-reg').value.trim();
+  const vType = document.getElementById('mb-vtype').value;
+  const errorMsg = document.getElementById('mb-error');
+  
+  errorMsg.style.display = 'none';
+  
+  if (!name || !phone || !reg) {
+    errorMsg.innerText = "Please fill in Customer Name, Phone, and Vehicle Number.";
+    errorMsg.style.display = 'inline';
+    return;
+  }
+  
+  phone = phone.replace(/\D/g, '').slice(-10);
+  if (phone.length < 10) {
+    errorMsg.innerText = "Please enter a valid 10-digit phone number.";
+    errorMsg.style.display = 'inline';
+    return;
+  }
+  
+  const container = document.getElementById('mb-services-container');
+  const rows = container.querySelectorAll('div[id^="mb-row-"]');
+  const services = [];
+  
+  rows.forEach(row => {
+    const sel = row.querySelector('.mb-svc-select');
+    const opt = sel.options[sel.selectedIndex];
+    if (opt.dataset.name) {
+      services.push({
+        id: opt.value || 'undefined',
+        name: opt.dataset.name,
+        quantity: parseInt(row.querySelector('.mb-svc-qty').value) || 1,
+        unit_price: parseFloat(row.querySelector('.mb-svc-price').value) || 0
+      });
+    }
+  });
+  
+  if (services.length === 0) {
+    errorMsg.innerText = "Please add at least one valid service.";
+    errorMsg.style.display = 'inline';
+    return;
+  }
+  
+  const totals = mbCalcTotals();
+  const payStatus = document.getElementById('mb-pay-status').value;
+  const payMethod = document.getElementById('mb-pay-method').value;
+  
+  if (totals.payAmt > totals.grandTotal) {
+      errorMsg.innerText = "Amount Paid cannot be greater than Grand Total.";
+      errorMsg.style.display = 'inline';
+      return;
+  }
+  
+  const btn = document.getElementById('mb-submit-btn');
+  const oldText = btn.innerText;
+  btn.innerText = 'GENERATING...';
+  btn.disabled = true;
+  
+  try {
+    const payload = {
+      customer: { name, phone },
+      vehicle: { vehicle_type: vType, reg_number: reg },
+      services: services,
+      totals: totals,
+      payment: {
+        amount: totals.payAmt,
+        method: payMethod,
+        status: payStatus
+      }
+    };
+    
+    if (!window.TrieyeDB) {
+      throw new Error("Database connection unavailable.");
+    }
+    
+    const res = await window.TrieyeDB.createInvoice(payload);
+    
+    if (res && res.success) {
+      // Show Invoice
+      openInvoiceModal(res.invoice.id);
+      
+      // Reset Form
+      document.getElementById('mb-name').value = '';
+      document.getElementById('mb-phone').value = '';
+      document.getElementById('mb-reg').value = '';
+      document.getElementById('mb-discount').value = '0';
+      document.getElementById('mb-pay-status').value = 'UNPAID';
+      container.innerHTML = '';
+      mbAddServiceRow();
+      mbCalcTotals();
+      
+      // Refresh list if applicable
+      if (typeof loadInvoices === 'function') loadInvoices();
+      
+      // Save customer to local Customers Database
+      try {
+        if (typeof getCustomers === 'function' && typeof saveCustomers === 'function') {
+          const custs = getCustomers();
+          const cleanP = typeof cleanPhone === 'function' ? cleanPhone(phone) : phone.replace(/\D/g, '').slice(-10);
+          if (!custs[cleanP]) {
+            custs[cleanP] = {
+              name: name,
+              phone: phone,
+              vehicleType: vType,
+              model: vType,
+              reg: reg,
+              vehicles: [{ type: vType, reg: reg }],
+              visits: 1,
+              spent: totals.grandTotal,
+              lastVisit: new Date().toISOString().split('T')[0],
+              notes: ''
+            };
+          } else {
+            custs[cleanP].visits = (custs[cleanP].visits || 0) + 1;
+            custs[cleanP].spent = (custs[cleanP].spent || 0) + totals.grandTotal;
+            custs[cleanP].lastVisit = new Date().toISOString().split('T')[0];
+            if (!custs[cleanP].reg) custs[cleanP].reg = reg;
+            if (!custs[cleanP].vehicles) custs[cleanP].vehicles = [];
+            if (!custs[cleanP].vehicles.some(v => v.reg === reg)) {
+                custs[cleanP].vehicles.push({ type: vType, reg: reg });
+            }
+          }
+          saveCustomers(custs);
+          if (typeof renderCustomersTable === 'function') renderCustomersTable();
+        }
+      } catch (e) {
+        console.error("Error saving customer:", e);
+      }
+    } else {
+      errorMsg.innerText = "Failed: " + (res.error.message || res.error || "Unknown error");
+      errorMsg.style.display = 'inline';
+    }
+  } catch (err) {
+    errorMsg.innerText = "Error: " + (err.message || err);
+    errorMsg.style.display = 'inline';
+    console.error("Make Bill Error:", err);
+  } finally {
+    btn.innerText = oldText;
+    btn.disabled = false;
+  }
+}
+
+// Automatically add one row on load
+document.addEventListener('DOMContentLoaded', () => {
+    mbAddServiceRow();
+});
+// ==========================================
+
+
+async function loadInvoices() {
+  const tbody = document.getElementById('invoices-tbody');
+  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Loading invoices...</td></tr>';
+  
+  const invoices = await window.TrieyeDB.getInvoices();
+  allInvoices = invoices;
+  renderInvoicesList(invoices);
+}
+
+function renderInvoicesList(invoices) {
+  const tbody = document.getElementById('invoices-tbody');
+  tbody.innerHTML = '';
+  
+  if (invoices.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No invoices found.</td></tr>';
+    return;
+  }
+
+  invoices.forEach(inv => {
+    const cust = inv.customers || {};
+    const veh = inv.vehicles || {};
+    const pays = (inv.bookings && inv.bookings.payments) ? inv.bookings.payments : (inv.payments || []);
+    const pay = pays[0] || {};
+    const dateStr = new Date(inv.created_at).toLocaleDateString();
+    
+    let statusBadge = '';
+    if (pay.status === 'PAID') statusBadge = '<span class="status-badge conf">PAID</span>';
+    else if (pay.status === 'PARTIAL') statusBadge = '<span class="status-badge in-prog">PARTIAL</span>';
+    else statusBadge = '<span class="status-badge pend">UNPAID</span>';
+
+    tbody.innerHTML += `
+      <tr>
+        <td style="font-family:'IBM Plex Mono'; font-weight:600;">${inv.invoice_number}</td>
+        <td>${dateStr}</td>
+        <td>${cust.name || 'N/A'}<br><small>${cust.phone || ''}</small></td>
+        <td>${veh.reg_number || 'N/A'}</td>
+        <td style="font-weight:600;">₹${inv.grand_total}</td>
+        <td>${statusBadge}</td>
+        <td>
+          <button class="btn btn-primary" style="padding:0.3rem 0.6rem; font-size:0.8rem;" onclick="openInvoiceModal('${inv.id}')">View</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+function filterInvoices() {
+  const q = document.getElementById('invoice-search').value.toLowerCase();
+  if (!q) {
+    renderInvoicesList(allInvoices);
+    return;
+  }
+  const filtered = allInvoices.filter(inv => {
+    const cust = inv.customers || {};
+    const veh = inv.vehicles || {};
+    return (inv.invoice_number && inv.invoice_number.toLowerCase().includes(q)) ||
+           (cust.phone && cust.phone.includes(q)) ||
+           (veh.reg_number && veh.reg_number.toLowerCase().includes(q)) ||
+           (cust.name && cust.name.toLowerCase().includes(q));
+  });
+  renderInvoicesList(filtered);
+}
+
+// 6. Invoice Modal / Print
+let currentPrintInvoice = null;
+
+async function openInvoiceModal(invoiceId) {
+  currentPrintInvoice = null;
+  const inv = await window.TrieyeDB.getInvoiceById(invoiceId);
+  if (!inv) return;
+  currentPrintInvoice = inv;
+  
+  const cust = inv.customers || {};
+  const veh = inv.vehicles || {};
+  const items = inv.invoice_items || [];
+  const pays = (inv.bookings && inv.bookings.payments) ? inv.bookings.payments : (inv.payments || []);
+  const pay = pays[0] || {};
+
+  document.getElementById('inv-num').innerText = inv.invoice_number;
+  document.getElementById('inv-date').innerText = 'Date: ' + new Date(inv.created_at).toLocaleString();
+  
+  document.getElementById('inv-cust-name').innerText = cust.name || 'Valued Customer';
+  document.getElementById('inv-cust-phone').innerText = cust.phone ? '+91 ' + cust.phone : 'N/A';
+  
+  document.getElementById('inv-veh-reg').innerText = veh.reg_number || 'N/A';
+  document.getElementById('inv-veh-model').innerText = veh.vehicle_type || 'Car';
+  
+  const tbody = document.getElementById('inv-items-tbody');
+  tbody.innerHTML = '';
+  items.forEach(item => {
+    tbody.innerHTML += `
+      <tr style="border-bottom:1px solid #eee;">
+        <td style="padding:10px;">${item.service_name}</td>
+        <td style="padding:10px; text-align:center;">${item.quantity}</td>
+        <td style="padding:10px; text-align:right;">${item.unit_price}</td>
+        <td style="padding:10px; text-align:right; font-weight:600;">${item.total_price}</td>
+      </tr>
+    `;
+  });
+
+  document.getElementById('inv-subtotal').innerText = '₹' + inv.subtotal;
+  document.getElementById('inv-discount').innerText = '- ₹' + inv.discount;
+  document.getElementById('inv-grandtotal').innerText = '₹' + inv.grand_total;
+  
+  const amtPaid = pay.amount || 0;
+  const balanceDue = Math.max(0, inv.grand_total - amtPaid);
+  
+  document.getElementById('inv-amt-paid').innerText = '₹' + amtPaid;
+  document.getElementById('inv-balance').innerText = '₹' + balanceDue;
+  document.getElementById('inv-pay-status').innerText = pay.status || 'UNPAID';
+  document.getElementById('inv-pay-method').innerText = pay.method || 'Pending';
+
+  document.getElementById('invoiceModalBackdrop').style.display = 'block';
+  document.getElementById('invoiceModal').style.display = 'block';
+}
+
+function closeInvoiceModal() {
+  document.getElementById('invoiceModalBackdrop').style.display = 'none';
+  document.getElementById('invoiceModal').style.display = 'none';
+}
+
+function printInvoice() {
+  const originalTitle = document.title;
+  document.title = currentPrintInvoice ? currentPrintInvoice.invoice_number : 'Invoice';
+  window.print();
+  document.title = originalTitle;
+}
+
+function downloadInvoice() {
+  const element = document.getElementById('printable-invoice');
+  const filename = currentPrintInvoice ? currentPrintInvoice.invoice_number + '.pdf' : 'Invoice.pdf';
+  
+  const opt = {
+    margin:       0,
+    filename:     filename,
+    image:        { type: 'jpeg', quality: 0.98 },
+    html2canvas:  { scale: 2, useCORS: true },
+    jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+  };
+  
+  html2pdf().set(opt).from(element).save();
+}
+
+function shareInvoiceWhatsApp() {
+  if (!currentPrintInvoice) return;
+  const cust = currentPrintInvoice.customers || {};
+  if (!cust.phone) {
+    alert("No customer phone number available.");
+    return;
+  }
+  const text = `Hello ${cust.name || 'Customer'},\n\nThank you for choosing TRIEYE. Your invoice ${currentPrintInvoice.invoice_number} for ₹${currentPrintInvoice.grand_total} has been generated.\n\nDetail • Precision • Protection`;
+  const url = `https://wa.me/91${cust.phone}?text=${encodeURIComponent(text)}`;
+  window.open(url, '_blank');
+}
+
+</script>
 </body>
 </html>

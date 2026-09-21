@@ -968,7 +968,189 @@ const TrieyeDB = {
     }
   },
 
-  // 8. INDIAN VEHICLE REGISTRATION FORMATTER & VALIDATOR
+  // 8. INVOICES & BILLING (OFFLINE)
+  async getInvoices() {
+    const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
+    if (sb) {
+      try {
+        const { data, error } = await sb
+          .from('invoices')
+          .select(`
+            *,
+            customers (id, name, phone, email, notes),
+            vehicles (id, vehicle_type, reg_number),
+            invoice_items (*),
+            bookings ( payments (id, amount, method, status) )
+          `)
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          TrieyeDB.logError('invoices', 'SELECT', error);
+          return [];
+        }
+        return data || [];
+      } catch (err) {
+        console.error('🚨 [Supabase Network Error on getInvoices]:', err);
+        return [];
+      }
+    }
+    return [];
+  },
+
+  async createInvoice(payload) {
+    const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
+    if (!sb) return { success: false, error: 'Database service is unavailable.' };
+
+    try {
+      // 1. Ensure Customer Exists
+      let customerId = payload.customer.id;
+      if (!customerId) {
+        const { data: existCust } = await sb.from('customers').select('id').eq('phone', payload.customer.phone).maybeSingle();
+        if (existCust && existCust.id) {
+          customerId = existCust.id;
+        } else {
+          const { data: custData, error: custErr } = await sb
+            .from('customers')
+            .insert({
+              name: payload.customer.name,
+              phone: payload.customer.phone,
+              email: payload.customer.email || null
+            })
+            .select('id')
+            .single();
+          if (custErr) throw custErr;
+          customerId = custData.id;
+        }
+      }
+
+      // 2. Ensure Vehicle Exists
+      let vehicleId = payload.vehicle.id;
+      if (!vehicleId && customerId) {
+        const { data: existVeh } = await sb.from('vehicles').select('id').eq('reg_number', payload.vehicle.reg_number).maybeSingle();
+        if (existVeh && existVeh.id) {
+          vehicleId = existVeh.id;
+        } else {
+          const { data: vehData, error: vehErr } = await sb
+            .from('vehicles')
+            .insert({
+              customer_id: customerId,
+              vehicle_type: payload.vehicle.vehicle_type || 'Car',
+              reg_number: payload.vehicle.reg_number || 'NO REG'
+            })
+            .select('id')
+            .single();
+          if (vehErr) throw vehErr;
+          vehicleId = vehData.id;
+        }
+      }
+
+      // 3. Create Booking Record (WALK_IN)
+      let primaryServiceId = (payload.services && payload.services.length > 0) ? payload.services[0].id : null;
+      if (primaryServiceId === 'undefined' || primaryServiceId === 'null' || !primaryServiceId) primaryServiceId = null;
+      
+      const { data: bookData, error: bookErr } = await sb
+        .from('bookings')
+        .insert({
+          customer_id: customerId,
+          vehicle_id: vehicleId,
+          service_id: primaryServiceId, // Primary service
+          booking_date: new Date().toISOString().split('T')[0],
+          status: 'COMPLETED',
+          source: 'WALK_IN',
+          total_amount: payload.totals.grand_total
+        })
+        .select('id')
+        .single();
+      
+      if (bookErr) {
+        console.error("Booking insert failed:", bookErr);
+        throw bookErr;
+      }
+      const bookingId = bookData.id;
+
+      // 4. Create Invoice Record
+      const { data: invData, error: invErr } = await sb
+        .from('invoices')
+        .insert({
+          customer_id: customerId,
+          vehicle_id: vehicleId,
+          booking_id: bookingId,
+          subtotal: payload.totals.subtotal,
+          discount: payload.totals.discount,
+          grand_total: payload.totals.grand_total,
+          status: 'ISSUED'
+        })
+        .select('id, invoice_number, created_at')
+        .single();
+      if (invErr) {
+        console.error("Invoice insert failed:", invErr);
+        throw invErr;
+      }
+      const invoiceId = invData.id;
+
+      // 4. Create Invoice Items
+      const itemsPayload = payload.services.map(s => {
+        let sid = s.id || null;
+        if (sid === 'undefined' || sid === 'null' || !sid) sid = null;
+        return {
+          invoice_id: invoiceId,
+          service_id: sid,
+          service_name: s.name,
+          quantity: s.quantity || 1,
+          unit_price: s.unit_price,
+          total_price: (s.quantity || 1) * s.unit_price
+        };
+      });
+      const { error: itemsErr } = await sb.from('invoice_items').insert(itemsPayload);
+      if (itemsErr) throw itemsErr;
+
+      // 6. Create Payment Record (Optional)
+      if (payload.payment) {
+        const { error: payErr } = await sb.from('payments').insert({
+          booking_id: bookingId,
+          amount: payload.payment.amount,
+          method: payload.payment.method,
+          status: payload.payment.status,
+          paid_at: payload.payment.status === 'PAID' ? new Date().toISOString() : null
+        });
+        if (payErr) {
+          console.error("Payment insert failed:", payErr);
+          throw payErr;
+        }
+      }
+
+      return { success: true, invoice: invData };
+    } catch (err) {
+      console.error('🚨 [TrieyeDB] createInvoice error:', err);
+      return { success: false, error: err.message || 'Failed to create invoice.' };
+    }
+  },
+
+  async getInvoiceById(invoiceId) {
+    const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
+    if (sb) {
+      try {
+        const { data, error } = await sb
+          .from('invoices')
+          .select(`
+            *,
+            customers (id, name, phone, email, notes),
+            vehicles (id, vehicle_type, reg_number),
+            invoice_items (*),
+            bookings ( payments (id, amount, method, status) )
+          `)
+          .eq('id', invoiceId)
+          .single();
+        if (error) throw error;
+        return data;
+      } catch (err) {
+        console.error('🚨 [TrieyeDB] getInvoiceById error:', err);
+      }
+    }
+    return null;
+  },
+
+  // 9. INDIAN VEHICLE REGISTRATION FORMATTER & VALIDATOR
   formatVehicleReg(raw) {
     if (!raw) return '';
     const clean = String(raw).toUpperCase().replace(/[^A-Z0-9]/g, '');
