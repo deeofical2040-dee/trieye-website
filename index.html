@@ -1893,6 +1893,76 @@
   }
 
 
+  /* --- Brands Marquee Section --- */
+  .brands-section {
+    padding: 3rem 0;
+    background: var(--bg-body);
+    border-bottom: 1px solid var(--line);
+    overflow: hidden;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .brands-sec-head {
+    text-align: center;
+    margin-bottom: 2rem;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-weight: 600;
+  }
+  .marquee-wrapper {
+    display: flex;
+    width: max-content;
+    animation: marquee 60s linear infinite;
+  }
+  .marquee-wrapper:hover {
+    animation-play-state: paused;
+  }
+  .marquee-content {
+    display: flex;
+    gap: 4rem;
+    padding: 0 2rem;
+    align-items: center;
+  }
+  .brand-logo-item {
+    height: 40px;
+    width: auto;
+    opacity: 0.8;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    user-select: none;
+    object-fit: contain;
+  }
+  .brand-logo-item:hover {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+  @keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+  /* Smooth fade edges for marquee */
+  .brands-section::before,
+  .brands-section::after {
+    content: "";
+    position: absolute;
+    bottom: 0;
+    width: 150px;
+    height: 100%;
+    z-index: 2;
+    pointer-events: none;
+  }
+  .brands-section::before {
+    left: 0;
+    background: linear-gradient(to right, var(--bg-body), transparent);
+  }
+  .brands-section::after {
+    right: 0;
+    background: linear-gradient(to left, var(--bg-body), transparent);
+  }
 </style>
   <!-- Official Supabase JavaScript Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -1971,6 +2041,70 @@
         <a href="#booking" class="btn btn-hero-primary">BOOK AN APPOINTMENT →</a>
         <a href="#services" class="btn btn-hero-secondary">VIEW SERVICES</a>
       </div>
+    </div>
+  </div>
+</section>
+
+<section class="brands-section" id="brands">
+  <div class="brands-sec-head">TRUSTED BY OWNERS OF</div>
+  <div class="marquee-wrapper">
+    <!-- First Set -->
+    <div class="marquee-content">
+      <img src="assets/brand_logos/toyota.svg" class="brand-logo-item" alt="Toyota">
+      <img src="assets/brand_logos/honda.png" class="brand-logo-item" alt="Honda">
+      <img src="assets/brand_logos/bmw.svg" class="brand-logo-item" alt="BMW">
+      <img src="assets/brand_logos/mercedes-benz.svg" class="brand-logo-item" alt="Mercedes-Benz">
+      <img src="assets/brand_logos/audi.svg" class="brand-logo-item" alt="Audi">
+      <img src="assets/brand_logos/ford.png" class="brand-logo-item" alt="Ford">
+      <img src="assets/brand_logos/chevrolet.png" class="brand-logo-item" alt="Chevrolet">
+      <img src="assets/brand_logos/nissan.svg" class="brand-logo-item" alt="Nissan">
+      <img src="assets/brand_logos/hyundai.svg" class="brand-logo-item" alt="Hyundai">
+      <img src="assets/brand_logos/kia.svg" class="brand-logo-item" alt="Kia">
+      <img src="assets/brand_logos/volkswagen.svg" class="brand-logo-item" alt="Volkswagen">
+      <img src="assets/brand_logos/lexus.png" class="brand-logo-item" alt="Lexus">
+      <img src="assets/brand_logos/volvo.svg" class="brand-logo-item" alt="Volvo">
+      <img src="assets/brand_logos/mazda.svg" class="brand-logo-item" alt="Mazda">
+      <img src="assets/brand_logos/subaru.png" class="brand-logo-item" alt="Subaru">
+      <img src="assets/brand_logos/jeep.svg" class="brand-logo-item" alt="Jeep">
+      <img src="assets/brand_logos/land-rover.svg" class="brand-logo-item" alt="Land Rover">
+      <img src="assets/brand_logos/mitsubishi.svg" class="brand-logo-item" alt="Mitsubishi">
+      <img src="assets/brand_logos/suzuki.svg" class="brand-logo-item" alt="Suzuki">
+      <img src="assets/brand_logos/renault.svg" class="brand-logo-item" alt="Renault">
+      <img src="assets/brand_logos/peugeot.svg" class="brand-logo-item" alt="Peugeot">
+      <img src="assets/brand_logos/skoda.svg" class="brand-logo-item" alt="Skoda">
+      <img src="assets/brand_logos/bentley.svg" class="brand-logo-item" alt="Bentley">
+      <img src="assets/brand_logos/rolls-royce.svg" class="brand-logo-item" alt="Rolls-Royce">
+      <img src="assets/brand_logos/bugatti.svg" class="brand-logo-item" alt="Bugatti">
+      <img src="assets/brand_logos/mclaren.svg" class="brand-logo-item" alt="McLaren">
+    </div>
+    <!-- Duplicate Set for seamless smooth loop -->
+    <div class="marquee-content" aria-hidden="true">
+      <img src="assets/brand_logos/toyota.svg" class="brand-logo-item" alt="Toyota">
+      <img src="assets/brand_logos/honda.png" class="brand-logo-item" alt="Honda">
+      <img src="assets/brand_logos/bmw.svg" class="brand-logo-item" alt="BMW">
+      <img src="assets/brand_logos/mercedes-benz.svg" class="brand-logo-item" alt="Mercedes-Benz">
+      <img src="assets/brand_logos/audi.svg" class="brand-logo-item" alt="Audi">
+      <img src="assets/brand_logos/ford.png" class="brand-logo-item" alt="Ford">
+      <img src="assets/brand_logos/chevrolet.png" class="brand-logo-item" alt="Chevrolet">
+      <img src="assets/brand_logos/nissan.svg" class="brand-logo-item" alt="Nissan">
+      <img src="assets/brand_logos/hyundai.svg" class="brand-logo-item" alt="Hyundai">
+      <img src="assets/brand_logos/kia.svg" class="brand-logo-item" alt="Kia">
+      <img src="assets/brand_logos/volkswagen.svg" class="brand-logo-item" alt="Volkswagen">
+      <img src="assets/brand_logos/lexus.png" class="brand-logo-item" alt="Lexus">
+      <img src="assets/brand_logos/volvo.svg" class="brand-logo-item" alt="Volvo">
+      <img src="assets/brand_logos/mazda.svg" class="brand-logo-item" alt="Mazda">
+      <img src="assets/brand_logos/subaru.png" class="brand-logo-item" alt="Subaru">
+      <img src="assets/brand_logos/jeep.svg" class="brand-logo-item" alt="Jeep">
+      <img src="assets/brand_logos/land-rover.svg" class="brand-logo-item" alt="Land Rover">
+      <img src="assets/brand_logos/mitsubishi.svg" class="brand-logo-item" alt="Mitsubishi">
+      <img src="assets/brand_logos/suzuki.svg" class="brand-logo-item" alt="Suzuki">
+      <img src="assets/brand_logos/renault.svg" class="brand-logo-item" alt="Renault">
+      <img src="assets/brand_logos/peugeot.svg" class="brand-logo-item" alt="Peugeot">
+      <img src="assets/brand_logos/skoda.svg" class="brand-logo-item" alt="Skoda">
+      <img src="assets/brand_logos/bentley.svg" class="brand-logo-item" alt="Bentley">
+      <img src="assets/brand_logos/rolls-royce.svg" class="brand-logo-item" alt="Rolls-Royce">
+      <img src="assets/brand_logos/bugatti.svg" class="brand-logo-item" alt="Bugatti">
+      <img src="assets/brand_logos/mclaren.svg" class="brand-logo-item" alt="McLaren">
     </div>
   </div>
 </section>
@@ -2108,7 +2242,7 @@
         </div>
         <div class="field">
           <label for="ph">Phone Number (WhatsApp)</label>
-          <input type="tel" id="ph" placeholder="e.g. 9876543210" pattern="[0-9]{10}" required>
+          <input type="tel" id="ph" placeholder="e.g. 9876543210" pattern="[0-9]{10}" maxlength="10" title="Phone number must be exactly 10 digits" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.key === 'Backspace' || event.key === 'Delete'" required>
         </div>
       </div>
       <div class="form-row">

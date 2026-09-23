@@ -53,12 +53,12 @@ BEGIN
       'payment_method', COALESCE(p.method, 'Pending'),
       'payment_status', COALESCE(p.status, 'UNPAID'),
       'business', jsonb_build_object(
-        'name', 'TRIEYE WATERWASH & DETAILING',
+        'name', 'Trieye Detailing',
         'tagline', 'Premium Car Spa, Ceramic Coating & Paint Protection Studio',
-        'address', 'OMR Road, Sholinganallur, Chennai — 600119',
+        'address', '1st, 19, 6th Street, Main Rd, Baba Nagar, Villivakkam, Chennai, Tamil Nadu 600049',
         'phone', '+91 98765 43210',
         'email', 'care@trieyestudio.com',
-        'gstin', '33AAAAA0000A1Z5'
+        'gstin', '33CKMPB5885L1ZO'
       )
     )
   ) INTO v_result

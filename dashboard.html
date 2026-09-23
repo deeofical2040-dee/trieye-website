@@ -1250,10 +1250,10 @@
             <div class="section-subtitle">Real-time studio health, bay telemetry &amp; booking statistics</div>
           </div>
           <div style="display:flex; gap:0.5rem; align-items:center;">
-            <div style="display:flex; align-items:center; gap:0.75rem; background: var(--bg-panel-2); border: 1px solid var(--line); padding: 0.4rem 0.75rem; border-radius: 6px;">
-               <input type="date" id="overview-date-picker" style="background: transparent; border: none; color: inherit; font-family: inherit; font-size: 0.85rem; outline: none; cursor: pointer;" onchange="updateDateBookingsCount()">
-               <div style="width: 1px; height: 18px; background: var(--line);"></div>
-               <span id="overview-date-count" style="font-family: 'IBM Plex Mono', monospace; font-size: 0.85rem; font-weight: 600; color: var(--green);">0 Bookings</span>
+            <div style="display:flex; align-items:center; gap:0.4rem; background: var(--bg-panel-2); border: 1px solid var(--line); padding: 0.2rem 0.5rem; border-radius: 6px;">
+               <input type="date" id="overview-date-picker" style="background: transparent; border: none; color: inherit; font-family: inherit; font-size: 0.7rem; outline: none; cursor: pointer;" onchange="updateDateBookingsCount()">
+               <div style="width: 1px; height: 14px; background: var(--line);"></div>
+               <span id="overview-date-count" style="font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; font-weight: 600; color: var(--green);">0 Bookings</span>
             </div>
             <button class="btn btn-green" onclick="showSection('walkin-sec')">+ Quick Walk-In</button>
           </div>
@@ -1343,10 +1343,7 @@
           <div style="display:flex; gap:0.5rem;">
             <select class="form-select" id="queue-filter-select" onchange="renderQueueTable()" style="width:auto; font-size:0.78rem;">
               <option value="ALL">All Active &amp; Queued Jobs</option>
-              <option value="ARRIVED">Arrived / Waiting</option>
-              <option value="IN PROGRESS">In Progress</option>
-              <option value="QUALITY CHECK">Quality Check</option>
-              <option value="READY">Ready for Pickup</option>
+              <option value="ARRIVED">Arrived</option>
             </select>
             <button class="btn btn-primary" onclick="showSection('walkin-sec')">+ Add Vehicle</button>
           </div>
@@ -1382,9 +1379,7 @@
             <div class="section-title"><span>🌐</span> Online Website Bookings</div>
             <div class="section-subtitle">Reservations placed via Trieye customer booking portal</div>
           </div>
-          <div style="display:flex; gap:0.5rem;">
-            <button class="btn btn-primary" onclick="openNewBookingModal()">+ Create Manual Booking</button>
-          </div>
+
         </div>
 
         <div class="filter-bar">
@@ -1444,7 +1439,7 @@
           </div>
           <div class="form-group">
             <label class="form-label">Phone Number *</label>
-            <input type="tel" id="mb-phone" class="form-input" placeholder="e.g. 9840123456" pattern="[0-9]{10}" maxlength="10" title="Phone number must be exactly 10 digits" required>
+            <input type="tel" id="mb-phone" class="form-input" placeholder="e.g. 9840123456" pattern="[0-9]{10}" maxlength="10" title="Phone number must be exactly 10 digits" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.key === 'Backspace' || event.key === 'Delete'" required>
           </div>
           <div class="form-group">
             <label class="form-label">Vehicle Number *</label>
@@ -1597,9 +1592,11 @@
         <img src="assets/trieye-logo-dark.png" alt="Trieye" style="height:40px; margin-bottom:5px;">
         <div style="font-family:'Oswald', sans-serif; font-size:12px; letter-spacing:1px; color:#555;">DETAIL • PRECISION • PROTECTION</div>
         <div style="margin-top:10px; font-size:12px; color:#333;">
-          OMR Road, Sholinganallur, Chennai — 600119<br>
+          1st, 19, 6th Street, Main Rd<br>
+          Baba Nagar, Villivakkam<br>
+          Chennai, Tamil Nadu 600049<br>
           +91 98765 43210 | care@trieyestudio.com<br>
-          GSTIN: 33AAAAA0000A1Z5
+          GSTIN: 33CKMPB5885L1ZO
         </div>
       </div>
       <div style="text-align:right;">
@@ -2029,19 +2026,19 @@
             <form class="form-body" onsubmit="saveStudioSettings(event)">
               <div class="form-group">
                 <label class="form-label">Business Name</label>
-                <input type="text" id="set-business-name" class="form-input" value="Trieye Studio Chennai">
+                <input type="text" id="set-business-name" class="form-input" value="Trieye Detailing">
               </div>
               <div class="form-group">
                 <label class="form-label">Official Phone Number</label>
-                <input type="tel" id="set-business-phone" class="form-input" value="+91 98400 12345">
+                <input type="tel" id="set-business-phone" class="form-input" value="9840012345" pattern="[0-9]{10}" maxlength="10" title="Phone number must be exactly 10 digits" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.key === 'Backspace' || event.key === 'Delete'">
               </div>
               <div class="form-group">
                 <label class="form-label">WhatsApp Dispatch Number</label>
-                <input type="tel" id="set-business-wa" class="form-input" value="919840012345">
+                <input type="tel" id="set-business-wa" class="form-input" value="9840012345" pattern="[0-9]{10}" maxlength="10" title="Phone number must be exactly 10 digits" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.key === 'Backspace' || event.key === 'Delete'">
               </div>
               <div class="form-group">
                 <label class="form-label">Studio Address</label>
-                <input type="text" id="set-business-address" class="form-input" value="OMR Road, Sholinganallur, Chennai">
+                <input type="text" id="set-business-address" class="form-input" value="1st, 19, 6th Street, Main Rd, Baba Nagar, Villivakkam, Chennai, Tamil Nadu 600049">
               </div>
               <button type="submit" class="btn btn-primary" style="align-self:flex-start; margin-top:0.5rem;">Save Business Profile</button>
             </form>
@@ -2091,7 +2088,7 @@
         </div>
         <div class="form-group">
           <label class="form-label">Phone Number (WhatsApp)</label>
-          <input type="tel" id="cust-modal-phone" class="form-input" placeholder="10-digit mobile" required>
+          <input type="tel" id="cust-modal-phone" class="form-input" placeholder="10-digit mobile" pattern="[0-9]{10}" maxlength="10" title="Phone number must be exactly 10 digits" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.key === 'Backspace' || event.key === 'Delete'" required>
         </div>
         <div class="form-group">
           <label class="form-label">Email Address (Optional)</label>
@@ -2566,14 +2563,63 @@
     }
 
     // Modal Helpers
+    const activeModals = [];
+
     function openModal(id) {
       const el = document.getElementById(id);
-      if (el) el.classList.add('open');
+      if (!el || el.classList.contains('open')) return;
+
+      if (el.parentElement !== document.body) {
+        document.body.appendChild(el);
+      }
+      
+      el.classList.add('open');
+      activeModals.push(id);
+      updateModalLayers();
     }
+
     function closeModal(id) {
       const el = document.getElementById(id);
-      if (el) el.classList.remove('open');
+      if (!el || !el.classList.contains('open')) return;
+
+      el.classList.remove('open');
+      const idx = activeModals.indexOf(id);
+      if (idx > -1) {
+        activeModals.splice(idx, 1);
+      }
+      updateModalLayers();
     }
+
+    function updateModalLayers() {
+      if (activeModals.length > 0) {
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = '';
+      }
+
+      activeModals.forEach((modalId, index) => {
+        const el = document.getElementById(modalId);
+        if (el) {
+          el.style.zIndex = 1000 + (index * 1000);
+        }
+      });
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && activeModals.length > 0) {
+        const topModal = activeModals[activeModals.length - 1];
+        closeModal(topModal);
+      }
+    });
+
+    document.addEventListener('mousedown', (e) => {
+      if (e.target.classList.contains('dash-modal-backdrop') && activeModals.length > 0) {
+        const topModal = activeModals[activeModals.length - 1];
+        if (e.target.id === topModal) {
+          closeModal(topModal);
+        }
+      }
+    });
 
     // Tab Navigation
     function showSection(secId) {
@@ -2957,10 +3003,7 @@
             <select class="form-select" onchange="changeJobStatus('${b.id}', this.value)" style="font-size:0.72rem; padding:0.2rem 0.4rem; font-family:'IBM Plex Mono';">
               <option value="CONFIRMED" ${b.status==='CONFIRMED'?'selected':''}>CONFIRMED</option>
               <option value="ARRIVED" ${b.status==='ARRIVED'?'selected':''}>ARRIVED</option>
-              <option value="WAITING" ${b.status==='WAITING'?'selected':''}>WAITING</option>
-              <option value="IN PROGRESS" ${b.status==='IN PROGRESS'?'selected':''}>IN PROGRESS</option>
-              <option value="QUALITY CHECK" ${b.status==='QUALITY CHECK'?'selected':''}>QUALITY CHECK</option>
-              <option value="READY" ${b.status==='READY'?'selected':''}>READY</option>
+
               <option value="COMPLETED" ${b.status==='COMPLETED'?'selected':''}>COMPLETED</option>
               <option value="CANCELLED" ${b.status==='CANCELLED'?'selected':''}>CANCELLED</option>
             </select>
@@ -3883,10 +3926,10 @@
         <div class="invoice-box" style="padding:1.25rem; border-radius:8px; background:var(--bg-panel-2); border:1px solid var(--line); display:flex; flex-direction:column; gap:1rem;">
           <!-- Studio Branding Header -->
           <div style="text-align:center; padding-bottom:0.75rem; border-bottom:1px dashed var(--line);">
-            <div style="font-family:'Oswald', sans-serif; font-size:1.5rem; letter-spacing:0.04em; color:var(--white);">TRIEYE WATERWASH &amp; DETAILING</div>
+            <div style="font-family:'Oswald', sans-serif; font-size:1.5rem; letter-spacing:0.04em; color:var(--white);">Trieye Detailing</div>
             <div style="font-size:0.75rem; color:var(--muted); font-family:'IBM Plex Mono'; margin-top:2px;">
               Premium Car Spa, Ceramic Coating &amp; Paint Protection Studio<br>
-              OMR Road, Sholinganallur, Chennai · GSTIN: 33AAAAA0000A1Z5 · Ph: +91 98765 43210
+              1st, 19, 6th Street, Main Rd, Baba Nagar, Villivakkam, Chennai, Tamil Nadu 600049 · GSTIN: 33CKMPB5885L1ZO · Ph: +91 98765 43210
             </div>
           </div>
 
