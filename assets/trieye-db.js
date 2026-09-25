@@ -173,7 +173,8 @@ const TrieyeDB = {
             slots (id, slot_time, status),
             payments (id, amount, method, status)
           `)
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false })
+          .gte('created_at', '2026-09-25T00:00:00Z');
 
         if (error) {
           TrieyeDB.logError('bookings', 'SELECT', error);
@@ -493,7 +494,8 @@ const TrieyeDB = {
           .select(`
             id, name, phone, email, notes, created_at,
             vehicles (id, vehicle_type, reg_number)
-          `);
+          `)
+          .gte('created_at', '2026-09-25T00:00:00Z');
 
         if (error) {
           TrieyeDB.logError('customers', 'SELECT', error);
@@ -982,7 +984,8 @@ const TrieyeDB = {
             invoice_items (*),
             bookings ( payments (id, amount, method, status) )
           `)
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false })
+          .gte('created_at', '2026-09-25T00:00:00Z');
 
         if (error) {
           TrieyeDB.logError('invoices', 'SELECT', error);
@@ -1069,9 +1072,14 @@ const TrieyeDB = {
       const bookingId = bookData.id;
 
       // 4. Create Invoice Record
+      let newInvSeq = parseInt(localStorage.getItem('trieye_new_inv_seq') || '1');
+      const customInv = 'TR-' + new Date().getFullYear() + '-' + String(newInvSeq).padStart(6, '0');
+      localStorage.setItem('trieye_new_inv_seq', String(newInvSeq + 1));
+
       const { data: invData, error: invErr } = await sb
         .from('invoices')
         .insert({
+          invoice_number: customInv,
           customer_id: customerId,
           vehicle_id: vehicleId,
           booking_id: bookingId,

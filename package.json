@@ -8,6 +8,7 @@
     "start": "node server.js",
     "serve": "npx serve ."
   },
-  "dependencies": {},
-  "devDependencies": {}
+  "dependencies": {
+    "@supabase/supabase-js": "^2.117.2"
+  }
 }

@@ -40,6 +40,13 @@ if (typeof supabase !== 'undefined') {
   });
 }
 
+// Purge old local storage cache once
+if (!localStorage.getItem('trieye_fresh_start_25')) {
+  localStorage.clear();
+  localStorage.setItem('trieye_fresh_start_25', 'true');
+  console.log('⚡ [Trieye] Local cache cleared for fresh start.');
+}
+
 // Global accessor
 window.getTrieyeSupabase = function () {
   if (!supabaseClient) {
