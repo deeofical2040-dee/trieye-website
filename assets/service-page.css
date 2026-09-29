@@ -1013,7 +1013,7 @@
   .loc-card-map-layer{
     position: absolute;
     inset: 0;
-    background-image: url('assets/trieye-map-bg.png');
+    background-image: url('trieye-map-bg.png');
     background-size: cover;
     background-position: center;
     filter: grayscale(80%) contrast(92%) brightness(0.97);
