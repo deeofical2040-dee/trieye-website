@@ -1925,21 +1925,23 @@
 
   /* --- Brands Marquee Section --- */
   .brands-section {
-    padding: 3rem 0;
-    background: var(--bg-body);
+    padding: 2.2rem 0 2rem 0;
+    background: #ffffff;
     border-bottom: 1px solid var(--line);
     overflow: hidden;
     position: relative;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
   }
   .brands-sec-head {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1.25rem;
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.8rem;
-    color: var(--text-muted);
+    font-size: 0.75rem;
+    color: var(--muted);
     text-transform: uppercase;
     letter-spacing: 3px;
     font-weight: 600;
@@ -1947,28 +1949,43 @@
   .marquee-wrapper {
     display: flex;
     width: max-content;
-    animation: marquee 60s linear infinite;
+    animation: marquee 50s linear infinite;
+    will-change: transform;
   }
   .marquee-wrapper:hover {
     animation-play-state: paused;
   }
   .marquee-content {
     display: flex;
-    gap: 4rem;
-    padding: 0 2rem;
     align-items: center;
   }
-  .brand-logo-item {
-    height: 40px;
-    width: auto;
-    opacity: 0.8;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    user-select: none;
-    object-fit: contain;
+  .logo-item {
+    width: 150px;
+    height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 0 10px;
+    box-sizing: border-box;
   }
+  .logo-item img,
+  .brand-logo-item {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    max-width: 125px;
+    max-height: 50px;
+    opacity: 1 !important;
+    filter: none !important;
+    transition: transform 0.25s ease;
+    user-select: none;
+  }
+  .logo-item:hover img,
   .brand-logo-item:hover {
-    opacity: 1;
-    transform: scale(1.15);
+    opacity: 1 !important;
+    filter: none !important;
+    transform: scale(1.04);
   }
   @keyframes marquee {
     0% { transform: translateX(0); }
@@ -1979,19 +1996,44 @@
   .brands-section::after {
     content: "";
     position: absolute;
+    top: 0;
     bottom: 0;
-    width: 150px;
+    width: 140px;
     height: 100%;
     z-index: 2;
     pointer-events: none;
   }
   .brands-section::before {
     left: 0;
-    background: linear-gradient(to right, var(--bg-body), transparent);
+    background: linear-gradient(to right, #ffffff, transparent);
   }
   .brands-section::after {
     right: 0;
-    background: linear-gradient(to left, var(--bg-body), transparent);
+    background: linear-gradient(to left, #ffffff, transparent);
+  }
+  @media (max-width: 768px) {
+    .brands-section {
+      padding: 1.6rem 0 1.4rem 0;
+    }
+    .brands-sec-head {
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      margin-bottom: 1rem;
+    }
+    .logo-item {
+      width: 110px;
+      height: 50px;
+      padding: 0 6px;
+    }
+    .logo-item img,
+    .brand-logo-item {
+      max-width: 95px;
+      max-height: 40px;
+    }
+    .brands-section::before,
+    .brands-section::after {
+      width: 60px;
+    }
   }
 </style>
   <!-- Official Supabase JavaScript Client -->
@@ -2076,65 +2118,65 @@
 </section>
 
 <section class="brands-section" id="brands">
-  <div class="brands-sec-head">TRUSTED BY OWNERS OF</div>
+  <div class="brands-sec-head">CARS WE CARE FOR</div>
   <div class="marquee-wrapper">
     <!-- First Set -->
     <div class="marquee-content">
-      <img src="assets/brand_logos/toyota.svg" class="brand-logo-item" alt="Toyota">
-      <img src="assets/brand_logos/honda.png" class="brand-logo-item" alt="Honda">
-      <img src="assets/brand_logos/bmw.svg" class="brand-logo-item" alt="BMW">
-      <img src="assets/brand_logos/mercedes-benz.svg" class="brand-logo-item" alt="Mercedes-Benz">
-      <img src="assets/brand_logos/audi.svg" class="brand-logo-item" alt="Audi">
-      <img src="assets/brand_logos/ford.png" class="brand-logo-item" alt="Ford">
-      <img src="assets/brand_logos/chevrolet.png" class="brand-logo-item" alt="Chevrolet">
-      <img src="assets/brand_logos/nissan.svg" class="brand-logo-item" alt="Nissan">
-      <img src="assets/brand_logos/hyundai.svg" class="brand-logo-item" alt="Hyundai">
-      <img src="assets/brand_logos/kia.svg" class="brand-logo-item" alt="Kia">
-      <img src="assets/brand_logos/volkswagen.svg" class="brand-logo-item" alt="Volkswagen">
-      <img src="assets/brand_logos/lexus.png" class="brand-logo-item" alt="Lexus">
-      <img src="assets/brand_logos/volvo.svg" class="brand-logo-item" alt="Volvo">
-      <img src="assets/brand_logos/mazda.svg" class="brand-logo-item" alt="Mazda">
-      <img src="assets/brand_logos/subaru.png" class="brand-logo-item" alt="Subaru">
-      <img src="assets/brand_logos/jeep.svg" class="brand-logo-item" alt="Jeep">
-      <img src="assets/brand_logos/land-rover.svg" class="brand-logo-item" alt="Land Rover">
-      <img src="assets/brand_logos/mitsubishi.svg" class="brand-logo-item" alt="Mitsubishi">
-      <img src="assets/brand_logos/suzuki.svg" class="brand-logo-item" alt="Suzuki">
-      <img src="assets/brand_logos/renault.svg" class="brand-logo-item" alt="Renault">
-      <img src="assets/brand_logos/peugeot.svg" class="brand-logo-item" alt="Peugeot">
-      <img src="assets/brand_logos/skoda.svg" class="brand-logo-item" alt="Skoda">
-      <img src="assets/brand_logos/bentley.svg" class="brand-logo-item" alt="Bentley">
-      <img src="assets/brand_logos/rolls-royce.svg" class="brand-logo-item" alt="Rolls-Royce">
-      <img src="assets/brand_logos/bugatti.svg" class="brand-logo-item" alt="Bugatti">
-      <img src="assets/brand_logos/mclaren.svg" class="brand-logo-item" alt="McLaren">
+      <div class="logo-item"><img src="assets/brand_logos/toyota.svg" alt="Toyota"></div>
+      <div class="logo-item"><img src="assets/brand_logos/honda.svg" alt="Honda"></div>
+      <div class="logo-item"><img src="assets/brand_logos/bmw.svg" alt="BMW"></div>
+      <div class="logo-item"><img src="assets/brand_logos/mercedes-benz.svg" alt="Mercedes-Benz"></div>
+      <div class="logo-item"><img src="assets/brand_logos/audi.svg" alt="Audi"></div>
+      <div class="logo-item"><img src="assets/brand_logos/ford.png" alt="Ford"></div>
+      <div class="logo-item"><img src="assets/brand_logos/chevrolet.png" alt="Chevrolet"></div>
+      <div class="logo-item"><img src="assets/brand_logos/nissan.svg" alt="Nissan"></div>
+      <div class="logo-item"><img src="assets/brand_logos/hyundai.svg" alt="Hyundai"></div>
+      <div class="logo-item"><img src="assets/brand_logos/kia.svg" alt="Kia"></div>
+      <div class="logo-item"><img src="assets/brand_logos/volkswagen.svg" alt="Volkswagen"></div>
+      <div class="logo-item"><img src="assets/brand_logos/lexus.png" alt="Lexus"></div>
+      <div class="logo-item"><img src="assets/brand_logos/volvo.svg" alt="Volvo"></div>
+      <div class="logo-item"><img src="assets/brand_logos/mazda.svg" alt="Mazda"></div>
+      <div class="logo-item"><img src="assets/brand_logos/subaru.png" alt="Subaru"></div>
+      <div class="logo-item"><img src="assets/brand_logos/jeep.svg" alt="Jeep"></div>
+      <div class="logo-item"><img src="assets/brand_logos/land-rover.svg" alt="Land Rover"></div>
+      <div class="logo-item"><img src="assets/brand_logos/mitsubishi.svg" alt="Mitsubishi"></div>
+      <div class="logo-item"><img src="assets/brand_logos/suzuki.svg" alt="Suzuki"></div>
+      <div class="logo-item"><img src="assets/brand_logos/renault.svg" alt="Renault"></div>
+      <div class="logo-item"><img src="assets/brand_logos/peugeot.svg" alt="Peugeot"></div>
+      <div class="logo-item"><img src="assets/brand_logos/skoda.svg" alt="Skoda"></div>
+      <div class="logo-item"><img src="assets/brand_logos/bentley.svg" alt="Bentley"></div>
+      <div class="logo-item"><img src="assets/brand_logos/rolls-royce.svg" alt="Rolls-Royce"></div>
+      <div class="logo-item"><img src="assets/brand_logos/bugatti.svg" alt="Bugatti"></div>
+      <div class="logo-item"><img src="assets/brand_logos/mclaren.svg" alt="McLaren"></div>
     </div>
     <!-- Duplicate Set for seamless smooth loop -->
     <div class="marquee-content" aria-hidden="true">
-      <img src="assets/brand_logos/toyota.svg" class="brand-logo-item" alt="Toyota">
-      <img src="assets/brand_logos/honda.png" class="brand-logo-item" alt="Honda">
-      <img src="assets/brand_logos/bmw.svg" class="brand-logo-item" alt="BMW">
-      <img src="assets/brand_logos/mercedes-benz.svg" class="brand-logo-item" alt="Mercedes-Benz">
-      <img src="assets/brand_logos/audi.svg" class="brand-logo-item" alt="Audi">
-      <img src="assets/brand_logos/ford.png" class="brand-logo-item" alt="Ford">
-      <img src="assets/brand_logos/chevrolet.png" class="brand-logo-item" alt="Chevrolet">
-      <img src="assets/brand_logos/nissan.svg" class="brand-logo-item" alt="Nissan">
-      <img src="assets/brand_logos/hyundai.svg" class="brand-logo-item" alt="Hyundai">
-      <img src="assets/brand_logos/kia.svg" class="brand-logo-item" alt="Kia">
-      <img src="assets/brand_logos/volkswagen.svg" class="brand-logo-item" alt="Volkswagen">
-      <img src="assets/brand_logos/lexus.png" class="brand-logo-item" alt="Lexus">
-      <img src="assets/brand_logos/volvo.svg" class="brand-logo-item" alt="Volvo">
-      <img src="assets/brand_logos/mazda.svg" class="brand-logo-item" alt="Mazda">
-      <img src="assets/brand_logos/subaru.png" class="brand-logo-item" alt="Subaru">
-      <img src="assets/brand_logos/jeep.svg" class="brand-logo-item" alt="Jeep">
-      <img src="assets/brand_logos/land-rover.svg" class="brand-logo-item" alt="Land Rover">
-      <img src="assets/brand_logos/mitsubishi.svg" class="brand-logo-item" alt="Mitsubishi">
-      <img src="assets/brand_logos/suzuki.svg" class="brand-logo-item" alt="Suzuki">
-      <img src="assets/brand_logos/renault.svg" class="brand-logo-item" alt="Renault">
-      <img src="assets/brand_logos/peugeot.svg" class="brand-logo-item" alt="Peugeot">
-      <img src="assets/brand_logos/skoda.svg" class="brand-logo-item" alt="Skoda">
-      <img src="assets/brand_logos/bentley.svg" class="brand-logo-item" alt="Bentley">
-      <img src="assets/brand_logos/rolls-royce.svg" class="brand-logo-item" alt="Rolls-Royce">
-      <img src="assets/brand_logos/bugatti.svg" class="brand-logo-item" alt="Bugatti">
-      <img src="assets/brand_logos/mclaren.svg" class="brand-logo-item" alt="McLaren">
+      <div class="logo-item"><img src="assets/brand_logos/toyota.svg" alt="Toyota"></div>
+      <div class="logo-item"><img src="assets/brand_logos/honda.svg" alt="Honda"></div>
+      <div class="logo-item"><img src="assets/brand_logos/bmw.svg" alt="BMW"></div>
+      <div class="logo-item"><img src="assets/brand_logos/mercedes-benz.svg" alt="Mercedes-Benz"></div>
+      <div class="logo-item"><img src="assets/brand_logos/audi.svg" alt="Audi"></div>
+      <div class="logo-item"><img src="assets/brand_logos/ford.png" alt="Ford"></div>
+      <div class="logo-item"><img src="assets/brand_logos/chevrolet.png" alt="Chevrolet"></div>
+      <div class="logo-item"><img src="assets/brand_logos/nissan.svg" alt="Nissan"></div>
+      <div class="logo-item"><img src="assets/brand_logos/hyundai.svg" alt="Hyundai"></div>
+      <div class="logo-item"><img src="assets/brand_logos/kia.svg" alt="Kia"></div>
+      <div class="logo-item"><img src="assets/brand_logos/volkswagen.svg" alt="Volkswagen"></div>
+      <div class="logo-item"><img src="assets/brand_logos/lexus.png" alt="Lexus"></div>
+      <div class="logo-item"><img src="assets/brand_logos/volvo.svg" alt="Volvo"></div>
+      <div class="logo-item"><img src="assets/brand_logos/mazda.svg" alt="Mazda"></div>
+      <div class="logo-item"><img src="assets/brand_logos/subaru.png" alt="Subaru"></div>
+      <div class="logo-item"><img src="assets/brand_logos/jeep.svg" alt="Jeep"></div>
+      <div class="logo-item"><img src="assets/brand_logos/land-rover.svg" alt="Land Rover"></div>
+      <div class="logo-item"><img src="assets/brand_logos/mitsubishi.svg" alt="Mitsubishi"></div>
+      <div class="logo-item"><img src="assets/brand_logos/suzuki.svg" alt="Suzuki"></div>
+      <div class="logo-item"><img src="assets/brand_logos/renault.svg" alt="Renault"></div>
+      <div class="logo-item"><img src="assets/brand_logos/peugeot.svg" alt="Peugeot"></div>
+      <div class="logo-item"><img src="assets/brand_logos/skoda.svg" alt="Skoda"></div>
+      <div class="logo-item"><img src="assets/brand_logos/bentley.svg" alt="Bentley"></div>
+      <div class="logo-item"><img src="assets/brand_logos/rolls-royce.svg" alt="Rolls-Royce"></div>
+      <div class="logo-item"><img src="assets/brand_logos/bugatti.svg" alt="Bugatti"></div>
+      <div class="logo-item"><img src="assets/brand_logos/mclaren.svg" alt="McLaren"></div>
     </div>
   </div>
 </section>
@@ -2301,7 +2343,7 @@
     </div>
     <div class="gallery-grid">
       <div class="g-card">
-        <img src="assets/foam-wash.jpg" alt="Professional car detailing at TRIEYE" loading="lazy">
+        <img src="assets/foam-wash.jpg" alt="Professional snow foam exterior car wash at TRIEYE Detailing Studio" loading="lazy">
         <div class="g-overlay">
           <div class="g-tag">01 / Exterior Wash</div>
           <div class="g-lbl">Snow Foam Pre-Wash &amp; Decon</div>

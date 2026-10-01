@@ -1880,21 +1880,23 @@
 
   /* --- Brands Marquee Section --- */
   .brands-section {
-    padding: 3rem 0;
-    background: var(--bg-body);
+    padding: 2.2rem 0 2rem 0;
+    background: #ffffff;
     border-bottom: 1px solid var(--line);
     overflow: hidden;
     position: relative;
     display: flex;
     flex-direction: column;
     justify-content: center;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
   }
   .brands-sec-head {
     text-align: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1.25rem;
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.8rem;
-    color: var(--text-muted);
+    font-size: 0.75rem;
+    color: var(--muted);
     text-transform: uppercase;
     letter-spacing: 3px;
     font-weight: 600;
@@ -1902,28 +1904,43 @@
   .marquee-wrapper {
     display: flex;
     width: max-content;
-    animation: marquee 60s linear infinite;
+    animation: marquee 50s linear infinite;
+    will-change: transform;
   }
   .marquee-wrapper:hover {
     animation-play-state: paused;
   }
   .marquee-content {
     display: flex;
-    gap: 4rem;
-    padding: 0 2rem;
     align-items: center;
   }
-  .brand-logo-item {
-    height: 40px;
-    width: auto;
-    opacity: 0.8;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-    user-select: none;
-    object-fit: contain;
+  .logo-item {
+    width: 150px;
+    height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 0 10px;
+    box-sizing: border-box;
   }
+  .logo-item img,
+  .brand-logo-item {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    max-width: 125px;
+    max-height: 50px;
+    opacity: 1 !important;
+    filter: none !important;
+    transition: transform 0.25s ease;
+    user-select: none;
+  }
+  .logo-item:hover img,
   .brand-logo-item:hover {
-    opacity: 1;
-    transform: scale(1.15);
+    opacity: 1 !important;
+    filter: none !important;
+    transform: scale(1.04);
   }
   @keyframes marquee {
     0% { transform: translateX(0); }
@@ -1934,19 +1951,44 @@
   .brands-section::after {
     content: "";
     position: absolute;
+    top: 0;
     bottom: 0;
-    width: 150px;
+    width: 140px;
     height: 100%;
     z-index: 2;
     pointer-events: none;
   }
   .brands-section::before {
     left: 0;
-    background: linear-gradient(to right, var(--bg-body), transparent);
+    background: linear-gradient(to right, #ffffff, transparent);
   }
   .brands-section::after {
     right: 0;
-    background: linear-gradient(to left, var(--bg-body), transparent);
+    background: linear-gradient(to left, #ffffff, transparent);
+  }
+  @media (max-width: 768px) {
+    .brands-section {
+      padding: 1.6rem 0 1.4rem 0;
+    }
+    .brands-sec-head {
+      font-size: 0.7rem;
+      letter-spacing: 2px;
+      margin-bottom: 1rem;
+    }
+    .logo-item {
+      width: 110px;
+      height: 50px;
+      padding: 0 6px;
+    }
+    .logo-item img,
+    .brand-logo-item {
+      max-width: 95px;
+      max-height: 40px;
+    }
+    .brands-section::before,
+    .brands-section::after {
+      width: 60px;
+    }
   }
 
 /* ---------- SERVICE PAGE CUSTOM SECTIONS ---------- */

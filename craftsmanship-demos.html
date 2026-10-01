@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TRIEYE Studio Craftsmanship - 5 Design Concepts Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #ffffff;
+    --bg-panel: #ffffff;
+    --bg-panel-2: #f8f9fa;
+    --bg-panel-3: #f1f3f5;
+    --line: #e2e8f0;
+    --pink: #ee2f76;
+    --pink-dim: rgba(238, 47, 118, 0.12);
+    --green: #689f0e;
+    --green-dim: rgba(104, 159, 14, 0.15);
+    --text-primary: #111827;
+    --muted: #64748b;
+    --white: #111827;
+    --dark-bg: #0d0e12;
+    --dark-panel: #14161d;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: #f4f6f8;
+    color: var(--text-primary);
+    line-height: 1.5;
+    padding-bottom: 80px;
+  }
+
+  /* Top sticky navigation bar for Demos */
+  .demo-nav-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #0d0e12;
+    color: #fff;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #262933;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  }
+  .demo-brand {
+    font-family: 'Oswald', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .demo-brand span { color: var(--pink); }
+  .demo-nav-links {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+  }
+  .demo-nav-btn {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 4px;
+    background: #1c1f2b;
+    color: #a0a5b5;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    border: 1px solid transparent;
+  }
+  .demo-nav-btn:hover, .demo-nav-btn.active {
+    background: var(--pink);
+    color: #fff;
+    border-color: var(--pink);
+  }
+
+  .preview-wrapper {
+    max-width: 1240px;
+    margin: 30px auto;
+    padding: 0 20px;
+  }
+
+  .demo-section-container {
+    background: #ffffff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    margin-bottom: 50px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+  }
+
+  .demo-header-tag {
+    background: #0d0e12;
+    color: #fff;
+    padding: 12px 24px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .demo-header-tag span.badge {
+    background: var(--pink);
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 11px;
+  }
+
+  .demo-body {
+    padding: 40px;
+  }
+
+  /* Shared Section Titles */
+  .sec-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--pink);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .sec-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 32px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: #111827;
+    margin-bottom: 6px;
+    line-height: 1.1;
+  }
+  .sec-desc {
+    font-size: 15px;
+    color: var(--muted);
+    margin-bottom: 28px;
+  }
+
+  /* ==================================================
+     DEMO 01 — CINEMATIC FEATURE + SERVICE STRIP
+     ================================================== */
+  .d1-grid {
+    display: grid;
+    grid-template-columns: 1.35fr 1fr;
+    gap: 24px;
+    align-items: stretch;
+  }
+  .d1-feature-card {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    height: 460px;
+    background: #0d0e12;
+    border: 1px solid var(--line);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.12);
+  }
+  .d1-feature-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.4s ease, transform 0.6s ease;
+  }
+  .d1-feature-card:hover .d1-feature-img {
+    transform: scale(1.03);
+  }
+  .d1-feature-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(13,14,18,0.92) 0%, rgba(13,14,18,0.3) 50%, transparent 100%);
+    padding: 28px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+  .d1-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--green);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .d1-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 26px;
+    color: #fff;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    letter-spacing: 0.5px;
+  }
+  .d1-subtitle {
+    font-size: 14px;
+    color: #a0a5b5;
+  }
+
+  .d1-selector-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    justify-content: center;
+  }
+  .d1-item {
+    background: #ffffff;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 18px 20px;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    overflow: hidden;
+  }
+  .d1-item::before {
+    content: "";
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    background: transparent;
+    transition: background 0.2s ease;
+  }
+  .d1-item:hover, .d1-item.active {
+    border-color: #333642;
+    background: #f8fafc;
+    box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    transform: translateX(4px);
+  }
+  .d1-item.active::before, .d1-item:hover::before {
+    background: var(--pink);
+  }
+  .d1-item-info {
+    display: flex;
+    flex-direction: column;
+  }
+  .d1-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--pink);
+    letter-spacing: 1px;
+    margin-bottom: 2px;
+  }
+  .d1-name {
+    font-family: 'Oswald', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #111827;
+    letter-spacing: 0.5px;
+  }
+  .d1-desc {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .d1-arrow {
+    font-size: 18px;
+    color: #cbd5e1;
+    transition: all 0.25s ease;
+  }
+  .d1-item:hover .d1-arrow, .d1-item.active .d1-arrow {
+    color: var(--pink);
+    transform: translateX(3px);
+  }
+
+  /* ==================================================
+     DEMO 02 — EDITORIAL BENTO GRID
+     ================================================== */
+  .d2-bento-grid {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    grid-template-rows: 210px 210px auto;
+    gap: 16px;
+  }
+  .d2-card {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #0d0e12;
+    border: 1px solid var(--line);
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+    text-decoration: none;
+    display: block;
+  }
+  .d2-card-wash {
+    grid-column: 1 / 2;
+    grid-row: 1 / 3;
+  }
+  .d2-card-paint {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+  }
+  .d2-card-interior {
+    grid-column: 2 / 3;
+    grid-row: 2 / 3;
+  }
+  .d2-card-protection {
+    grid-column: 1 / 3;
+    grid-row: 3 / 4;
+    height: 180px;
+  }
+  .d2-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.4s ease, filter 0.4s ease;
+  }
+  .d2-card:hover .d2-img {
+    transform: scale(1.05);
+  }
+  .d2-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(13,14,18,0.92) 0%, rgba(13,14,18,0.3) 60%, transparent 100%);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+  }
+  .d2-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--green);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 3px;
+  }
+  .d2-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: #fff;
+    text-transform: uppercase;
+    line-height: 1.2;
+  }
+  .d2-sub {
+    font-size: 12.5px;
+    color: #cbd5e1;
+    margin-top: 2px;
+  }
+
+  /* ==================================================
+     DEMO 03 — HORIZONTAL STORY TIMELINE
+     ================================================== */
+  .d3-timeline-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--line);
+  }
+  .d3-steps-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--muted);
+  }
+  .d3-steps-bar span.active { color: var(--pink); }
+  
+  .d3-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    position: relative;
+  }
+  .d3-card {
+    background: #ffffff;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.04);
+  }
+  .d3-card:hover {
+    transform: translateY(-5px);
+    border-color: #333642;
+    box-shadow: 0 12px 28px rgba(0,0,0,0.12);
+  }
+  .d3-img-wrap {
+    height: 200px;
+    position: relative;
+    overflow: hidden;
+    background: #0d0e12;
+  }
+  .d3-card-wide .d3-img-wrap { height: 230px; }
+  .d3-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+  }
+  .d3-card:hover .d3-img { transform: scale(1.06); }
+  .d3-num-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(13,14,18,0.85);
+    backdrop-filter: blur(4px);
+    color: #fff;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+  .d3-content {
+    padding: 18px;
+  }
+  .d3-stage-name {
+    font-family: 'Oswald', sans-serif;
+    font-size: 18px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #111827;
+    margin-bottom: 4px;
+  }
+  .d3-desc {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  /* ==================================================
+     DEMO 04 — FULL-WIDTH INTERACTIVE SHOWCASE
+     ================================================== */
+  .d4-showcase {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    height: 480px;
+    background: #0d0e12;
+    border: 1px solid var(--line);
+    box-shadow: 0 14px 40px rgba(0,0,0,0.2);
+  }
+  .d4-bg-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.5s ease, transform 0.8s ease;
+  }
+  .d4-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to right, rgba(13,14,18,0.95) 0%, rgba(13,14,18,0.65) 50%, rgba(13,14,18,0.3) 100%);
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  .d4-top-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--pink);
+    opacity: 0.85;
+    line-height: 1;
+  }
+  .d4-main-info {
+    max-width: 500px;
+  }
+  .d4-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 38px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: #ffffff;
+    line-height: 1.1;
+    margin-bottom: 10px;
+    letter-spacing: 0.5px;
+  }
+  .d4-desc {
+    font-size: 15px;
+    color: #cbd5e1;
+    margin-bottom: 20px;
+  }
+  .d4-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--pink);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 4px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+  .d4-btn:hover { background: #d41f62; transform: translateY(-2px); }
+
+  .d4-tab-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    background: rgba(13,14,18,0.85);
+    backdrop-filter: blur(10px);
+    border-top: 1px solid rgba(255,255,255,0.1);
+    margin: -40px;
+    margin-top: 0;
+  }
+  .d4-tab {
+    padding: 16px 20px;
+    cursor: pointer;
+    border-right: 1px solid rgba(255,255,255,0.08);
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+  }
+  .d4-tab:last-child { border-right: none; }
+  .d4-tab:hover, .d4-tab.active {
+    background: rgba(238, 47, 118, 0.15);
+    border-top: 3px solid var(--pink);
+  }
+  .d4-tab-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--green);
+    font-weight: 700;
+  }
+  .d4-tab-name {
+    font-family: 'Oswald', sans-serif;
+    font-size: 15px;
+    color: #fff;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  /* ==================================================
+     DEMO 05 — BEFORE / PROCESS / RESULT SHOWCASE
+     ================================================== */
+  .d5-editorial-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    align-items: center;
+  }
+  .d5-main-photo {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    height: 420px;
+    background: #0d0e12;
+    border: 1px solid var(--line);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  }
+  .d5-main-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .d5-hero-badge {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background: rgba(13,14,18,0.9);
+    padding: 14px 20px;
+    border-radius: 6px;
+    border-left: 3px solid var(--pink);
+  }
+  .d5-hero-badge-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 18px;
+    color: #fff;
+    text-transform: uppercase;
+  }
+  .d5-hero-badge-sub {
+    font-size: 12px;
+    color: var(--green);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .d5-editorial-side {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .d5-stage-row {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 16px;
+    background: #ffffff;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    transition: all 0.25s ease;
+  }
+  .d5-stage-row:hover {
+    border-color: #333642;
+    transform: translateX(4px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+  }
+  .d5-big-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--pink);
+    line-height: 1;
+    min-width: 45px;
+  }
+  .d5-stage-info { flex: 1; }
+  .d5-stage-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #111827;
+  }
+  .d5-stage-desc {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .d5-thumb {
+    width: 70px;
+    height: 50px;
+    border-radius: 4px;
+    object-fit: cover;
+    border: 1px solid var(--line);
+  }
+
+  /* Responsive Media Queries */
+  @media (max-width: 960px) {
+    .d1-grid { grid-template-columns: 1fr; }
+    .d1-feature-card { height: 350px; }
+    .d2-bento-grid { grid-template-columns: 1fr; grid-template-rows: auto; }
+    .d2-card-wash, .d2-card-paint, .d2-card-interior, .d2-card-protection { grid-column: 1 / 2; grid-row: auto; height: 200px; }
+    .d3-grid { grid-template-columns: repeat(2, 1fr); }
+    .d4-tab-bar { grid-template-columns: repeat(2, 1fr); }
+    .d5-editorial-wrap { grid-template-columns: 1fr; }
+  }
+
+  @media (max-width: 580px) {
+    .d3-grid { grid-template-columns: 1fr; }
+    .d4-showcase { height: auto; }
+    .d4-overlay { position: relative; inset: auto; padding: 24px; }
+    .d4-tab-bar { grid-template-columns: 1fr; margin: 0; }
+  }
+</style>
+</head>
+<body>
+
+  <!-- Top Sticky Navigation Bar -->
+  <header class="demo-nav-header">
+    <div class="demo-brand">
+      TRIEYE <span>CRAFTSMANSHIP REDESIGN</span>
+    </div>
+    <nav class="demo-nav-links">
+      <a href="#demo1" class="demo-nav-btn active">01 Cinematic Feature</a>
+      <a href="#demo2" class="demo-nav-btn">02 Bento Grid</a>
+      <a href="#demo3" class="demo-nav-btn">03 Story Timeline</a>
+      <a href="#demo4" class="demo-nav-btn">04 Interactive Showcase</a>
+      <a href="#demo5" class="demo-nav-btn">05 Editorial Showcase</a>
+    </nav>
+  </header>
+
+  <div class="preview-wrapper">
+
+    <!-- ==================================================
+         DEMO 01 — CINEMATIC FEATURE + SERVICE STRIP
+         ================================================== -->
+    <div class="demo-section-container" id="demo1">
+      <div class="demo-header-tag">
+        <span>DEMO 01 — CINEMATIC FEATURE + VERTICAL SERVICE STRIP</span>
+        <span class="badge">CONCEPT 1</span>
+      </div>
+      <div class="demo-body">
+        <div class="sec-tag">// Studio Craftsmanship</div>
+        <h2 class="sec-title">The work speaks for itself</h2>
+        <p class="sec-desc">Precision detailing &amp; vehicle restoration from our Villivakkam studio.</p>
+
+        <div class="d1-grid">
+          <!-- Featured Large Image (Left) -->
+          <div class="d1-feature-card">
+            <img src="assets/foam-wash.jpg" alt="Featured Service" class="d1-feature-img" id="d1-img-target">
+            <div class="d1-feature-overlay">
+              <div class="d1-tag" id="d1-tag-target">01 / EXTERIOR WASH</div>
+              <div class="d1-title" id="d1-title-target">Snow Foam Pre-Wash &amp; Decon</div>
+              <div class="d1-subtitle" id="d1-sub-target">pH-neutral snow foam application, touchless pre-wash, and micro-fiber hand decontamination.</div>
+            </div>
+          </div>
+
+          <!-- Vertical Service Selector (Right) -->
+          <div class="d1-selector-list">
+            <div class="d1-item active" onclick="switchDemo1('assets/foam-wash.jpg', '01 / EXTERIOR WASH', 'Snow Foam Pre-Wash &amp; Decon', 'pH-neutral snow foam application, touchless pre-wash, and micro-fiber hand decontamination.', this)">
+              <div class="d1-item-info">
+                <span class="d1-num">01 / EXTERIOR WASH</span>
+                <span class="d1-name">Snow Foam Pre-Wash &amp; Decon</span>
+                <span class="d1-desc">Safe multi-stage exterior body wash</span>
+              </div>
+              <span class="d1-arrow">→</span>
+            </div>
+
+            <div class="d1-item" onclick="switchDemo1('assets/rubbing-polish.jpg', '02 / PAINT CORRECTION', 'Dual-Action Rubbing Polish', 'Multi-stage machine polishing removing 85%+ swirl marks, oxidation &amp; haze.', this)">
+              <div class="d1-item-info">
+                <span class="d1-num">02 / PAINT CORRECTION</span>
+                <span class="d1-name">Dual-Action Rubbing Polish</span>
+                <span class="d1-desc">Rotary swirl removal &amp; gloss enhancement</span>
+              </div>
+              <span class="d1-arrow">→</span>
+            </div>
+
+            <div class="d1-item" onclick="switchDemo1('assets/interior-clean.jpg', '03 / INTERIOR SPA', 'Steam Extraction &amp; Leather Feed', 'Deep thermal steam sanitization, carpet extraction &amp; pH-balanced leather feeding.', this)">
+              <div class="d1-item-info">
+                <span class="d1-num">03 / INTERIOR SPA</span>
+                <span class="d1-name">Steam Extraction &amp; Leather Feed</span>
+                <span class="d1-desc">Germ-free cabin deep cleaning</span>
+              </div>
+              <span class="d1-arrow">→</span>
+            </div>
+
+            <div class="d1-item" onclick="switchDemo1('assets/ceramic-coating.jpg', '04 / PROTECTION', 'Hydrophobic Ceramic Shield', '9H SiO2 quartz ceramic layer offering multi-year gloss &amp; UV protection.', this)">
+              <div class="d1-item-info">
+                <span class="d1-num">04 / PROTECTION</span>
+                <span class="d1-name">Hydrophobic Ceramic Shield</span>
+                <span class="d1-desc">Long-term paint ceramic armor</span>
+              </div>
+              <span class="d1-arrow">→</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ==================================================
+         DEMO 02 — EDITORIAL BENTO GRID
+         ================================================== -->
+    <div class="demo-section-container" id="demo2">
+      <div class="demo-header-tag">
+        <span>DEMO 02 — EDITORIAL BENTO GRID (ASYMMETRIC COMPOSITION)</span>
+        <span class="badge">CONCEPT 2</span>
+      </div>
+      <div class="demo-body">
+        <div class="sec-tag">// Studio Craftsmanship</div>
+        <h2 class="sec-title">The work speaks for itself</h2>
+        <p class="sec-desc">Precision before/after transformations from our Chennai detailing studio.</p>
+
+        <div class="d2-bento-grid">
+          <!-- Large Dominant Wash Card -->
+          <a href="/car-wash" class="d2-card d2-card-wash">
+            <img src="assets/foam-wash.jpg" alt="Exterior Wash" class="d2-img">
+            <div class="d2-overlay">
+              <div class="d2-tag">01 / EXTERIOR WASH</div>
+              <div class="d2-title">Snow Foam Pre-Wash &amp; Decon</div>
+              <div class="d2-sub">Filtered pressure rinse &amp; scratch-free washing</div>
+            </div>
+          </a>
+
+          <!-- Paint Correction Card -->
+          <a href="/paint-correction" class="d2-card d2-card-paint">
+            <img src="assets/rubbing-polish.jpg" alt="Paint Correction" class="d2-img">
+            <div class="d2-overlay">
+              <div class="d2-tag">02 / PAINT CORRECTION</div>
+              <div class="d2-title">Dual-Action Rubbing Polish</div>
+              <div class="d2-sub">85%+ swirl mark &amp; defect elimination</div>
+            </div>
+          </a>
+
+          <!-- Interior Spa Card -->
+          <a href="/interior-detailing" class="d2-card d2-card-interior">
+            <img src="assets/interior-clean.jpg" alt="Interior Spa" class="d2-img">
+            <div class="d2-overlay">
+              <div class="d2-tag">03 / INTERIOR SPA</div>
+              <div class="d2-title">Steam Extraction &amp; Leather Care</div>
+              <div class="d2-sub">Thermal sanitization &amp; upholstery care</div>
+            </div>
+          </a>
+
+          <!-- Protection Horizontal Wide Card -->
+          <a href="/ceramic-coating" class="d2-card d2-card-protection">
+            <img src="assets/ceramic-coating.jpg" alt="Protection" class="d2-img">
+            <div class="d2-overlay">
+              <div class="d2-tag">04 / PROTECTION</div>
+              <div class="d2-title">Hydrophobic Ceramic &amp; Graphene Protection</div>
+              <div class="d2-sub">Deep mirror gloss, extreme water beading &amp; UV protection</div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ==================================================
+         DEMO 03 — HORIZONTAL STORY TIMELINE
+         ================================================== -->
+    <div class="demo-section-container" id="demo3">
+      <div class="demo-header-tag">
+        <span>DEMO 03 — HORIZONTAL STORY TIMELINE (DETAILING PROCESS)</span>
+        <span class="badge">CONCEPT 3</span>
+      </div>
+      <div class="demo-body">
+        <div class="d3-timeline-header">
+          <div>
+            <div class="sec-tag">// Detailing Workflow</div>
+            <h2 class="sec-title">The Craftsmanship Sequence</h2>
+          </div>
+          <div class="d3-steps-bar">
+            <span class="active">01 WASH</span> → <span>02 CORRECT</span> → <span>03 RESTORE</span> → <span>04 PROTECT</span>
+          </div>
+        </div>
+
+        <div class="d3-grid">
+          <!-- Step 1 -->
+          <div class="d3-card">
+            <div class="d3-img-wrap">
+              <img src="assets/foam-wash.jpg" alt="Step 01 Wash" class="d3-img">
+              <span class="d3-num-badge">01 WASH</span>
+            </div>
+            <div class="d3-content">
+              <div class="d3-stage-name">Snow Foam Pre-Wash</div>
+              <div class="d3-desc">Touchless foam decontamination removing dirt before paint work.</div>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="d3-card">
+            <div class="d3-img-wrap">
+              <img src="assets/rubbing-polish.jpg" alt="Step 02 Correct" class="d3-img">
+              <span class="d3-num-badge">02 CORRECT</span>
+            </div>
+            <div class="d3-content">
+              <div class="d3-stage-name">Paint Correction</div>
+              <div class="d3-desc">Dual-action machine polishing restoring true depth and clarity.</div>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="d3-card">
+            <div class="d3-img-wrap">
+              <img src="assets/interior-clean.jpg" alt="Step 03 Restore" class="d3-img">
+              <span class="d3-num-badge">03 RESTORE</span>
+            </div>
+            <div class="d3-content">
+              <div class="d3-stage-name">Interior Deep Spa</div>
+              <div class="d3-desc">High-pressure steam extraction and protective leather nourishment.</div>
+            </div>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="d3-card d3-card-wide">
+            <div class="d3-img-wrap">
+              <img src="assets/ceramic-coating.jpg" alt="Step 04 Protect" class="d3-img">
+              <span class="d3-num-badge" style="background: var(--pink);">04 PROTECT</span>
+            </div>
+            <div class="d3-content">
+              <div class="d3-stage-name">Ceramic Protection</div>
+              <div class="d3-desc">9H hydrophobic armor locking in pristine gloss for years.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ==================================================
+         DEMO 04 — FULL-WIDTH INTERACTIVE SHOWCASE
+         ================================================== -->
+    <div class="demo-section-container" id="demo4">
+      <div class="demo-header-tag">
+        <span>DEMO 04 — FULL-WIDTH INTERACTIVE SHOWCASE</span>
+        <span class="badge">CONCEPT 4</span>
+      </div>
+      <div class="demo-body">
+        <div class="sec-tag">// Studio Craftsmanship</div>
+        <h2 class="sec-title">The work speaks for itself</h2>
+        <p class="sec-desc">Explore our signature detailing services below.</p>
+
+        <div class="d4-showcase">
+          <img src="assets/foam-wash.jpg" alt="Showcase" class="d4-bg-img" id="d4-target-img">
+          <div class="d4-overlay">
+            <div class="d4-top-num" id="d4-target-num">01</div>
+            <div class="d4-main-info">
+              <div class="d4-title" id="d4-target-title">EXTERIOR WASH</div>
+              <div class="d4-desc" id="d4-target-desc">Snow Foam Pre-Wash &amp; Decontamination detailing for a swirl-free finish.</div>
+              <a href="/car-wash" class="d4-btn" id="d4-target-link">VIEW SERVICE DETAILS →</a>
+            </div>
+
+            <div class="d4-tab-bar">
+              <div class="d4-tab active" onclick="switchDemo4('assets/foam-wash.jpg', '01', 'EXTERIOR WASH', 'Snow Foam Pre-Wash &amp; Decontamination detailing for a swirl-free finish.', '/car-wash', this)">
+                <span class="d4-tab-num">01</span>
+                <span class="d4-tab-name">Exterior Wash</span>
+              </div>
+              <div class="d4-tab" onclick="switchDemo4('assets/rubbing-polish.jpg', '02', 'PAINT CORRECTION', 'Dual-Action Rubbing Polish removing swirl marks and restoring depth.', '/paint-correction', this)">
+                <span class="d4-tab-num">02</span>
+                <span class="d4-tab-name">Paint Correction</span>
+              </div>
+              <div class="d4-tab" onclick="switchDemo4('assets/interior-clean.jpg', '03', 'INTERIOR SPA', 'Steam Extraction &amp; Leather Feed for a sterile, fresh cabin.', '/interior-detailing', this)">
+                <span class="d4-tab-num">03</span>
+                <span class="d4-tab-name">Interior Spa</span>
+              </div>
+              <div class="d4-tab" onclick="switchDemo4('assets/ceramic-coating.jpg', '04', 'CERAMIC PROTECTION', 'Hydrophobic Ceramic &amp; Graphene Coating for long-term armor.', '/ceramic-coating', this)">
+                <span class="d4-tab-num">04</span>
+                <span class="d4-tab-name">Protection</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ==================================================
+         DEMO 05 — BEFORE / PROCESS / RESULT SHOWCASE
+         ================================================== -->
+    <div class="demo-section-container" id="demo5">
+      <div class="demo-header-tag">
+        <span>DEMO 05 — EDITORIAL BEFORE / PROCESS / RESULT SHOWCASE</span>
+        <span class="badge">CONCEPT 5</span>
+      </div>
+      <div class="demo-body">
+        <div class="sec-tag">// Studio Craftsmanship</div>
+        <h2 class="sec-title">The work speaks for itself</h2>
+        <p class="sec-desc">A technical editorial breakdown of our 4-stage vehicle treatment.</p>
+
+        <div class="d5-editorial-wrap">
+          <!-- Main Hero Focal Image -->
+          <div class="d5-main-photo">
+            <img src="assets/foam-wash.jpg" alt="Detailing Studio Craftsmanship" id="d5-main-img">
+            <div class="d5-hero-badge">
+              <div class="d5-hero-badge-title" id="d5-badge-title">01 / EXTERIOR WASH STAGE</div>
+              <div class="d5-hero-badge-sub">pH-Neutral Snow Foam &amp; Decon</div>
+            </div>
+          </div>
+
+          <!-- Editorial Process Callouts -->
+          <div class="d5-editorial-side">
+            <div class="d5-stage-row" onmouseenter="setDemo5Image('assets/foam-wash.jpg', '01 / EXTERIOR WASH STAGE', 'pH-Neutral Snow Foam &amp; Decon')">
+              <div class="d5-big-num">01</div>
+              <div class="d5-stage-info">
+                <div class="d5-stage-title">WASH — Snow Foam &amp; Decon</div>
+                <div class="d5-stage-desc">Safe touchless foam bath and clay bar decontamination.</div>
+              </div>
+              <img src="assets/foam-wash.jpg" alt="Wash" class="d5-thumb">
+            </div>
+
+            <div class="d5-stage-row" onmouseenter="setDemo5Image('assets/rubbing-polish.jpg', '02 / PAINT CORRECTION STAGE', 'Dual-Action Rotary Swirl Removal')">
+              <div class="d5-big-num">02</div>
+              <div class="d5-stage-info">
+                <div class="d5-stage-title">CORRECT — Dual-Action Polish</div>
+                <div class="d5-stage-desc">Eliminating 85%+ swirls, oxidation and light scratches.</div>
+              </div>
+              <img src="assets/rubbing-polish.jpg" alt="Correct" class="d5-thumb">
+            </div>
+
+            <div class="d5-stage-row" onmouseenter="setDemo5Image('assets/interior-clean.jpg', '03 / INTERIOR SPA STAGE', 'Steam Extraction &amp; Leather Nourishment')">
+              <div class="d5-big-num">03</div>
+              <div class="d5-stage-info">
+                <div class="d5-stage-title">RESTORE — Interior Deep Spa</div>
+                <div class="d5-stage-desc">Thermal sanitization, carpet extraction &amp; leather feeding.</div>
+              </div>
+              <img src="assets/interior-clean.jpg" alt="Restore" class="d5-thumb">
+            </div>
+
+            <div class="d5-stage-row" onmouseenter="setDemo5Image('assets/ceramic-coating.jpg', '04 / PROTECTION STAGE', '9H Hydrophobic Ceramic Armor')">
+              <div class="d5-big-num" style="color: var(--green);">04</div>
+              <div class="d5-stage-info">
+                <div class="d5-stage-title">PROTECT — Hydrophobic Armor</div>
+                <div class="d5-stage-desc">9H SiO2 quartz layer sealing in deep mirror gloss.</div>
+              </div>
+              <img src="assets/ceramic-coating.jpg" alt="Protect" class="d5-thumb">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Interactive JavaScript -->
+  <script>
+    function switchDemo1(imgSrc, tag, title, sub, element) {
+      document.getElementById('d1-img-target').src = imgSrc;
+      document.getElementById('d1-tag-target').innerText = tag;
+      document.getElementById('d1-title-target').innerText = title;
+      document.getElementById('d1-sub-target').innerText = sub;
+      
+      const items = document.querySelectorAll('.d1-item');
+      items.forEach(el => el.classList.remove('active'));
+      element.classList.add('active');
+    }
+
+    function switchDemo4(imgSrc, num, title, desc, link, element) {
+      document.getElementById('d4-target-img').src = imgSrc;
+      document.getElementById('d4-target-num').innerText = num;
+      document.getElementById('d4-target-title').innerText = title;
+      document.getElementById('d4-target-desc').innerText = desc;
+      document.getElementById('d4-target-link').href = link;
+
+      const tabs = document.querySelectorAll('.d4-tab');
+      tabs.forEach(el => el.classList.remove('active'));
+      element.classList.add('active');
+    }
+
+    function setDemo5Image(imgSrc, title, sub) {
+      document.getElementById('d5-main-img').src = imgSrc;
+      document.getElementById('d5-badge-title').innerText = title;
+      document.getElementById('d5-badge-sub').innerText = sub;
+    }
+  </script>
+</body>
+</html>
