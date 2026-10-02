@@ -1171,15 +1171,16 @@
   }
   .about-stat-num{
     font-family:'Oswald',sans-serif;
-    font-size:clamp(26px, 4.5vw, 42px);
+    font-size:clamp(16px, 2.2vw, 24px);
     font-weight:700;
     color:var(--green);
-    line-height:1.1;
-    margin-bottom:10px;
-    letter-spacing:0.04em;
-    white-space:nowrap;
-    word-break:keep-all;
+    line-height:1.2;
+    margin-bottom:8px;
+    letter-spacing:0.02em;
     text-transform:uppercase;
+    max-width:100%;
+    word-break:normal;
+    overflow-wrap:break-word;
   }
   .about-stat-label{
     font-family:'IBM Plex Mono',monospace;
@@ -1663,9 +1664,12 @@
     display:flex;
     align-items:center;
     justify-content:center;
-    gap:20px;
+    gap:28px;
     margin-top:32px;
     width:100%;
+    max-width:1200px;
+    margin-inline:auto;
+    box-sizing:border-box;
   }
   .faq-line{
     flex:1;
@@ -1674,10 +1678,13 @@
   }
   .faq-divider-text{
     font-family:'IBM Plex Mono', monospace;
-    font-size:12px;
+    font-size:clamp(10px, 1.4vw, 12px);
     color:var(--muted);
-    letter-spacing:0.2em;
+    letter-spacing:clamp(0.1em, 0.2vw, 0.2em);
     text-transform:uppercase;
+    flex-shrink:0;
+    text-align:center;
+    white-space:nowrap;
   }
 
   @media (max-width: 900px){
@@ -1688,7 +1695,8 @@
       grid-column:auto;
     }
     .faq-bottom-divider {
-      display:none;
+      gap:16px;
+      margin-top:24px;
     }
   }
 
@@ -2367,7 +2375,7 @@
 <section id="services">
   <div class="wrap">
     <div class="sec-head">
-      <div class="sec-tag">// Services &amp; pricing</div>
+      <div class="sec-tag">Services &amp; pricing</div>
       <h2>Pick your vehicle class</h2>
       <p>Three service tiers, four vehicle classes. Rates shown are current studio pricing synced live from the studio database.</p>
     </div>
@@ -2442,7 +2450,7 @@
 <section class="booking" id="booking">
   <div class="wrap booking-grid">
     <div class="booking-copy">
-      <div class="sec-tag">// Direct Instant Booking</div>
+      <div class="sec-tag">Direct Instant Booking</div>
       <h2>No more waiting in the bay queue</h2>
       <p style="color:var(--muted);margin-top:12px;font-size:15px;">Book your detailing appointment online and drive straight into detailing bay #1.</p>
       <ul>
@@ -2500,7 +2508,7 @@
 <section id="gallery">
   <div class="wrap">
     <div class="sec-head">
-      <div class="sec-tag">// Studio Craftsmanship</div>
+      <div class="sec-tag">Studio Craftsmanship</div>
       <h2>The work speaks for itself</h2>
       <p>Precision before/after transformations from our Chennai detailing studio.</p>
     </div>
@@ -2541,7 +2549,7 @@
   <div class="wrap">
     <div class="sec-head-row">
       <div class="sec-head" style="margin-bottom:0;">
-        <div class="sec-tag">// REAL CUSTOMER REVIEWS</div>
+        <div class="sec-tag">REAL CUSTOMER REVIEWS</div>
         <h2>LOVED BY OUR CUSTOMERS</h2>
         <p>Real experiences from customers who trust TRIEYE with their vehicles.</p>
       </div>
@@ -2675,7 +2683,7 @@
 <section class="about-section" id="about">
   <div class="wrap about-grid">
     <div class="about-content">
-      <div class="sec-tag">// The Trieye Standard</div>
+      <div class="sec-tag">The Trieye Standard</div>
       <h2>Obsessive Detailing &amp; Clear-Coat Protection</h2>
       <p class="about-lead">Founded in Chennai, Trieye is engineered around a singular philosophy: treating every car and bike as a bespoke piece of rolling artwork.</p>
       <p class="about-body">We eliminate harsh acidic chemicals and outdated swirl-inducing sponge washes. In our Villivakkam studio, our master detailers apply pH-neutral snow foams, filtered pressure rinses, zero-touch warm air drying, and multi-stage rotary paint restoration with certified ceramic quartz finishes.</p>
@@ -2787,7 +2795,7 @@
     </div>
     <div>
       <div class="sec-head" style="margin-bottom:24px;">
-        <div class="sec-tag">// Visit our studio</div>
+        <div class="sec-tag">Visit our studio</div>
         <h2>Find us &amp; reach us</h2>
         <p style="margin-top:16px; color:var(--muted); font-size:15px; max-width:480px;">TRIEYE Detailing Studio is a professional car and <a href="/bike-detailing" style="color:var(--pink);text-decoration:underline;">bike detailing</a> studio in Villivakkam, Chennai, offering <a href="/car-wash" style="color:var(--pink);text-decoration:underline;">premium car wash</a>, interior deep cleaning, paint correction, polishing, ceramic and <a href="/graphene-coating" style="color:var(--pink);text-decoration:underline;">graphene coatings</a>, PPF and vehicle protection services.</p>
       </div>
@@ -2823,7 +2831,7 @@
   <div class="faq-bg-pattern"></div>
   <div class="faq-container">
     <div class="faq-header">
-      <div class="sec-tag">// Got Questions?</div>
+      <div class="sec-tag">Got Questions?</div>
       <h2 class="faq-title">FREQUENTLY ASKED <span class="faq-pink">QUESTIONS</span></h2>
       <p class="faq-subtitle">Clear answers. A better detailing experience.</p>
     </div>
@@ -2963,13 +2971,11 @@
         <img src="assets/trieye-logo-dark.png" alt="TRIEYE car detailing studio" class="footer-logo logo-dark">
         <img src="assets/trieye-logo-light.png" alt="TRIEYE car detailing studio" class="footer-logo logo-light">
       </a>
-      <p class="footer-tagline">DETAIL • PRECISION • PROTECTION</p>
-    </div>
+          </div>
 
     <!-- Bottom Footer -->
     <div class="footer-bottom">
       <div class="footer-copy">© 2026 Trieye Detail Studio. All rights reserved.</div>
-      <div class="footer-sub-tag">DETAIL • PRECISION • PROTECTION</div>
     </div>
   </div>
 </footer>

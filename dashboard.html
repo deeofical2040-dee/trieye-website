@@ -988,6 +988,7 @@
       margin-bottom: 1.5rem;
       box-shadow: 0 4px 18px rgba(0, 0, 0, 0.35);
       animation: fadeIn 0.25s ease;
+      scroll-margin-top: 90px;
     }
     .customer-profile-header {
       display: flex;
@@ -1386,7 +1387,10 @@
           <button class="filter-pill active" onclick="filterOnlineBookings('TODAY', this)">Today</button>
           <button class="filter-pill" onclick="filterOnlineBookings('TOMORROW', this)">Tomorrow</button>
           <button class="filter-pill" onclick="filterOnlineBookings('UPCOMING', this)">Upcoming</button>
+          <button class="filter-pill" onclick="filterOnlineBookings('PENDING', this)">Pending</button>
+          <button class="filter-pill" onclick="filterOnlineBookings('CONFIRMED', this)">Confirmed</button>
           <button class="filter-pill" onclick="filterOnlineBookings('COMPLETED', this)">Completed</button>
+          <button class="filter-pill" onclick="filterOnlineBookings('CANCELLED', this)">Cancelled</button>
           <button class="filter-pill" onclick="filterOnlineBookings('ALL', this)">All Online</button>
         </div>
 
@@ -2888,7 +2892,7 @@
       });
       
       const revenue = todayBookings
-        .filter(b => b.status === 'IN PROGRESS' || b.status === 'COMPLETED' || b.status === 'CONFIRMED')
+        .filter(b => b.status !== 'CANCELLED' && (b.payStatus || '').toUpperCase() === 'PAID')
         .reduce((sum, b) => sum + (Number(b.price) || 0), 0);
 
       const activeVehicles = bookings.filter(b => b.status === 'IN PROGRESS' || b.status === 'ARRIVED' || b.status === 'QUALITY CHECK').length;
@@ -3091,12 +3095,21 @@
           return bDate === localTomorrow;
         }
         if (onlineFilterState === 'UPCOMING') {
-          return bDate > localTomorrow;
+          return bDate > localTomorrow && (b.status || '').toUpperCase() !== 'CANCELLED';
+        }
+        if (onlineFilterState === 'PENDING') {
+          return (b.status || '').toUpperCase() === 'PENDING';
+        }
+        if (onlineFilterState === 'CONFIRMED') {
+          return (b.status || '').toUpperCase() === 'CONFIRMED';
         }
         if (onlineFilterState === 'COMPLETED') {
           return (b.status || '').toUpperCase() === 'COMPLETED';
         }
-        // ALL or default: show all online bookings
+        if (onlineFilterState === 'CANCELLED') {
+          return (b.status || '').toUpperCase() === 'CANCELLED';
+        }
+        // ALL or default: show all online bookings (including CANCELLED)
         return true;
       });
 
@@ -3136,7 +3149,8 @@
           <td>
             <div class="action-btn-group">
               ${(b.payStatus || 'UNPAID').toUpperCase() !== 'PAID' ? `<button class="action-btn" style="background:rgba(0,230,118,0.12); color:var(--green); border-color:var(--green);" title="Record Payment" onclick="openMarkPaidModal('${b.id}')">💳 Pay</button>` : ''}
-              ${(b.status || '').toUpperCase() === 'CONFIRMED' ? `<button class="action-btn arrive" onclick="changeJobStatus('${b.id}', 'ARRIVED')" title="Mark Vehicle Arrived">🚗 Arrived</button>` : ''}
+              ${(b.status || '').toUpperCase() === 'CONFIRMED' || (b.status || '').toUpperCase() === 'PENDING' ? `<button class="action-btn arrive" onclick="changeJobStatus('${b.id}', 'ARRIVED')" title="Mark Vehicle Arrived">🚗 Arrived</button>` : ''}
+              ${(b.status || '').toUpperCase() !== 'CANCELLED' && (b.status || '').toUpperCase() !== 'COMPLETED' ? `<button class="action-btn" style="background:rgba(239,68,68,0.12); color:var(--red); border-color:var(--red);" onclick="changeJobStatus('${b.id}', 'CANCELLED')" title="Cancel Booking">🚫 Cancel</button>` : ''}
               <button class="action-btn" title="View & Print Bill Invoice" onclick="openBillInvoiceModal('${b.id}')">🧾 Bill</button>
               <button class="action-btn wa" title="Share Bill on WhatsApp" onclick="shareBillWhatsApp('${b.id}')">💬 WA Bill</button>
               ${b.phone ? `<a href="tel:${cleanPhone(b.phone)}" class="action-btn call" title="Call Customer">📞 Call</a>` : ''}
@@ -3717,10 +3731,23 @@
       document.getElementById('cust-prof-spent').innerText = `₹${totalSpent.toLocaleString()}`;
       document.getElementById('cust-prof-lastvisit').innerText = lastVisit;
 
-      document.getElementById('customer-profile-panel').style.display = 'block';
+      const profilePanel = document.getElementById('customer-profile-panel');
+      if (profilePanel) {
+        profilePanel.style.display = 'block';
+      }
 
       // Render Service History Table
       renderCustomerHistoryTable(customerBookings, c, phoneKey);
+
+      // Smoothly scroll opened History & Bills section into view after layout rendering
+      requestAnimationFrame(() => {
+        if (profilePanel) {
+          profilePanel.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+          });
+        }
+      });
     }
 
     function clearSelectedCustomer() {
@@ -4894,6 +4921,9 @@ TRIEYE WATERWASH & DETAILING`;
 
       // Check Supabase session first before loading sensitive admin data
       await checkAdminAuth();
+
+      // Perform immediate sync from Supabase
+      await syncFromSupabase();
 
       // Setup live Realtime subscription from Supabase
       if (window.TrieyeDB) {

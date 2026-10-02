@@ -173,8 +173,7 @@ const TrieyeDB = {
             slots (id, slot_time, status),
             payments (id, amount, method, status)
           `)
-          .order('created_at', { ascending: false })
-          .gte('created_at', '2026-09-25T00:00:00Z');
+          .order('created_at', { ascending: false });
 
         if (error) {
           TrieyeDB.logError('bookings', 'SELECT', error);
@@ -201,13 +200,18 @@ const TrieyeDB = {
             const payStatus = (pay.status || 'UNPAID').toUpperCase();
             const payMethod = pay.method ? (pay.method.toUpperCase() === 'PENDING' ? 'Pending' : pay.method) : 'Pending';
 
+            let normStatus = (b.status || 'CONFIRMED').toUpperCase().trim();
+            if (normStatus === 'CANCELED' || normStatus === 'CANCEL') normStatus = 'CANCELLED';
+            if (normStatus === 'PENDING_CONFIRMATION') normStatus = 'PENDING';
+            if (normStatus === 'DONE' || normStatus === 'FINISHED') normStatus = 'COMPLETED';
+
             return {
               id: b.id,
               share_token: b.share_token,
               invoice_ref: shortRef,
               booking_date: b.booking_date || '',
               total_amount: totalAmt,
-              status: (b.status || 'CONFIRMED').toUpperCase(),
+              status: normStatus,
               source: (b.source || 'ONLINE').toUpperCase(),
               customer_id: b.customer_id,
               vehicle_id: b.vehicle_id,

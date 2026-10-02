@@ -1131,12 +1131,16 @@
   }
   .about-stat-num{
     font-family:'Oswald',sans-serif;
-    font-size:clamp(30px, 5vw, 44px);
+    font-size:clamp(16px, 2.2vw, 24px);
     font-weight:700;
     color:var(--green);
-    line-height:1.1;
-    margin-bottom:4px;
+    line-height:1.2;
+    margin-bottom:6px;
     letter-spacing:0.02em;
+    text-transform:uppercase;
+    max-width:100%;
+    word-break:normal;
+    overflow-wrap:break-word;
   }
   .about-stat-label{
     font-family:'IBM Plex Mono',monospace;
@@ -1618,9 +1622,12 @@
     display:flex;
     align-items:center;
     justify-content:center;
-    gap:20px;
+    gap:28px;
     margin-top:32px;
     width:100%;
+    max-width:1200px;
+    margin-inline:auto;
+    box-sizing:border-box;
   }
   .faq-line{
     flex:1;
@@ -1629,10 +1636,13 @@
   }
   .faq-divider-text{
     font-family:'IBM Plex Mono', monospace;
-    font-size:12px;
+    font-size:clamp(10px, 1.4vw, 12px);
     color:var(--muted);
-    letter-spacing:0.2em;
+    letter-spacing:clamp(0.1em, 0.2vw, 0.2em);
     text-transform:uppercase;
+    flex-shrink:0;
+    text-align:center;
+    white-space:nowrap;
   }
 
   @media (max-width: 900px){
@@ -1643,7 +1653,8 @@
       grid-column:auto;
     }
     .faq-bottom-divider {
-      display:none;
+      gap:16px;
+      margin-top:24px;
     }
   }
 
@@ -1730,7 +1741,7 @@
 
   .footer-logo{
     display:block;
-    width:180px;
+    width:280px;
     max-width:100%;
     height:auto;
     object-fit:contain;
@@ -1740,9 +1751,9 @@
 
   .footer-tagline{
     font-family:'IBM Plex Mono', monospace;
-    font-size:12px;
+    font-size:14px;
     font-weight:600;
-    letter-spacing:0.18em;
+    letter-spacing:0.2em;
     color:var(--muted);
     text-transform:uppercase;
     margin:0;
