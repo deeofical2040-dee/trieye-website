@@ -859,25 +859,184 @@
   }
   .g-card:hover img{transform:scale(1.06);}
   .g-card .g-overlay{
-    position:absolute;inset:0;background:linear-gradient(to top, rgba(10,10,11,0.88) 0%, transparent 55%);
+    position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,0.92) 0%, rgba(0,0,0,0.45) 55%, transparent 100%);
     display:flex;flex-direction:column;justify-content:flex-end;padding:14px;box-sizing:border-box;
   }
   .g-card .g-tag{
     font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:0.1em;text-transform:uppercase;
-    color:var(--green);margin-bottom:3px;font-weight:500;
+    color:#a6d331;margin-bottom:3px;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,0.8);
   }
   .g-card .g-lbl{
     font-family:'Oswald',sans-serif;font-size:14px;letter-spacing:0.04em;text-transform:uppercase;
-    color:var(--white);font-weight:600;line-height:1.2;
+    color:#ffffff;font-weight:600;line-height:1.2;text-shadow:0 1px 3px rgba(0,0,0,0.9);
   }
 
-  /* ---------- TESTIMONIALS ---------- */
-  .testi-grid{display:grid;grid-template-columns:repeat(3, minmax(0, 1fr));gap:1px;background:var(--line);border:1px solid var(--line);width:100%;box-sizing:border-box;}
-  @media (max-width:860px){.testi-grid{grid-template-columns:1fr;}}
-  .testi{background:var(--bg);padding:clamp(18px, 3.5vw, 30px);min-width:0;box-sizing:border-box;}
-  .testi .stars{color:var(--green);font-size:13px;margin-bottom:12px;letter-spacing:2px;}
-  .testi p{color:var(--white);font-size:14px;margin-bottom:16px;}
-  .testi .who{font-family:'Oswald',sans-serif;font-size:13px;color:var(--muted);letter-spacing:0.05em;text-transform:uppercase;}
+  /* ---------- REAL GOOGLE REVIEWS SMOOTH SLIDER ---------- */
+  .sec-head-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    margin-bottom: 24px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .slider-nav-btns {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .slider-nav-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--line);
+    background: var(--bg-panel);
+    color: var(--text-primary);
+    font-size: 18px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 2px 8px var(--shadow-pop);
+  }
+  .slider-nav-btn:hover {
+    background: var(--pink);
+    color: #ffffff;
+    border-color: var(--pink);
+    transform: translateY(-2px);
+  }
+
+  .reviews-slider-wrapper {
+    width: 100%;
+    position: relative;
+    box-sizing: border-box;
+  }
+
+  .reviews-slider {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    padding: 6px 2px 14px;
+    width: 100%;
+    box-sizing: border-box;
+    scrollbar-width: none;
+  }
+  .reviews-slider::-webkit-scrollbar {
+    display: none;
+  }
+
+  .reviews-slider .review-card-link {
+    flex: 0 0 calc(33.333% - 14px);
+    min-width: 300px;
+    scroll-snap-align: start;
+    box-sizing: border-box;
+  }
+
+  @media (max-width: 1024px) {
+    .reviews-slider .review-card-link {
+      flex: 0 0 calc(50% - 10px);
+      min-width: 280px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .reviews-slider .review-card-link {
+      flex: 0 0 88%;
+      min-width: 260px;
+    }
+  }
+
+  .review-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    box-sizing: border-box;
+    cursor: pointer;
+  }
+  .review-card-link:hover .review-card {
+    transform: translateY(-4px);
+    border-color: #cbd5e1;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+  }
+
+  .review-stars {
+    color: #f59e0b;
+    font-size: 16px;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+  }
+  .review-author-name {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    color: #111827;
+    margin-bottom: 2px;
+    line-height: 1.3;
+  }
+  .review-source {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    margin-bottom: 14px;
+    font-weight: 500;
+  }
+  .review-text {
+    font-family: 'Inter', sans-serif;
+    color: #1f2937;
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    font-weight: 400;
+    word-break: break-word;
+  }
+  .review-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 14px;
+    border-top: 1px solid #f1f5f9;
+    font-family: 'Inter', sans-serif;
+    font-size: 12.5px;
+    margin-top: auto;
+  }
+  .review-date {
+    color: #64748b;
+    font-weight: 500;
+  }
+  .review-google-link {
+    color: #ee2f76;
+    font-weight: 600;
+    font-size: 12.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    letter-spacing: 0.02em;
+    transition: color 0.2s ease;
+  }
+  .review-card-link:hover .review-google-link {
+    color: #dc2626;
+  }
+  .review-card-link:hover .review-google-link .arrow {
+    transform: translateX(4px);
+  }
+  .review-google-link .arrow {
+    transition: transform 0.2s ease;
+    display: inline-block;
+  }
 
   /* ---------- ABOUT US SECTION ---------- */
   .about-section{
@@ -986,7 +1145,7 @@
   .about-stats-panel{
     display:grid;
     grid-template-columns:repeat(2, minmax(0, 1fr));
-    gap:14px;
+    gap:16px;
     width:100%;
     box-sizing:border-box;
   }
@@ -994,35 +1153,43 @@
     background:var(--bg);
     border:1px solid var(--line);
     border-radius:16px;
-    padding:clamp(20px, 3.5vw, 28px) clamp(16px, 2.5vw, 20px);
+    padding:clamp(22px, 3.5vw, 30px) clamp(16px, 2.5vw, 22px);
     display:flex;
     flex-direction:column;
     align-items:center;
+    justify-content:center;
     text-align:center;
     box-sizing:border-box;
     box-shadow:0 8px 24px -6px var(--shadow-pop);
-    transition:transform 0.2s ease, border-color 0.2s ease;
+    transition:transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    min-height:130px;
   }
   .about-stat-box:hover{
     border-color:var(--green);
     transform:translateY(-2px);
+    box-shadow:0 12px 30px -4px var(--shadow-pop);
   }
   .about-stat-num{
     font-family:'Oswald',sans-serif;
-    font-size:clamp(30px, 5vw, 44px);
+    font-size:clamp(26px, 4.5vw, 42px);
     font-weight:700;
     color:var(--green);
     line-height:1.1;
-    margin-bottom:4px;
-    letter-spacing:0.02em;
+    margin-bottom:10px;
+    letter-spacing:0.04em;
+    white-space:nowrap;
+    word-break:keep-all;
+    text-transform:uppercase;
   }
   .about-stat-label{
     font-family:'IBM Plex Mono',monospace;
-    font-size:11px;
-    letter-spacing:0.08em;
+    font-size:clamp(9.5px, 1.4vw, 11px);
+    letter-spacing:0.14em;
     text-transform:uppercase;
     color:var(--muted);
     font-weight:600;
+    line-height:1.4;
+    opacity:0.85;
   }
 
   /* ---------- CONTACT ---------- */
@@ -1054,27 +1221,29 @@
     box-shadow: 0 12px 36px -8px rgba(0, 0, 0, 0.5);
   }
 
-  /* 1. Map Background Layer (Full opacity with subtle desaturation) */
+  /* 1. Map Background Layer (Slightly faded background map) */
   .loc-card-map-layer{
     position: absolute;
     inset: 0;
     background-image: url('assets/trieye-map-bg.png');
     background-size: cover;
     background-position: center;
-    filter: grayscale(80%) contrast(92%) brightness(0.97);
+    opacity: 0.35;
+    filter: brightness(0.98) contrast(1.05);
     pointer-events: none;
     z-index: 1;
     transform: scale(1.02);
   }
   [data-theme="dark"] .loc-card-map-layer{
-    filter: grayscale(100%) invert(92%) contrast(80%) opacity(0.35);
+    opacity: 0.20;
+    filter: grayscale(100%) invert(92%) contrast(80%);
   }
 
-  /* 2. White Translucent Readability Overlay (88% white overlay) */
+  /* 2. White Translucent Readability Overlay */
   .loc-card-overlay{
     position: absolute;
     inset: 0;
-    background: rgba(255, 255, 255, 0.88);
+    background: rgba(255, 255, 255, 0.65);
     pointer-events: none;
     z-index: 2;
   }
@@ -1145,30 +1314,33 @@
   }
   .loc-title{
     font-family: 'Oswald', sans-serif;
-    font-size: clamp(20px, 3.2vw, 26px);
-    font-weight: 700;
-    letter-spacing: 0.03em;
+    font-size: clamp(22px, 3.4vw, 28px);
+    font-weight: 800;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
-    color: #111827;
+    color: #09090b;
     line-height: 1.25;
     margin: 0 0 clamp(10px, 2vw, 14px);
     word-break: break-word;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.9);
   }
   [data-theme="dark"] .loc-title{
-    color: #f3f3f0;
+    color: #ffffff;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
   }
   .loc-address{
     font-style: normal;
     display: flex;
     flex-direction: column;
     gap: 3px;
-    color: #4b5563;
+    color: var(--pink, #ee2f76);
     font-size: clamp(13.5px, 2.2vw, 14.5px);
+    font-weight: 600;
     line-height: 1.45;
     margin-bottom: clamp(12px, 2.2vw, 16px);
   }
   [data-theme="dark"] .loc-address{
-    color: #9ca3af;
+    color: var(--pink, #ee2f76);
   }
   .loc-region{
     display: inline-flex;
@@ -1176,13 +1348,13 @@
     gap: 8px;
     font-family: 'IBM Plex Mono', monospace;
     font-size: 11.5px;
-    font-weight: 600;
-    color: #6b7280;
+    font-weight: 700;
+    color: var(--pink, #ee2f76);
     letter-spacing: 0.05em;
     text-transform: uppercase;
   }
   [data-theme="dark"] .loc-region{
-    color: #8d8d92;
+    color: var(--pink, #ee2f76);
   }
   .loc-sep{
     color: var(--pink, #ee2f76);
@@ -1244,18 +1416,31 @@
   .contact-list{list-style:none;width:100%;min-width:0;}
   .contact-list li{
     display:flex;gap:12px;padding:clamp(12px, 2.5vw, 18px) 0;border-top:1px solid var(--line);
-    width:100%;min-width:0;box-sizing:border-box;align-items:flex-start;
+    width:100%;min-width:0;box-sizing:border-box;align-items:center;
   }
   .contact-list li:last-child{border-bottom:1px solid var(--line);}
-  .contact-list li > div{flex:1;min-width:0;}
+  .contact-list li > div,.contact-list li > a{flex:1;min-width:0;}
+  .contact-list a.contact-row-link{
+    display:flex;gap:12px;align-items:center;width:100%;text-decoration:none;color:inherit;
+    padding:clamp(12px, 2.5vw, 18px) 0;border-top:1px solid var(--line);box-sizing:border-box;
+    transition:background-color 0.2s ease, opacity 0.2s ease;
+  }
+  .contact-list a.contact-row-link:hover{
+    opacity:0.85;
+  }
+  .contact-list a.contact-row-link:hover .v{
+    color:var(--pink);
+  }
   .contact-list .ic{
     width:36px;height:36px;min-width:36px;min-height:36px;flex-shrink:0;
     border:1px solid var(--line);border-radius:6px;
-    display:flex;align-items:center;justify-content:center;margin-top:2px;
+    display:flex;align-items:center;justify-content:center;
   }
-  .contact-list .ic svg{width:16px;height:16px;stroke:var(--pink);}
+  .contact-list .ic svg{width:16px;height:16px;stroke:var(--pink);fill:none;}
   .contact-list .k{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:3px;}
-  .contact-list .v{font-size:14px;word-break:break-word;overflow-wrap:anywhere;}
+  .contact-list .v{font-size:14px;word-break:break-word;overflow-wrap:anywhere;color:inherit;transition:color 0.2s ease;}
+  .contact-list .v-phone a{color:inherit;text-decoration:none;transition:color 0.2s ease;}
+  .contact-list .v-phone a:hover{color:var(--pink);text-decoration:underline;}
   .contact-ctas{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;width:100%;min-width:0;}
   @media (max-width:600px){
     .contact-ctas{flex-direction:column;width:100%;}
@@ -1646,30 +1831,8 @@
     }
     .footer-bottom{
       flex-direction:column;
-      align-items:center;
       text-align:center;
       gap:8px;
-    }
-  }
-
-  @media (max-width: 480px){
-    .footer-container{
-      padding:32px 16px 24px;
-    }
-    .footer-tagline{
-      font-size:10px;
-    }
-    .footer-copy{
-      font-size:11px;
-    }
-    .footer-sub-tag{
-      font-size:10px;
-    }
-  }
-
-  @media (max-width: 380px){
-    .footer-container{
-      padding:28px 12px 20px;
     }
   }
 
@@ -2374,33 +2537,135 @@
   </div>
 </section>
 
-<section>
+<section id="reviews">
   <div class="wrap">
-    <div class="sec-head">
-      <div class="sec-tag">// Verified Customer Feedback</div>
-      <h2>Trusted across Chennai</h2>
+    <div class="sec-head-row">
+      <div class="sec-head" style="margin-bottom:0;">
+        <div class="sec-tag">// REAL CUSTOMER REVIEWS</div>
+        <h2>LOVED BY OUR CUSTOMERS</h2>
+        <p>Real experiences from customers who trust TRIEYE with their vehicles.</p>
+      </div>
+      <div class="slider-nav-btns">
+        <button type="button" class="slider-nav-btn" onclick="slideReviews(-1)" aria-label="Previous Reviews">←</button>
+        <button type="button" class="slider-nav-btn" onclick="slideReviews(1)" aria-label="Next Reviews">→</button>
+      </div>
     </div>
-    <div class="testi-grid">
-      <div class="testi">
-        <div>
-          <div class="stars">★★★★★</div>
-          <p>"Booked the 11:00 AM slot online from OMR. Drove straight into the bay with zero waiting time. Foam wash finish was absolutely spotless."</p>
-        </div>
-        <div class="who">Karthik S. <span>Hyundai i20 · Foam Wash</span></div>
-      </div>
-      <div class="testi">
-        <div>
-          <div class="stars">★★★★★</div>
-          <p>"Interior deep clean removed tough coffee stains and water marks I thought were permanent. The leather seats look and smell brand new."</p>
-        </div>
-        <div class="who">Priya R. <span>Honda City · Interior Deep Clean</span></div>
-      </div>
-      <div class="testi">
-        <div>
-          <div class="stars">★★★★★</div>
-          <p>"Rubbing polish on my Harrier held up brilliantly through monsoon rains. Excellent swirl removal and deep gloss reflection."</p>
-        </div>
-        <div class="who">Vignesh M. <span>Tata Harrier · Rubbing Polish</span></div>
+    
+    <div class="reviews-slider-wrapper">
+      <div class="reviews-slider" id="reviewsSlider">
+        <!-- REVIEW 01: Sathish Kumar -->
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="review-card-link">
+          <div class="review-card">
+            <div>
+              <div class="review-stars">★★★★★</div>
+              <div class="review-author-name">Sathish Kumar</div>
+              <div class="review-source">
+                <svg width="14" height="14" viewBox="0 0 24 24" style="margin-right:4px; flex-shrink:0;"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
+                Google Review
+              </div>
+              <p class="review-text">Went here for the first time to was my XUV 700 .. the team here is dedicated and clean the car in detail .. they also have a AC waiting area which is very comfortable.</p>
+            </div>
+            <div class="review-card-footer">
+              <span class="review-date">3 months ago</span>
+              <span class="review-google-link">VIEW ON GOOGLE <span class="arrow">→</span></span>
+            </div>
+          </div>
+        </a>
+
+        <!-- REVIEW 02: Ganeshjr -->
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="review-card-link">
+          <div class="review-card">
+            <div>
+              <div class="review-stars">★★★★★</div>
+              <div class="review-author-name">Ganeshjr</div>
+              <div class="review-source">
+                <svg width="14" height="14" viewBox="0 0 24 24" style="margin-right:4px; flex-shrink:0;"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
+                Google Review
+              </div>
+              <p class="review-text">Done a foam wash for my MT15 they did awesome and good customer attention highly recommend worth for money ,👍💪🩵 …</p>
+            </div>
+            <div class="review-card-footer">
+              <span class="review-date">3 months ago</span>
+              <span class="review-google-link">VIEW ON GOOGLE <span class="arrow">→</span></span>
+            </div>
+          </div>
+        </a>
+
+        <!-- REVIEW 03: Jaikrishna -->
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="review-card-link">
+          <div class="review-card">
+            <div>
+              <div class="review-stars">★★★★★</div>
+              <div class="review-author-name">Jaikrishna</div>
+              <div class="review-source">
+                <svg width="14" height="14" viewBox="0 0 24 24" style="margin-right:4px; flex-shrink:0;"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
+                Google Review
+              </div>
+              <p class="review-text">"Excellent service and professional work. My vehicle looks clean and shiny after detailing. Friendly staff, good attention to detail, and reasonable pricing. Highly recommended!" ⭐⭐⭐⭐⭐</p>
+            </div>
+            <div class="review-card-footer">
+              <span class="review-date">3 months ago</span>
+              <span class="review-google-link">VIEW ON GOOGLE <span class="arrow">→</span></span>
+            </div>
+          </div>
+        </a>
+
+        <!-- REVIEW 04: Raj Sharan -->
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="review-card-link">
+          <div class="review-card">
+            <div>
+              <div class="review-stars">★★★★★</div>
+              <div class="review-author-name">Raj Sharan</div>
+              <div class="review-source">
+                <svg width="14" height="14" viewBox="0 0 24 24" style="margin-right:4px; flex-shrink:0;"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
+                Google Review
+              </div>
+              <p class="review-text">The service is  really good and affordable it’s a new shop and a new experience for me and a must visit place</p>
+            </div>
+            <div class="review-card-footer">
+              <span class="review-date">4 months ago</span>
+              <span class="review-google-link">VIEW ON GOOGLE <span class="arrow">→</span></span>
+            </div>
+          </div>
+        </a>
+
+        <!-- REVIEW 05: Pon Vijay -->
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="review-card-link">
+          <div class="review-card">
+            <div>
+              <div class="review-stars">★★★★★</div>
+              <div class="review-author-name">Pon Vijay</div>
+              <div class="review-source">
+                <svg width="14" height="14" viewBox="0 0 24 24" style="margin-right:4px; flex-shrink:0;"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
+                Google Review
+              </div>
+              <p class="review-text">"Excellent car wash service! My car looks absolutely brand new after the wash. The team was very professional and paid attention to every detail. I was especially impressed that they used high-quality branded materials for the foam wash and interior cleaning. The cleaning quality, shine, and freshness inside the car were outstanding. Highly recommended for anyone looking for premium car care service!"</p>
+            </div>
+            <div class="review-card-footer">
+              <span class="review-date">4 months ago</span>
+              <span class="review-google-link">VIEW ON GOOGLE <span class="arrow">→</span></span>
+            </div>
+          </div>
+        </a>
+
+        <!-- REVIEW 06: Sathish103 C -->
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="review-card-link">
+          <div class="review-card">
+            <div>
+              <div class="review-stars">★★★★★</div>
+              <div class="review-author-name">Sathish103 C</div>
+              <div class="review-source">
+                <svg width="14" height="14" viewBox="0 0 24 24" style="margin-right:4px; flex-shrink:0;"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
+                Google Review
+              </div>
+              <p class="review-text">"People handling the car very well,it's very clean after foamwash.must vist place"</p>
+            </div>
+            <div class="review-card-footer">
+              <span class="review-date">3 months ago</span>
+              <span class="review-google-link">VIEW ON GOOGLE <span class="arrow">→</span></span>
+            </div>
+          </div>
+        </a>
       </div>
     </div>
   </div>
@@ -2452,16 +2717,16 @@
 
     <div class="about-stats-panel">
       <div class="about-stat-box">
-        <div class="about-stat-num">5,000+</div>
-        <div class="about-stat-label">Vehicles Detailed</div>
+        <div class="about-stat-num">CAR + BIKE</div>
+        <div class="about-stat-label">PROFESSIONAL DETAILING CARE</div>
       </div>
       <div class="about-stat-box">
-        <div class="about-stat-num">100%</div>
-        <div class="about-stat-label">Swirl-Free Guarantee</div>
+        <div class="about-stat-num">pH-NEUTRAL</div>
+        <div class="about-stat-label">SAFE WASH &amp; CARE</div>
       </div>
       <div class="about-stat-box">
-        <div class="about-stat-num">4.9 ★</div>
-        <div class="about-stat-label">Customer Rating</div>
+        <div class="about-stat-num">VILLIVAKKAM</div>
+        <div class="about-stat-label">CHENNAI STUDIO</div>
       </div>
       <div class="about-stat-box">
         <div class="about-stat-num">7am–9pm</div>
@@ -2528,12 +2793,20 @@
       </div>
       <ul class="contact-list">
         <li>
-          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div>
-          <div><div class="k">Location</div><div class="v">No. 19, 6th Street, 1st Main Road, Baba Nagar, Villivakkam, Chennai 600049 (Behind Bank of Baroda)</div></div>
+          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .3 2 .7 3a2 2 0 0 1-.4 2.1L8 10.3a16 16 0 0 0 6 6l1.5-1.4a2 2 0 0 1 2.1-.4c1 .4 2 .6 3 .7a2 2 0 0 1 1.7 2Z"/></svg></div>
+          <div><div class="k">Direct Hotline</div><div class="v v-phone"><a href="tel:+919940181934">+91 99401 81934</a> / <a href="tel:+918124266363">+91 81242 66363</a></div></div>
         </li>
         <li>
-          <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .3 2 .7 3a2 2 0 0 1-.4 2.1L8 10.3a16 16 0 0 0 6 6l1.5-1.4a2 2 0 0 1 2.1-.4c1 .4 2 .6 3 .7a2 2 0 0 1 1.7 2Z"/></svg></div>
-          <div><div class="k">Direct Hotline</div><div class="v">+91 99401 81934 / +91 81242 66363</div></div>
+          <a href="https://wa.me/919940181934" target="_blank" rel="noopener noreferrer" class="contact-row-link">
+            <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21l1.65-3.8a9 9 0 1 1 3.4 2.9L3 21"/><path d="M9 10a.5.5 0 0 0 1 0V9a.5.5 0 0 0-1 0v1a5 5 0 0 0 5 5h1a.5.5 0 0 0 0-1h-1a.5.5 0 0 0 0 1"/></svg></div>
+            <div><div class="k">WhatsApp</div><div class="v">CHAT WITH TRIEYE &rarr;</div></div>
+          </a>
+        </li>
+        <li>
+          <a href="https://www.instagram.com/trieye_detailing?utm_source=ig_web_button_share_sheet&amp;stkn=ZDNlZDc0MzIxNw==" target="_blank" rel="noopener noreferrer" class="contact-row-link">
+            <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg></div>
+            <div><div class="k">Instagram</div><div class="v">FOLLOW TRIEYE &rarr;</div></div>
+          </a>
         </li>
         <li>
           <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="m3 6 9 6 9-6"/></svg></div>
@@ -3496,6 +3769,55 @@
   const selectedTheme = 'light';
   console.log('Initial theme:', selectedTheme);
 
+  // Smooth Google Reviews Slider Controller with Auto-Slide
+  (function initReviewsAutoSlide() {
+    const slider = document.getElementById('reviewsSlider');
+    if (!slider) return;
+
+    let autoSlideInterval = null;
+    const intervalTime = 3500; // 3.5 seconds auto slide
+
+    function nextSlide() {
+      const card = slider.querySelector('.review-card-link');
+      const step = card ? card.offsetWidth + 20 : 360;
+      // Loop back to start if reached end
+      if (Math.ceil(slider.scrollLeft + slider.clientWidth) >= slider.scrollWidth - 10) {
+        slider.scrollTo({ left: 0, behavior: 'smooth' });
+      } else {
+        slider.scrollBy({ left: step, behavior: 'smooth' });
+      }
+    }
+
+    function startAutoSlide() {
+      stopAutoSlide();
+      autoSlideInterval = setInterval(nextSlide, intervalTime);
+    }
+
+    function stopAutoSlide() {
+      if (autoSlideInterval) {
+        clearInterval(autoSlideInterval);
+        autoSlideInterval = null;
+      }
+    }
+
+    // Manual navigation button click handler
+    window.slideReviews = function(dir) {
+      stopAutoSlide();
+      const card = slider.querySelector('.review-card-link');
+      const step = card ? card.offsetWidth + 20 : 360;
+      slider.scrollBy({ left: dir * step, behavior: 'smooth' });
+      startAutoSlide(); // Resume timer after manual click
+    };
+
+    // Pause on hover or touch/swipe
+    slider.parentElement.addEventListener('mouseenter', stopAutoSlide);
+    slider.parentElement.addEventListener('mouseleave', startAutoSlide);
+    slider.parentElement.addEventListener('touchstart', stopAutoSlide, { passive: true });
+    slider.parentElement.addEventListener('touchend', startAutoSlide, { passive: true });
+
+    // Start auto slide on init
+    startAutoSlide();
+  })();
 </script>
 
 </body>
