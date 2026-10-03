@@ -124,7 +124,92 @@
     <ul class="nav-links" id="navLinks">
       <li><a href="/">Home</a></li>
       <li><a href="/#about">About Us</a></li>
-      <li><a href="/#services">Services <span class="nav-caret">▾</span></a></li>
+      <li class="nav-item-dropdown">
+        <a href="javascript:void(0)" class="nav-dropdown-toggle" aria-expanded="false" aria-haspopup="true">Services <span class="nav-caret">▾</span></a>
+        <div class="nav-dropdown-menu mega-menu-container">
+          <div class="mega-menu-grid">
+            <!-- LEFT COLUMN: CLEAN & DETAIL -->
+            <div class="mega-menu-col">
+              <div class="mega-col-header">// CLEAN &amp; DETAIL</div>
+
+              <a href="/car-wash" class="mega-menu-item active">
+                <div class="mega-item-img-wrap">
+                  <img src="assets/foam-wash.jpg" alt="Car Wash foam wash detailing at TRIEYE" loading="lazy">
+                </div>
+                <div class="mega-item-info">
+                  <div class="mega-item-title">CAR WASH <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Exterior wash &amp; maintenance care</div>
+                </div>
+              </a>
+
+              <a href="/interior-detailing" class="mega-menu-item">
+                <div class="mega-item-img-wrap">
+                  <img src="assets/interior-clean.jpg" alt="Interior Detailing deep cleaning at TRIEYE" loading="lazy">
+                </div>
+                <div class="mega-item-info">
+                  <div class="mega-item-title">INTERIOR DETAILING <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Deep cabin cleaning &amp; interior care</div>
+                </div>
+              </a>
+
+              <a href="/bike-detailing" class="mega-menu-item">
+                <div class="mega-item-img-wrap">
+                  <img src="assets/bike/bike-hero.jpg" alt="Bike Detailing motorcycle detailing at TRIEYE" loading="lazy">
+                </div>
+                <div class="mega-item-info">
+                  <div class="mega-item-title">BIKE DETAILING <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Professional motorcycle detailing</div>
+                </div>
+              </a>
+            </div>
+
+            <!-- RIGHT COLUMN: PROTECT & RESTORE -->
+            <div class="mega-menu-col">
+              <div class="mega-col-header">// PROTECT &amp; RESTORE</div>
+
+              <a href="/ceramic-coating" class="mega-menu-item">
+                <div class="mega-item-img-wrap">
+                  <img src="assets/ceramic-coating/hydrophobic-water-beading.webp" alt="Ceramic Coating hydrophobic protection at TRIEYE" loading="lazy">
+                </div>
+                <div class="mega-item-info">
+                  <div class="mega-item-title">CERAMIC COATING <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Gloss &amp; hydrophobic paint protection</div>
+                </div>
+              </a>
+
+              <a href="/graphene-coating" class="mega-menu-item">
+                <div class="mega-item-img-wrap">
+                  <img src="assets/graphene/graphene-application.jpg" alt="Graphene Coating application at TRIEYE" loading="lazy">
+                </div>
+                <div class="mega-item-info">
+                  <div class="mega-item-title">GRAPHENE COATING <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Advanced coating &amp; surface protection</div>
+                </div>
+              </a>
+
+              <a href="/paint-correction" class="mega-menu-item">
+                <div class="mega-item-img-wrap">
+                  <img src="assets/rubbing-polish.jpg" alt="Paint Correction machine polishing at TRIEYE" loading="lazy">
+                </div>
+                <div class="mega-item-info">
+                  <div class="mega-item-title">PAINT CORRECTION <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Swirl removal &amp; paint refinement</div>
+                </div>
+              </a>
+
+              <a href="/ppf" class="mega-menu-item">
+                <div class="mega-item-img-wrap">
+                  <img src="assets/ppf/ppf-installation.jpg" alt="Paint Protection Film PPF installation at TRIEYE" loading="lazy">
+                </div>
+                <div class="mega-item-info">
+                  <div class="mega-item-title">PAINT PROTECTION FILM (PPF) <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Transparent physical paint protection</div>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </li>
       <li><a href="/#gallery">Gallery</a></li>
       <li><a href="/#contact">Contact Us</a></li>
     </ul>
@@ -154,7 +239,21 @@
   <ul class="mobile-drawer-links">
     <li><a href="/"><span class="m-num">01</span> Home</a></li>
     <li><a href="/#about"><span class="m-num">02</span> About Us</a></li>
-    <li><a href="/#services"><span class="m-num">03</span> Services &amp; Pricing</a></li>
+    <li class="mobile-drawer-accordion">
+      <button class="mobile-accordion-btn" type="button" aria-expanded="false">
+        <span><span class="m-num">03</span> Services</span>
+        <span class="mobile-accordion-icon">+</span>
+      </button>
+      <ul class="mobile-accordion-content">
+        <li><a href="/car-wash" class="m-sublink active">Car Wash</a></li>
+        <li><a href="/ceramic-coating" class="m-sublink">Ceramic Coating</a></li>
+        <li><a href="/graphene-coating" class="m-sublink">Graphene Coating</a></li>
+        <li><a href="/paint-correction" class="m-sublink">Paint Correction</a></li>
+        <li><a href="/interior-detailing" class="m-sublink">Interior Detailing</a></li>
+        <li><a href="/ppf" class="m-sublink">Paint Protection Film (PPF)</a></li>
+        <li><a href="/bike-detailing" class="m-sublink">Bike Detailing</a></li>
+      </ul>
+    </li>
     <li><a href="/#gallery"><span class="m-num">04</span> Studio Gallery</a></li>
     <li><a href="/#contact"><span class="m-num">05</span> Contact Us</a></li>
   </ul>
@@ -596,6 +695,39 @@
       <div class="faq-line"></div>
       <div class="faq-divider-text">TRIEYE • DETAIL • PRECISION • PROTECTION</div>
       <div class="faq-line"></div>
+    </div>
+  </div>
+</section>
+
+<!-- RELATED SERVICES -->
+<section class="related-services-sec">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-tag">// EXPLORE MORE</div>
+      <h2>OTHER SERVICES FROM TRIEYE</h2>
+    </div>
+    <div class="related-cards-grid">
+      <a href="/interior-detailing" class="related-card">
+        <div>
+          <div class="related-card-title">INTERIOR DETAILING</div>
+          <div class="related-card-desc">Deep cabin cleaning &amp; interior care for seats, carpets and dashboard.</div>
+        </div>
+        <div class="related-card-cta">EXPLORE <span>→</span></div>
+      </a>
+      <a href="/paint-correction" class="related-card">
+        <div>
+          <div class="related-card-title">PAINT CORRECTION</div>
+          <div class="related-card-desc">Machine polishing to eliminate swirls, scratches and restore paint clarity.</div>
+        </div>
+        <div class="related-card-cta">EXPLORE <span>→</span></div>
+      </a>
+      <a href="/ceramic-coating" class="related-card">
+        <div>
+          <div class="related-card-title">CERAMIC COATING</div>
+          <div class="related-card-desc">Glossy hydrophobic surface protection shield for long-term paint durability.</div>
+        </div>
+        <div class="related-card-cta">EXPLORE <span>→</span></div>
+      </a>
     </div>
   </div>
 </section>

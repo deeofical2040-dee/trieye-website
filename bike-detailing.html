@@ -124,7 +124,92 @@
     <ul class="nav-links" id="navLinks">
       <li><a href="/">Home</a></li>
       <li><a href="/#about">About Us</a></li>
-      <li><a href="/#services">Services <span class="nav-caret">▾</span></a></li>
+      <li class="nav-item-dropdown">
+        <a href="javascript:void(0)" class="nav-dropdown-toggle" aria-expanded="false" aria-haspopup="true">Services <span class="nav-caret">▾</span></a>
+        <div class="nav-dropdown-menu mega-menu-container">
+          <div class="mega-menu-grid">
+            <!-- LEFT COLUMN: CLEAN & DETAIL -->
+            <div class="mega-menu-col">
+              <div class="mega-col-header">// CLEAN &amp; DETAIL</div>
+
+              <a href="/car-wash" class="mega-menu-item">
+                <div class="mega-item-img-wrap">
+                  <img src="assets/foam-wash.jpg" alt="Car Wash foam wash detailing at TRIEYE" loading="lazy">
+                </div>
+                <div class="mega-item-info">
+                  <div class="mega-item-title">CAR WASH <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Exterior wash &amp; maintenance care</div>
+                </div>
+              </a>
+
+              <a href="/interior-detailing" class="mega-menu-item">
+                <div class="mega-item-img-wrap">
+                  <img src="assets/interior-clean.jpg" alt="Interior Detailing deep cleaning at TRIEYE" loading="lazy">
+                </div>
+                <div class="mega-item-info">
+                  <div class="mega-item-title">INTERIOR DETAILING <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Deep cabin cleaning &amp; interior care</div>
+                </div>
+              </a>
+
+              <a href="/bike-detailing" class="mega-menu-item active">
+                <div class="mega-item-img-wrap">
+                  <img src="assets/bike/bike-hero.jpg" alt="Bike Detailing motorcycle detailing at TRIEYE" loading="lazy">
+                </div>
+                <div class="mega-item-info">
+                  <div class="mega-item-title">BIKE DETAILING <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Professional motorcycle detailing</div>
+                </div>
+              </a>
+            </div>
+
+            <!-- RIGHT COLUMN: PROTECT & RESTORE -->
+            <div class="mega-menu-col">
+              <div class="mega-col-header">// PROTECT &amp; RESTORE</div>
+
+              <a href="/ceramic-coating" class="mega-menu-item">
+                <div class="mega-item-img-wrap">
+                  <img src="assets/ceramic-coating/hydrophobic-water-beading.webp" alt="Ceramic Coating hydrophobic protection at TRIEYE" loading="lazy">
+                </div>
+                <div class="mega-item-info">
+                  <div class="mega-item-title">CERAMIC COATING <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Gloss &amp; hydrophobic paint protection</div>
+                </div>
+              </a>
+
+              <a href="/graphene-coating" class="mega-menu-item">
+                <div class="mega-item-img-wrap">
+                  <img src="assets/graphene/graphene-application.jpg" alt="Graphene Coating application at TRIEYE" loading="lazy">
+                </div>
+                <div class="mega-item-info">
+                  <div class="mega-item-title">GRAPHENE COATING <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Advanced coating &amp; surface protection</div>
+                </div>
+              </a>
+
+              <a href="/paint-correction" class="mega-menu-item">
+                <div class="mega-item-img-wrap">
+                  <img src="assets/rubbing-polish.jpg" alt="Paint Correction machine polishing at TRIEYE" loading="lazy">
+                </div>
+                <div class="mega-item-info">
+                  <div class="mega-item-title">PAINT CORRECTION <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Swirl removal &amp; paint refinement</div>
+                </div>
+              </a>
+
+              <a href="/ppf" class="mega-menu-item">
+                <div class="mega-item-img-wrap">
+                  <img src="assets/ppf/ppf-installation.jpg" alt="Paint Protection Film PPF installation at TRIEYE" loading="lazy">
+                </div>
+                <div class="mega-item-info">
+                  <div class="mega-item-title">PAINT PROTECTION FILM (PPF) <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Transparent physical paint protection</div>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </li>
       <li><a href="/#gallery">Gallery</a></li>
       <li><a href="/#contact">Contact Us</a></li>
     </ul>
@@ -151,13 +236,35 @@
     </div>
     <button class="mobile-drawer-close" id="mobileDrawerClose" aria-label="Close navigation menu">&times;</button>
   </div>
-  <ul class="mobile-drawer-links">
-    <li><a href="/"><span class="m-num">01</span> Home</a></li>
-    <li><a href="/#about"><span class="m-num">02</span> About Us</a></li>
-    <li><a href="/#services"><span class="m-num">03</span> Services &amp; Pricing</a></li>
-    <li><a href="/#gallery"><span class="m-num">04</span> Studio Gallery</a></li>
-    <li><a href="/#contact"><span class="m-num">05</span> Contact Us</a></li>
-  </ul>
+  <div class="mobile-drawer-accordion">
+    <div class="mobile-drawer-nav-item">
+      <a href="/" class="mobile-drawer-nav-link"><span>01</span> Home</a>
+    </div>
+    <div class="mobile-drawer-nav-item">
+      <a href="/#about" class="mobile-drawer-nav-link"><span>02</span> About Us</a>
+    </div>
+    <div class="mobile-drawer-nav-item has-sub">
+      <div class="mobile-drawer-nav-header" id="mobileServicesToggle">
+        <span class="mobile-drawer-nav-title"><span>03</span> Services</span>
+        <span class="mobile-drawer-icon">+</span>
+      </div>
+      <div class="mobile-drawer-sub" id="mobileServicesSub">
+        <a href="/car-wash" class="mobile-sub-link">Car Wash</a>
+        <a href="/ceramic-coating" class="mobile-sub-link">Ceramic Coating</a>
+        <a href="/graphene-coating" class="mobile-sub-link">Graphene Coating</a>
+        <a href="/paint-correction" class="mobile-sub-link">Paint Correction</a>
+        <a href="/interior-detailing" class="mobile-sub-link">Interior Detailing</a>
+        <a href="/ppf" class="mobile-sub-link">Paint Protection Film (PPF)</a>
+        <a href="/bike-detailing" class="mobile-sub-link active">Bike Detailing</a>
+      </div>
+    </div>
+    <div class="mobile-drawer-nav-item">
+      <a href="/#gallery" class="mobile-drawer-nav-link"><span>04</span> Studio Gallery</a>
+    </div>
+    <div class="mobile-drawer-nav-item">
+      <a href="/#contact" class="mobile-drawer-nav-link"><span>05</span> Contact Us</a>
+    </div>
+  </div>
   <div class="mobile-drawer-footer">
     <a href="/#booking" class="btn btn-primary mobile-drawer-cta" id="mobileDrawerBookBtn">Book a Slot →</a>
     <div class="mobile-drawer-phone">
@@ -604,6 +711,48 @@
   </div>
 </section>
 
+<!-- RELATED SERVICES SECTION -->
+<section class="related-services-sec" style="padding: 70px 0; background-color: #f8f9fa; border-top: 1px solid #e2e8f0;">
+  <div class="wrap" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+    <div style="text-align: center; margin-bottom: 40px;">
+      <div class="sec-tag" style="color: var(--pink); font-size: 14px; font-weight: 600; letter-spacing: 2px; margin-bottom: 10px; font-family: 'IBM Plex Mono', monospace;">EXPLORE MORE SERVICES</div>
+      <h2 style="font-size: clamp(26px, 3.5vw, 36px); font-weight: 800; text-transform: uppercase; color: #111;">RECOMMENDED DETAILING SERVICES</h2>
+    </div>
+    <div class="related-services-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
+      <a href="/car-wash" class="related-card" style="display: flex; flex-direction: column; background: #fff; border-radius: 12px; overflow: hidden; text-decoration: none; border: 1px solid #e2e8f0; transition: transform 0.25s ease, box-shadow 0.25s ease;">
+        <div style="height: 180px; overflow: hidden;">
+          <img src="assets/foam-wash.jpg" alt="Car Wash foam wash detailing at TRIEYE" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+        </div>
+        <div style="padding: 20px; display: flex; flex-direction: column; flex-grow: 1;">
+          <h3 style="font-size: 18px; font-weight: 700; color: #111; margin-bottom: 8px;">CAR WASH</h3>
+          <p style="font-size: 14px; color: #64748b; line-height: 1.5; margin-bottom: 16px; flex-grow: 1;">Exterior wash &amp; maintenance care for all vehicle types.</p>
+          <span style="font-size: 14px; font-weight: 600; color: var(--pink);">Explore Service &rarr;</span>
+        </div>
+      </a>
+      <a href="/ceramic-coating" class="related-card" style="display: flex; flex-direction: column; background: #fff; border-radius: 12px; overflow: hidden; text-decoration: none; border: 1px solid #e2e8f0; transition: transform 0.25s ease, box-shadow 0.25s ease;">
+        <div style="height: 180px; overflow: hidden;">
+          <img src="assets/ceramic-coating/hydrophobic-water-beading.webp" alt="Ceramic Coating hydrophobic protection at TRIEYE" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+        </div>
+        <div style="padding: 20px; display: flex; flex-direction: column; flex-grow: 1;">
+          <h3 style="font-size: 18px; font-weight: 700; color: #111; margin-bottom: 8px;">CERAMIC COATING</h3>
+          <p style="font-size: 14px; color: #64748b; line-height: 1.5; margin-bottom: 16px; flex-grow: 1;">Gloss &amp; hydrophobic paint protection for long-lasting shine.</p>
+          <span style="font-size: 14px; font-weight: 600; color: var(--pink);">Explore Service &rarr;</span>
+        </div>
+      </a>
+      <a href="/graphene-coating" class="related-card" style="display: flex; flex-direction: column; background: #fff; border-radius: 12px; overflow: hidden; text-decoration: none; border: 1px solid #e2e8f0; transition: transform 0.25s ease, box-shadow 0.25s ease;">
+        <div style="height: 180px; overflow: hidden;">
+          <img src="assets/graphene/graphene-application.jpg" alt="Graphene Coating application at TRIEYE" style="width: 100%; height: 100%; object-fit: cover;" loading="lazy">
+        </div>
+        <div style="padding: 20px; display: flex; flex-direction: column; flex-grow: 1;">
+          <h3 style="font-size: 18px; font-weight: 700; color: #111; margin-bottom: 8px;">GRAPHENE COATING</h3>
+          <p style="font-size: 14px; color: #64748b; line-height: 1.5; margin-bottom: 16px; flex-grow: 1;">Advanced nano-technology surface protection &amp; scratch resistance.</p>
+          <span style="font-size: 14px; font-weight: 600; color: var(--pink);">Explore Service &rarr;</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
 <!-- FOOTER -->
 <footer class="site-footer">
   <div class="footer-container">
@@ -658,6 +807,21 @@
   const mobileNavDrawer = document.getElementById('mobileNavDrawer');
   const mobileDrawerBackdrop = document.getElementById('mobileDrawerBackdrop');
   const mobileDrawerClose = document.getElementById('mobileDrawerClose');
+  const mobileServicesToggle = document.getElementById('mobileServicesToggle');
+  const mobileServicesSub = document.getElementById('mobileServicesSub');
+
+  if (mobileServicesToggle && mobileServicesSub) {
+    mobileServicesToggle.addEventListener('click', () => {
+      const isExpanded = mobileServicesSub.classList.contains('open');
+      if (isExpanded) {
+        mobileServicesSub.classList.remove('open');
+        mobileServicesToggle.querySelector('.mobile-drawer-icon').textContent = '+';
+      } else {
+        mobileServicesSub.classList.add('open');
+        mobileServicesToggle.querySelector('.mobile-drawer-icon').textContent = '−';
+      }
+    });
+  }
 
   function openDrawer() {
     mobileNavDrawer.classList.add('active');

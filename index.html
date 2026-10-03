@@ -1889,10 +1889,540 @@
   }
   .summary-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.05);gap:10px;flex-wrap:wrap;}
   .summary-row:last-child{border-bottom:none;}
-  .modal-actions{display:flex;gap:12px;flex-wrap:wrap;}
+  .modal-actions{display:flex;flex-direction:column;gap:10px;}
+  .modal-helper-text{
+    font-size: 13px;
+    line-height: 1.4;
+    color: var(--muted, #64748b);
+    text-align: center;
+    margin: 4px 0 0 0;
+    font-weight: 400;
+  }
+
+  /* ---------- PREMIUM BUTTON DESIGN SYSTEM ---------- */
+  button.btn,
+  a.btn,
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    min-height: 44px;
+    font-family: 'Oswald', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    line-height: 1.2;
+    border-radius: 8px;
+    border: 1.5px solid transparent;
+    background: transparent;
+    color: var(--white, #111827);
+    cursor: pointer;
+    text-decoration: none;
+    user-select: none;
+    -webkit-user-select: none;
+    appearance: none;
+    -webkit-appearance: none;
+    outline: none;
+    box-sizing: border-box;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn:focus-visible {
+    outline: 2px solid var(--pink, #ee2f76);
+    outline-offset: 2px;
+  }
+
+  .btn:active {
+    transform: translateY(1px) scale(0.98) !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08) !important;
+    transition: transform 0.06s ease, box-shadow 0.06s ease;
+  }
+
+  /* Premium Secondary / Outline Button (e.g. Done Button) */
+  .btn-outline,
+  #modalDoneBtn {
+    background: #ffffff !important;
+    border: 1.5px solid #cbd5e1 !important;
+    color: #0f172a !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.06em !important;
+    padding: 11px 26px !important;
+    border-radius: 8px !important;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04) !important;
+  }
+
+  .btn-outline:hover,
+  #modalDoneBtn:hover {
+    background: #f8fafc !important;
+    border-color: #64748b !important;
+    color: #020617 !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12), 0 2px 4px rgba(0, 0, 0, 0.06) !important;
+  }
+
+  .btn-outline:active,
+  #modalDoneBtn:active {
+    background: #f1f5f9 !important;
+    border-color: #475569 !important;
+    transform: translateY(0px) scale(0.97) !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.08) !important;
+  }
+
+  /* Primary WhatsApp / Action Button */
+  .btn-primary,
+  #modalWhatsAppBtn {
+    background: linear-gradient(135deg, #25D366 0%, #1da851 100%) !important;
+    border: 1px solid #1fa650 !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.06em !important;
+    padding: 12px 24px !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 14px rgba(37, 211, 102, 0.32) !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  }
+
+  .btn-primary:hover,
+  #modalWhatsAppBtn:hover {
+    background: linear-gradient(135deg, #28e16d 0%, #1fba59 100%) !important;
+    border-color: #179b47 !important;
+    color: #ffffff !important;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.45) !important;
+  }
+
+  .btn-primary:active,
+  #modalWhatsAppBtn:active {
+    transform: translateY(0px) scale(0.97) !important;
+    box-shadow: 0 2px 6px rgba(37, 211, 102, 0.25) !important;
+  }
+
   @media (max-width:480px){
     .modal-actions{flex-direction:column;}
     .modal-actions .btn{width:100%;justify-content:center;min-height:46px;}
+  }
+
+  /* ---------- TWO-COLUMN MEGA MENU (DESKTOP) ---------- */
+  .nav-item-dropdown {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    height: 100%;
+  }
+  .nav-item-dropdown::before {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: -20px;
+    right: -20px;
+    height: 18px;
+    background: transparent;
+    z-index: 1001;
+  }
+  .nav-dropdown-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    text-decoration: none;
+  }
+  .nav-dropdown-menu.mega-menu-container {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 50%;
+    transform: translateX(-50%) translateY(6px);
+    width: 780px;
+    max-width: 90vw;
+    background: #ffffff;
+    border: 1px solid var(--line, #e2e8f0);
+    border-radius: 14px;
+    padding: 22px 24px;
+    box-shadow: 0 20px 45px rgba(15, 23, 42, 0.16), 0 4px 12px rgba(0, 0, 0, 0.06);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.2s ease;
+    z-index: 1000;
+  }
+  .nav-item-dropdown:hover .nav-dropdown-menu.mega-menu-container,
+  .nav-item-dropdown:focus-within .nav-dropdown-menu.mega-menu-container,
+  .nav-dropdown-menu.mega-menu-container.is-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateX(-50%) translateY(0);
+  }
+  .mega-menu-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+  .mega-menu-col {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .mega-col-header {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--pink, #ee2f76);
+    padding-bottom: 8px;
+    margin-bottom: 6px;
+    border-bottom: 1px solid var(--line, #e2e8f0);
+  }
+  .mega-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 9px 10px;
+    border-radius: 8px;
+    text-decoration: none !important;
+    color: inherit !important;
+    transition: background 0.18s ease, transform 0.18s ease;
+  }
+  .mega-menu-item:hover {
+    background: rgba(238, 47, 118, 0.05);
+    transform: translateX(2px);
+  }
+  .mega-item-img-wrap {
+    width: 58px;
+    height: 58px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+    background: #f1f5f9;
+    border: 1px solid var(--line, #e2e8f0);
+  }
+  .mega-item-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.25s ease;
+  }
+  .mega-menu-item:hover .mega-item-img-wrap img {
+    transform: scale(1.08);
+  }
+  .mega-item-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .mega-item-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: #0f172a;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    line-height: 1.25;
+    transition: color 0.15s ease;
+  }
+  .mega-menu-item:hover .mega-item-title {
+    color: var(--pink, #ee2f76);
+  }
+  .mega-item-desc {
+    font-size: 12px;
+    color: #64748b;
+    margin-top: 3px;
+    line-height: 1.35;
+  }
+  .mega-item-arrow {
+    font-size: 13px;
+    color: var(--green, #689f0e);
+    opacity: 0.6;
+    transition: transform 0.18s ease, color 0.18s ease, opacity 0.18s ease;
+  }
+  .mega-menu-item:hover .mega-item-arrow {
+    opacity: 1;
+    color: var(--pink, #ee2f76);
+    transform: translateX(4px);
+  }
+  .mega-menu-item.active {
+    background: rgba(238, 47, 118, 0.08);
+    border-left: 3px solid var(--pink, #ee2f76);
+  }
+  .mega-menu-item.active .mega-item-title {
+    color: var(--pink, #ee2f76);
+    font-weight: 700;
+  }
+  @media (max-width: 860px) {
+    .nav-dropdown-menu.mega-menu-container {
+      display: none !important;
+    }
+  }
+
+  /* ---------- MOBILE SERVICES ACCORDION ---------- */
+  .mobile-drawer-accordion {
+    width: 100%;
+  }
+  .mobile-accordion-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    background: none;
+    border: none;
+    padding: 12px 0;
+    font-family: 'Oswald', sans-serif;
+    font-size: 18px;
+    text-transform: uppercase;
+    color: var(--white, #111827);
+    cursor: pointer;
+    text-align: left;
+  }
+  .mobile-accordion-icon {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--pink, #ee2f76);
+  }
+  .mobile-accordion-content {
+    display: none;
+    list-style: none;
+    padding: 4px 0 8px 16px;
+    margin: 0;
+    border-left: 2px solid var(--pink, #ee2f76);
+  }
+  .mobile-drawer-accordion.open .mobile-accordion-content {
+    display: block;
+  }
+  .mobile-accordion-content li {
+    margin-bottom: 8px;
+  }
+  .mobile-accordion-content a.m-sublink {
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--muted, #64748b);
+    text-decoration: none;
+    display: block;
+    padding: 4px 0;
+    transition: color 0.15s ease;
+  }
+  .mobile-accordion-content a.m-sublink:hover,
+  .mobile-accordion-content a.m-sublink.active {
+    color: var(--pink, #ee2f76);
+    font-weight: 600;
+  }
+
+  /* ---------- EXPLORE OUR SERVICES SECTION ---------- */
+  .explore-services-sec {
+    padding: 56px 0;
+    background: var(--bg-panel-2, #f8f9fa);
+    border-top: 1px solid var(--line, #e2e8f0);
+    border-bottom: 1px solid var(--line, #e2e8f0);
+  }
+  .explore-services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-top: 28px;
+  }
+  .explore-featured-row {
+    display: flex;
+    justify-content: center;
+    margin-top: 18px;
+  }
+  .explore-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-panel, #ffffff);
+    border: 1px solid var(--line, #e2e8f0);
+    border-radius: 10px;
+    overflow: hidden;
+    text-decoration: none !important;
+    color: inherit !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease;
+  }
+  .explore-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--pink, #ee2f76);
+    box-shadow: 0 10px 28px rgba(238, 47, 118, 0.12), 0 4px 10px rgba(0, 0, 0, 0.04);
+  }
+  .explore-card-img-wrap {
+    width: 100%;
+    height: 150px;
+    overflow: hidden;
+    position: relative;
+    background: #f1f5f9;
+  }
+  .explore-card-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .explore-card:hover .explore-card-img-wrap img {
+    transform: scale(1.05);
+  }
+  .explore-card-num {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    color: var(--pink, #ee2f76);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 3px 8px;
+    border-radius: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+  .explore-card-body {
+    padding: 16px 16px 18px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+  .explore-card-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--white, #111827);
+    margin-bottom: 6px;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+  }
+  .explore-card-desc {
+    font-size: 13px;
+    color: var(--muted, #64748b);
+    line-height: 1.45;
+    margin-bottom: 14px;
+    flex-grow: 1;
+  }
+  .explore-card-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    width: 100%;
+    padding: 9px 14px;
+    background: var(--green, #689f0e);
+    color: #000000;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(104, 159, 14, 0.22);
+    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .explore-card:hover .explore-card-btn {
+    background: #5c8f0c;
+    box-shadow: 0 4px 12px rgba(104, 159, 14, 0.32);
+  }
+  .explore-card-btn .arrow {
+    transition: transform 0.2s ease;
+  }
+  .explore-card:hover .explore-card-btn .arrow {
+    transform: translateX(4px);
+  }
+
+  /* Featured Bike Card */
+  .explore-card-featured {
+    width: min(420px, 100%);
+  }
+  .explore-card-featured .explore-card-img-wrap {
+    height: 165px;
+  }
+  .explore-card-featured .explore-card-body {
+    padding: 18px 18px 20px;
+  }
+
+  @media (max-width: 1024px) {
+    .explore-services-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+    .explore-card-featured {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .explore-services-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+  }
+
+  /* ---------- RELATED SERVICES SECTION ---------- */
+  .related-services-sec {
+    padding: 56px 0;
+    background: var(--bg-panel-2, #f8f9fa);
+    border-top: 1px solid var(--line, #e2e8f0);
+  }
+  .related-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 24px;
+  }
+  @media (max-width: 768px) {
+    .related-cards-grid {
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+  }
+  .related-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background: var(--bg-panel, #ffffff);
+    border: 1px solid var(--line, #e2e8f0);
+    border-radius: 10px;
+    padding: 22px;
+    text-decoration: none !important;
+    color: inherit !important;
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+  .related-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--pink, #ee2f76);
+    box-shadow: 0 8px 24px rgba(238, 47, 118, 0.12);
+  }
+  .related-card-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    text-transform: uppercase;
+    color: var(--white, #111827);
+    margin-bottom: 6px;
+  }
+  .related-card-desc {
+    font-size: 13.5px;
+    color: var(--muted, #64748b);
+    line-height: 1.45;
+    margin-bottom: 16px;
+  }
+  .related-card-cta {
+    font-family: 'Oswald', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--pink, #ee2f76);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .related-card:hover .related-card-cta span {
+    transform: translateX(4px);
+    transition: transform 0.2s ease;
   }
 
   /* ---------- NEXT.JS DEV ISSUE INDICATOR ---------- */
@@ -2225,7 +2755,92 @@
     <ul class="nav-links" id="navLinks">
       <li><a href="#">Home</a></li>
       <li><a href="#about">About Us</a></li>
-      <li><a href="#services">Services <span class="nav-caret">▾</span></a></li>
+      <li class="nav-item-dropdown">
+        <a href="#services" class="nav-dropdown-toggle" aria-expanded="false" aria-haspopup="true">Services <span class="nav-caret">▾</span></a>
+        <div class="nav-dropdown-menu mega-menu-container">
+          <div class="mega-menu-grid">
+            <!-- LEFT COLUMN: CLEAN & DETAIL -->
+            <div class="mega-menu-col">
+              <div class="mega-col-header">// CLEAN &amp; DETAIL</div>
+
+              <a href="/car-wash" class="mega-menu-item">
+                <div class="mega-item-img-wrap">
+                  <img src="assets/foam-wash.jpg" alt="Car Wash foam wash detailing at TRIEYE" loading="lazy">
+                </div>
+                <div class="mega-item-info">
+                  <div class="mega-item-title">CAR WASH <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Exterior wash &amp; maintenance care</div>
+                </div>
+              </a>
+
+              <a href="/interior-detailing" class="mega-menu-item">
+                <div class="mega-item-img-wrap">
+                  <img src="assets/interior-clean.jpg" alt="Interior Detailing deep cleaning at TRIEYE" loading="lazy">
+                </div>
+                <div class="mega-item-info">
+                  <div class="mega-item-title">INTERIOR DETAILING <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Deep cabin cleaning &amp; interior care</div>
+                </div>
+              </a>
+
+              <a href="/bike-detailing" class="mega-menu-item">
+                <div class="mega-item-img-wrap">
+                  <img src="assets/bike/bike-hero.jpg" alt="Bike Detailing motorcycle detailing at TRIEYE" loading="lazy">
+                </div>
+                <div class="mega-item-info">
+                  <div class="mega-item-title">BIKE DETAILING <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Professional motorcycle detailing</div>
+                </div>
+              </a>
+            </div>
+
+            <!-- RIGHT COLUMN: PROTECT & RESTORE -->
+            <div class="mega-menu-col">
+              <div class="mega-col-header">// PROTECT &amp; RESTORE</div>
+
+              <a href="/ceramic-coating" class="mega-menu-item">
+                <div class="mega-item-img-wrap">
+                  <img src="assets/ceramic-coating/hydrophobic-water-beading.webp" alt="Ceramic Coating hydrophobic protection at TRIEYE" loading="lazy">
+                </div>
+                <div class="mega-item-info">
+                  <div class="mega-item-title">CERAMIC COATING <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Gloss &amp; hydrophobic paint protection</div>
+                </div>
+              </a>
+
+              <a href="/graphene-coating" class="mega-menu-item">
+                <div class="mega-item-img-wrap">
+                  <img src="assets/graphene/graphene-application.jpg" alt="Graphene Coating application at TRIEYE" loading="lazy">
+                </div>
+                <div class="mega-item-info">
+                  <div class="mega-item-title">GRAPHENE COATING <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Advanced coating &amp; surface protection</div>
+                </div>
+              </a>
+
+              <a href="/paint-correction" class="mega-menu-item">
+                <div class="mega-item-img-wrap">
+                  <img src="assets/rubbing-polish.jpg" alt="Paint Correction machine polishing at TRIEYE" loading="lazy">
+                </div>
+                <div class="mega-item-info">
+                  <div class="mega-item-title">PAINT CORRECTION <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Swirl removal &amp; paint refinement</div>
+                </div>
+              </a>
+
+              <a href="/ppf" class="mega-menu-item">
+                <div class="mega-item-img-wrap">
+                  <img src="assets/ppf/ppf-installation.jpg" alt="Paint Protection Film PPF installation at TRIEYE" loading="lazy">
+                </div>
+                <div class="mega-item-info">
+                  <div class="mega-item-title">PAINT PROTECTION FILM (PPF) <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Transparent physical paint protection</div>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </li>
       <li><a href="#gallery">Gallery</a></li>
       <li><a href="#contact">Contact Us</a></li>
     </ul>
@@ -2255,7 +2870,21 @@
   <ul class="mobile-drawer-links">
     <li><a href="#"><span class="m-num">01</span> Home</a></li>
     <li><a href="#about"><span class="m-num">02</span> About Us</a></li>
-    <li><a href="#services"><span class="m-num">03</span> Services &amp; Pricing</a></li>
+    <li class="mobile-drawer-accordion">
+      <button class="mobile-accordion-btn" type="button" aria-expanded="false">
+        <span><span class="m-num">03</span> Services</span>
+        <span class="mobile-accordion-icon">+</span>
+      </button>
+      <ul class="mobile-accordion-content">
+        <li><a href="/car-wash" class="m-sublink">Car Wash</a></li>
+        <li><a href="/ceramic-coating" class="m-sublink">Ceramic Coating</a></li>
+        <li><a href="/graphene-coating" class="m-sublink">Graphene Coating</a></li>
+        <li><a href="/paint-correction" class="m-sublink">Paint Correction</a></li>
+        <li><a href="/interior-detailing" class="m-sublink">Interior Detailing</a></li>
+        <li><a href="/ppf" class="m-sublink">Paint Protection Film (PPF)</a></li>
+        <li><a href="/bike-detailing" class="m-sublink">Bike Detailing</a></li>
+      </ul>
+    </li>
     <li><a href="#gallery"><span class="m-num">04</span> Studio Gallery</a></li>
     <li><a href="#contact"><span class="m-num">05</span> Contact Us</a></li>
   </ul>
@@ -2368,6 +2997,112 @@
       <div class="n">03 / PROTECTION</div>
       <h3>Polish that <span>holds</span></h3>
       <p>Rubbing and polish stages are built to protect the paint between visits, not just shine for a day.</p>
+    </div>
+  </div>
+</section>
+<!-- EXPLORE OUR SERVICES SECTION -->
+<section class="explore-services-sec" id="explore-services">
+  <div class="wrap">
+    <div class="sec-head" style="text-align: center; max-width: 700px; margin: 0 auto 36px;">
+      <div class="sec-tag" style="color: var(--pink); font-size: 13px; font-weight: 600; letter-spacing: 2px; margin-bottom: 10px; font-family: 'IBM Plex Mono', monospace;">// EXPLORE OUR SERVICES</div>
+      <h2 style="font-size: clamp(28px, 4vw, 42px); font-weight: 800; text-transform: uppercase; color: var(--white); margin-bottom: 12px; line-height: 1.15;">EVERYTHING YOUR RIDE NEEDS</h2>
+      <p style="color: var(--muted); font-size: 15px; line-height: 1.6;">From maintenance foam washes to high-durability nano-coatings and paint correction, explore our complete line of studio detailing services.</p>
+    </div>
+
+    <!-- ROW 1 (01–03) & ROW 2 (04–06) GRID -->
+    <div class="explore-services-grid">
+      <!-- 01 CAR WASH -->
+      <a href="/car-wash" class="explore-card">
+        <div class="explore-card-img-wrap">
+          <span class="explore-card-num">01</span>
+          <img src="assets/foam-wash.jpg" alt="Car Wash foam wash detailing at TRIEYE" loading="lazy">
+        </div>
+        <div class="explore-card-body">
+          <h3 class="explore-card-title">CAR WASH</h3>
+          <p class="explore-card-desc">Exterior snow foam wash &amp; maintenance care for a clean, scratch-free finish.</p>
+          <span class="explore-card-btn">EXPLORE CAR WASH <span class="arrow">&rarr;</span></span>
+        </div>
+      </a>
+
+      <!-- 02 CERAMIC COATING -->
+      <a href="/ceramic-coating" class="explore-card">
+        <div class="explore-card-img-wrap">
+          <span class="explore-card-num">02</span>
+          <img src="assets/ceramic-coating/hydrophobic-water-beading.webp" alt="Ceramic Coating hydrophobic protection at TRIEYE" loading="lazy">
+        </div>
+        <div class="explore-card-body">
+          <h3 class="explore-card-title">CERAMIC COATING</h3>
+          <p class="explore-card-desc">Deep gloss &amp; hydrophobic paint protection engineered to repel dirt and water.</p>
+          <span class="explore-card-btn">EXPLORE CERAMIC <span class="arrow">&rarr;</span></span>
+        </div>
+      </a>
+
+      <!-- 03 GRAPHENE COATING -->
+      <a href="/graphene-coating" class="explore-card">
+        <div class="explore-card-img-wrap">
+          <span class="explore-card-num">03</span>
+          <img src="assets/graphene/graphene-application.jpg" alt="Graphene Coating application at TRIEYE" loading="lazy">
+        </div>
+        <div class="explore-card-body">
+          <h3 class="explore-card-title">GRAPHENE COATING</h3>
+          <p class="explore-card-desc">Advanced nano-graphene shield for high chemical resistance &amp; mirror shine.</p>
+          <span class="explore-card-btn">EXPLORE GRAPHENE <span class="arrow">&rarr;</span></span>
+        </div>
+      </a>
+
+      <!-- 04 PAINT CORRECTION -->
+      <a href="/paint-correction" class="explore-card">
+        <div class="explore-card-img-wrap">
+          <span class="explore-card-num">04</span>
+          <img src="assets/rubbing-polish.jpg" alt="Paint Correction machine polishing at TRIEYE" loading="lazy">
+        </div>
+        <div class="explore-card-body">
+          <h3 class="explore-card-title">PAINT CORRECTION</h3>
+          <p class="explore-card-desc">Multi-stage machine polishing to eliminate swirl marks, scratches &amp; haze.</p>
+          <span class="explore-card-btn">EXPLORE PAINT CORRECTION <span class="arrow">&rarr;</span></span>
+        </div>
+      </a>
+
+      <!-- 05 INTERIOR DETAILING -->
+      <a href="/interior-detailing" class="explore-card">
+        <div class="explore-card-img-wrap">
+          <span class="explore-card-num">05</span>
+          <img src="assets/interior-clean.jpg" alt="Interior Detailing deep cabin cleaning at TRIEYE" loading="lazy">
+        </div>
+        <div class="explore-card-body">
+          <h3 class="explore-card-title">INTERIOR DETAILING</h3>
+          <p class="explore-card-desc">Deep steam cleaning, upholstery extraction &amp; interior surface conditioning.</p>
+          <span class="explore-card-btn">EXPLORE INTERIOR <span class="arrow">&rarr;</span></span>
+        </div>
+      </a>
+
+      <!-- 06 PAINT PROTECTION FILM (PPF) -->
+      <a href="/ppf" class="explore-card">
+        <div class="explore-card-img-wrap">
+          <span class="explore-card-num">06</span>
+          <img src="assets/ppf/ppf-installation.jpg" alt="Paint Protection Film PPF installation at TRIEYE" loading="lazy">
+        </div>
+        <div class="explore-card-body">
+          <h3 class="explore-card-title">PAINT PROTECTION FILM (PPF)</h3>
+          <p class="explore-card-desc">Self-healing TPU film protecting your paint from rock chips &amp; road debris.</p>
+          <span class="explore-card-btn">EXPLORE PPF <span class="arrow">&rarr;</span></span>
+        </div>
+      </a>
+    </div>
+
+    <!-- ROW 3: 07 BIKE DETAILING (FEATURED CENTERED CARD) -->
+    <div class="explore-featured-row">
+      <a href="/bike-detailing" class="explore-card explore-card-featured">
+        <div class="explore-card-img-wrap">
+          <span class="explore-card-num">07</span>
+          <img src="assets/bike/bike-hero.jpg" alt="Professional motorcycle detailing at TRIEYE" loading="lazy">
+        </div>
+        <div class="explore-card-body">
+          <h3 class="explore-card-title">BIKE DETAILING</h3>
+          <p class="explore-card-desc">Dedicated motorcycle cleaning, wheel care, bodywork polishing &amp; protective finishing.</p>
+          <span class="explore-card-btn">EXPLORE BIKE DETAILING <span class="arrow">&rarr;</span></span>
+        </div>
+      </a>
     </div>
   </div>
 </section>
@@ -2997,9 +3732,12 @@
       <!-- Injected via JS -->
     </div>
 
-    <div style="display:flex;gap:12px;">
-      <a href="#" id="modalWhatsAppBtn" target="_blank" class="btn btn-primary" style="flex:1;justify-content:center;">Send on WhatsApp</a>
-      <button class="btn btn-outline" id="modalDoneBtn">Done</button>
+    <div class="modal-actions" style="display:flex;flex-direction:column;gap:10px;">
+      <a href="#" id="modalWhatsAppBtn" target="_blank" class="btn btn-primary" style="width:100%;justify-content:center;">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0;"><path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.762.459 3.48 1.332 5.001l-1.416 5.169 5.297-1.389c1.472.802 3.133 1.224 4.774 1.225h.004c5.505 0 9.988-4.478 9.989-9.985 0-2.668-1.039-5.176-2.927-7.063a9.927 9.927 0 0 0-7.063-2.942zm5.79 14.195c-.244.688-1.419 1.314-1.956 1.396-.51.077-1.163.116-3.701-.931-3.24-1.339-5.326-4.636-5.487-4.851-.161-.215-1.309-1.741-1.309-3.322 0-1.58.827-2.357 1.121-2.68.294-.323.644-.404.859-.404.215 0 .43.002.617.01.198.008.465-.075.728.556.27.646.918 2.241.998 2.403.08.162.134.35.027.565-.107.215-.161.35-.322.538-.161.188-.338.42-.483.564-.16.162-.328.338-.14.661.188.323.834 1.378 1.79 2.23 1.23 1.096 2.268 1.436 2.59 1.597.323.161.511.134.7-.08.188-.215.806-.941 1.021-1.263.215-.323.43-.269.725-.161.296.107 1.88.886 2.202 1.047.323.161.538.242.618.376.08.134.08.779-.164 1.467z"/></svg>
+        <span>Send on WhatsApp</span>
+      </a>
+      <p class="modal-helper-text">Please confirm your booking on WhatsApp to complete your reservation.</p>
     </div>
   </div>
 </div>
