@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#ffffff">
+<title>Track Your Booking | TRIEYE Detailing Studio Chennai</title>
+<meta name="description" content="Track your TRIEYE Detailing Studio booking using your booking reference and registered phone number. Check your car or bike detailing appointment status in Chennai.">
+<meta property="og:title" content="Track Your Booking | TRIEYE Detailing Studio Chennai">
+<meta property="og:description" content="Track your TRIEYE Detailing Studio booking using your booking reference and registered phone number. Check your car or bike detailing appointment status in Chennai.">
+<meta property="og:type" content="website">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="assets/trieye-logo.png">
+
+<script>
+  // Customer Public Website: Always enforce clean LIGHT theme
+  document.documentElement.removeAttribute('data-theme');
+</script>
+
+<link rel="stylesheet" href="assets/service-page.css">
+
+<style>
+  /* ---------- TRACK BOOKING CUSTOM STYLES ---------- */
+  .track-hero-section {
+    width: 100%;
+    padding: 60px 24px 80px;
+    background: var(--bg);
+    min-height: calc(100vh - 350px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+  }
+
+  .track-container {
+    max-width: 680px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .track-header {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+
+  .track-header .sec-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--pink);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .track-header h1 {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: var(--white);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+
+  .track-header p {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.6;
+    max-width: 540px;
+    margin: 0 auto;
+  }
+
+  /* Centered Lookup Card */
+  .track-card {
+    background: #ffffff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 36px 32px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+    margin-bottom: 32px;
+    transition: box-shadow 0.25s ease;
+  }
+
+  .track-form-group {
+    margin-bottom: 20px;
+  }
+
+  .track-form-group label {
+    display: block;
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+
+  .track-input {
+    width: 100%;
+    height: 48px;
+    padding: 0 16px;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: var(--white);
+    background: #f8f9fa;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    outline: none;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+  }
+
+  .track-input:focus {
+    background: #ffffff;
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(104, 159, 14, 0.15);
+  }
+
+  .track-btn-submit {
+    width: 100%;
+    height: 50px;
+    background: var(--green, #a6d331);
+    color: #000000;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 14px rgba(104, 159, 14, 0.3);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    margin-top: 24px;
+  }
+
+  .track-btn-submit:hover:not(:disabled) {
+    background: #5a8a0b;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(104, 159, 14, 0.45);
+    color: #ffffff;
+  }
+
+  .track-btn-submit:disabled {
+    opacity: 0.75;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Inline Error Box */
+  .track-error-box {
+    display: none;
+    background: rgba(220, 38, 38, 0.08);
+    border: 1px solid rgba(220, 38, 38, 0.3);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-top: 20px;
+    color: #dc2626;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .track-error-box svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* Result Display Card */
+  .result-card {
+    display: none;
+    background: #ffffff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 36px 32px;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.06);
+    animation: fadeInUp 0.35s ease forwards;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .result-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .result-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .result-status-badge.status-confirmed {
+    background: rgba(104, 159, 14, 0.15);
+    color: #4c750a;
+    border: 1px solid rgba(104, 159, 14, 0.3);
+  }
+
+  .result-status-badge.status-completed {
+    background: rgba(37, 99, 235, 0.12);
+    color: #1d4ed8;
+    border: 1px solid rgba(37, 99, 235, 0.3);
+  }
+
+  .result-status-badge.status-cancelled {
+    background: rgba(220, 38, 38, 0.12);
+    color: #b91c1c;
+    border: 1px solid rgba(220, 38, 38, 0.3);
+  }
+
+  .result-ref-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  .result-ref-title span {
+    color: var(--pink);
+    font-weight: 700;
+  }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px 24px;
+  }
+
+  .result-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .result-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .result-value {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--white);
+    word-break: break-word;
+  }
+
+  .result-value.highlight-price {
+    color: var(--green);
+    font-size: 17px;
+    font-weight: 700;
+  }
+
+  /* Footer Navigation Links */
+  .footer-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 16px 24px;
+    padding: 24px 0 32px;
+    margin: 0 auto;
+    border-top: 1px solid var(--line);
+    max-width: 900px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .footer-nav a {
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .footer-nav a:hover {
+    color: var(--green, #a6d331);
+  }
+
+  @media (max-width: 640px) {
+    .track-hero-section {
+      padding: 36px 16px 60px;
+    }
+    .track-card, .result-card {
+      padding: 24px 18px;
+    }
+    .result-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    .footer-nav {
+      gap: 12px 18px;
+      padding: 20px 10px 24px;
+    }
+  }
+</style>
+
+<!-- Official Supabase JavaScript Client -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Trieye Supabase Config & Database Adapter -->
+<script src="assets/supabase-config.js"></script>
+<script src="assets/trieye-db.js"></script>
+</head>
+<body>
+
+<header>
+  <nav>
+    <a href="index.html" class="nav-brand">
+      <img src="assets/trieye-logo-dark.png" alt="TRIEYE car detailing studio" class="nav-logo logo-dark">
+      <img src="assets/trieye-logo-light.png" alt="TRIEYE car detailing studio" class="nav-logo logo-light">
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="index.html#about">About Us</a></li>
+      <li class="nav-item-dropdown">
+        <a href="index.html#services" class="nav-dropdown-toggle" aria-expanded="false" aria-haspopup="true">Services <span class="nav-caret">▾</span></a>
+        <div class="nav-dropdown-menu mega-menu-container">
+          <div class="mega-menu-grid">
+            <div class="mega-menu-col">
+              <div class="mega-col-header">// CLEAN &amp; DETAIL</div>
+              <a href="car-wash.html" class="mega-menu-item">
+                <div class="mega-item-info">
+                  <div class="mega-item-title">CAR WASH <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Exterior wash &amp; maintenance care</div>
+                </div>
+              </a>
+              <a href="interior-detailing.html" class="mega-menu-item">
+                <div class="mega-item-info">
+                  <div class="mega-item-title">INTERIOR DETAILING <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Deep cabin cleaning &amp; interior care</div>
+                </div>
+              </a>
+              <a href="bike-detailing.html" class="mega-menu-item">
+                <div class="mega-item-info">
+                  <div class="mega-item-title">BIKE DETAILING <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Precision wash &amp; polishing for motorcycles</div>
+                </div>
+              </a>
+            </div>
+            <div class="mega-menu-col">
+              <div class="mega-col-header">// RESTORE &amp; PROTECT</div>
+              <a href="paint-correction.html" class="mega-menu-item">
+                <div class="mega-item-info">
+                  <div class="mega-item-title">PAINT CORRECTION <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Swirl removal &amp; gloss restoration</div>
+                </div>
+              </a>
+              <a href="ceramic-coating.html" class="mega-menu-item">
+                <div class="mega-item-info">
+                  <div class="mega-item-title">CERAMIC COATING <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Hydrophobic nanotech paint shield</div>
+                </div>
+              </a>
+              <a href="graphene-coating.html" class="mega-menu-item">
+                <div class="mega-item-info">
+                  <div class="mega-item-title">GRAPHENE COATING <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Ultra-durable matrix heat protection</div>
+                </div>
+              </a>
+              <a href="ppf.html" class="mega-menu-item">
+                <div class="mega-item-info">
+                  <div class="mega-item-title">PAINT PROTECTION FILM (PPF) <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Self-healing TPU impact armor</div>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </li>
+      <li><a href="index.html#faq">FAQ</a></li>
+      <li><a href="index.html#contact">Contact Us</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="index.html#booking" class="nav-cta">Book Now <span class="nav-cta-arrow">→</span></a>
+      <button class="burger-btn" id="burgerBtn" aria-label="Toggle navigation menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+</header>
+
+<!-- MOBILE DRAWER -->
+<div class="mobile-drawer-backdrop" id="mobileDrawerBackdrop"></div>
+<div class="mobile-nav-drawer" id="mobileNavDrawer">
+  <div class="mobile-drawer-header">
+    <img src="assets/trieye-logo-dark.png" alt="TRIEYE logo" class="nav-logo logo-dark">
+    <img src="assets/trieye-logo-light.png" alt="TRIEYE logo" class="nav-logo logo-light">
+    <button class="mobile-drawer-close" id="mobileDrawerClose" aria-label="Close menu">&times;</button>
+  </div>
+  <div class="mobile-drawer-body">
+    <ul class="mobile-drawer-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="car-wash.html">Car Wash</a></li>
+      <li><a href="interior-detailing.html">Interior Detailing</a></li>
+      <li><a href="bike-detailing.html">Bike Detailing</a></li>
+      <li><a href="paint-correction.html">Paint Correction</a></li>
+      <li><a href="ceramic-coating.html">Ceramic Coating</a></li>
+      <li><a href="graphene-coating.html">Graphene Coating</a></li>
+      <li><a href="ppf.html">PPF</a></li>
+      <li><a href="track-booking.html">Track Booking</a></li>
+    </ul>
+    <a href="index.html#booking" class="btn btn-primary mobile-drawer-cta">Book a Slot →</a>
+  </div>
+</div>
+
+<!-- MAIN TRACK BOOKING SECTION -->
+<main class="track-hero-section">
+  <div class="track-container">
+
+    <div class="track-header">
+      <div class="sec-tag">// TRACK YOUR BOOKING</div>
+      <h1>CHECK YOUR BOOKING STATUS</h1>
+      <p>Enter your vehicle number and registered phone number to view the latest status of your TRIEYE appointment.</p>
+    </div>
+
+    <!-- LOOKUP FORM CARD -->
+    <div class="track-card">
+      <form id="trackForm" onsubmit="return false;">
+        <div class="track-form-group">
+          <label for="trackRef">Vehicle Number</label>
+          <input type="text" id="trackRef" class="track-input" placeholder="TN 01 AB 1234" maxlength="13" required autocomplete="off" spellcheck="false">
+        </div>
+
+        <div class="track-form-group">
+          <label for="trackPhone">Registered Phone Number</label>
+          <input type="tel" id="trackPhone" class="track-input" placeholder="9876543210" maxlength="10" inputmode="numeric" required autocomplete="tel">
+        </div>
+
+        <button type="submit" id="btnTrackSubmit" class="track-btn-submit">
+          <span>CHECK BOOKING →</span>
+        </button>
+      </form>
+
+      <!-- Inline Error Message Box -->
+      <div id="trackError" class="track-error-box" style="display:none;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="trackErrorText">We couldn't find a booking matching those details. Please check your vehicle number and phone number.</span>
+      </div>
+    </div>
+
+    <!-- BOOKING RESULT DISPLAY CARD -->
+    <div id="trackResultCard" class="result-card">
+      <div class="result-header">
+        <div id="resultStatusBadge" class="result-status-badge status-confirmed">
+          ✓ BOOKING CONFIRMED
+        </div>
+        <div class="result-ref-title">
+          Booking Ref: <span id="resRef">TRI-01E8A992</span>
+        </div>
+      </div>
+
+      <div class="result-grid">
+        <div class="result-row">
+          <span class="result-label">Customer Name</span>
+          <span class="result-value" id="resName">--</span>
+        </div>
+
+        <div class="result-row">
+          <span class="result-label">Selected Service</span>
+          <span class="result-value" id="resService">--</span>
+        </div>
+
+        <div class="result-row">
+          <span class="result-label">Vehicle Type</span>
+          <span class="result-value" id="resVehicle">--</span>
+        </div>
+
+        <div class="result-row">
+          <span class="result-label">Registration Number</span>
+          <span class="result-value" id="resReg">--</span>
+        </div>
+
+        <div class="result-row">
+          <span class="result-label">Booking Date</span>
+          <span class="result-value" id="resDate">--</span>
+        </div>
+
+        <div class="result-row">
+          <span class="result-label">Booking Time / Slot</span>
+          <span class="result-value" id="resTime">--</span>
+        </div>
+
+        <div class="result-row">
+          <span class="result-label">Estimated Price</span>
+          <span class="result-value highlight-price" id="resPrice">₹0</span>
+        </div>
+
+        <div class="result-row">
+          <span class="result-label">Current Status</span>
+          <span class="result-value" id="resStatusText">CONFIRMED</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- GLOBAL FOOTER -->
+<footer class="site-footer">
+  <div class="footer-container">
+    <div class="footer-brand-wrap">
+      <a href="index.html" class="footer-logo-link" aria-label="Trieye Home">
+        <img src="assets/trieye-logo-dark.png" alt="TRIEYE car detailing studio" class="footer-logo logo-dark">
+        <img src="assets/trieye-logo-light.png" alt="TRIEYE car detailing studio" class="footer-logo logo-light">
+      </a>
+    </div>
+
+    <!-- Footer Navigation Links -->
+    <nav class="footer-nav" aria-label="Footer Navigation">
+      <a href="index.html">Home</a>
+      <a href="car-wash.html">Car Wash</a>
+      <a href="ceramic-coating.html">Ceramic Coating</a>
+      <a href="graphene-coating.html">Graphene Coating</a>
+      <a href="paint-correction.html">Paint Correction</a>
+      <a href="interior-detailing.html">Interior Detailing</a>
+      <a href="ppf.html">PPF</a>
+      <a href="bike-detailing.html">Bike Detailing</a>
+      <a href="track-booking.html">Track Booking</a>
+    </nav>
+
+    <!-- Bottom Footer -->
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2026 Trieye Detail Studio. All rights reserved.</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Mobile drawer logic
+  const burgerBtn = document.getElementById('burgerBtn');
+  const mobileNavDrawer = document.getElementById('mobileNavDrawer');
+  const mobileDrawerBackdrop = document.getElementById('mobileDrawerBackdrop');
+  const mobileDrawerClose = document.getElementById('mobileDrawerClose');
+
+  function openDrawer() {
+    if (mobileNavDrawer) mobileNavDrawer.classList.add('active');
+    if (mobileDrawerBackdrop) mobileDrawerBackdrop.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeDrawer() {
+    if (mobileNavDrawer) mobileNavDrawer.classList.remove('active');
+    if (mobileDrawerBackdrop) mobileDrawerBackdrop.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  if (burgerBtn) burgerBtn.addEventListener('click', openDrawer);
+  if (mobileDrawerClose) mobileDrawerClose.addEventListener('click', closeDrawer);
+  if (mobileDrawerBackdrop) mobileDrawerBackdrop.addEventListener('click', closeDrawer);
+
+  // Strict formatting listeners for Vehicle Number and Registered Phone Number
+  document.addEventListener('DOMContentLoaded', () => {
+    const trackRefInput = document.getElementById('trackRef');
+    const trackPhoneInput = document.getElementById('trackPhone');
+
+    // Vehicle Number auto-formatter: 2 letters + 2 numbers + 2 letters + 4 numbers (e.g. TN 01 AB 1234)
+    if (trackRefInput) {
+      trackRefInput.addEventListener('input', function() {
+        const val = this.value.toUpperCase();
+        if (window.TrieyeDB && typeof window.TrieyeDB.formatVehicleReg === 'function' && !val.startsWith('TRI-')) {
+          this.value = window.TrieyeDB.formatVehicleReg(val);
+        } else {
+          this.value = val;
+        }
+      });
+    }
+
+    // Phone Number filter: Numbers ONLY, maximum 10 digits
+    if (trackPhoneInput) {
+      trackPhoneInput.addEventListener('input', function() {
+        this.value = this.value.replace(/\D/g, '').slice(0, 10);
+      });
+    }
+
+    // Auto-prefill reference from URL query parameter (e.g. ?ref=TRI-01E8A992)
+    const params = new URLSearchParams(window.location.search);
+    const refParam = params.get('ref');
+    if (refParam && trackRefInput) {
+      trackRefInput.value = refParam.trim().toUpperCase();
+      if (trackPhoneInput) trackPhoneInput.focus();
+    }
+  });
+
+  // Track Booking Lookup Execution Handler
+  const trackForm = document.getElementById('trackForm');
+  const btnTrackSubmit = document.getElementById('btnTrackSubmit');
+  const trackError = document.getElementById('trackError');
+  const trackErrorText = document.getElementById('trackErrorText');
+  const trackResultCard = document.getElementById('trackResultCard');
+
+  if (trackForm) {
+    trackForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const refVal = document.getElementById('trackRef').value.trim();
+      const phoneVal = document.getElementById('trackPhone').value.trim();
+
+      if (!refVal || !phoneVal) {
+        showError("Please enter both your Vehicle Number and registered Phone Number.");
+        return;
+      }
+
+      if (phoneVal.replace(/\D/g, '').length < 10) {
+        showError("Registered Phone Number must contain exactly 10 digits.");
+        return;
+      }
+
+      // Set loading state
+      setLoading(true);
+      hideError();
+      hideResult();
+
+      try {
+        if (!window.TrieyeDB || typeof window.TrieyeDB.trackBooking !== 'function') {
+          showError("Database adapter loading... Please wait a moment and try again.");
+          return;
+        }
+
+        const res = await window.TrieyeDB.trackBooking(refVal, phoneVal);
+
+        if (res && res.success && res.booking) {
+          renderBookingResult(res.booking);
+        } else {
+          showError((res && res.error) || "We couldn't find a booking matching those details. Please check your booking reference and phone number.");
+        }
+      } catch (err) {
+        console.error('🚨 [Track Booking Exception]:', err);
+        showError("An unexpected error occurred while looking up your booking. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    });
+  }
+
+  function setLoading(isLoading) {
+    if (!btnTrackSubmit) return;
+    if (isLoading) {
+      btnTrackSubmit.disabled = true;
+      btnTrackSubmit.innerHTML = `
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation: spin 1s linear infinite;"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>
+        <span>CHECKING STATUS...</span>
+      `;
+    } else {
+      btnTrackSubmit.disabled = false;
+      btnTrackSubmit.innerHTML = `<span>CHECK BOOKING →</span>`;
+    }
+  }
+
+  function showError(msg) {
+    if (trackErrorText) trackErrorText.textContent = msg;
+    if (trackError) trackError.style.display = 'flex';
+  }
+
+  function hideError() {
+    if (trackError) trackError.style.display = 'none';
+  }
+
+  function hideResult() {
+    if (trackResultCard) trackResultCard.style.display = 'none';
+  }
+
+  function renderBookingResult(b) {
+    // Populate card details
+    document.getElementById('resRef').textContent = b.booking_ref || 'TRI-BOOKING';
+    document.getElementById('resName').textContent = b.customer_name || 'Valued Customer';
+    document.getElementById('resService').textContent = b.service || 'Detailing Service';
+    document.getElementById('resVehicle').textContent = b.vehicleType || 'Car';
+    document.getElementById('resReg').textContent = b.reg || 'N/A';
+    
+    // Format Date
+    let formattedDate = b.booking_date || 'Standard Entry';
+    if (b.booking_date && b.booking_date.includes('-')) {
+      try {
+        const d = new Date(b.booking_date);
+        if (!isNaN(d.getTime())) {
+          formattedDate = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+      } catch (e) {}
+    }
+    document.getElementById('resDate').textContent = formattedDate;
+    document.getElementById('resTime').textContent = b.booking_time || '10:00 AM';
+
+    const priceNum = Number(b.price || 0);
+    document.getElementById('resPrice').textContent = priceNum > 0 ? `₹${priceNum.toLocaleString()}` : '₹---';
+    document.getElementById('resStatusText').textContent = b.status || 'CONFIRMED';
+
+    // Status Badge Styling
+    const badge = document.getElementById('resultStatusBadge');
+    if (badge) {
+      badge.className = 'result-status-badge';
+      const st = String(b.status || 'CONFIRMED').toUpperCase();
+
+      if (st === 'CONFIRMED') {
+        badge.classList.add('status-confirmed');
+        badge.innerHTML = `✓ BOOKING CONFIRMED`;
+      } else if (st === 'COMPLETED' || st === 'FINISHED' || st === 'DONE') {
+        badge.classList.add('status-completed');
+        badge.innerHTML = `✓ BOOKING COMPLETED`;
+      } else if (st === 'CANCELLED' || st === 'CANCELED') {
+        badge.classList.add('status-cancelled');
+        badge.innerHTML = `✕ BOOKING CANCELLED`;
+      } else {
+        badge.classList.add('status-confirmed');
+        badge.innerHTML = `✓ BOOKING ${st}`;
+      }
+    }
+
+    if (trackResultCard) {
+      trackResultCard.style.display = 'block';
+      trackResultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+</script>
+
+<style>
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+</style>
+
+</body>
+</html>

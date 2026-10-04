@@ -1198,6 +1198,161 @@ const TrieyeDB = {
     if (!val) return false;
     const regex = /^[A-Z]{2}\s\d{2}\s[A-Z]{2}\s\d{4}$/;
     return regex.test(String(val).trim());
+  },
+
+  // 10. PUBLIC SECURE TRACK BOOKING LOOKUP
+  async trackBooking(bookingRefOrVeh, phone) {
+    if (!bookingRefOrVeh || !phone) {
+      return {
+        success: false,
+        error: "Please enter both your Vehicle Number and registered Phone Number."
+      };
+    }
+
+    const rawInput = String(bookingRefOrVeh).trim().toUpperCase();
+    const cleanRef = rawInput.replace(/^#/, '').replace(/^TRI-/, '');
+    const cleanReg = rawInput.replace(/[^A-Z0-9]/g, '');
+    const cleanPhone = String(phone).replace(/\D/g, '').slice(-10);
+
+    if (!cleanRef && !cleanReg) {
+      return {
+        success: false,
+        error: "Please enter a valid Vehicle Number (e.g., TN 01 AB 1234) or Booking Reference."
+      };
+    }
+
+    if (!cleanPhone || cleanPhone.length < 10) {
+      return {
+        success: false,
+        error: "Please enter a valid 10-digit registered phone number."
+      };
+    }
+
+    const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
+
+    if (sb) {
+      try {
+        const { data, error } = await sb
+          .from('bookings')
+          .select(`
+            id,
+            booking_date,
+            booking_time,
+            status,
+            total_amount,
+            source,
+            created_at,
+            customers!inner (id, name, phone),
+            vehicles (id, vehicle_type, reg_number),
+            services (id, name, base_price),
+            bays (id, name),
+            slots (id, slot_time)
+          `)
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          TrieyeDB.logError('bookings:trackBooking', 'SELECT', error);
+        } else if (Array.isArray(data) && data.length > 0) {
+          const match = data.find(b => {
+            const custPhone = b.customers && b.customers.phone ? String(b.customers.phone).replace(/\D/g, '').slice(-10) : '';
+            const phoneMatches = custPhone === cleanPhone;
+            if (!phoneMatches) return false;
+
+            const bRef = b.id ? `TRI-${String(b.id).substring(0, 8).toUpperCase()}` : '';
+            const rawId = String(b.id || '').toUpperCase();
+            const refMatches = cleanRef && (cleanRef === bRef.replace('TRI-', '') || rawId.startsWith(cleanRef));
+
+            const vReg = b.vehicles && b.vehicles.reg_number ? String(b.vehicles.reg_number).toUpperCase().replace(/[^A-Z0-9]/g, '') : '';
+            const regMatches = cleanReg && vReg && (vReg === cleanReg || vReg.includes(cleanReg) || cleanReg.includes(vReg));
+
+            return refMatches || regMatches;
+          });
+
+          if (match) {
+            return {
+              success: true,
+              booking: this._formatTrackBookingResult(match)
+            };
+          }
+        }
+      } catch (err) {
+        console.error('🚨 [Supabase Network Error on trackBooking]:', err);
+      }
+    }
+
+    // Fallback to local cache (for offline / offline-generated bookings)
+    try {
+      const local = JSON.parse(localStorage.getItem('trieye_bookings')) || [];
+      const match = local.find(b => {
+        const custPhone = String(b.phone || (b.customers && b.customers.phone) || '').replace(/\D/g, '').slice(-10);
+        const phoneMatches = custPhone === cleanPhone;
+        if (!phoneMatches) return false;
+
+        const bRef = String(b.invoice_ref || b.id || '').toUpperCase().replace(/^TRI-/, '');
+        const refMatches = cleanRef && (bRef.startsWith(cleanRef) || cleanRef.startsWith(bRef) || (b.id && String(b.id).toUpperCase().replace(/^TRI-/, '').startsWith(cleanRef)));
+
+        const vReg = String(b.reg || (b.vehicles && b.vehicles.reg_number) || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+        const regMatches = cleanReg && vReg && (vReg === cleanReg || vReg.includes(cleanReg) || cleanReg.includes(vReg));
+
+        return refMatches || regMatches;
+      });
+
+      if (match) {
+        let normStatus = (match.status || 'CONFIRMED').toUpperCase().trim();
+        if (normStatus === 'CANCELED' || normStatus === 'CANCEL') normStatus = 'CANCELLED';
+        if (normStatus === 'DONE' || normStatus === 'FINISHED') normStatus = 'COMPLETED';
+
+        return {
+          success: true,
+          booking: {
+            booking_ref: match.invoice_ref || (match.id ? `TRI-${String(match.id).substring(0, 8).toUpperCase()}` : 'TRI-BOOKING'),
+            customer_name: match.name || (match.customers && match.customers.name) || 'Valued Customer',
+            phone: match.phone || (match.customers && match.customers.phone) || '',
+            service: match.service || (match.services && match.services.name) || 'Car Detailing',
+            vehicleType: match.vehicleType || (match.vehicles && match.vehicles.vehicle_type) || 'Car',
+            reg: match.reg || (match.vehicles && match.vehicles.reg_number) || 'N/A',
+            booking_date: match.date || match.booking_date || '',
+            booking_time: match.bookingTime || match.slot || (match.slots && match.slots.slot_time) || 'Standard Slot',
+            price: Number(match.price || match.total_amount || 0),
+            status: normStatus,
+            created_at: match.created || match.created_at || new Date().toISOString()
+          }
+        };
+      }
+    } catch (e) {}
+
+    return {
+      success: false,
+      error: "We couldn't find a booking matching those details. Please check your vehicle number and phone number."
+    };
+  },
+
+  _formatTrackBookingResult(b) {
+    const cust = b.customers || {};
+    const veh = b.vehicles || {};
+    const svc = b.services || {};
+    const slot = b.slots || {};
+
+    const shortRef = b.id && String(b.id).length > 8 ? `TRI-${String(b.id).substring(0, 8).toUpperCase()}` : (b.id || 'TRI-BOOKING');
+    const totalAmt = Number(b.total_amount !== null && b.total_amount !== undefined ? b.total_amount : (svc.base_price || 0));
+
+    let normStatus = (b.status || 'CONFIRMED').toUpperCase().trim();
+    if (normStatus === 'CANCELED' || normStatus === 'CANCEL') normStatus = 'CANCELLED';
+    if (normStatus === 'DONE' || normStatus === 'FINISHED') normStatus = 'COMPLETED';
+
+    return {
+      booking_ref: shortRef,
+      customer_name: cust.name || 'Valued Customer',
+      phone: cust.phone || '',
+      service: svc.name || 'Car Detailing',
+      vehicleType: veh.vehicle_type || 'Car',
+      reg: veh.reg_number || 'N/A',
+      booking_date: b.booking_date || '',
+      booking_time: b.booking_time || slot.slot_time || 'Standard Slot',
+      price: totalAmt,
+      status: normStatus,
+      created_at: b.created_at || new Date().toISOString()
+    };
   }
 };
 
