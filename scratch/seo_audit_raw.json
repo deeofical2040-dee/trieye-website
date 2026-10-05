@@ -1,0 +1,3099 @@
+{
+  "index.html": {
+    "title": "TRIEYE Detailing Studio | Car & Bike Detailing in Chennai",
+    "metaDesc": "Professional car and bike detailing in Villivakkam, Chennai. Explore premium wash, interior care, paint correction, ceramic coating, PPF and vehicle protection services at TRIEYE Detailing Studio.",
+    "metaRobots": null,
+    "canonical": null,
+    "viewport": "width=device-width, initial-scale=1.0",
+    "h1s": [
+      "YOUR RIDE\n        DESERVES\n        MORE THAN AWASH."
+    ],
+    "h2Count": 8,
+    "h3Count": 12,
+    "schemas": [
+      {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "name": "TRIEYE Detailing Studio",
+        "image": "assets/trieye-logo.png",
+        "telephone": "+919940181934",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "No. 19, 6th Street, 1st Main Road, Baba Nagar, Villivakkam",
+          "addressLocality": "Chennai",
+          "addressRegion": "Tamil Nadu",
+          "postalCode": "600049",
+          "addressCountry": "IN"
+        },
+        "openingHoursSpecification": {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday"
+          ],
+          "opens": "08:00",
+          "closes": "20:00"
+        }
+      }
+    ],
+    "og": {
+      "title": "TRIEYE Detailing Studio | Car & Bike Detailing in Chennai",
+      "desc": "Professional car and bike detailing in Villivakkam, Chennai. Explore premium wash, interior care, paint correction, ceramic coating, PPF and vehicle protection services at TRIEYE Detailing Studio.",
+      "img": "assets/trieye-logo.png",
+      "url": null,
+      "type": "website"
+    },
+    "twitter": {
+      "card": null
+    },
+    "imgStats": {
+      "total": 76,
+      "withAlt": 76,
+      "emptyAlt": 0,
+      "missingAlt": 0,
+      "altDetails": [
+        {
+          "src": "assets/trieye-logo-dark.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-light.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/foam-wash.jpg",
+          "alt": "Car Wash foam wash detailing at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/interior-clean.jpg",
+          "alt": "Interior Detailing deep cleaning at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/bike/bike-hero.jpg",
+          "alt": "Bike Detailing motorcycle detailing at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ceramic-coating/hydrophobic-water-beading.webp",
+          "alt": "Ceramic Coating hydrophobic protection at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/graphene/graphene-application.jpg",
+          "alt": "Graphene Coating application at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/rubbing-polish.jpg",
+          "alt": "Paint Correction machine polishing at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ppf/ppf-installation.jpg",
+          "alt": "Paint Protection Film PPF installation at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-dark.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-light.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/toyota.svg",
+          "alt": "Toyota",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/honda.svg",
+          "alt": "Honda",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/bmw.svg",
+          "alt": "BMW",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/mercedes-benz.svg",
+          "alt": "Mercedes-Benz",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/audi.svg",
+          "alt": "Audi",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/ford.png",
+          "alt": "Ford",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/chevrolet.png",
+          "alt": "Chevrolet",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/nissan.svg",
+          "alt": "Nissan",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/hyundai.svg",
+          "alt": "Hyundai",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/kia.svg",
+          "alt": "Kia",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/volkswagen.svg",
+          "alt": "Volkswagen",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/lexus.png",
+          "alt": "Lexus",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/volvo.svg",
+          "alt": "Volvo",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/mazda.svg",
+          "alt": "Mazda",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/subaru.png",
+          "alt": "Subaru",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/jeep.svg",
+          "alt": "Jeep",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/land-rover.svg",
+          "alt": "Land Rover",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/mitsubishi.svg",
+          "alt": "Mitsubishi",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/suzuki.svg",
+          "alt": "Suzuki",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/renault.svg",
+          "alt": "Renault",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/peugeot.svg",
+          "alt": "Peugeot",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/skoda.svg",
+          "alt": "Skoda",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/bentley.svg",
+          "alt": "Bentley",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/rolls-royce.svg",
+          "alt": "Rolls-Royce",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/bugatti.svg",
+          "alt": "Bugatti",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/mclaren.svg",
+          "alt": "McLaren",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/toyota.svg",
+          "alt": "Toyota",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/honda.svg",
+          "alt": "Honda",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/bmw.svg",
+          "alt": "BMW",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/mercedes-benz.svg",
+          "alt": "Mercedes-Benz",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/audi.svg",
+          "alt": "Audi",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/ford.png",
+          "alt": "Ford",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/chevrolet.png",
+          "alt": "Chevrolet",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/nissan.svg",
+          "alt": "Nissan",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/hyundai.svg",
+          "alt": "Hyundai",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/kia.svg",
+          "alt": "Kia",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/volkswagen.svg",
+          "alt": "Volkswagen",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/lexus.png",
+          "alt": "Lexus",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/volvo.svg",
+          "alt": "Volvo",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/mazda.svg",
+          "alt": "Mazda",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/subaru.png",
+          "alt": "Subaru",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/jeep.svg",
+          "alt": "Jeep",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/land-rover.svg",
+          "alt": "Land Rover",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/mitsubishi.svg",
+          "alt": "Mitsubishi",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/suzuki.svg",
+          "alt": "Suzuki",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/renault.svg",
+          "alt": "Renault",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/peugeot.svg",
+          "alt": "Peugeot",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/skoda.svg",
+          "alt": "Skoda",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/bentley.svg",
+          "alt": "Bentley",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/rolls-royce.svg",
+          "alt": "Rolls-Royce",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/bugatti.svg",
+          "alt": "Bugatti",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/brand_logos/mclaren.svg",
+          "alt": "McLaren",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/foam-wash.jpg",
+          "alt": "Car Wash foam wash detailing at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ceramic-coating/hydrophobic-water-beading.webp",
+          "alt": "Ceramic Coating hydrophobic protection at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/graphene/graphene-application.jpg",
+          "alt": "Graphene Coating application at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/rubbing-polish.jpg",
+          "alt": "Paint Correction machine polishing at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/interior-clean.jpg",
+          "alt": "Interior Detailing deep cabin cleaning at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ppf/ppf-installation.jpg",
+          "alt": "Paint Protection Film PPF installation at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/bike/bike-hero.jpg",
+          "alt": "Professional motorcycle detailing at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/foam-wash.jpg",
+          "alt": "Professional snow foam exterior car wash at TRIEYE Detailing Studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/rubbing-polish.jpg",
+          "alt": "Car paint correction and polishing service",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/interior-clean.jpg",
+          "alt": "Car interior detailing service",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ceramic-coating.jpg",
+          "alt": "Ceramic coating service",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-dark.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-light.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        }
+      ]
+    },
+    "links": [
+      "#",
+      "#",
+      "#about",
+      "#services",
+      "/car-wash",
+      "/interior-detailing",
+      "/bike-detailing",
+      "/ceramic-coating",
+      "/graphene-coating",
+      "/paint-correction",
+      "/ppf",
+      "#gallery",
+      "#contact",
+      "#booking",
+      "index.html",
+      "index.html",
+      "index.html#about",
+      "car-wash.html",
+      "ceramic-coating.html",
+      "graphene-coating.html",
+      "paint-correction.html",
+      "interior-detailing.html",
+      "ppf.html",
+      "bike-detailing.html",
+      "index.html#gallery",
+      "track-booking.html",
+      "index.html#contact",
+      "index.html#booking",
+      "#booking",
+      "#services",
+      "/car-wash",
+      "/ceramic-coating",
+      "/graphene-coating",
+      "/paint-correction",
+      "/interior-detailing",
+      "/ppf",
+      "/bike-detailing",
+      "/car-wash",
+      "/bike-detailing",
+      "/paint-correction",
+      "/interior-detailing",
+      "/ceramic-coating",
+      "https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049",
+      "https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049",
+      "https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049",
+      "https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049",
+      "https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049",
+      "https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049",
+      "https://www.google.com/maps/search/?api=1&query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049",
+      "/bike-detailing",
+      "/car-wash",
+      "/graphene-coating",
+      "tel:+919940181934",
+      "tel:+918124266363",
+      "https://wa.me/919940181934",
+      "https://www.instagram.com/trieye_detailing?utm_source=ig_web_button_share_sheet&amp;stkn=ZDNlZDc0MzIxNw==",
+      "index.html",
+      "https://www.instagram.com/trieye_detailing",
+      "https://wa.me/919940181934",
+      "tel:+919940181934",
+      "car-wash.html",
+      "ceramic-coating.html",
+      "graphene-coating.html",
+      "paint-correction.html",
+      "interior-detailing.html",
+      "ppf.html",
+      "bike-detailing.html",
+      "index.html",
+      "index.html#about",
+      "index.html#gallery",
+      "track-booking.html",
+      "index.html#contact",
+      "tel:+919940181934",
+      "#",
+      "track-booking.html"
+    ]
+  },
+  "car-wash.html": {
+    "title": "Car Wash in Chennai | Foam Wash | TRIEYE Detailing Studio",
+    "metaDesc": "Professional car wash and foam wash in Villivakkam, Chennai at TRIEYE Detailing Studio. Careful exterior cleaning for body panels, wheels, tyres, glass and vehicle surfaces.",
+    "metaRobots": null,
+    "canonical": null,
+    "viewport": "width=device-width, initial-scale=1.0",
+    "h1s": [
+      "CAR WASH"
+    ],
+    "h2Count": 9,
+    "h3Count": 18,
+    "schemas": [
+      {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "name": "TRIEYE Detailing Studio",
+        "image": "assets/trieye-logo.png",
+        "telephone": "+919940181934",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "No. 19, 6th Street, 1st Main Road, Baba Nagar, Villivakkam",
+          "addressLocality": "Chennai",
+          "addressRegion": "Tamil Nadu",
+          "postalCode": "600049",
+          "addressCountry": "IN"
+        },
+        "openingHoursSpecification": {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday"
+          ],
+          "opens": "08:00",
+          "closes": "20:00"
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "serviceType": "Car Wash and Foam Wash",
+        "provider": {
+          "@type": "LocalBusiness",
+          "name": "TRIEYE Detailing Studio"
+        },
+        "areaServed": {
+          "@type": "City",
+          "name": "Chennai"
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "How often should I wash my car?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "For regular city driving, washing your car every 1–2 weeks helps remove road dust, dirt and surface contaminants. Frequency may vary depending on weather, parking conditions and daily usage."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is included in a foam car wash?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "A foam wash uses a pre-wash foam to loosen surface dirt before the vehicle is carefully cleaned and rinsed. This helps reduce unnecessary contact with the paint during washing."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is foam wash safe for car paint?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "When performed using suitable automotive cleaning products and proper wash techniques, foam washing is a safe method for routine exterior cleaning."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How long does a car wash take?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Service time depends on the vehicle size, condition and selected wash package. The TRIEYE team can provide an estimated completion time after inspecting the vehicle."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can I book a car wash online?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. You can use the online booking section to select your vehicle type, service and preferred date before visiting TRIEYE Detailing Studio in Villivakkam, Chennai."
+            }
+          }
+        ]
+      }
+    ],
+    "og": {
+      "title": "Car Wash in Chennai | Foam Wash | TRIEYE Detailing Studio",
+      "desc": "Professional car wash and foam wash in Villivakkam, Chennai at TRIEYE Detailing Studio. Careful exterior cleaning for body panels, wheels, tyres, glass and vehicle surfaces.",
+      "img": "assets/wash/wash-hero.jpg",
+      "url": null,
+      "type": "website"
+    },
+    "twitter": {
+      "card": null
+    },
+    "imgStats": {
+      "total": 31,
+      "withAlt": 31,
+      "emptyAlt": 0,
+      "missingAlt": 0,
+      "altDetails": [
+        {
+          "src": "assets/trieye-logo-dark.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-light.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/foam-wash.jpg",
+          "alt": "Car Wash foam wash detailing at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/interior-clean.jpg",
+          "alt": "Interior Detailing deep cleaning at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/bike/bike-hero.jpg",
+          "alt": "Bike Detailing motorcycle detailing at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ceramic-coating/hydrophobic-water-beading.webp",
+          "alt": "Ceramic Coating hydrophobic protection at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/graphene/graphene-application.jpg",
+          "alt": "Graphene Coating application at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/rubbing-polish.jpg",
+          "alt": "Paint Correction machine polishing at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ppf/ppf-installation.jpg",
+          "alt": "Paint Protection Film PPF installation at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-dark.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-light.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/car-wash/snow-foam-prewash.jpg",
+          "alt": "Professional car wash and snow foam detailing in Villivakkam Chennai",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/car-wash/safe-hand-wash.jpg",
+          "alt": "Scratch safe hand car wash in Villivakkam Chennai",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/car-wash/everyarea-body-panels.jpg",
+          "alt": "Safe foam hand wash on car body panels in Chennai",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/car-wash/everyarea-wheels.jpg",
+          "alt": "Professional alloy wheel cleaning at TRIEYE Chennai",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/car-wash/everyarea-tyres.jpg",
+          "alt": "Tyre sidewall deep cleaning during professional car wash",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/car-wash/everyarea-glass.jpg",
+          "alt": "Streak free car windshield and glass cleaning Chennai",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/car-wash/everyarea-grille-trims.jpg",
+          "alt": "Car grille and exterior trim detailing Chennai",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/car-wash/everyarea-final-wipe.jpg",
+          "alt": "Final microfiber wipe after professional car wash Chennai",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/car-wash/car-wash-hero.jpg",
+          "alt": "Professional car wash and snow foam detailing in Villivakkam Chennai",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/car-wash/snow-foam-prewash.jpg",
+          "alt": "Snow foam pre wash car detailing at TRIEYE Villivakkam Chennai",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/car-wash/safe-hand-wash.jpg",
+          "alt": "Scratch safe hand car wash in Villivakkam Chennai",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/car-wash/wheel-tyre-cleaning.jpg",
+          "alt": "Professional alloy wheel and tyre cleaning Chennai",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/car-wash/microfiber-drying.jpg",
+          "alt": "Microfiber car drying after professional wash Chennai",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/car-wash/snow-foam-prewash.jpg",
+          "alt": "Snow foam pre wash car detailing at TRIEYE Villivakkam Chennai",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/car-wash/pressure-rinse.jpg",
+          "alt": "High pressure car rinse and exterior wash Chennai",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/car-wash/wheel-tyre-cleaning.jpg",
+          "alt": "Professional alloy wheel and tyre cleaning Chennai",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/car-wash/final-clean-finish.jpg",
+          "alt": "Freshly washed and detailed car at TRIEYE Detailing Studio Chennai",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/car-wash/final-clean-finish.jpg",
+          "alt": "Freshly washed and detailed car at TRIEYE Detailing Studio Chennai",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-dark.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-light.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        }
+      ]
+    },
+    "links": [
+      "/",
+      "/",
+      "/#about",
+      "javascript:void(0)",
+      "/car-wash",
+      "/interior-detailing",
+      "/bike-detailing",
+      "/ceramic-coating",
+      "/graphene-coating",
+      "/paint-correction",
+      "/ppf",
+      "/#gallery",
+      "/#contact",
+      "/#booking",
+      "index.html",
+      "index.html",
+      "index.html#about",
+      "car-wash.html",
+      "ceramic-coating.html",
+      "graphene-coating.html",
+      "paint-correction.html",
+      "interior-detailing.html",
+      "ppf.html",
+      "bike-detailing.html",
+      "index.html#gallery",
+      "track-booking.html",
+      "index.html#contact",
+      "index.html#booking",
+      "/#booking",
+      "#why-trieye",
+      "/#booking",
+      "/#booking",
+      "/#contact",
+      "/interior-detailing",
+      "/paint-correction",
+      "/ceramic-coating",
+      "index.html",
+      "https://www.instagram.com/trieye_detailing",
+      "https://wa.me/919940181934",
+      "tel:+919940181934",
+      "car-wash.html",
+      "ceramic-coating.html",
+      "graphene-coating.html",
+      "paint-correction.html",
+      "interior-detailing.html",
+      "ppf.html",
+      "bike-detailing.html",
+      "index.html",
+      "index.html#about",
+      "index.html#gallery",
+      "track-booking.html",
+      "index.html#contact",
+      "tel:+919940181934"
+    ]
+  },
+  "ceramic-coating.html": {
+    "title": "Ceramic Coating in Chennai | TRIEYE Detailing Studio",
+    "metaDesc": "Discover premium ceramic coating services at TRIEYE Detailing Studio in Villivakkam, Chennai. Protect your car or bike with high-gloss, hydrophobic paint protection.",
+    "metaRobots": null,
+    "canonical": null,
+    "viewport": "width=device-width, initial-scale=1.0",
+    "h1s": [
+      "CERAMIC COATING"
+    ],
+    "h2Count": 8,
+    "h3Count": 13,
+    "schemas": [
+      {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "name": "TRIEYE Detailing Studio",
+        "image": "assets/trieye-logo.png",
+        "telephone": "+919940181934",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "No. 19, 6th Street, 1st Main Road, Baba Nagar, Villivakkam",
+          "addressLocality": "Chennai",
+          "addressRegion": "Tamil Nadu",
+          "postalCode": "600049",
+          "addressCountry": "IN"
+        },
+        "openingHoursSpecification": {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday"
+          ],
+          "opens": "08:00",
+          "closes": "20:00"
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "serviceType": "Ceramic Coating",
+        "provider": {
+          "@type": "LocalBusiness",
+          "name": "TRIEYE Detailing Studio"
+        },
+        "areaServed": {
+          "@type": "City",
+          "name": "Chennai"
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is ceramic coating?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Ceramic coating is a liquid protective coating applied to prepared vehicle paint. After curing, it creates a durable surface layer that enhances gloss, hydrophobic behaviour and ease of maintenance."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How long does ceramic coating last?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Durability depends on the coating product, preparation, vehicle usage, environmental exposure and maintenance. Proper aftercare helps the coating perform effectively for longer."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does ceramic coating prevent scratches?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Ceramic coating can help protect the paint from light environmental contamination and make maintenance easier, but it does not make the vehicle scratch-proof or replace Paint Protection Film for physical impact protection."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does the paint need polishing before ceramic coating?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Paint preparation is important before coating. Depending on the paint condition, cleaning, decontamination and paint correction may be recommended to improve the final finish before the coating is applied."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How should I maintain a ceramic-coated vehicle?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Regular gentle washing with suitable automotive products and proper drying techniques helps preserve the coating's gloss and hydrophobic performance."
+            }
+          }
+        ]
+      }
+    ],
+    "og": {
+      "title": "Ceramic Coating in Chennai | TRIEYE Detailing Studio",
+      "desc": "Discover premium ceramic coating services at TRIEYE Detailing Studio in Villivakkam, Chennai. Protect your car or bike with high-gloss, hydrophobic paint protection.",
+      "img": "assets/ceramic-coating/ceramic-coating-hero.webp",
+      "url": null,
+      "type": "website"
+    },
+    "twitter": {
+      "card": null
+    },
+    "imgStats": {
+      "total": 23,
+      "withAlt": 23,
+      "emptyAlt": 0,
+      "missingAlt": 0,
+      "altDetails": [
+        {
+          "src": "assets/trieye-logo-dark.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-light.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/foam-wash.jpg",
+          "alt": "Car Wash foam wash detailing at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/interior-clean.jpg",
+          "alt": "Interior Detailing deep cleaning at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/bike/bike-hero.jpg",
+          "alt": "Bike Detailing motorcycle detailing at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ceramic-coating/hydrophobic-water-beading.webp",
+          "alt": "Ceramic Coating hydrophobic protection at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/graphene/graphene-application.jpg",
+          "alt": "Graphene Coating application at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/rubbing-polish.jpg",
+          "alt": "Paint Correction machine polishing at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ppf/ppf-installation.jpg",
+          "alt": "Paint Protection Film PPF installation at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-dark.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-light.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ceramic-coating/ceramic-coating-application.webp",
+          "alt": "Ceramic coating application on car paint",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ceramic-coating/vehicle-detailing-inspection.webp",
+          "alt": "Interior inspection before vehicle detailing",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/foam-wash.jpg",
+          "alt": "Car deep wash and decontamination",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ceramic-coating/paint-preparation.jpg",
+          "alt": "Machine polishing during vehicle paint preparation",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ceramic-coating/ceramic-application-pad.jpg",
+          "alt": "Ceramic coating application on car paint",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ceramic-coating/final-inspection.jpg",
+          "alt": "Glossy car paint finish after professional detailing",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ceramic-coating/studio-glossy-car.jpg",
+          "alt": "Professionally finished glossy vehicle inside a detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ceramic-coating/ceramic-before-after.jpg",
+          "alt": "Ceramic coating before and after swirl correction on car paint",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ceramic-coating/glossy-hood.jpg",
+          "alt": "Ceramic coated car with deep gloss finish",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ceramic-coating/hydrophobic-water-beading.webp",
+          "alt": "Hydrophobic ceramic coating water beading on car paint",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-dark.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-light.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        }
+      ]
+    },
+    "links": [
+      "/",
+      "/",
+      "/#about",
+      "javascript:void(0)",
+      "/car-wash",
+      "/interior-detailing",
+      "/bike-detailing",
+      "/ceramic-coating",
+      "/graphene-coating",
+      "/paint-correction",
+      "/ppf",
+      "/#gallery",
+      "/#contact",
+      "/#booking",
+      "index.html",
+      "index.html",
+      "index.html#about",
+      "car-wash.html",
+      "ceramic-coating.html",
+      "graphene-coating.html",
+      "paint-correction.html",
+      "interior-detailing.html",
+      "ppf.html",
+      "bike-detailing.html",
+      "index.html#gallery",
+      "track-booking.html",
+      "index.html#contact",
+      "index.html#booking",
+      "/#booking",
+      "#results",
+      "/#booking",
+      "https://www.google.com/maps/search/?api=1&query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049",
+      "tel:+919940181934",
+      "tel:+918124266363",
+      "https://wa.me/919940181934",
+      "https://www.instagram.com/trieye_detailing?utm_source=ig_web_button_share_sheet&amp;stkn=ZDNlZDc0MzIxNw==",
+      "/paint-correction",
+      "/graphene-coating",
+      "/ppf",
+      "index.html",
+      "https://www.instagram.com/trieye_detailing",
+      "https://wa.me/919940181934",
+      "tel:+919940181934",
+      "car-wash.html",
+      "ceramic-coating.html",
+      "graphene-coating.html",
+      "paint-correction.html",
+      "interior-detailing.html",
+      "ppf.html",
+      "bike-detailing.html",
+      "index.html",
+      "index.html#about",
+      "index.html#gallery",
+      "track-booking.html",
+      "index.html#contact",
+      "tel:+919940181934",
+      "#",
+      "track-booking.html"
+    ]
+  },
+  "graphene-coating.html": {
+    "title": "Graphene Coating in Chennai | TRIEYE Detailing Studio",
+    "metaDesc": "TRIEYE Detailing Studio provides advanced graphene coating for cars and bikes in Villivakkam, Chennai. Enhance paint protection, deep gloss, and hydrophobic slickness.",
+    "metaRobots": null,
+    "canonical": null,
+    "viewport": "width=device-width, initial-scale=1.0",
+    "h1s": [
+      "GRAPHENE COATING"
+    ],
+    "h2Count": 10,
+    "h3Count": 15,
+    "schemas": [
+      {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "name": "TRIEYE Detailing Studio",
+        "image": "assets/trieye-logo.png",
+        "telephone": "+919940181934",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "No. 19, 6th Street, 1st Main Road, Baba Nagar, Villivakkam",
+          "addressLocality": "Chennai",
+          "addressRegion": "Tamil Nadu",
+          "postalCode": "600049",
+          "addressCountry": "IN"
+        },
+        "openingHoursSpecification": {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday"
+          ],
+          "opens": "08:00",
+          "closes": "20:00"
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "serviceType": "Graphene Coating",
+        "provider": {
+          "@type": "LocalBusiness",
+          "name": "TRIEYE Detailing Studio"
+        },
+        "areaServed": {
+          "@type": "City",
+          "name": "Chennai"
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is graphene coating for cars?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Graphene coating is an advanced vehicle surface coating designed to enhance paint gloss, slickness, hydrophobic behaviour and ease of maintenance."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between graphene and ceramic coating?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Both are protective coating options designed to enhance and protect vehicle paint. Their formulation, surface characteristics and maintenance behaviour can differ, so the best option depends on the vehicle and the owner's expectations."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does graphene coating make a car scratch-proof?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "No coating makes vehicle paint completely scratch-proof. Graphene coating is primarily intended for surface protection, gloss, hydrophobic performance and easier maintenance."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is paint preparation required before graphene coating?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. Proper cleaning and surface preparation are important for coating performance. Paint correction may also be recommended when visible swirls or defects need to be improved before application."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How do I maintain graphene coating?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Use proper wash techniques, suitable automotive cleaning products and gentle drying methods. Consistent maintenance helps preserve gloss and water-repellent behaviour."
+            }
+          }
+        ]
+      }
+    ],
+    "og": {
+      "title": "Graphene Coating in Chennai | TRIEYE Detailing Studio",
+      "desc": "TRIEYE Detailing Studio provides advanced graphene coating for cars and bikes in Villivakkam, Chennai. Enhance paint protection, deep gloss, and hydrophobic slickness.",
+      "img": "assets/graphene/graphene-hero.jpg",
+      "url": null,
+      "type": "website"
+    },
+    "twitter": {
+      "card": null
+    },
+    "imgStats": {
+      "total": 26,
+      "withAlt": 26,
+      "emptyAlt": 0,
+      "missingAlt": 0,
+      "altDetails": [
+        {
+          "src": "assets/trieye-logo-dark.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-light.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/foam-wash.jpg",
+          "alt": "Car Wash foam wash detailing at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/interior-clean.jpg",
+          "alt": "Interior Detailing deep cleaning at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/bike/bike-hero.jpg",
+          "alt": "Bike Detailing motorcycle detailing at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ceramic-coating/hydrophobic-water-beading.webp",
+          "alt": "Ceramic Coating hydrophobic protection at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/graphene/graphene-application.jpg",
+          "alt": "Graphene Coating application at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/rubbing-polish.jpg",
+          "alt": "Paint Correction machine polishing at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ppf/ppf-installation.jpg",
+          "alt": "Paint Protection Film PPF installation at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-dark.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-light.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/graphene/graphene-hero.jpg",
+          "alt": "Graphene coating paint protection and deep gloss car detailing",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/graphene/graphene-intro-application.jpg",
+          "alt": "Graphene paint protection coating being applied to car paint",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/graphene/graphene-comparison.jpg",
+          "alt": "Illustrative comparison of graphene coated and uncoated car paint",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/graphene/graphene-inspection.jpg",
+          "alt": "Vehicle paint inspection before graphene coating",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/graphene/graphene-decontamination.jpg",
+          "alt": "Vehicle deep wash and decontamination before graphene coating",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/graphene/graphene-paint-prep.jpg",
+          "alt": "Machine polishing car paint before graphene coating application",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/graphene/graphene-application.jpg",
+          "alt": "Graphene coating being applied to prepared automotive paint",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/graphene/graphene-final-inspection.jpg",
+          "alt": "Final inspection of graphene coated vehicle paint",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/graphene/graphene-hydrophobic.jpg",
+          "alt": "Ceramic coating and graphene coating paint protection comparison",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/graphene/graphene-workmanship.jpg",
+          "alt": "Professional vehicle detailing and paint protection workmanship",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/graphene/graphene-result-prep.jpg",
+          "alt": "Automotive paint preparation and polishing",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/graphene/graphene-result-app.jpg",
+          "alt": "Graphene coating application on automotive paint",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/graphene/graphene-result-gloss.jpg",
+          "alt": "Glossy finished vehicle after paint protection treatment",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-dark.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-light.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        }
+      ]
+    },
+    "links": [
+      "/",
+      "/",
+      "/#about",
+      "javascript:void(0)",
+      "/car-wash",
+      "/interior-detailing",
+      "/bike-detailing",
+      "/ceramic-coating",
+      "/graphene-coating",
+      "/paint-correction",
+      "/ppf",
+      "/#gallery",
+      "/#contact",
+      "/#booking",
+      "index.html",
+      "index.html",
+      "index.html#about",
+      "car-wash.html",
+      "ceramic-coating.html",
+      "graphene-coating.html",
+      "paint-correction.html",
+      "interior-detailing.html",
+      "ppf.html",
+      "bike-detailing.html",
+      "index.html#gallery",
+      "track-booking.html",
+      "index.html#contact",
+      "index.html#booking",
+      "/#booking",
+      "#why-trieye",
+      "/ceramic-coating",
+      "/#booking",
+      "/#booking",
+      "https://www.google.com/maps/search/?api=1&query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049",
+      "tel:+919940181934",
+      "tel:+918124266363",
+      "https://wa.me/919940181934",
+      "https://www.instagram.com/trieye_detailing?utm_source=ig_web_button_share_sheet&amp;stkn=ZDNlZDc0MzIxNw==",
+      "/paint-correction",
+      "/ceramic-coating",
+      "/ppf",
+      "index.html",
+      "https://www.instagram.com/trieye_detailing",
+      "https://wa.me/919940181934",
+      "tel:+919940181934",
+      "car-wash.html",
+      "ceramic-coating.html",
+      "graphene-coating.html",
+      "paint-correction.html",
+      "interior-detailing.html",
+      "ppf.html",
+      "bike-detailing.html",
+      "index.html",
+      "index.html#about",
+      "index.html#gallery",
+      "track-booking.html",
+      "index.html#contact",
+      "tel:+919940181934",
+      "#",
+      "track-booking.html"
+    ]
+  },
+  "paint-correction.html": {
+    "title": "Paint Correction in Chennai | TRIEYE Detailing Studio",
+    "metaDesc": "Professional paint correction and rubbing polish in Villivakkam, Chennai. Reduce suitable swirl marks, paint haze and light surface defects while restoring clarity and gloss at TRIEYE Detailing Studio.",
+    "metaRobots": null,
+    "canonical": "https://trieyedetailing.com/paint-correction",
+    "viewport": "width=device-width, initial-scale=1.0",
+    "h1s": [
+      "PAINT CORRECTION"
+    ],
+    "h2Count": 9,
+    "h3Count": 16,
+    "schemas": [
+      {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "name": "TRIEYE Detailing Studio",
+        "image": "assets/trieye-logo.png",
+        "telephone": "+919940181934",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "No. 19, 6th Street, 1st Main Road, Baba Nagar, Villivakkam",
+          "addressLocality": "Chennai",
+          "addressRegion": "Tamil Nadu",
+          "postalCode": "600049",
+          "addressCountry": "IN"
+        },
+        "openingHoursSpecification": {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday"
+          ],
+          "opens": "08:00",
+          "closes": "20:00"
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "serviceType": "Paint Correction and Rubbing Polish",
+        "provider": {
+          "@type": "LocalBusiness",
+          "name": "TRIEYE Detailing Studio"
+        },
+        "areaServed": {
+          "@type": "City",
+          "name": "Chennai"
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is paint correction?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Paint correction is a machine-polishing process used to improve defects such as swirl marks, light scratches, oxidation and dullness in automotive paint."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can paint correction remove all scratches?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Not every scratch can be safely removed. The achievable correction depends on the depth of the defect and the available clear coat. Deep scratches may require a different repair method."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "What is the difference between polishing and paint correction?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Basic polishing mainly improves gloss, while paint correction involves a more controlled process focused on reducing visible paint defects and improving surface clarity."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Should paint correction be done before ceramic or graphene coating?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "When paint defects are present, correction before coating can improve the surface finish so the protective coating is applied over cleaner and more refined paint."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How long does paint correction take?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The time required depends on the vehicle size, paint condition and level of correction required. A detailed inspection is needed for an accurate estimate."
+            }
+          }
+        ]
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "https://trieyedetailing.com/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Paint Correction",
+            "item": "https://trieyedetailing.com/paint-correction"
+          }
+        ]
+      }
+    ],
+    "og": {
+      "title": "Paint Correction in Chennai | TRIEYE Detailing Studio",
+      "desc": "Professional paint correction and rubbing polish in Villivakkam, Chennai. Reduce suitable swirl marks, paint haze and light surface defects while restoring clarity and gloss at TRIEYE Detailing Studio.",
+      "img": "https://trieyedetailing.com/assets/paint-correction/paint-correction-hero.webp",
+      "url": "https://trieyedetailing.com/paint-correction",
+      "type": "website"
+    },
+    "twitter": {
+      "card": "summary_large_image"
+    },
+    "imgStats": {
+      "total": 29,
+      "withAlt": 29,
+      "emptyAlt": 0,
+      "missingAlt": 0,
+      "altDetails": [
+        {
+          "src": "assets/trieye-logo-dark.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-light.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/foam-wash.jpg",
+          "alt": "Car Wash foam wash detailing at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/interior-clean.jpg",
+          "alt": "Interior Detailing deep cleaning at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/bike/bike-hero.jpg",
+          "alt": "Bike Detailing motorcycle detailing at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ceramic-coating/hydrophobic-water-beading.webp",
+          "alt": "Ceramic Coating hydrophobic protection at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/graphene/graphene-application.jpg",
+          "alt": "Graphene Coating application at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/rubbing-polish.jpg",
+          "alt": "Paint Correction machine polishing at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ppf/ppf-installation.jpg",
+          "alt": "Paint Protection Film PPF installation at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-dark.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-light.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/paint-correction/machine-polishing.webp",
+          "alt": "Professional car paint correction using machine polisher",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/paint-correction/swirl-marks.webp",
+          "alt": "Swirl marks visible on automotive paint under inspection light",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/paint-correction/light-scratches.webp",
+          "alt": "Light shallow surface scratches on car paint clear coat",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/paint-correction/oxidation.webp",
+          "alt": "Oxidized automotive paint next to corrected glossy section",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/paint-correction/paint-haze.webp",
+          "alt": "Cloudy paint haze and buffer trails before paint correction",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/paint-correction/water-spots.webp",
+          "alt": "Water spots and mineral deposit etching on automotive paint",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/paint-correction/loss-of-gloss.webp",
+          "alt": "Dull car paint finish with severe loss of gloss before polishing",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/paint-correction/process-inspection.webp",
+          "alt": "Automotive paint inspection under detailing light",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/paint-correction/process-decontamination.webp",
+          "alt": "Car paint decontamination before polishing",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/paint-correction/process-preparation.webp",
+          "alt": "Detailer preparing automotive paint and masking sensitive trims",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/paint-correction/process-polishing.webp",
+          "alt": "Machine polishing car paint during paint correction",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/paint-correction/process-final-inspection.webp",
+          "alt": "Inspecting corrected vehicle paint under detailing lights",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/paint-correction/result-swirl.webp",
+          "alt": "Before and after swirl reduction on automotive paint",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/paint-correction/result-clarity.webp",
+          "alt": "Restored paint clarity and sharp reflections",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/paint-correction/result-gloss.webp",
+          "alt": "Glossy corrected automotive paint after polishing",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/paint-correction/why-trieye-paint.webp",
+          "alt": "High-gloss automotive paint finish at TRIEYE Detailing Studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-dark.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-light.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        }
+      ]
+    },
+    "links": [
+      "/",
+      "/",
+      "/#about",
+      "javascript:void(0)",
+      "/car-wash",
+      "/interior-detailing",
+      "/bike-detailing",
+      "/ceramic-coating",
+      "/graphene-coating",
+      "/paint-correction",
+      "/ppf",
+      "/#gallery",
+      "/#contact",
+      "/#booking",
+      "index.html",
+      "index.html",
+      "index.html#about",
+      "car-wash.html",
+      "ceramic-coating.html",
+      "graphene-coating.html",
+      "paint-correction.html",
+      "interior-detailing.html",
+      "ppf.html",
+      "bike-detailing.html",
+      "index.html#gallery",
+      "track-booking.html",
+      "index.html#contact",
+      "index.html#booking",
+      "/#booking",
+      "#results",
+      "/#booking",
+      "/ceramic-coating",
+      "/ppf",
+      "/#services",
+      "https://www.google.com/maps/search/?api=1&query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049",
+      "tel:+919940181934",
+      "tel:+918124266363",
+      "https://wa.me/919940181934",
+      "https://www.instagram.com/trieye_detailing?utm_source=ig_web_button_share_sheet&amp;stkn=ZDNlZDc0MzIxNw==",
+      "/ceramic-coating",
+      "/graphene-coating",
+      "/car-wash",
+      "index.html",
+      "https://www.instagram.com/trieye_detailing",
+      "https://wa.me/919940181934",
+      "tel:+919940181934",
+      "car-wash.html",
+      "ceramic-coating.html",
+      "graphene-coating.html",
+      "paint-correction.html",
+      "interior-detailing.html",
+      "ppf.html",
+      "bike-detailing.html",
+      "index.html",
+      "index.html#about",
+      "index.html#gallery",
+      "track-booking.html",
+      "index.html#contact",
+      "tel:+919940181934"
+    ]
+  },
+  "interior-detailing.html": {
+    "title": "Car Interior Cleaning in Chennai | TRIEYE Detailing Studio",
+    "metaDesc": "Professional car interior deep cleaning and detailing services at TRIEYE Detailing Studio in Villivakkam, Chennai. Refresh your cabin with our expert interior care.",
+    "metaRobots": null,
+    "canonical": null,
+    "viewport": "width=device-width, initial-scale=1.0",
+    "h1s": [
+      "INTERIOR DEEP CLEANING"
+    ],
+    "h2Count": 10,
+    "h3Count": 19,
+    "schemas": [
+      {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "name": "TRIEYE Detailing Studio",
+        "image": "assets/trieye-logo.png",
+        "telephone": "+919940181934",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "No. 19, 6th Street, 1st Main Road, Baba Nagar, Villivakkam",
+          "addressLocality": "Chennai",
+          "addressRegion": "Tamil Nadu",
+          "postalCode": "600049",
+          "addressCountry": "IN"
+        },
+        "openingHoursSpecification": {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday"
+          ],
+          "opens": "08:00",
+          "closes": "20:00"
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "serviceType": "Car Interior Deep Cleaning / Interior Detailing",
+        "provider": {
+          "@type": "LocalBusiness",
+          "name": "TRIEYE Detailing Studio"
+        },
+        "areaServed": {
+          "@type": "City",
+          "name": "Chennai"
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is included in interior deep cleaning?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Interior detailing can include cleaning and vacuuming seats, carpets, floor mats, dashboard areas, console surfaces, door panels and accessible luggage areas depending on the selected service."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can interior detailing remove stains?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Many common stains and surface contaminants can be significantly improved, but results depend on the material, type of stain and how long it has been present."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Do you clean both fabric and leather seats?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Yes. The cleaning method should be selected according to the seat material so fabric and leather surfaces receive appropriate treatment."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How long does interior detailing take?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Service time depends on the vehicle size and interior condition. Heavily soiled interiors may require additional cleaning time."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How often should I deep clean my car interior?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "The ideal frequency depends on vehicle usage, passengers, pets, food spills and daily driving conditions. Periodic deep cleaning helps maintain a cleaner and more comfortable cabin."
+            }
+          }
+        ]
+      }
+    ],
+    "og": {
+      "title": "Car Interior Cleaning in Chennai | TRIEYE Detailing Studio",
+      "desc": "Professional car interior deep cleaning and detailing services at TRIEYE Detailing Studio in Villivakkam, Chennai. Refresh your cabin with our expert interior care.",
+      "img": "assets/interior-detailing/interior-hero.webp",
+      "url": null,
+      "type": "website"
+    },
+    "twitter": {
+      "card": null
+    },
+    "imgStats": {
+      "total": 29,
+      "withAlt": 29,
+      "emptyAlt": 0,
+      "missingAlt": 0,
+      "altDetails": [
+        {
+          "src": "assets/trieye-logo-dark.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-light.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/foam-wash.jpg",
+          "alt": "Car Wash foam wash detailing at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/interior-clean.jpg",
+          "alt": "Interior Detailing deep cleaning at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/bike/bike-hero.jpg",
+          "alt": "Bike Detailing motorcycle detailing at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ceramic-coating/hydrophobic-water-beading.webp",
+          "alt": "Ceramic Coating hydrophobic protection at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/graphene/graphene-application.jpg",
+          "alt": "Graphene Coating application at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/rubbing-polish.jpg",
+          "alt": "Paint Correction machine polishing at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ppf/ppf-installation.jpg",
+          "alt": "Paint Protection Film PPF installation at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-dark.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-light.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/interior-detailing/interior-deep-cleaning.webp",
+          "alt": "Professional car interior deep cleaning",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/interior-detailing/seat-cleaning.webp",
+          "alt": "Car seat cleaning and vacuuming",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/interior-detailing/carpet-cleaning.webp",
+          "alt": "Car carpet deep cleaning",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/interior-detailing/floor-mat-cleaning.webp",
+          "alt": "Car floor mat cleaning",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/interior-detailing/dashboard-detailing.webp",
+          "alt": "Dashboard and centre console detailing",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/interior-detailing/door-panel-cleaning.webp",
+          "alt": "Car door panel interior cleaning",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/interior-detailing/boot-cleaning.webp",
+          "alt": "Car boot vacuum cleaning",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/interior-detailing/inspection.webp",
+          "alt": "Professional car interior inspection",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/interior-detailing/vacuum-cleaning.webp",
+          "alt": "Car interior vacuum cleaning",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/interior-detailing/deep-surface-cleaning.webp",
+          "alt": "Professional car interior deep cleaning",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/interior-detailing/interior-finishing.webp",
+          "alt": "Dashboard and centre console detailing",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/interior-detailing/final-interior.webp",
+          "alt": "Finished clean car interior after professional detailing",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/interior-detailing/result-seat.webp",
+          "alt": "Clean car seat",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/interior-detailing/result-carpet.webp",
+          "alt": "Clean car carpet",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/interior-detailing/result-dashboard.webp",
+          "alt": "Clean dashboard",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/interior-detailing/why-trieye-interior.webp",
+          "alt": "Clean car interior after professional detailing",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-dark.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-light.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        }
+      ]
+    },
+    "links": [
+      "/",
+      "/",
+      "/#about",
+      "javascript:void(0)",
+      "/car-wash",
+      "/interior-detailing",
+      "/bike-detailing",
+      "/ceramic-coating",
+      "/graphene-coating",
+      "/paint-correction",
+      "/ppf",
+      "/#gallery",
+      "/#contact",
+      "/#booking",
+      "index.html",
+      "index.html",
+      "index.html#about",
+      "car-wash.html",
+      "ceramic-coating.html",
+      "graphene-coating.html",
+      "paint-correction.html",
+      "interior-detailing.html",
+      "ppf.html",
+      "bike-detailing.html",
+      "index.html#gallery",
+      "track-booking.html",
+      "index.html#contact",
+      "index.html#booking",
+      "/#booking",
+      "#results",
+      "/#booking",
+      "/#booking",
+      "https://www.google.com/maps/search/?api=1&query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049",
+      "tel:+919940181934",
+      "tel:+918124266363",
+      "https://wa.me/919940181934",
+      "https://www.instagram.com/trieye_detailing?utm_source=ig_web_button_share_sheet&amp;stkn=ZDNlZDc0MzIxNw==",
+      "/car-wash",
+      "/bike-detailing",
+      "/paint-correction",
+      "index.html",
+      "https://www.instagram.com/trieye_detailing",
+      "https://wa.me/919940181934",
+      "tel:+919940181934",
+      "car-wash.html",
+      "ceramic-coating.html",
+      "graphene-coating.html",
+      "paint-correction.html",
+      "interior-detailing.html",
+      "ppf.html",
+      "bike-detailing.html",
+      "index.html",
+      "index.html#about",
+      "index.html#gallery",
+      "track-booking.html",
+      "index.html#contact",
+      "tel:+919940181934",
+      "#",
+      "track-booking.html"
+    ]
+  },
+  "ppf.html": {
+    "title": "PPF in Chennai | Paint Protection Film | TRIEYE",
+    "metaDesc": "Professional Paint Protection Film (PPF) installation services at TRIEYE Detailing Studio in Villivakkam, Chennai. Preserve your car paint with an invisible shield.",
+    "metaRobots": null,
+    "canonical": null,
+    "viewport": "width=device-width, initial-scale=1.0",
+    "h1s": [
+      "PAINT PROTECTION FILM"
+    ],
+    "h2Count": 11,
+    "h3Count": 15,
+    "schemas": [
+      {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "name": "TRIEYE Detailing Studio",
+        "image": "assets/trieye-logo.png",
+        "telephone": "+919940181934",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "No. 19, 6th Street, 1st Main Road, Baba Nagar, Villivakkam",
+          "addressLocality": "Chennai",
+          "addressRegion": "Tamil Nadu",
+          "postalCode": "600049",
+          "addressCountry": "IN"
+        },
+        "openingHoursSpecification": {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday"
+          ],
+          "opens": "08:00",
+          "closes": "20:00"
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "serviceType": "Paint Protection Film (PPF)",
+        "provider": {
+          "@type": "LocalBusiness",
+          "name": "TRIEYE Detailing Studio"
+        },
+        "areaServed": {
+          "@type": "City",
+          "name": "Chennai"
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is Paint Protection Film (PPF)?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Paint Protection Film is a transparent protective film applied over painted vehicle surfaces to help protect them from stone chips, minor abrasions and everyday road exposure."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Which parts of a car can be protected with PPF?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "PPF can be installed on selected high-impact areas such as the bonnet, bumper, mirrors and fenders, or across larger sections of the vehicle depending on the required coverage."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Does PPF change the colour of my car?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "High-quality clear PPF is designed to preserve the appearance of the original paint while adding a protective layer over it."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can PPF protect against stone chips?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "PPF is specifically designed to provide a physical barrier that can help reduce paint damage caused by small road debris and stone impacts."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How should a PPF-protected car be maintained?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Regular gentle washing and appropriate detailing methods are recommended. Avoid aggressive cleaning techniques around film edges and follow the installer's aftercare instructions."
+            }
+          }
+        ]
+      }
+    ],
+    "og": {
+      "title": "PPF in Chennai | Paint Protection Film | TRIEYE",
+      "desc": "Professional Paint Protection Film (PPF) installation services at TRIEYE Detailing Studio in Villivakkam, Chennai. Preserve your car paint with an invisible shield.",
+      "img": "assets/ppf/ppf-hero.jpg",
+      "url": null,
+      "type": "website"
+    },
+    "twitter": {
+      "card": null
+    },
+    "imgStats": {
+      "total": 23,
+      "withAlt": 23,
+      "emptyAlt": 0,
+      "missingAlt": 0,
+      "altDetails": [
+        {
+          "src": "assets/trieye-logo-dark.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-light.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/foam-wash.jpg",
+          "alt": "Car Wash foam wash detailing at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/interior-clean.jpg",
+          "alt": "Interior Detailing deep cleaning at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/bike/bike-hero.jpg",
+          "alt": "Bike Detailing motorcycle detailing at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ceramic-coating/hydrophobic-water-beading.webp",
+          "alt": "Ceramic Coating hydrophobic protection at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/graphene/graphene-application.jpg",
+          "alt": "Graphene Coating application at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/rubbing-polish.jpg",
+          "alt": "Paint Correction machine polishing at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ppf/ppf-installation.jpg",
+          "alt": "Paint Protection Film PPF installation at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-dark.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-light.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ppf/ppf-installation.jpg",
+          "alt": "Technician applying transparent PPF to car paint",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ppf/ppf-paint-inspection.jpg",
+          "alt": "Car paint surface preparation before PPF installation",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/foam-wash.jpg",
+          "alt": "Vehicle wash and decontamination",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ppf/ppf-surface-preparation.jpg",
+          "alt": "Car paint surface preparation before PPF installation",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ppf/ppf-application.jpg",
+          "alt": "Paint protection film installation on car at TRIEYE Detailing Studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ppf/ppf-final-finish.jpg",
+          "alt": "Finished car after paint protection film installation",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ppf/ppf-final-finish.jpg",
+          "alt": "Finished car after paint protection film installation",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ppf/ppf-bumper.jpg",
+          "alt": "Bumper paint protection film on car",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ppf/ppf-hero.jpg",
+          "alt": "Paint protection film on car bonnet",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ceramic-coating/glossy-hood.jpg",
+          "alt": "Finished high-gloss protected panel",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-dark.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-light.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        }
+      ]
+    },
+    "links": [
+      "/",
+      "/",
+      "/#about",
+      "javascript:void(0)",
+      "/car-wash",
+      "/interior-detailing",
+      "/bike-detailing",
+      "/ceramic-coating",
+      "/graphene-coating",
+      "/paint-correction",
+      "/ppf",
+      "/#gallery",
+      "/#contact",
+      "/#booking",
+      "index.html",
+      "index.html",
+      "index.html#about",
+      "car-wash.html",
+      "ceramic-coating.html",
+      "graphene-coating.html",
+      "paint-correction.html",
+      "interior-detailing.html",
+      "ppf.html",
+      "bike-detailing.html",
+      "index.html#gallery",
+      "track-booking.html",
+      "index.html#contact",
+      "index.html#booking",
+      "/#booking",
+      "#results",
+      "/ceramic-coating",
+      "/#booking",
+      "/#booking",
+      "https://www.google.com/maps/search/?api=1&query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049",
+      "tel:+919940181934",
+      "tel:+918124266363",
+      "https://wa.me/919940181934",
+      "https://www.instagram.com/trieye_detailing?utm_source=ig_web_button_share_sheet&amp;stkn=ZDNlZDc0MzIxNw==",
+      "/paint-correction",
+      "/ceramic-coating",
+      "/graphene-coating",
+      "index.html",
+      "https://www.instagram.com/trieye_detailing",
+      "https://wa.me/919940181934",
+      "tel:+919940181934",
+      "car-wash.html",
+      "ceramic-coating.html",
+      "graphene-coating.html",
+      "paint-correction.html",
+      "interior-detailing.html",
+      "ppf.html",
+      "bike-detailing.html",
+      "index.html",
+      "index.html#about",
+      "index.html#gallery",
+      "track-booking.html",
+      "index.html#contact",
+      "tel:+919940181934",
+      "#",
+      "track-booking.html"
+    ]
+  },
+  "bike-detailing.html": {
+    "title": "Bike Detailing in Chennai | TRIEYE Detailing Studio",
+    "metaDesc": "Professional bike detailing in Villivakkam, Chennai at TRIEYE Detailing Studio. Explore detailed motorcycle cleaning, wheel care, bodywork cleaning and premium finishing services.",
+    "metaRobots": null,
+    "canonical": null,
+    "viewport": "width=device-width, initial-scale=1.0",
+    "h1s": [
+      "BIKE DETAILING"
+    ],
+    "h2Count": 8,
+    "h3Count": 24,
+    "schemas": [
+      {
+        "@context": "https://schema.org",
+        "@type": "LocalBusiness",
+        "name": "TRIEYE Detailing Studio",
+        "image": "assets/trieye-logo.png",
+        "telephone": "+919940181934",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "No. 19, 6th Street, 1st Main Road, Baba Nagar, Villivakkam",
+          "addressLocality": "Chennai",
+          "addressRegion": "Tamil Nadu",
+          "postalCode": "600049",
+          "addressCountry": "IN"
+        },
+        "openingHoursSpecification": {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": [
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+            "Sunday"
+          ],
+          "opens": "08:00",
+          "closes": "20:00"
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "Service",
+        "serviceType": "Bike Detailing",
+        "provider": {
+          "@type": "LocalBusiness",
+          "name": "TRIEYE Detailing Studio"
+        },
+        "areaServed": {
+          "@type": "City",
+          "name": "Chennai"
+        }
+      },
+      {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+          {
+            "@type": "Question",
+            "name": "What is included in bike detailing?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Bike detailing focuses on careful cleaning of accessible exterior areas such as painted body panels, wheels, selected engine surfaces and other reachable components according to the service package."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Is foam washing safe for motorcycles?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Foam washing can be suitable when motorcycle-safe products and controlled cleaning methods are used, with appropriate care around sensitive electrical and mechanical components."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Do you clean bike wheels and accessible chain areas?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Accessible wheels and surrounding areas can be cleaned as part of the detailing process. Chain-related cleaning should be performed carefully using appropriate products and methods."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "Can ceramic or graphene coating be applied to a bike?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Protective coatings can be applied to suitable painted motorcycle surfaces after proper cleaning and preparation. The appropriate treatment depends on the material and surface condition."
+            }
+          },
+          {
+            "@type": "Question",
+            "name": "How often should I detail my bike?",
+            "acceptedAnswer": {
+              "@type": "Answer",
+              "text": "Detailing frequency depends on riding conditions, weather exposure, storage and how often the motorcycle is used. Regular maintenance helps prevent heavy dirt buildup."
+            }
+          }
+        ]
+      }
+    ],
+    "og": {
+      "title": "Bike Detailing in Chennai | TRIEYE Detailing Studio",
+      "desc": "Professional bike detailing in Villivakkam, Chennai at TRIEYE Detailing Studio. Explore detailed motorcycle cleaning, wheel care, bodywork cleaning and premium finishing services.",
+      "img": "assets/bike/bike-hero.jpg",
+      "url": null,
+      "type": "website"
+    },
+    "twitter": {
+      "card": null
+    },
+    "imgStats": {
+      "total": 33,
+      "withAlt": 33,
+      "emptyAlt": 0,
+      "missingAlt": 0,
+      "altDetails": [
+        {
+          "src": "assets/trieye-logo-dark.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-light.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/foam-wash.jpg",
+          "alt": "Car Wash foam wash detailing at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/interior-clean.jpg",
+          "alt": "Interior Detailing deep cleaning at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/bike/bike-hero.jpg",
+          "alt": "Bike Detailing motorcycle detailing at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ceramic-coating/hydrophobic-water-beading.webp",
+          "alt": "Ceramic Coating hydrophobic protection at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/graphene/graphene-application.jpg",
+          "alt": "Graphene Coating application at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/rubbing-polish.jpg",
+          "alt": "Paint Correction machine polishing at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ppf/ppf-installation.jpg",
+          "alt": "Paint Protection Film PPF installation at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-dark.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-light.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/bike/bike-hero.jpg",
+          "alt": "Professional bike detailing at TRIEYE Detailing Studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/bike/bike-intro.jpg",
+          "alt": "Professional motorcycle body detailing and cleaning",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/bike/bike-detail-body.jpg?v=3",
+          "alt": "Motorcycle body panel foam cleaning during professional bike detailing",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/bike/bike-detail-wheels.jpg",
+          "alt": "Motorcycle wheel detailing and cleaning",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/bike/bike-detail-engine.jpg",
+          "alt": "Motorcycle engine area detailing",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/bike/bike-detail-chain.jpg?v=3",
+          "alt": "Motorcycle chain cleaning and degreasing tool",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/bike/bike-detail-seat.jpg",
+          "alt": "Motorcycle seat and trim detailing",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/bike/bike-detail-finish.jpg",
+          "alt": "Motorcycle detailing final finish",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/bike/bike-intro.jpg",
+          "alt": "Motorcycle inspection process",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/bike/bike-detail-wheels.jpg",
+          "alt": "Motorcycle pre-wash cleaning",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/bike/bike-detail-engine.jpg",
+          "alt": "Detailed motorcycle component cleaning",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/bike/bike-detail-finish.jpg",
+          "alt": "Motorcycle paint finishing and drying",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/bike/bike-hero.jpg",
+          "alt": "Motorcycle detailing final inspection",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/bike/bike-detail-body.jpg",
+          "alt": "Motorcycle body panel glossy finish",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/bike/bike-detail-wheels.jpg",
+          "alt": "Clean motorcycle wheel and rim",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/bike/bike-detail-finish.jpg",
+          "alt": "Professionally detailed motorcycle inside studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/bike/bike-hero.jpg",
+          "alt": "Freshly detailed motorcycle inside TRIEYE studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/foam-wash.jpg",
+          "alt": "Car Wash foam wash detailing at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ceramic-coating/hydrophobic-water-beading.webp",
+          "alt": "Ceramic Coating hydrophobic protection at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/graphene/graphene-application.jpg",
+          "alt": "Graphene Coating application at TRIEYE",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-dark.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-light.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        }
+      ]
+    },
+    "links": [
+      "/",
+      "/",
+      "/#about",
+      "javascript:void(0)",
+      "/car-wash",
+      "/interior-detailing",
+      "/bike-detailing",
+      "/ceramic-coating",
+      "/graphene-coating",
+      "/paint-correction",
+      "/ppf",
+      "/#gallery",
+      "/#contact",
+      "/#booking",
+      "index.html",
+      "index.html",
+      "index.html#about",
+      "car-wash.html",
+      "ceramic-coating.html",
+      "graphene-coating.html",
+      "paint-correction.html",
+      "interior-detailing.html",
+      "ppf.html",
+      "bike-detailing.html",
+      "index.html#gallery",
+      "track-booking.html",
+      "index.html#contact",
+      "index.html#booking",
+      "/#gallery",
+      "/#contact",
+      "/#booking",
+      "tel:+919940181934",
+      "/#booking",
+      "#why-trieye",
+      "/#booking",
+      "/ceramic-coating",
+      "/graphene-coating",
+      "/paint-correction",
+      "/car-wash",
+      "/ceramic-coating",
+      "/graphene-coating",
+      "index.html",
+      "https://www.instagram.com/trieye_detailing",
+      "https://wa.me/919940181934",
+      "tel:+919940181934",
+      "car-wash.html",
+      "ceramic-coating.html",
+      "graphene-coating.html",
+      "paint-correction.html",
+      "interior-detailing.html",
+      "ppf.html",
+      "bike-detailing.html",
+      "index.html",
+      "index.html#about",
+      "index.html#gallery",
+      "track-booking.html",
+      "index.html#contact",
+      "tel:+919940181934"
+    ]
+  },
+  "track-booking.html": {
+    "title": "Track Your Booking | TRIEYE Detailing Studio Chennai",
+    "metaDesc": "Track your TRIEYE Detailing Studio booking using your booking reference and registered phone number. Check your car or bike detailing appointment status in Chennai.",
+    "metaRobots": null,
+    "canonical": null,
+    "viewport": "width=device-width, initial-scale=1.0",
+    "h1s": [
+      "CHECK YOUR BOOKING STATUS"
+    ],
+    "h2Count": 0,
+    "h3Count": 0,
+    "schemas": [],
+    "og": {
+      "title": "Track Your Booking | TRIEYE Detailing Studio Chennai",
+      "desc": "Track your TRIEYE Detailing Studio booking using your booking reference and registered phone number. Check your car or bike detailing appointment status in Chennai.",
+      "img": null,
+      "url": null,
+      "type": "website"
+    },
+    "twitter": {
+      "card": null
+    },
+    "imgStats": {
+      "total": 6,
+      "withAlt": 6,
+      "emptyAlt": 0,
+      "missingAlt": 0,
+      "altDetails": [
+        {
+          "src": "assets/trieye-logo-dark.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-light.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-dark.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-light.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-dark.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-light.png",
+          "alt": "TRIEYE car detailing studio",
+          "type": "PRESENT"
+        }
+      ]
+    },
+    "links": [
+      "index.html",
+      "index.html",
+      "index.html#about",
+      "index.html#services",
+      "car-wash.html",
+      "interior-detailing.html",
+      "bike-detailing.html",
+      "paint-correction.html",
+      "ceramic-coating.html",
+      "graphene-coating.html",
+      "ppf.html",
+      "index.html#faq",
+      "index.html#contact",
+      "index.html#booking",
+      "index.html",
+      "index.html",
+      "index.html#about",
+      "car-wash.html",
+      "ceramic-coating.html",
+      "graphene-coating.html",
+      "paint-correction.html",
+      "interior-detailing.html",
+      "ppf.html",
+      "bike-detailing.html",
+      "index.html#gallery",
+      "track-booking.html",
+      "index.html#contact",
+      "index.html#booking",
+      "index.html",
+      "https://www.instagram.com/trieye_detailing",
+      "https://wa.me/919940181934",
+      "tel:+919940181934",
+      "car-wash.html",
+      "ceramic-coating.html",
+      "graphene-coating.html",
+      "paint-correction.html",
+      "interior-detailing.html",
+      "ppf.html",
+      "bike-detailing.html",
+      "index.html",
+      "index.html#about",
+      "index.html#gallery",
+      "track-booking.html",
+      "index.html#contact",
+      "tel:+919940181934"
+    ]
+  },
+  "craftsmanship-demos.html": {
+    "title": "TRIEYE Studio Craftsmanship - 5 Design Concepts Preview",
+    "metaDesc": null,
+    "metaRobots": null,
+    "canonical": null,
+    "viewport": "width=device-width, initial-scale=1.0",
+    "h1s": [],
+    "h2Count": 5,
+    "h3Count": 0,
+    "schemas": [],
+    "og": {
+      "title": null,
+      "desc": null,
+      "img": null,
+      "url": null,
+      "type": null
+    },
+    "twitter": {
+      "card": null
+    },
+    "imgStats": {
+      "total": 15,
+      "withAlt": 15,
+      "emptyAlt": 0,
+      "missingAlt": 0,
+      "altDetails": [
+        {
+          "src": "assets/foam-wash.jpg",
+          "alt": "Featured Service",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/foam-wash.jpg",
+          "alt": "Exterior Wash",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/rubbing-polish.jpg",
+          "alt": "Paint Correction",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/interior-clean.jpg",
+          "alt": "Interior Spa",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ceramic-coating.jpg",
+          "alt": "Protection",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/foam-wash.jpg",
+          "alt": "Step 01 Wash",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/rubbing-polish.jpg",
+          "alt": "Step 02 Correct",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/interior-clean.jpg",
+          "alt": "Step 03 Restore",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ceramic-coating.jpg",
+          "alt": "Step 04 Protect",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/foam-wash.jpg",
+          "alt": "Showcase",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/foam-wash.jpg",
+          "alt": "Detailing Studio Craftsmanship",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/foam-wash.jpg",
+          "alt": "Wash",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/rubbing-polish.jpg",
+          "alt": "Correct",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/interior-clean.jpg",
+          "alt": "Restore",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/ceramic-coating.jpg",
+          "alt": "Protect",
+          "type": "PRESENT"
+        }
+      ]
+    },
+    "links": [
+      "#demo1",
+      "#demo2",
+      "#demo3",
+      "#demo4",
+      "#demo5",
+      "/car-wash",
+      "/paint-correction",
+      "/interior-detailing",
+      "/ceramic-coating",
+      "/car-wash"
+    ]
+  },
+  "dashboard.html": {
+    "title": "Trieye Studio — Professional Operations &amp; Management Dashboard",
+    "metaDesc": null,
+    "metaRobots": null,
+    "canonical": null,
+    "viewport": "width=device-width, initial-scale=1.0",
+    "h1s": [
+      "TAX INVOICE"
+    ],
+    "h2Count": 1,
+    "h3Count": 1,
+    "schemas": [],
+    "og": {
+      "title": null,
+      "desc": null,
+      "img": null,
+      "url": null,
+      "type": null
+    },
+    "twitter": {
+      "card": null
+    },
+    "imgStats": {
+      "total": 5,
+      "withAlt": 5,
+      "emptyAlt": 0,
+      "missingAlt": 0,
+      "altDetails": [
+        {
+          "src": "assets/trieye-logo-dark.png",
+          "alt": "Trieye",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-light.png",
+          "alt": "Trieye",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-dark.png",
+          "alt": "Trieye Studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-light.png",
+          "alt": "Trieye Studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-dark.png",
+          "alt": "Trieye",
+          "type": "PRESENT"
+        }
+      ]
+    },
+    "links": [
+      "tel:${cleanPhone(b.phone)}"
+    ]
+  },
+  "invoice.html": {
+    "title": "Trieye Studio — Official Invoice",
+    "metaDesc": null,
+    "metaRobots": null,
+    "canonical": null,
+    "viewport": "width=device-width, initial-scale=1.0",
+    "h1s": [],
+    "h2Count": 0,
+    "h3Count": 0,
+    "schemas": [],
+    "og": {
+      "title": null,
+      "desc": null,
+      "img": null,
+      "url": null,
+      "type": null
+    },
+    "twitter": {
+      "card": null
+    },
+    "imgStats": {
+      "total": 2,
+      "withAlt": 2,
+      "emptyAlt": 0,
+      "missingAlt": 0,
+      "altDetails": [
+        {
+          "src": "assets/trieye-logo-light.png",
+          "alt": "Trieye Studio",
+          "type": "PRESENT"
+        },
+        {
+          "src": "assets/trieye-logo-light.png",
+          "alt": "Trieye Studio",
+          "type": "PRESENT"
+        }
+      ]
+    },
+    "links": [
+      "index.html",
+      "https://wa.me/919876543210?text=Hi%20Trieye%20Studio,%20I%20have%20a%20query%20about%20my%20invoice",
+      "tel:+919876543210",
+      "index.html",
+      "index.html",
+      "tel:+919876543210"
+    ]
+  }
+}
