@@ -1,4 +1,7 @@
 {
   "cleanUrls": true,
-  "directoryListing": true
+  "directoryListing": false,
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/404.html" }
+  ]
 }

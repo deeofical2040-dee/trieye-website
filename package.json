@@ -9,6 +9,7 @@
     "serve": "npx serve ."
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.117.2"
+    "@supabase/supabase-js": "^2.117.2",
+    "puppeteer": "^25.12.0"
   }
 }

@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>404 - Page Not Found | TRIEYE Detailing Studio</title>
+  <meta name="robots" content="noindex, follow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/service-page.css">
+  <style>
+    .error-page-wrapper {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: var(--bg, #ffffff);
+      color: var(--white, #111827);
+      padding: 0;
+      overflow-x: hidden;
+    }
+    .error-nav {
+      padding: 20px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--line, #e2e8f0);
+    }
+    .error-nav .nav-logo {
+      height: 34px;
+      width: auto;
+    }
+    .error-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      text-align: center;
+    }
+    .error-content {
+      max-width: 580px;
+      width: 100%;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .error-tag {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      color: var(--pink, #ee2f76);
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      background: var(--pink-dim, rgba(238, 47, 118, 0.08));
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1px solid rgba(238, 47, 118, 0.2);
+    }
+    .error-code {
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(80px, 16vw, 140px);
+      font-weight: 700;
+      line-height: 0.9;
+      color: var(--white, #111827);
+      letter-spacing: -0.02em;
+      margin: 10px 0 16px;
+      text-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    }
+    .error-title {
+      font-family: 'Oswald', sans-serif;
+      font-size: clamp(24px, 5vw, 36px);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      color: var(--white, #111827);
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .error-desc {
+      font-size: 15px;
+      line-height: 1.6;
+      color: var(--muted, #64748b);
+      max-width: 460px;
+      margin: 0 auto 32px;
+    }
+    .error-ctas {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      width: 100%;
+    }
+    .btn-error-primary {
+      background: var(--green, #689f0e) !important;
+      color: #000000 !important;
+      font-family: 'Oswald', sans-serif;
+      font-size: 14.5px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 13px 26px;
+      border-radius: 8px;
+      text-decoration: none;
+      box-shadow: 0 4px 14px rgba(104, 159, 14, 0.25);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-error-primary:hover {
+      background: #5c8f0c !important;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 18px rgba(104, 159, 14, 0.38);
+    }
+    .btn-error-secondary {
+      background: var(--bg-panel-2, #f8f9fa);
+      color: var(--white, #111827);
+      border: 1px solid var(--line, #e2e8f0);
+      font-family: 'Oswald', sans-serif;
+      font-size: 14.5px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 13px 26px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-error-secondary:hover {
+      border-color: var(--pink, #ee2f76);
+      color: var(--pink, #ee2f76);
+      transform: translateY(-2px);
+    }
+    .error-footer {
+      padding: 24px;
+      text-align: center;
+      border-top: 1px solid var(--line, #e2e8f0);
+      font-size: 13px;
+      color: var(--muted, #64748b);
+    }
+    .error-footer a {
+      color: var(--pink, #ee2f76);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    @media (max-width: 480px) {
+      .error-ctas {
+        flex-direction: column;
+        width: 100%;
+      }
+      .btn-error-primary, .btn-error-secondary {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="error-page-wrapper">
+    <!-- Header -->
+    <header class="error-nav">
+      <a href="/" aria-label="TRIEYE Home">
+        <img src="assets/trieye-logo-dark.png" alt="TRIEYE Detailing Studio Logo" class="nav-logo logo-dark">
+        <img src="assets/trieye-logo-light.png" alt="TRIEYE Detailing Studio Logo" class="nav-logo logo-light">
+      </a>
+      <a href="/#booking" class="btn-error-secondary" style="padding: 8px 16px; font-size: 12.5px;">Book Now &rarr;</a>
+    </header>
+
+    <!-- Main Content -->
+    <main class="error-container">
+      <div class="error-content">
+        <span class="error-tag">// WRONG TURN</span>
+        <div class="error-code">404</div>
+        <h1 class="error-title">THIS ROAD DOESN'T LEAD<br>TO THE STUDIO.</h1>
+        <p class="error-desc">
+          The page you're looking for may have moved or no longer exists. Head back to TRIEYE or explore our detailing services.
+        </p>
+        <div class="error-ctas">
+          <a href="/" class="btn-error-primary" id="btn404Home">BACK TO HOME &rarr;</a>
+          <a href="/#services" class="btn-error-secondary" id="btn404Services">EXPLORE SERVICES &rarr;</a>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="error-footer">
+      <p>&copy; TRIEYE Detailing Studio, Villivakkam, Chennai. <a href="/#booking">Book an appointment &rarr;</a></p>
+    </footer>
+  </div>
+  <script src="assets/animations.js" defer></script>
+</body>
+</html>

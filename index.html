@@ -3,38 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="canonical" href="https://trieyedetailing.com/">
+  <meta name="description" content="Premium car and bike detailing in Villivakkam, Chennai. Explore car wash, ceramic coating, PPF, paint correction and detailing at TRIEYE.">
+
+  <!-- Open Graph / Social Meta -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="TRIEYE Detailing Studio | Car & Bike Detailing in Chennai">
+  <meta property="og:description" content="Premium car and bike detailing in Villivakkam, Chennai. Explore car wash, ceramic coating, PPF, paint correction and detailing at TRIEYE.">
+  <meta property="og:url" content="https://trieyedetailing.com/">
+  <meta property="og:image" content="assets/trieye-hero-car.jpg">
+
+  <!-- Twitter Card Meta -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="TRIEYE Detailing Studio | Car & Bike Detailing in Chennai">
+  <meta name="twitter:description" content="Premium car and bike detailing in Villivakkam, Chennai. Explore car wash, ceramic coating, PPF, paint correction and detailing at TRIEYE.">
+  <meta name="twitter:image" content="assets/trieye-hero-car.jpg">
 <meta name="theme-color" content="#ffffff">
 <title>TRIEYE Detailing Studio | Car & Bike Detailing in Chennai</title>
-<meta name="description" content="Professional car and bike detailing in Villivakkam, Chennai. Explore premium wash, interior care, paint correction, ceramic coating, PPF and vehicle protection services at TRIEYE Detailing Studio.">
-<meta property="og:title" content="TRIEYE Detailing Studio | Car & Bike Detailing in Chennai">
-<meta property="og:description" content="Professional car and bike detailing in Villivakkam, Chennai. Explore premium wash, interior care, paint correction, ceramic coating, PPF and vehicle protection services at TRIEYE Detailing Studio.">
-<meta property="og:type" content="website">
-<meta property="og:image" content="assets/trieye-logo.png">
-<script type="application/ld+json">
-{
-  "@context": "https://schema.org",
-  "@type": "LocalBusiness",
-  "name": "TRIEYE Detailing Studio",
-  "image": "assets/trieye-logo.png",
-  "telephone": "+919940181934",
-  "address": {
-    "@type": "PostalAddress",
-    "streetAddress": "No. 19, 6th Street, 1st Main Road, Baba Nagar, Villivakkam",
-    "addressLocality": "Chennai",
-    "addressRegion": "Tamil Nadu",
-    "postalCode": "600049",
-    "addressCountry": "IN"
-  },
-  "openingHoursSpecification": {
-    "@type": "OpeningHoursSpecification",
-    "dayOfWeek": [
-      "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
-    ],
-    "opens": "08:00",
-    "closes": "20:00"
-  }
-}
-</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="preload" as="image" href="assets/trieye-logo.png">
@@ -497,10 +482,16 @@
   .hero-desc{
     font-size:clamp(14.5px, 1.15vw, 17px);
     line-height:1.6;
-    color:var(--muted);
-    max-width:480px;
+    color:#0f172a;
+    font-weight:500;
+    text-shadow:0 1px 4px rgba(255, 255, 255, 0.95), 0 0 2px rgba(255, 255, 255, 0.8);
+    max-width:520px;
     margin:0 0 clamp(20px, 3.2vh, 32px);
     width:100%;min-width:0;
+  }
+  [data-theme="dark"] .hero-desc{
+    color:#f3f3f0;
+    text-shadow:0 1px 4px rgba(0, 0, 0, 0.95), 0 0 2px rgba(0, 0, 0, 0.8);
   }
 
   .hero-ctas{
@@ -2359,21 +2350,7 @@
     }
   }
   .explore-card-num {
-    position: absolute;
-    top: 10px;
-    left: 10px;
-    background: rgba(15, 23, 42, 0.75);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    color: var(--pink, #ee2f76);
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10.5px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    padding: 3px 8px;
-    border-radius: 5px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    z-index: 3;
+    display: none !important;
   }
   .explore-card-body {
     padding: 16px 16px 18px;
@@ -2399,29 +2376,38 @@
     flex-grow: 1;
   }
   .explore-card-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-    width: 100%;
-    padding: 9px 14px;
-    background: var(--green, #689f0e);
-    color: #000000;
-    font-family: 'Inter', sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-    border-radius: 6px;
-    box-shadow: 0 2px 6px rgba(104, 159, 14, 0.22);
-    transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px !important;
+    width: 100% !important;
+    padding: 12px 18px !important;
+    background: var(--green, #689f0e) !important;
+    color: #000000 !important;
+    font-family: 'Oswald', sans-serif !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.06em !important;
+    text-transform: uppercase !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(104, 159, 14, 0.25) !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    text-decoration: none !important;
+  }
+  .explore-card-btn,
+  .explore-card-btn span,
+  .explore-card-btn .arrow {
+    color: #000000 !important;
   }
   .explore-card:hover .explore-card-btn {
-    background: #5c8f0c;
-    box-shadow: 0 4px 12px rgba(104, 159, 14, 0.32);
+    background: #5c8f0c !important;
+    color: #000000 !important;
+    box-shadow: 0 6px 16px rgba(104, 159, 14, 0.38) !important;
+    transform: translateY(-2px) !important;
   }
   .explore-card-btn .arrow {
     transition: transform 0.2s ease;
+    color: #000000 !important;
   }
   .explore-card:hover .explore-card-btn .arrow {
     transform: translateX(4px);
@@ -2837,6 +2823,63 @@
   <!-- Trieye Supabase Config & Database Adapter -->
   <script src="assets/supabase-config.js"></script>
   <script src="assets/trieye-db.js"></script>
+  <link rel="stylesheet" href="assets/service-page.css">
+
+  <script type="application/ld+json">
+[
+  {
+    "@context": "https://schema.org",
+    "@type": "AutoRepair",
+    "@id": "https://trieyedetailing.com/#business",
+    "name": "TRIEYE Detailing Studio",
+    "alternateName": "TRIEYE Car & Bike Detailing",
+    "image": "https://trieyedetailing.com/assets/trieye-hero-car.jpg",
+    "logo": "https://trieyedetailing.com/assets/trieye-logo-dark.png",
+    "url": "https://trieyedetailing.com/",
+    "telephone": "+919940181934",
+    "priceRange": "₹₹",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Villivakkam",
+      "addressLocality": "Chennai",
+      "addressRegion": "Tamil Nadu",
+      "postalCode": "600049",
+      "addressCountry": "IN"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": 13.1077,
+      "longitude": 80.2062
+    },
+    "openingHoursSpecification": [
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": [
+          "Monday",
+          "Tuesday",
+          "Wednesday",
+          "Thursday",
+          "Friday",
+          "Saturday",
+          "Sunday"
+        ],
+        "opens": "09:00",
+        "closes": "20:00"
+      }
+    ]
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": "https://trieyedetailing.com/#website",
+    "url": "https://trieyedetailing.com/",
+    "name": "TRIEYE Detailing Studio",
+    "publisher": {
+      "@id": "https://trieyedetailing.com/#business"
+    }
+  }
+]
+  </script>
 </head>
 <body>
 
@@ -2844,8 +2887,8 @@
 <header>
   <nav>
     <a href="#" class="nav-brand">
-      <img src="assets/trieye-logo-dark.png" alt="TRIEYE car detailing studio" class="nav-logo logo-dark">
-      <img src="assets/trieye-logo-light.png" alt="TRIEYE car detailing studio" class="nav-logo logo-light">
+      <img src="assets/trieye-logo-dark.png" alt="TRIEYE car detailing studio" class="nav-logo logo-dark" fetchpriority="high">
+      <img src="assets/trieye-logo-light.png" alt="TRIEYE car detailing studio" class="nav-logo logo-light" fetchpriority="high">
     </a>
     <ul class="nav-links" id="navLinks">
       <li><a href="#">Home</a></li>
@@ -2860,7 +2903,7 @@
 
               <a href="/car-wash" class="mega-menu-item">
                 <div class="mega-item-img-wrap">
-                  <img src="assets/foam-wash.jpg" alt="Car Wash foam wash detailing at TRIEYE" loading="lazy">
+                  <img src="assets/foam-wash.jpg" alt="Car Wash foam wash detailing at TRIEYE" loading="lazy" decoding="async">
                 </div>
                 <div class="mega-item-info">
                   <div class="mega-item-title">CAR WASH <span class="mega-item-arrow">→</span></div>
@@ -2870,7 +2913,7 @@
 
               <a href="/interior-detailing" class="mega-menu-item">
                 <div class="mega-item-img-wrap">
-                  <img src="assets/interior-clean.jpg" alt="Interior Detailing deep cleaning at TRIEYE" loading="lazy">
+                  <img src="assets/interior-clean.jpg" alt="Interior Detailing deep cleaning at TRIEYE" loading="lazy" decoding="async">
                 </div>
                 <div class="mega-item-info">
                   <div class="mega-item-title">INTERIOR DETAILING <span class="mega-item-arrow">→</span></div>
@@ -2880,7 +2923,7 @@
 
               <a href="/bike-detailing" class="mega-menu-item">
                 <div class="mega-item-img-wrap">
-                  <img src="assets/bike/bike-hero.jpg" alt="Bike Detailing motorcycle detailing at TRIEYE" loading="lazy">
+                  <img src="assets/bike/bike-hero.jpg" alt="Bike Detailing motorcycle detailing at TRIEYE" loading="lazy" fetchpriority="high">
                 </div>
                 <div class="mega-item-info">
                   <div class="mega-item-title">BIKE DETAILING <span class="mega-item-arrow">→</span></div>
@@ -2895,7 +2938,7 @@
 
               <a href="/ceramic-coating" class="mega-menu-item">
                 <div class="mega-item-img-wrap">
-                  <img src="assets/ceramic-coating/hydrophobic-water-beading.webp" alt="Ceramic Coating hydrophobic protection at TRIEYE" loading="lazy">
+                  <img src="assets/ceramic-coating/hydrophobic-water-beading.webp" alt="Ceramic Coating hydrophobic protection at TRIEYE" loading="lazy" decoding="async">
                 </div>
                 <div class="mega-item-info">
                   <div class="mega-item-title">CERAMIC COATING <span class="mega-item-arrow">→</span></div>
@@ -2905,7 +2948,7 @@
 
               <a href="/graphene-coating" class="mega-menu-item">
                 <div class="mega-item-img-wrap">
-                  <img src="assets/graphene/graphene-application.jpg" alt="Graphene Coating application at TRIEYE" loading="lazy">
+                  <img src="assets/graphene/graphene-application.jpg" alt="Graphene Coating application at TRIEYE" loading="lazy" decoding="async">
                 </div>
                 <div class="mega-item-info">
                   <div class="mega-item-title">GRAPHENE COATING <span class="mega-item-arrow">→</span></div>
@@ -2915,7 +2958,7 @@
 
               <a href="/paint-correction" class="mega-menu-item">
                 <div class="mega-item-img-wrap">
-                  <img src="assets/rubbing-polish.jpg" alt="Paint Correction machine polishing at TRIEYE" loading="lazy">
+                  <img src="assets/rubbing-polish.jpg" alt="Paint Correction machine polishing at TRIEYE" loading="lazy" decoding="async">
                 </div>
                 <div class="mega-item-info">
                   <div class="mega-item-title">PAINT CORRECTION <span class="mega-item-arrow">→</span></div>
@@ -2925,7 +2968,7 @@
 
               <a href="/ppf" class="mega-menu-item">
                 <div class="mega-item-img-wrap">
-                  <img src="assets/ppf/ppf-installation.jpg" alt="Paint Protection Film PPF installation at TRIEYE" loading="lazy">
+                  <img src="assets/ppf/ppf-installation.jpg" alt="Paint Protection Film PPF installation at TRIEYE" loading="lazy" decoding="async">
                 </div>
                 <div class="mega-item-info">
                   <div class="mega-item-title">PAINT PROTECTION FILM (PPF) <span class="mega-item-arrow">→</span></div>
@@ -2953,43 +2996,47 @@
 </header>
 
 <!-- MOBILE NAVIGATION DRAWER & BACKDROP -->
-<div class="mobile-drawer-backdrop" id="mobileDrawerBackdrop"></div>
-<div class="mobile-nav-drawer" id="mobileNavDrawer" aria-hidden="true">
+<div class="mobile-drawer-backdrop" id="mobileDrawerBackdrop" aria-hidden="true"></div>
+<div class="mobile-nav-drawer" id="mobileNavDrawer" aria-hidden="true" role="dialog" aria-label="Mobile Navigation Menu">
   <div class="mobile-drawer-header">
     <div class="mobile-drawer-brand">
-      <img src="assets/trieye-logo-dark.png" alt="TRIEYE car detailing studio" class="nav-logo logo-dark">
-      <img src="assets/trieye-logo-light.png" alt="TRIEYE car detailing studio" class="nav-logo logo-light">
+      <a href="/" aria-label="TRIEYE Home">
+        <img src="assets/trieye-logo-dark.png" alt="TRIEYE car detailing studio" class="nav-logo logo-dark" fetchpriority="high">
+        <img src="assets/trieye-logo-light.png" alt="TRIEYE car detailing studio" class="nav-logo logo-light" fetchpriority="high">
+      </a>
     </div>
     <button class="mobile-drawer-close" id="mobileDrawerClose" aria-label="Close navigation menu">&times;</button>
   </div>
-  <ul class="mobile-drawer-links">
-    <li><a href="#"><span class="m-num">01</span> Home</a></li>
-    <li><a href="#about"><span class="m-num">02</span> About Us</a></li>
-    <li class="mobile-drawer-accordion">
-      <button class="mobile-accordion-btn" type="button" aria-expanded="false">
-        <span><span class="m-num">03</span> Services</span>
-        <span class="mobile-accordion-icon">+</span>
-      </button>
-      <ul class="mobile-accordion-content">
-        <li><a href="/car-wash" class="m-sublink">Car Wash</a></li>
-        <li><a href="/ceramic-coating" class="m-sublink">Ceramic Coating</a></li>
-        <li><a href="/graphene-coating" class="m-sublink">Graphene Coating</a></li>
-        <li><a href="/paint-correction" class="m-sublink">Paint Correction</a></li>
-        <li><a href="/interior-detailing" class="m-sublink">Interior Detailing</a></li>
-        <li><a href="/ppf" class="m-sublink">Paint Protection Film (PPF)</a></li>
-        <li><a href="/bike-detailing" class="m-sublink">Bike Detailing</a></li>
-      </ul>
-    </li>
-    <li><a href="#gallery"><span class="m-num">04</span> Studio Gallery</a></li>
-    <li><a href="#contact"><span class="m-num">05</span> Contact Us</a></li>
-  </ul>
-  <div class="mobile-drawer-footer">
-    <a href="#booking" class="btn btn-primary mobile-drawer-cta" id="mobileDrawerBookBtn">Book a Slot →</a>
-    <div class="mobile-drawer-phone">
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .3 2 .7 3a2 2 0 0 1-.4 2.1L8 10.3a16 16 0 0 0 6 6l1.5-1.4a2 2 0 0 1 2.1-.4c1 .4 2 .6 3 .7a2 2 0 0 1 1.7 2Z"/></svg>
-      <a href="tel:+919940181934">+91 99401 81934</a>
+  <div class="mobile-drawer-body">
+    <ul class="mobile-drawer-links">
+      <li><a href="/"><span class="m-num">01</span> Home</a></li>
+      <li><a href="/#about"><span class="m-num">02</span> About Us</a></li>
+      <li class="mobile-drawer-accordion reveal-up">
+        <button class="mobile-accordion-btn reveal-up" id="mobileAccordionBtn" type="button" aria-expanded="false">
+          <span><span class="m-num">03</span> Services</span>
+          <span class="mobile-accordion-icon reveal-up">+</span>
+        </button>
+        <ul class="mobile-accordion-content reveal-up" id="mobileAccordionContent">
+          <li><a href="/car-wash" class="m-sublink">Car Wash</a></li>
+          <li><a href="/ceramic-coating" class="m-sublink">Ceramic Coating</a></li>
+          <li><a href="/graphene-coating" class="m-sublink">Graphene Coating</a></li>
+          <li><a href="/paint-correction" class="m-sublink">Paint Correction</a></li>
+          <li><a href="/interior-detailing" class="m-sublink">Interior Detailing</a></li>
+          <li><a href="/ppf" class="m-sublink">Paint Protection Film (PPF)</a></li>
+          <li><a href="/bike-detailing" class="m-sublink">Bike Detailing</a></li>
+        </ul>
+      </li>
+      <li><a href="/#gallery"><span class="m-num">04</span> Gallery</a></li>
+      <li><a href="/track-booking"><span class="m-num">05</span> Track Booking</a></li>
+      <li><a href="/#contact"><span class="m-num">06</span> Contact Us</a></li>
+    </ul>
+    <div class="mobile-drawer-footer">
+      <a href="/#booking" class="mobile-drawer-book-btn" id="mobileDrawerBookBtn">
+        BOOK NOW &rarr;
+      </a>
     </div>
   </div>
+</div>
 </div>
 
 <section class="hero" id="home">
@@ -3017,61 +3064,61 @@
   <div class="marquee-wrapper">
     <!-- First Set -->
     <div class="marquee-content">
-      <div class="logo-item"><img src="assets/brand_logos/toyota.svg" alt="Toyota"></div>
-      <div class="logo-item"><img src="assets/brand_logos/honda.svg" alt="Honda"></div>
-      <div class="logo-item"><img src="assets/brand_logos/bmw.svg" alt="BMW"></div>
-      <div class="logo-item"><img src="assets/brand_logos/mercedes-benz.svg" alt="Mercedes-Benz"></div>
-      <div class="logo-item"><img src="assets/brand_logos/audi.svg" alt="Audi"></div>
-      <div class="logo-item"><img src="assets/brand_logos/ford.png" alt="Ford"></div>
-      <div class="logo-item"><img src="assets/brand_logos/chevrolet.png" alt="Chevrolet"></div>
-      <div class="logo-item"><img src="assets/brand_logos/nissan.svg" alt="Nissan"></div>
-      <div class="logo-item"><img src="assets/brand_logos/hyundai.svg" alt="Hyundai"></div>
-      <div class="logo-item"><img src="assets/brand_logos/kia.svg" alt="Kia"></div>
-      <div class="logo-item"><img src="assets/brand_logos/volkswagen.svg" alt="Volkswagen"></div>
-      <div class="logo-item"><img src="assets/brand_logos/lexus.png" alt="Lexus"></div>
-      <div class="logo-item"><img src="assets/brand_logos/volvo.svg" alt="Volvo"></div>
-      <div class="logo-item"><img src="assets/brand_logos/mazda.svg" alt="Mazda"></div>
-      <div class="logo-item"><img src="assets/brand_logos/subaru.png" alt="Subaru"></div>
-      <div class="logo-item"><img src="assets/brand_logos/jeep.svg" alt="Jeep"></div>
-      <div class="logo-item"><img src="assets/brand_logos/land-rover.svg" alt="Land Rover"></div>
-      <div class="logo-item"><img src="assets/brand_logos/mitsubishi.svg" alt="Mitsubishi"></div>
-      <div class="logo-item"><img src="assets/brand_logos/suzuki.svg" alt="Suzuki"></div>
-      <div class="logo-item"><img src="assets/brand_logos/renault.svg" alt="Renault"></div>
-      <div class="logo-item"><img src="assets/brand_logos/peugeot.svg" alt="Peugeot"></div>
-      <div class="logo-item"><img src="assets/brand_logos/skoda.svg" alt="Skoda"></div>
-      <div class="logo-item"><img src="assets/brand_logos/bentley.svg" alt="Bentley"></div>
-      <div class="logo-item"><img src="assets/brand_logos/rolls-royce.svg" alt="Rolls-Royce"></div>
-      <div class="logo-item"><img src="assets/brand_logos/bugatti.svg" alt="Bugatti"></div>
-      <div class="logo-item"><img src="assets/brand_logos/mclaren.svg" alt="McLaren"></div>
+      <div class="logo-item"><img src="assets/brand_logos/toyota.svg" alt="Toyota" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/honda.svg" alt="Honda" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/bmw.svg" alt="BMW" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/mercedes-benz.svg" alt="Mercedes-Benz" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/audi.svg" alt="Audi" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/ford.png" alt="Ford" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/chevrolet.png" alt="Chevrolet" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/nissan.svg" alt="Nissan" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/hyundai.svg" alt="Hyundai" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/kia.svg" alt="Kia" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/volkswagen.svg" alt="Volkswagen" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/lexus.png" alt="Lexus" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/volvo.svg" alt="Volvo" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/mazda.svg" alt="Mazda" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/subaru.png" alt="Subaru" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/jeep.svg" alt="Jeep" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/land-rover.svg" alt="Land Rover" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/mitsubishi.svg" alt="Mitsubishi" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/suzuki.svg" alt="Suzuki" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/renault.svg" alt="Renault" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/peugeot.svg" alt="Peugeot" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/skoda.svg" alt="Skoda" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/bentley.svg" alt="Bentley" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/rolls-royce.svg" alt="Rolls-Royce" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/bugatti.svg" alt="Bugatti" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/mclaren.svg" alt="McLaren" loading="lazy" decoding="async"></div>
     </div>
     <!-- Duplicate Set for seamless smooth loop -->
     <div class="marquee-content" aria-hidden="true">
-      <div class="logo-item"><img src="assets/brand_logos/toyota.svg" alt="Toyota"></div>
-      <div class="logo-item"><img src="assets/brand_logos/honda.svg" alt="Honda"></div>
-      <div class="logo-item"><img src="assets/brand_logos/bmw.svg" alt="BMW"></div>
-      <div class="logo-item"><img src="assets/brand_logos/mercedes-benz.svg" alt="Mercedes-Benz"></div>
-      <div class="logo-item"><img src="assets/brand_logos/audi.svg" alt="Audi"></div>
-      <div class="logo-item"><img src="assets/brand_logos/ford.png" alt="Ford"></div>
-      <div class="logo-item"><img src="assets/brand_logos/chevrolet.png" alt="Chevrolet"></div>
-      <div class="logo-item"><img src="assets/brand_logos/nissan.svg" alt="Nissan"></div>
-      <div class="logo-item"><img src="assets/brand_logos/hyundai.svg" alt="Hyundai"></div>
-      <div class="logo-item"><img src="assets/brand_logos/kia.svg" alt="Kia"></div>
-      <div class="logo-item"><img src="assets/brand_logos/volkswagen.svg" alt="Volkswagen"></div>
-      <div class="logo-item"><img src="assets/brand_logos/lexus.png" alt="Lexus"></div>
-      <div class="logo-item"><img src="assets/brand_logos/volvo.svg" alt="Volvo"></div>
-      <div class="logo-item"><img src="assets/brand_logos/mazda.svg" alt="Mazda"></div>
-      <div class="logo-item"><img src="assets/brand_logos/subaru.png" alt="Subaru"></div>
-      <div class="logo-item"><img src="assets/brand_logos/jeep.svg" alt="Jeep"></div>
-      <div class="logo-item"><img src="assets/brand_logos/land-rover.svg" alt="Land Rover"></div>
-      <div class="logo-item"><img src="assets/brand_logos/mitsubishi.svg" alt="Mitsubishi"></div>
-      <div class="logo-item"><img src="assets/brand_logos/suzuki.svg" alt="Suzuki"></div>
-      <div class="logo-item"><img src="assets/brand_logos/renault.svg" alt="Renault"></div>
-      <div class="logo-item"><img src="assets/brand_logos/peugeot.svg" alt="Peugeot"></div>
-      <div class="logo-item"><img src="assets/brand_logos/skoda.svg" alt="Skoda"></div>
-      <div class="logo-item"><img src="assets/brand_logos/bentley.svg" alt="Bentley"></div>
-      <div class="logo-item"><img src="assets/brand_logos/rolls-royce.svg" alt="Rolls-Royce"></div>
-      <div class="logo-item"><img src="assets/brand_logos/bugatti.svg" alt="Bugatti"></div>
-      <div class="logo-item"><img src="assets/brand_logos/mclaren.svg" alt="McLaren"></div>
+      <div class="logo-item"><img src="assets/brand_logos/toyota.svg" alt="Toyota" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/honda.svg" alt="Honda" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/bmw.svg" alt="BMW" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/mercedes-benz.svg" alt="Mercedes-Benz" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/audi.svg" alt="Audi" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/ford.png" alt="Ford" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/chevrolet.png" alt="Chevrolet" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/nissan.svg" alt="Nissan" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/hyundai.svg" alt="Hyundai" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/kia.svg" alt="Kia" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/volkswagen.svg" alt="Volkswagen" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/lexus.png" alt="Lexus" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/volvo.svg" alt="Volvo" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/mazda.svg" alt="Mazda" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/subaru.png" alt="Subaru" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/jeep.svg" alt="Jeep" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/land-rover.svg" alt="Land Rover" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/mitsubishi.svg" alt="Mitsubishi" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/suzuki.svg" alt="Suzuki" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/renault.svg" alt="Renault" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/peugeot.svg" alt="Peugeot" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/skoda.svg" alt="Skoda" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/bentley.svg" alt="Bentley" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/rolls-royce.svg" alt="Rolls-Royce" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/bugatti.svg" alt="Bugatti" loading="lazy" decoding="async"></div>
+      <div class="logo-item"><img src="assets/brand_logos/mclaren.svg" alt="McLaren" loading="lazy" decoding="async"></div>
     </div>
   </div>
 </section>
@@ -3098,132 +3145,125 @@
 <!-- EXPLORE OUR SERVICES SECTION -->
 <section class="explore-services-sec" id="explore-services">
   <div class="wrap">
-    <div class="sec-head" style="text-align: center; max-width: 700px; margin: 0 auto 36px;">
-      <div class="sec-tag" style="color: var(--pink); font-size: 13px; font-weight: 600; letter-spacing: 2px; margin-bottom: 10px; font-family: 'IBM Plex Mono', monospace;">// EXPLORE OUR SERVICES</div>
+    <div class="sec-head reveal-element" style="text-align: center; max-width: 700px; margin: 0 auto 36px;">
+      <div class="sec-tag reveal-element reveal-text" style="color: var(--pink); font-size: 13px; font-weight: 600; letter-spacing: 2px; margin-bottom: 10px; font-family: 'IBM Plex Mono', monospace;">// EXPLORE OUR SERVICES</div>
       <h2 style="font-size: clamp(28px, 4vw, 42px); font-weight: 800; text-transform: uppercase; color: var(--white); margin-bottom: 12px; line-height: 1.15;">EVERYTHING YOUR RIDE NEEDS</h2>
       <p style="color: var(--muted); font-size: 15px; line-height: 1.6;">From maintenance foam washes to high-durability nano-coatings and paint correction, explore our complete line of studio detailing services.</p>
     </div>
 
     <!-- ROW 1 (01–03) & ROW 2 (04–06) GRID -->
-    <div class="explore-services-grid">
+    <div class="explore-services-grid reveal-stagger">
       <!-- 01 CAR WASH -->
-      <a href="/car-wash" class="explore-card">
-        <div class="explore-card-img-wrap">
-          <span class="explore-card-num">01</span>
-          <img src="assets/foam-wash.jpg" alt="Car Wash foam wash detailing at TRIEYE" loading="lazy">
-          <div class="explore-card-overlay">
+      <a href="/car-wash" class="explore-card reveal-element reveal-card">
+        <div class="explore-card-img-wrap reveal-card">
+          <img src="assets/foam-wash.jpg" alt="Car Wash foam wash detailing at TRIEYE" loading="lazy" decoding="async">
+          <div class="explore-card-overlay reveal-card">
             <span class="overlay-title">EXPLORE FULL SERVICE <span class="arrow">&rarr;</span></span>
             <span class="overlay-sub">View process, benefits &amp; complete details</span>
           </div>
         </div>
-        <div class="explore-card-body">
-          <h3 class="explore-card-title">CAR WASH</h3>
-          <p class="explore-card-desc">Exterior snow foam wash &amp; maintenance care for a clean, scratch-free finish.</p>
-          <span class="explore-card-btn">EXPLORE CAR WASH <span class="arrow">&rarr;</span></span>
+        <div class="explore-card-body reveal-card">
+          <h3 class="explore-card-title reveal-card">CAR WASH</h3>
+          <p class="explore-card-desc reveal-card">Exterior snow foam wash &amp; maintenance care for a clean, scratch-free finish.</p>
+          <span class="explore-card-btn reveal-card">EXPLORE CAR WASH <span class="arrow">&rarr;</span></span>
         </div>
       </a>
 
       <!-- 02 CERAMIC COATING -->
-      <a href="/ceramic-coating" class="explore-card">
-        <div class="explore-card-img-wrap">
-          <span class="explore-card-num">02</span>
-          <img src="assets/ceramic-coating/hydrophobic-water-beading.webp" alt="Ceramic Coating hydrophobic protection at TRIEYE" loading="lazy">
-          <div class="explore-card-overlay">
+      <a href="/ceramic-coating" class="explore-card reveal-element reveal-card">
+        <div class="explore-card-img-wrap reveal-card">
+          <img src="assets/ceramic-coating/hydrophobic-water-beading.webp" alt="Ceramic Coating hydrophobic protection at TRIEYE" loading="lazy" decoding="async">
+          <div class="explore-card-overlay reveal-card">
             <span class="overlay-title">EXPLORE FULL SERVICE <span class="arrow">&rarr;</span></span>
             <span class="overlay-sub">View process, benefits &amp; complete details</span>
           </div>
         </div>
-        <div class="explore-card-body">
-          <h3 class="explore-card-title">CERAMIC COATING</h3>
-          <p class="explore-card-desc">Deep gloss &amp; hydrophobic paint protection engineered to repel dirt and water.</p>
-          <span class="explore-card-btn">EXPLORE CERAMIC <span class="arrow">&rarr;</span></span>
+        <div class="explore-card-body reveal-card">
+          <h3 class="explore-card-title reveal-card">CERAMIC COATING</h3>
+          <p class="explore-card-desc reveal-card">Deep gloss &amp; hydrophobic paint protection engineered to repel dirt and water.</p>
+          <span class="explore-card-btn reveal-card">EXPLORE CERAMIC <span class="arrow">&rarr;</span></span>
         </div>
       </a>
 
       <!-- 03 GRAPHENE COATING -->
-      <a href="/graphene-coating" class="explore-card">
-        <div class="explore-card-img-wrap">
-          <span class="explore-card-num">03</span>
-          <img src="assets/graphene/graphene-application.jpg" alt="Graphene Coating application at TRIEYE" loading="lazy">
-          <div class="explore-card-overlay">
+      <a href="/graphene-coating" class="explore-card reveal-element reveal-card">
+        <div class="explore-card-img-wrap reveal-card">
+          <img src="assets/graphene/graphene-application.jpg" alt="Graphene Coating application at TRIEYE" loading="lazy" decoding="async">
+          <div class="explore-card-overlay reveal-card">
             <span class="overlay-title">EXPLORE FULL SERVICE <span class="arrow">&rarr;</span></span>
             <span class="overlay-sub">View process, benefits &amp; complete details</span>
           </div>
         </div>
-        <div class="explore-card-body">
-          <h3 class="explore-card-title">GRAPHENE COATING</h3>
-          <p class="explore-card-desc">Advanced nano-graphene shield for high chemical resistance &amp; mirror shine.</p>
-          <span class="explore-card-btn">EXPLORE GRAPHENE <span class="arrow">&rarr;</span></span>
+        <div class="explore-card-body reveal-card">
+          <h3 class="explore-card-title reveal-card">GRAPHENE COATING</h3>
+          <p class="explore-card-desc reveal-card">Advanced nano-graphene shield for high chemical resistance &amp; mirror shine.</p>
+          <span class="explore-card-btn reveal-card">EXPLORE GRAPHENE <span class="arrow">&rarr;</span></span>
         </div>
       </a>
 
       <!-- 04 PAINT CORRECTION -->
-      <a href="/paint-correction" class="explore-card">
-        <div class="explore-card-img-wrap">
-          <span class="explore-card-num">04</span>
-          <img src="assets/rubbing-polish.jpg" alt="Paint Correction machine polishing at TRIEYE" loading="lazy">
-          <div class="explore-card-overlay">
+      <a href="/paint-correction" class="explore-card reveal-element reveal-card">
+        <div class="explore-card-img-wrap reveal-card">
+          <img src="assets/rubbing-polish.jpg" alt="Paint Correction machine polishing at TRIEYE" loading="lazy" decoding="async">
+          <div class="explore-card-overlay reveal-card">
             <span class="overlay-title">EXPLORE FULL SERVICE <span class="arrow">&rarr;</span></span>
             <span class="overlay-sub">View process, benefits &amp; complete details</span>
           </div>
         </div>
-        <div class="explore-card-body">
-          <h3 class="explore-card-title">PAINT CORRECTION</h3>
-          <p class="explore-card-desc">Multi-stage machine polishing to eliminate swirl marks, scratches &amp; haze.</p>
-          <span class="explore-card-btn">EXPLORE PAINT CORRECTION <span class="arrow">&rarr;</span></span>
+        <div class="explore-card-body reveal-card">
+          <h3 class="explore-card-title reveal-card">PAINT CORRECTION</h3>
+          <p class="explore-card-desc reveal-card">Multi-stage machine polishing to eliminate swirl marks, scratches &amp; haze.</p>
+          <span class="explore-card-btn reveal-card">EXPLORE PAINT CORRECTION <span class="arrow">&rarr;</span></span>
         </div>
       </a>
 
       <!-- 05 INTERIOR DETAILING -->
-      <a href="/interior-detailing" class="explore-card">
-        <div class="explore-card-img-wrap">
-          <span class="explore-card-num">05</span>
-          <img src="assets/interior-clean.jpg" alt="Interior Detailing deep cabin cleaning at TRIEYE" loading="lazy">
-          <div class="explore-card-overlay">
+      <a href="/interior-detailing" class="explore-card reveal-element reveal-card">
+        <div class="explore-card-img-wrap reveal-card">
+          <img src="assets/interior-clean.jpg" alt="Interior Detailing deep cabin cleaning at TRIEYE" loading="lazy" decoding="async">
+          <div class="explore-card-overlay reveal-card">
             <span class="overlay-title">EXPLORE FULL SERVICE <span class="arrow">&rarr;</span></span>
             <span class="overlay-sub">View process, benefits &amp; complete details</span>
           </div>
         </div>
-        <div class="explore-card-body">
-          <h3 class="explore-card-title">INTERIOR DETAILING</h3>
-          <p class="explore-card-desc">Deep steam cleaning, upholstery extraction &amp; interior surface conditioning.</p>
-          <span class="explore-card-btn">EXPLORE INTERIOR <span class="arrow">&rarr;</span></span>
+        <div class="explore-card-body reveal-card">
+          <h3 class="explore-card-title reveal-card">INTERIOR DETAILING</h3>
+          <p class="explore-card-desc reveal-card">Deep steam cleaning, upholstery extraction &amp; interior surface conditioning.</p>
+          <span class="explore-card-btn reveal-card">EXPLORE INTERIOR <span class="arrow">&rarr;</span></span>
         </div>
       </a>
 
       <!-- 06 PAINT PROTECTION FILM (PPF) -->
-      <a href="/ppf" class="explore-card">
-        <div class="explore-card-img-wrap">
-          <span class="explore-card-num">06</span>
-          <img src="assets/ppf/ppf-installation.jpg" alt="Paint Protection Film PPF installation at TRIEYE" loading="lazy">
-          <div class="explore-card-overlay">
+      <a href="/ppf" class="explore-card reveal-element reveal-card">
+        <div class="explore-card-img-wrap reveal-card">
+          <img src="assets/ppf/ppf-installation.jpg" alt="Paint Protection Film PPF installation at TRIEYE" loading="lazy" decoding="async">
+          <div class="explore-card-overlay reveal-card">
             <span class="overlay-title">EXPLORE FULL SERVICE <span class="arrow">&rarr;</span></span>
             <span class="overlay-sub">View process, benefits &amp; complete details</span>
           </div>
         </div>
-        <div class="explore-card-body">
-          <h3 class="explore-card-title">PAINT PROTECTION FILM (PPF)</h3>
-          <p class="explore-card-desc">Self-healing TPU film protecting your paint from rock chips &amp; road debris.</p>
-          <span class="explore-card-btn">EXPLORE PPF <span class="arrow">&rarr;</span></span>
+        <div class="explore-card-body reveal-card">
+          <h3 class="explore-card-title reveal-card">PAINT PROTECTION FILM (PPF)</h3>
+          <p class="explore-card-desc reveal-card">Self-healing TPU film protecting your paint from rock chips &amp; road debris.</p>
+          <span class="explore-card-btn reveal-card">EXPLORE PPF <span class="arrow">&rarr;</span></span>
         </div>
       </a>
     </div>
 
     <!-- ROW 3: 07 BIKE DETAILING (FEATURED CENTERED CARD) -->
     <div class="explore-featured-row">
-      <a href="/bike-detailing" class="explore-card explore-card-featured">
-        <div class="explore-card-img-wrap">
-          <span class="explore-card-num">07</span>
-          <img src="assets/bike/bike-hero.jpg" alt="Professional motorcycle detailing at TRIEYE" loading="lazy">
-          <div class="explore-card-overlay">
+      <a href="/bike-detailing" class="explore-card explore-card-featured reveal-card">
+        <div class="explore-card-img-wrap reveal-card">
+          <img src="assets/bike/bike-hero.jpg" alt="Professional motorcycle detailing at TRIEYE" loading="lazy" fetchpriority="high">
+          <div class="explore-card-overlay reveal-card">
             <span class="overlay-title">EXPLORE FULL SERVICE <span class="arrow">&rarr;</span></span>
             <span class="overlay-sub">View process, benefits &amp; complete details</span>
           </div>
         </div>
-        <div class="explore-card-body">
-          <h3 class="explore-card-title">BIKE DETAILING</h3>
-          <p class="explore-card-desc">Dedicated motorcycle cleaning, wheel care, bodywork polishing &amp; protective finishing.</p>
-          <span class="explore-card-btn">EXPLORE BIKE DETAILING <span class="arrow">&rarr;</span></span>
+        <div class="explore-card-body reveal-card">
+          <h3 class="explore-card-title reveal-card">BIKE DETAILING</h3>
+          <p class="explore-card-desc reveal-card">Dedicated motorcycle cleaning, wheel care, bodywork polishing &amp; protective finishing.</p>
+          <span class="explore-card-btn reveal-card">EXPLORE BIKE DETAILING <span class="arrow">&rarr;</span></span>
         </div>
       </a>
     </div>
@@ -3232,8 +3272,8 @@
 
 <section id="services">
   <div class="wrap">
-    <div class="sec-head">
-      <div class="sec-tag">Services &amp; pricing</div>
+    <div class="sec-head reveal-element">
+      <div class="sec-tag reveal-element reveal-text">Services &amp; pricing</div>
       <h2>Pick your vehicle class</h2>
       <p>Three service tiers, four vehicle classes. Rates shown are current studio pricing synced live from the studio database.</p>
     </div>
@@ -3308,7 +3348,7 @@
 <section class="booking" id="booking">
   <div class="wrap booking-grid">
     <div class="booking-copy">
-      <div class="sec-tag">Direct Instant Booking</div>
+      <div class="sec-tag reveal-element reveal-text">Direct Instant Booking</div>
       <h2>No more waiting in the bay queue</h2>
       <p style="color:var(--muted);margin-top:12px;font-size:15px;">Book your detailing appointment online and drive straight into detailing bay #1.</p>
       <ul>
@@ -3365,35 +3405,35 @@
 
 <section id="gallery">
   <div class="wrap">
-    <div class="sec-head">
-      <div class="sec-tag">Studio Craftsmanship</div>
+    <div class="sec-head reveal-element">
+      <div class="sec-tag reveal-element reveal-text">Studio Craftsmanship</div>
       <h2>The work speaks for itself</h2>
       <p>Precision before/after transformations from our Chennai detailing studio.</p>
     </div>
     <div class="gallery-grid">
-      <div class="g-card">
-        <img src="assets/foam-wash.jpg" alt="Professional snow foam exterior car wash at TRIEYE Detailing Studio" loading="lazy">
+      <div class="g-card reveal-card">
+        <img src="assets/foam-wash.jpg" alt="Professional snow foam exterior car wash at TRIEYE Detailing Studio" loading="lazy" decoding="async">
         <div class="g-overlay">
           <div class="g-tag">01 / Exterior Wash</div>
           <div class="g-lbl">Snow Foam Pre-Wash &amp; Decon</div>
         </div>
       </div>
-      <a href="/paint-correction" class="g-card" style="display: block; text-decoration: none;">
-        <img src="assets/rubbing-polish.jpg" alt="Car paint correction and polishing service" loading="lazy">
+      <a href="/paint-correction" class="g-card reveal-card" style="display: block; text-decoration: none;">
+        <img src="assets/rubbing-polish.jpg" alt="Car paint correction and polishing service" loading="lazy" decoding="async">
         <div class="g-overlay">
           <div class="g-tag">02 / Paint Correction</div>
           <div class="g-lbl">Dual-Action Rubbing Polish</div>
         </div>
       </a>
-      <a href="/interior-detailing" class="g-card" style="display: block; text-decoration: none;">
-        <img src="assets/interior-clean.jpg" alt="Car interior detailing service" loading="lazy">
+      <a href="/interior-detailing" class="g-card reveal-card" style="display: block; text-decoration: none;">
+        <img src="assets/interior-clean.jpg" alt="Car interior detailing service" loading="lazy" decoding="async">
         <div class="g-overlay">
           <div class="g-tag">03 / Interior Spa</div>
           <div class="g-lbl">Steam Extraction &amp; Leather Feed</div>
         </div>
       </a>
-      <a href="/ceramic-coating" class="g-card" style="display: block; text-decoration: none;">
-        <img src="assets/ceramic-coating.jpg" alt="Ceramic coating service" loading="lazy">
+      <a href="/ceramic-coating" class="g-card reveal-card" style="display: block; text-decoration: none;">
+        <img src="assets/ceramic-coating.jpg" alt="Ceramic coating service" loading="lazy" decoding="async">
         <div class="g-overlay">
           <div class="g-tag">04 / Protection</div>
           <div class="g-lbl">Hydrophobic Ceramic Shield</div>
@@ -3406,8 +3446,8 @@
 <section id="reviews">
   <div class="wrap">
     <div class="sec-head-row">
-      <div class="sec-head" style="margin-bottom:0;">
-        <div class="sec-tag">REAL CUSTOMER REVIEWS</div>
+      <div class="sec-head reveal-element" style="margin-bottom:0;">
+        <div class="sec-tag reveal-element reveal-text">REAL CUSTOMER REVIEWS</div>
         <h2>LOVED BY OUR CUSTOMERS</h2>
         <p>Real experiences from customers who trust TRIEYE with their vehicles.</p>
       </div>
@@ -3420,8 +3460,8 @@
     <div class="reviews-slider-wrapper">
       <div class="reviews-slider" id="reviewsSlider">
         <!-- REVIEW 01: Sathish Kumar -->
-        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="review-card-link">
-          <div class="review-card">
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="review-card-link reveal-card">
+          <div class="review-card reveal-card">
             <div>
               <div class="review-stars">★★★★★</div>
               <div class="review-author-name">Sathish Kumar</div>
@@ -3431,7 +3471,7 @@
               </div>
               <p class="review-text">Went here for the first time to was my XUV 700 .. the team here is dedicated and clean the car in detail .. they also have a AC waiting area which is very comfortable.</p>
             </div>
-            <div class="review-card-footer">
+            <div class="review-card-footer reveal-card">
               <span class="review-date">3 months ago</span>
               <span class="review-google-link">VIEW ON GOOGLE <span class="arrow">→</span></span>
             </div>
@@ -3439,8 +3479,8 @@
         </a>
 
         <!-- REVIEW 02: Ganeshjr -->
-        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="review-card-link">
-          <div class="review-card">
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="review-card-link reveal-card">
+          <div class="review-card reveal-card">
             <div>
               <div class="review-stars">★★★★★</div>
               <div class="review-author-name">Ganeshjr</div>
@@ -3450,7 +3490,7 @@
               </div>
               <p class="review-text">Done a foam wash for my MT15 they did awesome and good customer attention highly recommend worth for money ,👍💪🩵 …</p>
             </div>
-            <div class="review-card-footer">
+            <div class="review-card-footer reveal-card">
               <span class="review-date">3 months ago</span>
               <span class="review-google-link">VIEW ON GOOGLE <span class="arrow">→</span></span>
             </div>
@@ -3458,8 +3498,8 @@
         </a>
 
         <!-- REVIEW 03: Jaikrishna -->
-        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="review-card-link">
-          <div class="review-card">
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="review-card-link reveal-card">
+          <div class="review-card reveal-card">
             <div>
               <div class="review-stars">★★★★★</div>
               <div class="review-author-name">Jaikrishna</div>
@@ -3469,7 +3509,7 @@
               </div>
               <p class="review-text">"Excellent service and professional work. My vehicle looks clean and shiny after detailing. Friendly staff, good attention to detail, and reasonable pricing. Highly recommended!" ⭐⭐⭐⭐⭐</p>
             </div>
-            <div class="review-card-footer">
+            <div class="review-card-footer reveal-card">
               <span class="review-date">3 months ago</span>
               <span class="review-google-link">VIEW ON GOOGLE <span class="arrow">→</span></span>
             </div>
@@ -3477,8 +3517,8 @@
         </a>
 
         <!-- REVIEW 04: Raj Sharan -->
-        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="review-card-link">
-          <div class="review-card">
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="review-card-link reveal-card">
+          <div class="review-card reveal-card">
             <div>
               <div class="review-stars">★★★★★</div>
               <div class="review-author-name">Raj Sharan</div>
@@ -3488,7 +3528,7 @@
               </div>
               <p class="review-text">The service is  really good and affordable it’s a new shop and a new experience for me and a must visit place</p>
             </div>
-            <div class="review-card-footer">
+            <div class="review-card-footer reveal-card">
               <span class="review-date">4 months ago</span>
               <span class="review-google-link">VIEW ON GOOGLE <span class="arrow">→</span></span>
             </div>
@@ -3496,8 +3536,8 @@
         </a>
 
         <!-- REVIEW 05: Pon Vijay -->
-        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="review-card-link">
-          <div class="review-card">
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="review-card-link reveal-card">
+          <div class="review-card reveal-card">
             <div>
               <div class="review-stars">★★★★★</div>
               <div class="review-author-name">Pon Vijay</div>
@@ -3507,7 +3547,7 @@
               </div>
               <p class="review-text">"Excellent car wash service! My car looks absolutely brand new after the wash. The team was very professional and paid attention to every detail. I was especially impressed that they used high-quality branded materials for the foam wash and interior cleaning. The cleaning quality, shine, and freshness inside the car were outstanding. Highly recommended for anyone looking for premium car care service!"</p>
             </div>
-            <div class="review-card-footer">
+            <div class="review-card-footer reveal-card">
               <span class="review-date">4 months ago</span>
               <span class="review-google-link">VIEW ON GOOGLE <span class="arrow">→</span></span>
             </div>
@@ -3515,8 +3555,8 @@
         </a>
 
         <!-- REVIEW 06: Sathish103 C -->
-        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="review-card-link">
-          <div class="review-card">
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="review-card-link reveal-card">
+          <div class="review-card reveal-card">
             <div>
               <div class="review-stars">★★★★★</div>
               <div class="review-author-name">Sathish103 C</div>
@@ -3526,7 +3566,7 @@
               </div>
               <p class="review-text">"People handling the car very well,it's very clean after foamwash.must vist place"</p>
             </div>
-            <div class="review-card-footer">
+            <div class="review-card-footer reveal-card">
               <span class="review-date">3 months ago</span>
               <span class="review-google-link">VIEW ON GOOGLE <span class="arrow">→</span></span>
             </div>
@@ -3538,16 +3578,16 @@
 </section>
 
 <!-- ABOUT TRIEYE STUDIO -->
-<section class="about-section" id="about">
+<section class="about-section reveal-element" id="about">
   <div class="wrap about-grid">
     <div class="about-content">
-      <div class="sec-tag">The Trieye Standard</div>
+      <div class="sec-tag reveal-element reveal-text">The Trieye Standard</div>
       <h2>Obsessive Detailing &amp; Clear-Coat Protection</h2>
       <p class="about-lead">Founded in Chennai, Trieye is engineered around a singular philosophy: treating every car and bike as a bespoke piece of rolling artwork.</p>
       <p class="about-body">We eliminate harsh acidic chemicals and outdated swirl-inducing sponge washes. In our Villivakkam studio, our master detailers apply pH-neutral snow foams, filtered pressure rinses, zero-touch warm air drying, and multi-stage rotary paint restoration with certified ceramic quartz finishes.</p>
       
       <div class="about-features">
-        <div class="about-feat-card">
+        <div class="about-feat-card reveal-card">
           <div class="about-feat-header">
             <span class="about-feat-icon">🔬</span>
             <div class="about-feat-title">Precision Chemistry</div>
@@ -3555,7 +3595,7 @@
           <p class="about-feat-desc">pH-neutral snow foams, iron decontamination, and premium wax protection.</p>
         </div>
 
-        <div class="about-feat-card">
+        <div class="about-feat-card reveal-card">
           <div class="about-feat-header">
             <span class="about-feat-icon">🛡️</span>
             <div class="about-feat-title">Swirl-Free Craft</div>
@@ -3563,7 +3603,7 @@
           <p class="about-feat-desc">Ultra-plush 1200 GSM microfibers and twin-bucket grit guard systems.</p>
         </div>
 
-        <div class="about-feat-card">
+        <div class="about-feat-card reveal-card">
           <div class="about-feat-header">
             <span class="about-feat-icon">⚡</span>
             <div class="about-feat-title">Dedicated Wash Bays</div>
@@ -3571,7 +3611,7 @@
           <p class="about-feat-desc">Equipped with filtered high-pressure water and climate-controlled curing.</p>
         </div>
 
-        <div class="about-feat-card">
+        <div class="about-feat-card reveal-card">
           <div class="about-feat-header">
             <span class="about-feat-icon">📱</span>
             <div class="about-feat-title">Transparent Pricing</div>
@@ -3604,18 +3644,18 @@
 
 <section id="contact">
   <div class="wrap contact-grid">
-    <div class="studio-loc-card">
-      <div class="loc-card-map-layer" aria-hidden="true"></div>
-      <div class="loc-card-overlay" aria-hidden="true"></div>
-      <div class="loc-card-deco-pin" aria-hidden="true">
+    <div class="studio-loc-card reveal-card">
+      <div class="loc-card-map-layer reveal-card" aria-hidden="true"></div>
+      <div class="loc-card-overlay reveal-card" aria-hidden="true"></div>
+      <div class="loc-card-deco-pin reveal-card" aria-hidden="true">
         <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
           <circle cx="12" cy="10" r="3"/>
         </svg>
       </div>
 
-      <div class="loc-card-body">
-        <div class="loc-card-badge">
+      <div class="loc-card-body reveal-card">
+        <div class="loc-card-badge reveal-card">
           <div class="loc-pin-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/>
@@ -3640,7 +3680,7 @@
         </div>
       </div>
 
-      <div class="loc-card-action">
+      <div class="loc-card-action reveal-card">
         <a href="https://www.google.com/maps/search/?api=1&query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="btn-get-directions">
           <span class="btn-dir-pin">📍</span>
           <span class="btn-dir-text">GET DIRECTIONS</span>
@@ -3652,8 +3692,8 @@
       </div>
     </div>
     <div>
-      <div class="sec-head" style="margin-bottom:24px;">
-        <div class="sec-tag">Visit our studio</div>
+      <div class="sec-head reveal-element" style="margin-bottom:24px;">
+        <div class="sec-tag reveal-element reveal-text">Visit our studio</div>
         <h2>Find us &amp; reach us</h2>
         <p style="margin-top:16px; color:var(--muted); font-size:15px; max-width:480px;">TRIEYE Detailing Studio is a professional car and <a href="/bike-detailing" style="color:var(--pink);text-decoration:underline;">bike detailing</a> studio in Villivakkam, Chennai, offering <a href="/car-wash" style="color:var(--pink);text-decoration:underline;">premium car wash</a>, interior deep cleaning, paint correction, polishing, ceramic and <a href="/graphene-coating" style="color:var(--pink);text-decoration:underline;">graphene coatings</a>, PPF and vehicle protection services.</p>
       </div>
@@ -3685,11 +3725,11 @@
 </section>
 
 <!-- FREQUENTLY ASKED QUESTIONS (FAQ) -->
-<section class="faq-section" id="faq">
+<section class="faq-section reveal-element" id="faq">
   <div class="faq-bg-pattern"></div>
-  <div class="faq-container">
+  <div class="faq-container reveal-element reveal-up">
     <div class="faq-header">
-      <div class="sec-tag">Got Questions?</div>
+      <div class="sec-tag reveal-element reveal-text">Got Questions?</div>
       <h2 class="faq-title">FREQUENTLY ASKED <span class="faq-pink">QUESTIONS</span></h2>
       <p class="faq-subtitle">Clear answers. A better detailing experience.</p>
     </div>
@@ -3822,34 +3862,78 @@
   </div>
 </section>
 
+
 <footer class="site-footer">
-  <div class="footer-container">
-    <div class="footer-brand-wrap">
-      <a href="index.html" class="footer-logo-link" aria-label="Trieye Home">
-        <img src="assets/trieye-logo-dark.png" alt="TRIEYE car detailing studio" class="footer-logo logo-dark">
-        <img src="assets/trieye-logo-light.png" alt="TRIEYE car detailing studio" class="footer-logo logo-light">
-      </a>
+  <div class="footer-wrap wrap">
+    <div class="footer-grid">
+      <!-- Col 1: Brand & Bio -->
+      <div class="footer-col footer-brand">
+        <a href="/" class="footer-logo-link" aria-label="TRIEYE Detailing Studio Home">
+          <img src="assets/trieye-logo-dark.png" alt="TRIEYE car detailing studio" class="footer-logo logo-dark" loading="lazy" decoding="async">
+          <img src="assets/trieye-logo-light.png" alt="TRIEYE car detailing studio" class="footer-logo logo-light" loading="lazy" decoding="async">
+        </a>
+        <p class="footer-desc">Professional car &amp; bike detailing studio. Specialized in hydrophobic ceramic &amp; graphene coatings, paint correction, self-healing PPF, and deep interior care.</p>
+        <div class="footer-socials">
+          <a href="https://www.instagram.com/trieye_detailing" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="social-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+          </a>
+          <a href="https://wa.me/919940181934" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" class="social-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.762.459 3.48 1.332 5.001l-1.416 5.169 5.297-1.389c1.472.802 3.133 1.224 4.774 1.225h.004c5.505 0 9.988-4.478 9.989-9.985 0-2.668-1.039-5.176-2.927-7.063a9.927 9.927 0 0 0-7.063-2.942zm5.79 14.195c-.244.688-1.419 1.314-1.956 1.396-.51.077-1.163.116-3.701-.931-3.24-1.339-5.326-4.636-5.487-4.851-.161-.215-1.309-1.741-1.309-3.322 0-1.58.827-2.357 1.121-2.68.294-.323.644-.404.859-.404.215 0 .43.002.617.01.198.008.465-.075.728.556.27.646.918 2.241.998 2.403.08.162.134.35.027.565-.107.215-.161.35-.322.538-.161.188-.338.42-.483.564-.16.162-.328.338-.14.661.188.323.834 1.378 1.79 2.23 1.23 1.096 2.268 1.436 2.59 1.597.323.161.511.134.7-.08.188-.215.806-.941 1.021-1.263.215-.323.43-.269.725-.161.296.107 1.88.886 2.202 1.047.323.161.538.242.618.376.08.134.08.779-.164 1.467z"/></svg>
+          </a>
+          <a href="tel:+919940181934" aria-label="Call Us" class="social-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Col 2: Services Links -->
+      <div class="footer-col reveal-element">
+        <h4 class="footer-heading">Services</h4>
+        <ul class="footer-links reveal-element">
+          <li><a href="/car-wash">Car Wash</a></li>
+          <li><a href="/ceramic-coating">Ceramic Coating</a></li>
+          <li><a href="/graphene-coating">Graphene Coating</a></li>
+          <li><a href="/paint-correction">Paint Correction</a></li>
+          <li><a href="/interior-detailing">Interior Detailing</a></li>
+          <li><a href="/ppf">Paint Protection Film (PPF)</a></li>
+          <li><a href="/bike-detailing">Bike Detailing</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 3: Quick Links & Booking -->
+      <div class="footer-col reveal-element">
+        <h4 class="footer-heading">Quick Links</h4>
+        <ul class="footer-links reveal-element">
+          <li><a href="/">Home</a></li>
+          <li><a href="/#about">About Us</a></li>
+          <li><a href="/#gallery">Gallery</a></li>
+          <li><a href="/track-booking" class="footer-highlight-link">Track Booking &rarr;</a></li>
+          <li><a href="/#contact">Contact &amp; Location</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 4: Studio Location (Hidden on Desktop, Visible on Mobile) -->
+      <div class="footer-col footer-col-location">
+        <h4 class="footer-heading">Studio Location</h4>
+        <p class="footer-info-text">No. 19, 6th Street, 1st Main Road, Baba Nagar, Villivakkam, Chennai, Tamil Nadu 600049</p>
+        <div class="footer-contact-item">
+          <span class="info-label">Phone:</span>
+          <a href="tel:+919940181934" class="footer-tel">+91 99401 81934</a>
+        </div>
+        <div class="footer-contact-item">
+          <span class="info-label">Hours:</span>
+          <span>Mon – Sun: 8:00 AM – 8:00 PM</span>
+        </div>
+      </div>
     </div>
 
-    <!-- Footer Navigation Links -->
-    <nav class="footer-nav" aria-label="Footer Navigation">
-      <a href="index.html">Home</a>
-      <a href="car-wash.html">Car Wash</a>
-      <a href="ceramic-coating.html">Ceramic Coating</a>
-      <a href="graphene-coating.html">Graphene Coating</a>
-      <a href="paint-correction.html">Paint Correction</a>
-      <a href="interior-detailing.html">Interior Detailing</a>
-      <a href="ppf.html">PPF</a>
-      <a href="bike-detailing.html">Bike Detailing</a>
-      <a href="track-booking.html">Track Booking</a>
-    </nav>
-
     <!-- Bottom Footer -->
-    <div class="footer-bottom">
-      <div class="footer-copy">© 2026 Trieye Detail Studio. All rights reserved.</div>
+    <div class="footer-bottom reveal-element">
+      <div class="footer-copy">&copy; 2026 TRIEYE Detailing Studio. All rights reserved.</div>
     </div>
   </div>
 </footer>
+
 
 <div class="toast" id="toast">
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0a0a0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
@@ -3873,7 +3957,7 @@
         <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" style="flex-shrink:0;"><path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.762.459 3.48 1.332 5.001l-1.416 5.169 5.297-1.389c1.472.802 3.133 1.224 4.774 1.225h.004c5.505 0 9.988-4.478 9.989-9.985 0-2.668-1.039-5.176-2.927-7.063a9.927 9.927 0 0 0-7.063-2.942zm5.79 14.195c-.244.688-1.419 1.314-1.956 1.396-.51.077-1.163.116-3.701-.931-3.24-1.339-5.326-4.636-5.487-4.851-.161-.215-1.309-1.741-1.309-3.322 0-1.58.827-2.357 1.121-2.68.294-.323.644-.404.859-.404.215 0 .43.002.617.01.198.008.465-.075.728.556.27.646.918 2.241.998 2.403.08.162.134.35.027.565-.107.215-.161.35-.322.538-.161.188-.338.42-.483.564-.16.162-.328.338-.14.661.188.323.834 1.378 1.79 2.23 1.23 1.096 2.268 1.436 2.59 1.597.323.161.511.134.7-.08.188-.215.806-.941 1.021-1.263.215-.323.43-.269.725-.161.296.107 1.88.886 2.202 1.047.323.161.538.242.618.376.08.134.08.779-.164 1.467z"/></svg>
         <span>Send on WhatsApp</span>
       </a>
-      <a href="track-booking.html" id="modalTrackBtn" class="modal-track-link">
+      <a href="/track-booking" id="modalTrackBtn" class="modal-track-link">
         <span>VIEW / TRACK BOOKING →</span>
       </a>
       <p class="modal-helper-text" style="font-size:12px; color:var(--muted); text-align:center; margin-top:4px;">
@@ -4710,5 +4794,73 @@
   })();
 </script>
 
+
+<script>
+(function initMobileDrawer() {
+  const burgerBtn = document.getElementById('burgerBtn') || document.querySelector('.mobile-nav-toggle');
+  const mobileNavDrawer = document.getElementById('mobileNavDrawer');
+  const mobileDrawerBackdrop = document.getElementById('mobileDrawerBackdrop');
+  const mobileDrawerClose = document.getElementById('mobileDrawerClose');
+  const mobileAccordionBtn = document.getElementById('mobileAccordionBtn');
+  const accordionContainer = document.querySelector('.mobile-drawer-accordion');
+
+  function openMobileNav() {
+    if (mobileNavDrawer && mobileDrawerBackdrop) {
+      mobileNavDrawer.classList.add('open');
+      mobileDrawerBackdrop.classList.add('open');
+      mobileNavDrawer.setAttribute('aria-hidden', 'false');
+      mobileDrawerBackdrop.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      if (burgerBtn) burgerBtn.setAttribute('aria-expanded', 'true');
+    }
+  }
+
+  function closeMobileNav() {
+    if (mobileNavDrawer && mobileDrawerBackdrop) {
+      mobileNavDrawer.classList.remove('open');
+      mobileDrawerBackdrop.classList.remove('open');
+      mobileNavDrawer.setAttribute('aria-hidden', 'true');
+      mobileDrawerBackdrop.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      if (burgerBtn) burgerBtn.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  if (burgerBtn) burgerBtn.addEventListener('click', openMobileNav);
+  if (mobileDrawerClose) mobileDrawerClose.addEventListener('click', closeMobileNav);
+  if (mobileDrawerBackdrop) mobileDrawerBackdrop.addEventListener('click', closeMobileNav);
+
+  if (mobileAccordionBtn && accordionContainer) {
+    mobileAccordionBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = accordionContainer.classList.contains('open');
+      if (isOpen) {
+        accordionContainer.classList.remove('open');
+        mobileAccordionBtn.setAttribute('aria-expanded', 'false');
+        const icon = mobileAccordionBtn.querySelector('.mobile-accordion-icon');
+        if (icon) icon.textContent = '+';
+      } else {
+        accordionContainer.classList.add('open');
+        mobileAccordionBtn.setAttribute('aria-expanded', 'true');
+        const icon = mobileAccordionBtn.querySelector('.mobile-accordion-icon');
+        if (icon) icon.textContent = '−';
+      }
+    });
+  }
+
+  document.querySelectorAll('.mobile-drawer-links a:not(.mobile-accordion-btn), .mobile-drawer-book-btn').forEach(link => {
+    link.addEventListener('click', closeMobileNav);
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && mobileNavDrawer && mobileNavDrawer.classList.contains('open')) {
+      closeMobileNav();
+    }
+  });
+})();
+</script>
+
+  <script src="assets/animations.js" defer></script>
+  <script src="assets/scroll-reveal.js" defer></script>
 </body>
 </html>
