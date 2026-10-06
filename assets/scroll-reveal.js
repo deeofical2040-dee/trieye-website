@@ -53,7 +53,7 @@
           if (entry.isIntersecting) {
             entry.target.classList.add("revealed");
             // Also reveal any nested semantic children inside observed containers
-            var children = entry.target.querySelectorAll(".sec-tag, .sec-title, .sec-subtitle, .sec-desc, .sec-cta, .process-step-num, .process-step-title, .process-step-desc, .process-card-media img, .explore-card-title, .explore-card-desc, .explore-card-btn");
+            var children = entry.target.querySelectorAll("img, .sec-tag, .sec-title, .sec-subtitle, .sec-desc, .sec-cta, .process-step-num, .process-step-title, .process-step-desc, .process-card-media img, .explore-card-title, .explore-card-desc, .explore-card-btn");
             children.forEach(function(child) {
               child.classList.add("revealed");
             });
