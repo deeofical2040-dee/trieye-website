@@ -1245,7 +1245,6 @@
       let bodyHtml = vehRows.map(veh => {
         const cellsHtml = services.map(s => {
           const price = getVehiclePrice(s, veh.key);
-          const isHigh = price && price >= 2000;
           let label = 'per visit';
           if (s.name && s.name.toLowerCase().includes('wash')) {
             label = 'per wash';
@@ -1256,7 +1255,7 @@
           const formatted = formatPriceDisplay(price);
 
           return `<div class="cell" data-label="${escapeHtml(s.name)}">
-            <span class="price mono ${isHigh ? 'hi' : ''}">${formatted}</span>
+            <span class="price mono">${formatted}</span>
             <span class="price-lbl">${label}</span>
           </div>`;
         }).join('');

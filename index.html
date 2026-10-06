@@ -721,8 +721,8 @@
   .veh-icon:hover{transform:scale(1.06);border-color:var(--green);}
   .veh-icon svg{width:26px;height:26px;stroke:var(--green);}
   .veh-name{font-family:'Oswald',sans-serif;font-size:15px;font-weight:600;letter-spacing:0.03em;}
-  .price{font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:500;}
-  .price.hi{color:var(--red);}
+  .price{font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:500;color:var(--white);}
+  .price.hi{color:var(--white);}
   .price-lbl{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-top:2px;font-family:'Inter',sans-serif;}
   
   @media (max-width:768px){
@@ -3602,9 +3602,9 @@
           <span class="veh-name">Hatchback</span>
         </div>
         <div class="cell" data-label="Foam Wash" data-svc-cell="Foam Wash"><span class="price mono">₹566</span><span class="price-lbl">per wash</span></div>
-        <div class="cell" data-label="Full Detail Combo" data-svc-cell="Full Detail Combo"><span class="price mono hi">₹3,999</span><span class="price-lbl">per visit</span></div>
+        <div class="cell" data-label="Full Detail Combo" data-svc-cell="Full Detail Combo"><span class="price mono">₹3,999</span><span class="price-lbl">per visit</span></div>
         <div class="cell" data-label="Interior Deep Cleaning" data-svc-cell="Interior Deep Cleaning"><span class="price mono">₹1,839</span><span class="price-lbl">per visit</span></div>
-        <div class="cell" data-label="Rubbing Polish" data-svc-cell="Rubbing Polish"><span class="price mono hi">₹2,799</span><span class="price-lbl">per visit</span></div>
+        <div class="cell" data-label="Rubbing Polish" data-svc-cell="Rubbing Polish"><span class="price mono">₹2,799</span><span class="price-lbl">per visit</span></div>
       </div>
 
       <div class="spec-row" data-veh-row="Sedan">
@@ -3615,9 +3615,9 @@
           <span class="veh-name">Sedan</span>
         </div>
         <div class="cell" data-label="Foam Wash" data-svc-cell="Foam Wash"><span class="price mono">₹699</span><span class="price-lbl">per wash</span></div>
-        <div class="cell" data-label="Full Detail Combo" data-svc-cell="Full Detail Combo"><span class="price mono hi">₹4,999</span><span class="price-lbl">per visit</span></div>
-        <div class="cell" data-label="Interior Deep Cleaning" data-svc-cell="Interior Deep Cleaning"><span class="price mono hi">₹2,299</span><span class="price-lbl">per visit</span></div>
-        <div class="cell" data-label="Rubbing Polish" data-svc-cell="Rubbing Polish"><span class="price mono hi">₹3,499</span><span class="price-lbl">per visit</span></div>
+        <div class="cell" data-label="Full Detail Combo" data-svc-cell="Full Detail Combo"><span class="price mono">₹4,999</span><span class="price-lbl">per visit</span></div>
+        <div class="cell" data-label="Interior Deep Cleaning" data-svc-cell="Interior Deep Cleaning"><span class="price mono">₹2,299</span><span class="price-lbl">per visit</span></div>
+        <div class="cell" data-label="Rubbing Polish" data-svc-cell="Rubbing Polish"><span class="price mono">₹3,499</span><span class="price-lbl">per visit</span></div>
       </div>
 
       <div class="spec-row" data-veh-row="SUV">
@@ -3628,9 +3628,9 @@
           <span class="veh-name">SUV / 4x4</span>
         </div>
         <div class="cell" data-label="Foam Wash" data-svc-cell="Foam Wash"><span class="price mono">₹874</span><span class="price-lbl">per wash</span></div>
-        <div class="cell" data-label="Full Detail Combo" data-svc-cell="Full Detail Combo"><span class="price mono hi">₹6,249</span><span class="price-lbl">per visit</span></div>
-        <div class="cell" data-label="Interior Deep Cleaning" data-svc-cell="Interior Deep Cleaning"><span class="price mono hi">₹2,874</span><span class="price-lbl">per visit</span></div>
-        <div class="cell" data-label="Rubbing Polish" data-svc-cell="Rubbing Polish"><span class="price mono hi">₹4,374</span><span class="price-lbl">per visit</span></div>
+        <div class="cell" data-label="Full Detail Combo" data-svc-cell="Full Detail Combo"><span class="price mono">₹6,249</span><span class="price-lbl">per visit</span></div>
+        <div class="cell" data-label="Interior Deep Cleaning" data-svc-cell="Interior Deep Cleaning"><span class="price mono">₹2,874</span><span class="price-lbl">per visit</span></div>
+        <div class="cell" data-label="Rubbing Polish" data-svc-cell="Rubbing Polish"><span class="price mono">₹4,374</span><span class="price-lbl">per visit</span></div>
       </div>
 
       <div class="spec-row" data-veh-row="Bike">
@@ -3641,7 +3641,7 @@
           <span class="veh-name">Superbike / Bike</span>
         </div>
         <div class="cell" data-label="Foam Wash" data-svc-cell="Foam Wash"><span class="price mono">₹350</span><span class="price-lbl">per wash</span></div>
-        <div class="cell" data-label="Full Detail Combo" data-svc-cell="Full Detail Combo"><span class="price mono hi">₹2,500</span><span class="price-lbl">per visit</span></div>
+        <div class="cell" data-label="Full Detail Combo" data-svc-cell="Full Detail Combo"><span class="price mono">₹2,500</span><span class="price-lbl">per visit</span></div>
         <div class="cell" data-label="Interior Deep Cleaning" data-svc-cell="Interior Deep Cleaning"><span class="price mono">₹1,150</span><span class="price-lbl">chain &amp; deep clean</span></div>
         <div class="cell" data-label="Rubbing Polish" data-svc-cell="Rubbing Polish"><span class="price mono">₹1,750</span><span class="price-lbl">per visit</span></div>
       </div>
@@ -4828,7 +4828,6 @@
       let bodyHtml = vehRows.map(veh => {
         const cellsHtml = services.map(s => {
           const price = getVehiclePrice(s, veh.key);
-          const isHigh = price && price >= 2000;
           let label = 'per visit';
           if (s.name && s.name.toLowerCase().includes('wash')) {
             label = 'per wash';
@@ -4839,7 +4838,7 @@
           const formatted = formatPriceDisplay(price);
 
           return `<div class="cell" data-label="${escapeHtml(s.name)}">
-            <span class="price mono ${isHigh ? 'hi' : ''}">${formatted}</span>
+            <span class="price mono">${formatted}</span>
             <span class="price-lbl">${label}</span>
           </div>`;
         }).join('');

@@ -694,8 +694,8 @@
   .veh-icon:hover{transform:scale(1.06);border-color:var(--green);}
   .veh-icon svg{width:26px;height:26px;stroke:var(--green);}
   .veh-name{font-family:'Oswald',sans-serif;font-size:15px;font-weight:600;letter-spacing:0.03em;}
-  .price{font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:500;}
-  .price.hi{color:var(--red);}
+  .price{font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:500;color:var(--white);}
+  .price.hi{color:var(--white);}
   .price-lbl{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-top:2px;font-family:'Inter',sans-serif;}
   
   @media (max-width:768px){
@@ -3798,7 +3798,7 @@ header nav {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 15px !important;
     font-weight: 700 !important;
-    color: var(--pink, #ee2f76) !important;
+    color: var(--white, #111827) !important;
     text-align: right !important;
     white-space: nowrap !important;
   }
@@ -3863,7 +3863,7 @@ header nav {
     font-family: 'IBM Plex Mono', monospace !important;
     font-size: 15px !important;
     font-weight: 700 !important;
-    color: var(--pink, #ee2f76) !important;
+    color: var(--white, #111827) !important;
     white-space: nowrap !important;
   }
   .spec-row .cell:not(.veh-cell) .price-lbl {
