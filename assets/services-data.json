@@ -3,17 +3,17 @@
     "id": "5dab226d-1044-40d3-a95a-f12b0aaa6cbb",
     "name": "Rubbing Polish",
     "desc": "Dual-Action Rubbing Polish & Paint Correction",
-    "base_price": 3499,
-    "hatchback_price": 2799,
-    "sedan_price": 3499,
-    "suv_price": 4374,
-    "bike_price": 1750,
+    "base_price": 97,
+    "hatchback_price": 69,
+    "sedan_price": 97,
+    "suv_price": 84,
+    "bike_price": 60,
     "duration_minutes": 120,
     "pricing": {
-      "Hatchback": 2799,
-      "Sedan": 3499,
-      "SUV / 4x4": 4374,
-      "Superbike": 1750
+      "Hatchback": 69,
+      "Sedan": 97,
+      "SUV / 4x4": 84,
+      "Superbike": 60
     },
     "active": true
   },
