@@ -1,0 +1,187 @@
+/* ==========================================================================
+   MOBILE STICKY STACKING SCROLL INTERACTION FOR PROCESS / STAGE CARDS
+   - Pure CSS position: sticky (No heavy JS / No scroll hijacking)
+   - Applies ONLY on mobile (max-width: 768px)
+   - Desktop remains completely unchanged
+   - Respects prefers-reduced-motion
+   ========================================================================== */
+@media (max-width: 768px) {
+  /* Process Section Mobile Container */
+  #process {
+    position: relative !important;
+    overflow: visible !important;
+    padding: 44px 0 56px 0 !important;
+  }
+
+  #process .wrap {
+    padding: 0 16px !important;
+    overflow: visible !important;
+    max-width: 100% !important;
+  }
+
+  /* Process Cards Grid/Layout Container on Mobile */
+  #process .process-horizontal-layout,
+  #process .process-grid,
+  #process .wrap > div:not(.sec-head):not([style*="text-align"]) {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+    position: relative !important;
+    overflow: visible !important;
+    transform: none !important;
+    perspective: none !important;
+    filter: none !important;
+    clip-path: none !important;
+    padding-bottom: 24px !important;
+  }
+
+  /* Process Cards Base Sticky Styling */
+  #process .process-card,
+  #process .process-step,
+  #process .process-horizontal-layout > div,
+  #process .process-grid > div,
+  #process .wrap > div:not(.sec-head):not([style*="text-align"]) > div {
+    position: sticky !important;
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    background: #0d0f12 !important;
+    border-radius: 20px !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.25), 0 12px 30px rgba(0, 0, 0, 0.28) !important;
+    margin-bottom: 28px !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    transform: translateZ(0) !important;
+    will-change: transform, top !important;
+    transition: box-shadow 0.25s ease, transform 0.25s ease !important;
+  }
+
+  #process .process-card:last-child,
+  #process .process-step:last-child,
+  #process .process-horizontal-layout > div:last-child,
+  #process .process-grid > div:last-child,
+  #process .wrap > div:not(.sec-head):not([style*="text-align"]) > div:last-child {
+    margin-bottom: 0 !important;
+  }
+
+  /* Staggered Sticky Top Offsets & Z-Index Layering */
+  #process .process-horizontal-layout > div:nth-child(1),
+  #process .process-grid > div:nth-child(1),
+  #process .wrap > div:not(.sec-head):not([style*="text-align"]) > div:nth-child(1) {
+    top: 72px !important;
+    z-index: 1 !important;
+  }
+
+  #process .process-horizontal-layout > div:nth-child(2),
+  #process .process-grid > div:nth-child(2),
+  #process .wrap > div:not(.sec-head):not([style*="text-align"]) > div:nth-child(2) {
+    top: 96px !important;
+    z-index: 2 !important;
+  }
+
+  #process .process-horizontal-layout > div:nth-child(3),
+  #process .process-grid > div:nth-child(3),
+  #process .wrap > div:not(.sec-head):not([style*="text-align"]) > div:nth-child(3) {
+    top: 120px !important;
+    z-index: 3 !important;
+  }
+
+  #process .process-horizontal-layout > div:nth-child(4),
+  #process .process-grid > div:nth-child(4),
+  #process .wrap > div:not(.sec-head):not([style*="text-align"]) > div:nth-child(4) {
+    top: 144px !important;
+    z-index: 4 !important;
+  }
+
+  #process .process-horizontal-layout > div:nth-child(5),
+  #process .process-grid > div:nth-child(5),
+  #process .wrap > div:not(.sec-head):not([style*="text-align"]) > div:nth-child(5) {
+    top: 168px !important;
+    z-index: 5 !important;
+  }
+
+  #process .process-horizontal-layout > div:nth-child(6),
+  #process .process-grid > div:nth-child(6),
+  #process .wrap > div:not(.sec-head):not([style*="text-align"]) > div:nth-child(6) {
+    top: 192px !important;
+    z-index: 6 !important;
+  }
+
+  /* Card Image Full-Width Display with Top Radius */
+  #process .process-horizontal-layout > div img,
+  #process .process-grid > div img,
+  #process .wrap > div:not(.sec-head):not([style*="text-align"]) > div img {
+    width: 100% !important;
+    height: 180px !important;
+    aspect-ratio: 16/9 !important;
+    object-fit: cover !important;
+    border-radius: 20px 20px 0 0 !important;
+    margin: 0 !important;
+    display: block !important;
+  }
+
+  /* Card Content Padding & Typography */
+  #process .process-horizontal-layout > div > div,
+  #process .process-grid > div > div,
+  #process .wrap > div:not(.sec-head):not([style*="text-align"]) > div > div {
+    padding: 16px 18px 6px 18px !important;
+    background: transparent !important;
+  }
+
+  #process .process-horizontal-layout > div > p,
+  #process .process-grid > div > p,
+  #process .wrap > div:not(.sec-head):not([style*="text-align"]) > div > p,
+  #process .process-horizontal-layout > div > div > p,
+  #process .process-grid > div > div > p,
+  #process .wrap > div:not(.sec-head):not([style*="text-align"]) > div > div > p {
+    color: #94a3b8 !important;
+    font-size: 13.5px !important;
+    line-height: 1.55 !important;
+    margin: 0 !important;
+    padding: 0 18px 18px 18px !important;
+  }
+
+  /* Reset any hardcoded padding-left on stage paragraph descriptions */
+  #process p[style*="padding-left"] {
+    padding-left: 18px !important;
+  }
+
+  /* Stage Headings */
+  #process .process-horizontal-layout h3,
+  #process .process-grid h3,
+  #process .wrap > div:not(.sec-head):not([style*="text-align"]) h3 {
+    color: #ffffff !important;
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.5px !important;
+    margin: 0 0 6px 0 !important;
+  }
+
+  /* Stage Badge / Numbers */
+  #process .process-horizontal-layout span,
+  #process .process-grid span,
+  #process .wrap > div:not(.sec-head):not([style*="text-align"]) span,
+  #process div[style*="IBM Plex Mono"] {
+    color: #ff3366 !important;
+    font-family: "IBM Plex Mono", monospace !important;
+    font-weight: 700 !important;
+    font-size: 13.5px !important;
+    letter-spacing: 1px !important;
+  }
+}
+
+/* Accessibility: Support Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  #process .process-horizontal-layout > div,
+  #process .process-grid > div,
+  #process .wrap > div:not(.sec-head):not([style*="text-align"]) > div {
+    position: static !important;
+    top: auto !important;
+    transform: none !important;
+    will-change: auto !important;
+    margin-bottom: 20px !important;
+  }
+}

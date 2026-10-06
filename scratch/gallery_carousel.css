@@ -1,0 +1,476 @@
+/* ==========================================================================
+   TRIEYE PREMIUM SHOWCASE GALLERY CAROUSEL
+   - Centered 3-card showcase layout (Active in center, faded on sides)
+   - Desktop & Mobile touch swipe & mouse drag
+   - Auto slide with hover / visibility pause
+   ========================================================================== */
+
+#gallery.gallery-showcase-section {
+  padding: 80px 0;
+  background-color: #ffffff;
+  position: relative;
+  overflow: hidden;
+}
+
+/* TOP HEADER ROW */
+.gallery-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 48px;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.gallery-header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.gallery-insta-badge {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 14px rgba(225, 48, 108, 0.25);
+  flex-shrink: 0;
+}
+
+.gallery-sub-tag {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--pink, #ff3366);
+  letter-spacing: 1.5px;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.gallery-main-heading {
+  font-size: clamp(24px, 3.5vw, 32px);
+  font-weight: 800;
+  color: #111111;
+  letter-spacing: 0.5px;
+  margin: 0;
+  text-transform: uppercase;
+  line-height: 1.15;
+}
+
+.gallery-accent {
+  color: var(--pink, #ff3366);
+}
+
+.btn-gallery-follow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #111111;
+  color: #ffffff;
+  padding: 12px 24px;
+  border-radius: 9999px;
+  font-size: 13.5px;
+  font-weight: 700;
+  text-decoration: none;
+  letter-spacing: 0.5px;
+  transition: transform 0.25s ease, background 0.25s ease, box-shadow 0.25s ease;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+}
+
+.btn-gallery-follow:hover {
+  background: #000000;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.btn-gallery-follow .arrow {
+  transition: transform 0.2s ease;
+}
+
+.btn-gallery-follow:hover .arrow {
+  transform: translateX(3px);
+}
+
+/* CAROUSEL WRAPPER */
+.gallery-carousel-container {
+  position: relative;
+  width: 100%;
+  max-width: 1140px;
+  margin: 0 auto;
+  user-select: none;
+}
+
+.gallery-viewport {
+  position: relative;
+  width: 100%;
+  height: 520px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.gallery-track {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* INDIVIDUAL SHOWCASE CARD */
+.gallery-card {
+  position: absolute;
+  width: 330px;
+  height: 480px;
+  border-radius: 24px;
+  overflow: hidden;
+  box-sizing: border-box;
+  background: #0c0d10;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, opacity;
+  cursor: pointer;
+}
+
+.gallery-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 24px;
+}
+
+.gallery-card-inner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.gallery-card.is-active:hover .gallery-card-inner img {
+  transform: scale(1.03);
+}
+
+/* CARD GRADIENT OVERLAYS */
+.gallery-card-inner::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0) 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.gallery-card-inner::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 180px;
+  background: linear-gradient(0deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.4) 60%, rgba(0,0,0,0) 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* TOP BADGES */
+.gallery-card-top-bar {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  right: 18px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 2;
+}
+
+.gallery-badge-reel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #ffffff;
+  padding: 5px 12px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.gallery-badge-reel .play-icon {
+  font-size: 8px;
+  color: var(--pink, #ff3366);
+}
+
+.gallery-badge-sound {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* BOTTOM TEXT & BUTTON */
+.gallery-card-bottom {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  right: 20px;
+  z-index: 2;
+  text-align: left;
+}
+
+.gallery-item-tag {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--pink, #ff3366);
+  letter-spacing: 1.5px;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.gallery-item-title {
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 700;
+  margin: 0 0 14px 0;
+  line-height: 1.3;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+.btn-card-ig {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 9999px;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.btn-card-ig:hover {
+  background: rgba(255, 255, 255, 0.28);
+  transform: translateY(-1px);
+}
+
+/* 3-CARD STACK POSITIONS (Desktop) */
+.gallery-card.is-active {
+  transform: translateX(0) scale(1);
+  opacity: 1;
+  z-index: 10;
+  cursor: default;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.24), 0 0 0 1px rgba(0, 0, 0, 0.06);
+  pointer-events: auto;
+}
+
+.gallery-card.is-prev {
+  transform: translateX(-310px) scale(0.88);
+  opacity: 0.45;
+  z-index: 5;
+  pointer-events: auto;
+}
+
+.gallery-card.is-next {
+  transform: translateX(310px) scale(0.88);
+  opacity: 0.45;
+  z-index: 5;
+  pointer-events: auto;
+}
+
+.gallery-card.is-hidden-left {
+  transform: translateX(-550px) scale(0.7);
+  opacity: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.gallery-card.is-hidden-right {
+  transform: translateX(550px) scale(0.7);
+  opacity: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* NAVIGATION ARROWS */
+.gallery-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  color: #111111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 20;
+  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.gallery-nav-btn:hover {
+  background: #111111;
+  color: #ffffff;
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.gallery-prev {
+  left: 24px;
+}
+
+.gallery-next {
+  right: 24px;
+}
+
+/* PAGINATION DOTS */
+.gallery-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 24px;
+}
+
+.gallery-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #cbd5e1;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: width 0.3s ease, background 0.3s ease, border-radius 0.3s ease;
+}
+
+.gallery-dot.active {
+  width: 24px;
+  border-radius: 9999px;
+  background: var(--pink, #ff3366);
+}
+
+/* ==========================================================================
+   MOBILE RESPONSIVENESS (max-width: 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+  #gallery.gallery-showcase-section {
+    padding: 56px 0;
+  }
+
+  .gallery-header-row {
+    margin-bottom: 32px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .gallery-header-left {
+    gap: 12px;
+  }
+
+  .gallery-insta-badge {
+    width: 42px;
+    height: 42px;
+  }
+
+  .gallery-main-heading {
+    font-size: 24px;
+  }
+
+  .gallery-viewport {
+    height: 440px;
+  }
+
+  .gallery-card {
+    width: 270px;
+    height: 410px;
+    border-radius: 20px;
+  }
+
+  .gallery-card-inner {
+    border-radius: 20px;
+  }
+
+  /* 3-card stack on mobile with peeking side cards */
+  .gallery-card.is-active {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+    z-index: 10;
+  }
+
+  .gallery-card.is-prev {
+    transform: translateX(-220px) scale(0.88);
+    opacity: 0.45;
+    z-index: 5;
+  }
+
+  .gallery-card.is-next {
+    transform: translateX(220px) scale(0.88);
+    opacity: 0.45;
+    z-index: 5;
+  }
+
+  .gallery-card.is-hidden-left {
+    transform: translateX(-380px) scale(0.7);
+  }
+
+  .gallery-card.is-hidden-right {
+    transform: translateX(380px) scale(0.7);
+  }
+
+  .gallery-nav-btn {
+    width: 38px;
+    height: 38px;
+  }
+
+  .gallery-prev {
+    left: 8px;
+  }
+
+  .gallery-next {
+    right: 8px;
+  }
+}
+
+@media (max-width: 360px) {
+  .gallery-card {
+    width: 240px;
+    height: 380px;
+  }
+  .gallery-card.is-prev {
+    transform: translateX(-190px) scale(0.88);
+  }
+  .gallery-card.is-next {
+    transform: translateX(190px) scale(0.88);
+  }
+}
