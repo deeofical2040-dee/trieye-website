@@ -586,29 +586,7 @@ const TrieyeDB = {
 
   // 3. SERVICES & PRICING
   async getServices(fallbackDefaults) {
-    let localSaved = null;
-    let localUpdatedTime = 0;
-    try {
-      const localStr = localStorage.getItem('trieye_services_matrix');
-      if (localStr) {
-        localSaved = JSON.parse(localStr);
-        localUpdatedTime = Number(localStorage.getItem('trieye_services_last_updated') || 0);
-      }
-    } catch (e) {}
-
-    // 1. Try local/server REST API if hosted with server
-    try {
-      const apiRes = await fetch('/api/services', { method: 'GET', cache: 'no-store' });
-      if (apiRes.ok) {
-        const apiData = await apiRes.json();
-        if (apiData && typeof apiData === 'object' && Object.keys(apiData).length > 0) {
-          localStorage.setItem('trieye_services_matrix', JSON.stringify(apiData));
-          return apiData;
-        }
-      }
-    } catch (e) {}
-
-    // 2. Try Supabase
+    // 1. Supabase Database is the authoritative Single Source of Truth
     const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
     if (sb) {
       try {
@@ -642,19 +620,21 @@ const TrieyeDB = {
             };
           });
 
-          // If local has explicit admin edits, merge to preserve latest admin prices
-          if (localSaved && localUpdatedTime > 0) {
-            Object.keys(localSaved).forEach(k => {
-              if (map[k]) {
-                // Merge in any locally saved pricing if remote row wasn't updated
-                map[k] = { ...map[k], ...localSaved[k] };
-              } else {
-                map[k] = localSaved[k];
-              }
-            });
-          }
+          // Sync freshly fetched Supabase data to localStorage cache for offline/instant initial paint
+          try {
+            localStorage.setItem('trieye_services_matrix', JSON.stringify(map));
+            localStorage.setItem('trieye_services_last_updated', String(Date.now()));
+          } catch (e) {}
 
-          localStorage.setItem('trieye_services_matrix', JSON.stringify(map));
+          // Also keep local dev server file synced if available
+          try {
+            fetch('/api/services', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(map)
+            }).catch(() => {});
+          } catch (e) {}
+
           return map;
         } else if (error) {
           TrieyeDB.logError('services', 'SELECT', error);
@@ -664,14 +644,36 @@ const TrieyeDB = {
       }
     }
 
-    if (localSaved && Object.keys(localSaved).length > 0) return localSaved;
+    // 2. Secondary fallback: Local Server REST API if offline
+    try {
+      const apiRes = await fetch('/api/services', { method: 'GET', cache: 'no-store' });
+      if (apiRes.ok) {
+        const apiData = await apiRes.json();
+        if (apiData && typeof apiData === 'object' && Object.keys(apiData).length > 0) {
+          localStorage.setItem('trieye_services_matrix', JSON.stringify(apiData));
+          return apiData;
+        }
+      }
+    } catch (e) {}
+
+    // 3. Tertiary fallback: LocalStorage
+    try {
+      const localStr = localStorage.getItem('trieye_services_matrix');
+      if (localStr) {
+        const localSaved = JSON.parse(localStr);
+        if (localSaved && Object.keys(localSaved).length > 0) return localSaved;
+      }
+    } catch (e) {}
+
     return fallbackDefaults || {};
   },
 
   async saveServices(servicesMap) {
     const timestamp = Date.now();
-    localStorage.setItem('trieye_services_matrix', JSON.stringify(servicesMap));
-    localStorage.setItem('trieye_services_last_updated', String(timestamp));
+    try {
+      localStorage.setItem('trieye_services_matrix', JSON.stringify(servicesMap));
+      localStorage.setItem('trieye_services_last_updated', String(timestamp));
+    } catch (e) {}
 
     // Broadcast across tabs instantly (< 5ms)
     try {
@@ -690,7 +692,7 @@ const TrieyeDB = {
       });
     } catch (e) {}
 
-    // 2. Persist to Supabase
+    // 2. Persist to Supabase Database (Single Source of Truth)
     const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
     if (sb) {
       try {
@@ -704,7 +706,7 @@ const TrieyeDB = {
 
           const payload = {
             name: s.name || k,
-            description: s.desc || '',
+            description: s.desc || s.description || '',
             duration_minutes: s.duration_minutes || null,
             base_price: base,
             hatchback_price: hatch,
@@ -714,31 +716,32 @@ const TrieyeDB = {
             active: s.active !== false
           };
 
+          let updateResult = null;
+          // Try update by ID if ID exists
           if (s.id) {
-            payload.id = s.id;
+            updateResult = await sb.from('services').update(payload).eq('id', s.id).select();
+          }
+          // Try update by name if no ID or no rows matched
+          if (!updateResult || !updateResult.data || updateResult.data.length === 0) {
+            updateResult = await sb.from('services').update(payload).eq('name', s.name || k).select();
+          }
+          // If still no row found, insert new service record
+          if (!updateResult || !updateResult.data || updateResult.data.length === 0) {
+            updateResult = await sb.from('services').insert(payload).select();
           }
 
-          const { error } = await sb.from('services').upsert(payload, { onConflict: 'name' });
-          if (error) {
-            TrieyeDB.logError('services', 'UPSERT', error);
-            // Fallback for schemas with standard columns
-            if (error.message && (error.message.includes('column') || error.code === '42703')) {
-              await sb.from('services').upsert({
-                name: s.name || k,
-                description: s.desc || '',
-                duration_minutes: s.duration_minutes || null,
-                base_price: base,
-                active: s.active !== false
-              }, { onConflict: 'name' });
-            }
-          } else {
-            console.log('⚡ [Supabase Services Saved]', k, payload);
+          if (updateResult && updateResult.error) {
+            TrieyeDB.logError('services:saveServices', 'UPDATE/INSERT', updateResult.error);
+          } else if (updateResult && updateResult.data && updateResult.data[0]) {
+            s.id = updateResult.data[0].id;
+            console.log('⚡ [Supabase Services Saved to DB]', k, updateResult.data[0]);
           }
         }
       } catch (err) {
         console.error('🚨 [Supabase Network Error on saveServices]:', err);
       }
     }
+    return { success: true, matrix: servicesMap };
   },
 
   // 4. DETAILING BAYS

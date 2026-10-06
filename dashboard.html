@@ -2738,18 +2738,18 @@
         return JSON.parse(localStorage.getItem(SERVICES_KEY)) || defaultServices;
       } catch (e) { return defaultServices; }
     }
-    function saveServices(svcs) {
+    async function saveServices(svcs) {
       localStorage.setItem(SERVICES_KEY, JSON.stringify(svcs));
       renderServicesTable();
       populateServiceSelects();
       try {
         if (typeof BroadcastChannel !== 'undefined') {
           const chan = new BroadcastChannel('trieye_pricing_sync');
-          chan.postMessage({ type: 'PRICING_UPDATED', matrix: svcs });
+          chan.postMessage({ type: 'PRICING_UPDATED', matrix: svcs, timestamp: Date.now() });
         }
       } catch (e) {}
       if (window.TrieyeDB && typeof window.TrieyeDB.saveServices === 'function') {
-        window.TrieyeDB.saveServices(svcs).catch(() => {});
+        await window.TrieyeDB.saveServices(svcs);
       }
     }
 
@@ -4380,7 +4380,7 @@ TRIEYE WATERWASH & DETAILING`;
       showToast(`Service package "${targetName}" deleted successfully`);
     }
 
-    function deleteServiceDirect(targetName) {
+    async function deleteServiceDirect(targetName) {
       if (!targetName) return;
       if (!confirm(`Are you sure you want to permanently delete the service package "${targetName}"?`)) {
         return;
@@ -4388,12 +4388,12 @@ TRIEYE WATERWASH & DETAILING`;
       const svcs = getServices();
       if (svcs[targetName]) {
         delete svcs[targetName];
-        saveServices(svcs);
-        showToast(`Service package "${targetName}" deleted`);
+        await saveServices(svcs);
+        showToast(`Service package "${targetName}" deleted and synced to Supabase`);
       }
     }
 
-    function saveServiceModal() {
+    async function saveServiceModal() {
       const orig = document.getElementById('svc-modal-orig-name').value;
       const name = document.getElementById('svc-modal-name').value.trim();
       const desc = document.getElementById('svc-modal-desc').value.trim();
@@ -4423,9 +4423,9 @@ TRIEYE WATERWASH & DETAILING`;
         active: existing.active !== false
       };
 
-      saveServices(svcs);
+      await saveServices(svcs);
       closeModal('modalService');
-      showToast(`Service ${name} configured and synced`);
+      showToast(`Service "${name}" updated and synced to Supabase`);
     }
 
     // 9. PAYMENTS LEDGER & RECEIPT

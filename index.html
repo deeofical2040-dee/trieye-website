@@ -5129,6 +5129,16 @@
     });
   }
 
+  // Visibility & Focus listener for instant fresh pricing when returning to tab/app
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      syncFromSupabase();
+    }
+  });
+  window.addEventListener('focus', () => {
+    syncFromSupabase();
+  });
+
   // Cross-tab local storage sync listener
   window.addEventListener('storage', (e) => {
     if (e.key === 'trieye_services_matrix') {
