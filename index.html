@@ -862,161 +862,384 @@
     color:#ffffff;font-weight:600;line-height:1.2;text-shadow:0 1px 3px rgba(0,0,0,0.9);
   }
 
-  /* ---------- REAL GOOGLE REVIEWS SMOOTH SLIDER ---------- */
-  .sec-head-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-    margin-bottom: 24px;
+  /* ---------- REDESIGNED GOOGLE REVIEWS SECTION ---------- */
+  .google-reviews-redesign {
+    background-color: #ffffff;
+    padding: 80px 0 90px;
     width: 100%;
-    box-sizing: border-box;
-  }
-  .slider-nav-btns {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 8px;
-  }
-  .slider-nav-btn {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    border: 1px solid var(--line);
-    background: var(--bg-panel);
-    color: var(--text-primary);
-    font-size: 18px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-    box-shadow: 0 2px 8px var(--shadow-pop);
-  }
-  .slider-nav-btn:hover {
-    background: var(--pink);
-    color: #ffffff;
-    border-color: var(--pink);
-    transform: translateY(-2px);
-  }
-
-  .reviews-slider-wrapper {
-    width: 100%;
+    overflow: hidden;
     position: relative;
     box-sizing: border-box;
   }
+  
+  .reviews-top-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin-bottom: 48px;
+    padding: 0 20px;
+  }
 
-  .reviews-slider {
+  .g-badge-icon {
+    width: 54px;
+    height: 54px;
+    background: #ffffff;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.07), 0 2px 6px rgba(0, 0, 0, 0.04);
+    margin-bottom: 22px;
+    border: 1px solid rgba(0,0,0,0.04);
+  }
+
+  .g-heading-main {
+    font-family: 'Oswald', sans-serif;
+    font-size: 42px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: 0.02em;
+    color: #111827;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+  .g-heading-main .g-accent {
+    color: var(--pink);
+  }
+
+  .g-rating-stars {
+    display: flex;
+    gap: 4px;
+    color: #ff6b00;
+    font-size: 22px;
+    margin-bottom: 10px;
+    justify-content: center;
+  }
+
+  .g-rating-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    color: #4b5563;
+    margin-bottom: 24px;
+  }
+
+  .g-see-all-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: #111827;
+    color: #ffffff;
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 14px 28px;
+    border-radius: 9999px;
+    text-decoration: none;
+    transition: background-color 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease;
+    box-shadow: 0 4px 14px rgba(17, 24, 39, 0.15);
+  }
+  .g-see-all-btn:hover {
+    background: #1f2937;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(17, 24, 39, 0.22);
+    color: #ffffff;
+  }
+
+  /* Edge-to-edge Marquee Layout */
+  .reviews-marquee-section {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .marquee-row-wrapper {
+    width: 100%;
+    overflow: hidden;
+    position: relative;
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: pan-y;
+  }
+  .marquee-row-wrapper:active {
+    cursor: grabbing;
+  }
+
+  .marquee-row-track {
     display: flex;
     gap: 20px;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scroll-behavior: smooth;
-    -webkit-overflow-scrolling: touch;
-    padding: 6px 2px 14px;
-    width: 100%;
-    box-sizing: border-box;
-    scrollbar-width: none;
-  }
-  .reviews-slider::-webkit-scrollbar {
-    display: none;
+    width: max-content;
+    will-change: transform;
   }
 
-  .reviews-slider .review-card-link {
-    flex: 0 0 calc(33.333% - 14px);
-    min-width: 300px;
-    scroll-snap-align: start;
-    box-sizing: border-box;
+  .marquee-row-1 .marquee-row-track {
+    animation: marquee-left 45s linear infinite;
   }
 
-  @media (max-width: 1024px) {
-    .reviews-slider .review-card-link {
-      flex: 0 0 calc(50% - 10px);
-      min-width: 280px;
-    }
+  .marquee-row-2 .marquee-row-track {
+    animation: marquee-right 48s linear infinite;
   }
 
-  @media (max-width: 640px) {
-    .reviews-slider .review-card-link {
-      flex: 0 0 88%;
-      min-width: 260px;
-    }
+  .marquee-row-wrapper:hover .marquee-row-track,
+  .marquee-row-wrapper.is-interacting .marquee-row-track {
+    animation-play-state: paused !important;
   }
 
-  .review-card {
-    background: #ffffff;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    padding: 24px;
+  @keyframes marquee-left {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  @keyframes marquee-right {
+    0% { transform: translateX(-50%); }
+    100% { transform: translateX(0); }
+  }
+
+  /* Card Design Matching Reference Screenshot */
+  .g-review-card-item {
+    width: 380px;
+    flex-shrink: 0;
+    background: #f8f9fa;
+    border: 1px solid #edf0f3;
+    border-radius: 30px;
+    padding: 26px 28px 24px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: 100%;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
-    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.02);
     box-sizing: border-box;
-    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
   }
-  .review-card-link:hover .review-card {
+  .g-review-card-item:hover {
     transform: translateY(-4px);
-    border-color: #cbd5e1;
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+    border-color: #e2e8f0;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.06);
   }
 
-  .review-stars {
-    color: #f59e0b;
-    font-size: 16px;
-    letter-spacing: 2px;
-    margin-bottom: 10px;
+  .g-card-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 16px;
   }
-  .review-author-name {
+
+  .g-avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
     font-family: 'Inter', sans-serif;
     font-weight: 700;
-    font-size: 16px;
-    color: #111827;
-    margin-bottom: 2px;
-    line-height: 1.3;
+    font-size: 18px;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
-  .review-source {
+
+  .g-author-info {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .g-author-name {
+    font-family: 'Inter', sans-serif;
+    font-size: 15.5px;
+    font-weight: 700;
+    color: #111827;
+    line-height: 1.25;
+    margin-bottom: 3px;
+  }
+
+  .g-author-date {
     font-family: 'Inter', sans-serif;
     font-size: 12px;
-    color: #64748b;
-    display: flex;
-    align-items: center;
-    margin-bottom: 14px;
     font-weight: 500;
+    color: #9ca3af;
+    line-height: 1;
   }
-  .review-text {
-    font-family: 'Inter', sans-serif;
-    color: #1f2937;
+
+  .g-card-stars {
+    color: #ff6b00;
     font-size: 14px;
-    line-height: 1.6;
-    margin-bottom: 20px;
-    font-weight: 400;
-    word-break: break-word;
+    letter-spacing: 1px;
+    line-height: 1;
   }
-  .review-card-footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-top: 14px;
-    border-top: 1px solid #f1f5f9;
+
+  .g-card-body-text {
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    line-height: 1.55;
+    color: #4b5563;
+    font-weight: 400;
+    margin-bottom: 20px;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .g-read-more-btn {
+    background: none;
+    border: none;
+    color: #111827;
     font-family: 'Inter', sans-serif;
     font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    padding: 0;
+    margin-top: 4px;
+    display: inline-block;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    transition: color 0.2s ease;
+  }
+  .g-read-more-btn:hover {
+    color: var(--pink);
+  }
+
+  .g-card-footer-branding {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'Inter', sans-serif;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: #9ca3af;
+    text-transform: uppercase;
     margin-top: auto;
   }
-  .review-date {
-    color: #64748b;
-    font-weight: 500;
-  }
-  .review-google-link {
-    color: #ee2f76;
-    font-weight: 600;
-    font-size: 12.5px;
-    display: inline-flex;
+
+  /* Full Review Read More Modal */
+  .review-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 99999;
+    display: flex;
     align-items: center;
-    gap: 4px;
-    letter-spacing: 0.02em;
-    transition: color 0.2s ease;
+    justify-content: center;
+    padding: 20px;
+    box-sizing: border-box;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+  }
+  .review-modal-backdrop.open {
+    opacity: 1;
+    visibility: visible;
+  }
+  .review-modal-box {
+    background: #ffffff;
+    border-radius: 28px;
+    padding: 32px 30px 28px;
+    max-width: 540px;
+    width: 100%;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
+    border: 1px solid #edf0f3;
+    position: relative;
+    box-sizing: border-box;
+    transform: scale(0.95);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  .review-modal-backdrop.open .review-modal-box {
+    transform: scale(1);
+  }
+  .review-modal-close {
+    position: absolute;
+    top: 18px;
+    right: 20px;
+    background: #f1f3f5;
+    border: none;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    font-size: 16px;
+    font-weight: 700;
+    color: #4b5563;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, color 0.2s;
+  }
+  .review-modal-close:hover {
+    background: #e2e8f0;
+    color: #111827;
+  }
+
+  /* Responsive Mobile Styling */
+  @media (max-width: 768px) {
+    .google-reviews-redesign {
+      padding: 50px 0 60px;
+    }
+    .reviews-top-container {
+      margin-bottom: 32px;
+    }
+    .g-heading-main {
+      font-size: 30px;
+    }
+    .g-badge-icon {
+      width: 46px;
+      height: 46px;
+      margin-bottom: 16px;
+      border-radius: 12px;
+    }
+    .g-rating-stars {
+      font-size: 19px;
+    }
+    .g-rating-text {
+      font-size: 13.5px;
+      margin-bottom: 20px;
+    }
+    .g-see-all-btn {
+      padding: 12px 24px;
+      font-size: 12.5px;
+    }
+
+    /* Single row marquee on mobile with easy horizontal touch swipe */
+    .marquee-row-2 {
+      display: none;
+    }
+    .g-review-card-item {
+      width: 295px;
+      padding: 22px 22px 20px;
+      border-radius: 24px;
+    }
+    .g-author-name {
+      font-size: 14.5px;
+    }
+    .g-card-body-text {
+      font-size: 13px;
+      -webkit-line-clamp: 5;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .marquee-row-track {
+      animation: none !important;
+      transform: none !important;
+    }
+    .marquee-row-wrapper {
+      overflow-x: auto;
+    }
   }
   .review-card-link:hover .review-google-link {
     color: #dc2626;
@@ -3403,173 +3626,390 @@
   </div>
 </section>
 
-<section id="gallery">
+<section id="gallery" class="gallery-showcase-section">
   <div class="wrap">
-    <div class="sec-head reveal-element">
-      <div class="sec-tag reveal-element reveal-text">Studio Craftsmanship</div>
-      <h2>The work speaks for itself</h2>
-      <p>Precision before/after transformations from our Chennai detailing studio.</p>
+    <!-- GALLERY TOP HEADER -->
+    <div class="gallery-header-row reveal-element">
+      <div class="gallery-sub-tag">TRIEYE DETAILING STUDIO</div>
+      <h2 class="gallery-main-heading">STUDIO <span class="gallery-accent">GALLERY</span></h2>
+      <p class="gallery-desc">A glimpse inside our detailing studio, craftsmanship and completed transformations.</p>
     </div>
-    <div class="gallery-grid">
-      <div class="g-card reveal-card">
-        <img src="assets/foam-wash.jpg" alt="Professional snow foam exterior car wash at TRIEYE Detailing Studio" loading="lazy" decoding="async">
-        <div class="g-overlay">
-          <div class="g-tag">01 / Exterior Wash</div>
-          <div class="g-lbl">Snow Foam Pre-Wash &amp; Decon</div>
+
+    <!-- GALLERY 3-CARD CAROUSEL VIEWPORT -->
+    <div class="gallery-carousel-container" id="galleryCarousel">
+      <!-- NAVIGATION ARROWS -->
+      <button class="gallery-nav-btn gallery-prev" id="galleryPrevBtn" aria-label="Previous Gallery Item" type="button">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+      <button class="gallery-nav-btn gallery-next" id="galleryNextBtn" aria-label="Next Gallery Item" type="button">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg>
+      </button>
+
+      <!-- CAROUSEL TRACK -->
+      <div class="gallery-viewport">
+        <div class="gallery-track" id="galleryTrack">
+
+          <!-- CARD 1 -->
+          <div class="gallery-card is-active" data-index="0">
+            <div class="gallery-card-inner">
+              <img src="assets/foam-wash.jpg" alt="Snow Foam Pre-Wash and Decon at TRIEYE Detailing Studio" loading="lazy" decoding="async">
+              <div class="gallery-card-bottom">
+                <div class="gallery-item-tag">01 / FOAM WASH</div>
+                <h3 class="gallery-item-title">HIGH-DENSITY SNOW FOAM &amp; DECON</h3>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 2 -->
+          <div class="gallery-card is-next" data-index="1">
+            <div class="gallery-card-inner">
+              <img src="assets/rubbing-polish.jpg" alt="Dual-Action Paint Correction Rubbing Polish" loading="lazy" decoding="async">
+              <div class="gallery-card-bottom">
+                <div class="gallery-item-tag">02 / PAINT CORRECTION</div>
+                <h3 class="gallery-item-title">DUAL-ACTION MACHINE POLISHING</h3>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 3 -->
+          <div class="gallery-card is-hidden-right" data-index="2">
+            <div class="gallery-card-inner">
+              <img src="assets/interior-clean.jpg" alt="Interior Detailing Steam Extraction and Leather Spa" loading="lazy" decoding="async">
+              <div class="gallery-card-bottom">
+                <div class="gallery-item-tag">03 / INTERIOR DETAILING</div>
+                <h3 class="gallery-item-title">DEEP STEAM EXTRACTION &amp; LEATHER SPA</h3>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 4 -->
+          <div class="gallery-card is-hidden-right" data-index="3">
+            <div class="gallery-card-inner">
+              <img src="assets/ceramic-coating.jpg" alt="Hydrophobic 9H Ceramic Coating Protection" loading="lazy" decoding="async">
+              <div class="gallery-card-bottom">
+                <div class="gallery-item-tag">04 / CERAMIC COATING</div>
+                <h3 class="gallery-item-title">9H HYDROPHOBIC SURFACE SHIELD</h3>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 5 -->
+          <div class="gallery-card is-hidden-right" data-index="4">
+            <div class="gallery-card-inner">
+              <img src="assets/ppf/ppf-installation.jpg" alt="Paint Protection Film Installation at TRIEYE Studio" loading="lazy" decoding="async">
+              <div class="gallery-card-bottom">
+                <div class="gallery-item-tag">05 / PPF INSTALLATION</div>
+                <h3 class="gallery-item-title">PRECISION PAINT PROTECTION FILM</h3>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 6 -->
+          <div class="gallery-card is-hidden-right" data-index="5">
+            <div class="gallery-card-inner">
+              <img src="assets/graphene/graphene-workmanship.jpg" alt="Precision Graphene Matrix Coating Application and Inspection" loading="lazy" decoding="async">
+              <div class="gallery-card-bottom">
+                <div class="gallery-item-tag">06 / GRAPHENE MATRIX</div>
+                <h3 class="gallery-item-title">PRECISION APPLICATION &amp; FINISH</h3>
+              </div>
+            </div>
+          </div>
+
+          <!-- CARD 7 -->
+          <div class="gallery-card is-prev" data-index="6">
+            <div class="gallery-card-inner">
+              <img src="assets/bike/bike-detail-finish.jpg" alt="Superbike Detailing and Hand Polishing at TRIEYE Studio" loading="lazy" decoding="async">
+              <div class="gallery-card-bottom">
+                <div class="gallery-item-tag">07 / SUPERBIKE DETAILING</div>
+                <h3 class="gallery-item-title">FULL MOTORCYCLE RESTORATION</h3>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
-      <a href="/paint-correction" class="g-card reveal-card" style="display: block; text-decoration: none;">
-        <img src="assets/rubbing-polish.jpg" alt="Car paint correction and polishing service" loading="lazy" decoding="async">
-        <div class="g-overlay">
-          <div class="g-tag">02 / Paint Correction</div>
-          <div class="g-lbl">Dual-Action Rubbing Polish</div>
-        </div>
-      </a>
-      <a href="/interior-detailing" class="g-card reveal-card" style="display: block; text-decoration: none;">
-        <img src="assets/interior-clean.jpg" alt="Car interior detailing service" loading="lazy" decoding="async">
-        <div class="g-overlay">
-          <div class="g-tag">03 / Interior Spa</div>
-          <div class="g-lbl">Steam Extraction &amp; Leather Feed</div>
-        </div>
-      </a>
-      <a href="/ceramic-coating" class="g-card reveal-card" style="display: block; text-decoration: none;">
-        <img src="assets/ceramic-coating.jpg" alt="Ceramic coating service" loading="lazy" decoding="async">
-        <div class="g-overlay">
-          <div class="g-tag">04 / Protection</div>
-          <div class="g-lbl">Hydrophobic Ceramic Shield</div>
-        </div>
-      </a>
+
+      <!-- PAGINATION DOTS -->
+      <div class="gallery-dots" id="galleryDots">
+        <button class="gallery-dot active" data-index="0" aria-label="Slide 1"></button>
+        <button class="gallery-dot" data-index="1" aria-label="Slide 2"></button>
+        <button class="gallery-dot" data-index="2" aria-label="Slide 3"></button>
+        <button class="gallery-dot" data-index="3" aria-label="Slide 4"></button>
+        <button class="gallery-dot" data-index="4" aria-label="Slide 5"></button>
+        <button class="gallery-dot" data-index="5" aria-label="Slide 6"></button>
+        <button class="gallery-dot" data-index="6" aria-label="Slide 7"></button>
+      </div>
     </div>
   </div>
 </section>
 
-<section id="reviews">
-  <div class="wrap">
-    <div class="sec-head-row">
-      <div class="sec-head reveal-element" style="margin-bottom:0;">
-        <div class="sec-tag reveal-element reveal-text">REAL CUSTOMER REVIEWS</div>
-        <h2>LOVED BY OUR CUSTOMERS</h2>
-        <p>Real experiences from customers who trust TRIEYE with their vehicles.</p>
-      </div>
-      <div class="slider-nav-btns">
-        <button type="button" class="slider-nav-btn" onclick="slideReviews(-1)" aria-label="Previous Reviews">←</button>
-        <button type="button" class="slider-nav-btn" onclick="slideReviews(1)" aria-label="Next Reviews">→</button>
+<section id="reviews" class="google-reviews-redesign">
+  <div class="reviews-top-container reveal-element">
+    <div class="g-badge-icon">
+      <svg width="28" height="28" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
+    </div>
+    <h2 class="g-heading-main">GOOGLE <span class="g-accent">REVIEWS</span></h2>
+    <div class="g-rating-stars">★★★★★</div>
+    <div class="g-rating-text">4.9/5 average · Google reviews</div>
+    <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="g-see-all-btn">SEE ALL REVIEWS &rarr;</a>
+  </div>
+
+  <div class="reviews-marquee-section">
+    <!-- Row 1: Smooth Left Infinite Auto-Scroll -->
+    <div class="marquee-row-wrapper marquee-row-1" id="marqueeRow1">
+      <div class="marquee-row-track">
+        <!-- Original Set Row 1 -->
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="g-review-card-item">
+          <div>
+            <div class="g-card-header">
+              <div class="g-avatar" style="background:#0d9488;">B</div>
+              <div class="g-author-info">
+                <div class="g-author-name">Bhoovaragan Venugopal</div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <div class="g-card-stars">★★★★★</div>
+                  <span class="g-author-date">2 months ago</span>
+                </div>
+              </div>
+            </div>
+            <p class="g-card-body-text">"Mr. Anand and his team did a amazing job and that too during the closing time. They accommodated my request and made sure every inch is clean and polished without hurrying the customer request. The approach towards customer is excellent and they are new in a prime place..."</p>
+            <button type="button" class="g-read-more-btn" onclick="openReviewModal(event, 'Bhoovaragan Venugopal', 'B', '#0d9488', '2 months ago', '&ldquo;Mr. Anand and his team did a amazing job and that too during the closing time. They accommodated my request and made sure every inch is clean and polished without hurrying the customer request. The approach towards customer is excellent and they are new in a prime place. Even at night time around 8.30pm they are doing fantastic job towards customers request. The team is very humble and understands customers situations and do not force anything on them. They also wax polished the car and polished the car glasses as a value addition when I told them I travelling to bangalore in highway. The thought towards the customer counts. Job well done. Very satisfied with your service and care.&rdquo;')">Read more</button>
+          </div>
+          <div class="g-card-footer-branding">
+            <svg width="14" height="14" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
+            GOOGLE · CHENNAI
+          </div>
+        </a>
+
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="g-review-card-item">
+          <div>
+            <div class="g-card-header">
+              <div class="g-avatar" style="background:#0284c7;">S</div>
+              <div class="g-author-info">
+                <div class="g-author-name">Sathish Kumar</div>
+                <div class="g-card-stars">★★★★★</div>
+              </div>
+            </div>
+            <p class="g-card-body-text">"Went here for the first time to was my XUV 700 .. the team here is dedicated and clean the car in detail .. they also have a AC waiting area which is very comfortable."</p>
+          </div>
+          <div class="g-card-footer-branding">
+            <svg width="14" height="14" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
+            GOOGLE · CHENNAI
+          </div>
+        </a>
+
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="g-review-card-item">
+          <div>
+            <div class="g-card-header">
+              <div class="g-avatar" style="background:#16a34a;">G</div>
+              <div class="g-author-info">
+                <div class="g-author-name">Ganeshjr</div>
+                <div class="g-card-stars">★★★★★</div>
+              </div>
+            </div>
+            <p class="g-card-body-text">"Done a foam wash for my MT15 they did awesome and good customer attention highly recommend worth for money ,👍💪🩵"</p>
+          </div>
+          <div class="g-card-footer-branding">
+            <svg width="14" height="14" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
+            GOOGLE · CHENNAI
+          </div>
+        </a>
+
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="g-review-card-item">
+          <div>
+            <div class="g-card-header">
+              <div class="g-avatar" style="background:#ee2f76;">J</div>
+              <div class="g-author-info">
+                <div class="g-author-name">Jaikrishna</div>
+                <div class="g-card-stars">★★★★★</div>
+              </div>
+            </div>
+            <p class="g-card-body-text">"Excellent service and professional work. My vehicle looks clean and shiny after detailing. Friendly staff, good attention to detail, and reasonable pricing. Highly recommended!"</p>
+          </div>
+          <div class="g-card-footer-branding">
+            <svg width="14" height="14" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
+            GOOGLE · CHENNAI
+          </div>
+        </a>
+
+        <!-- Duplicate Set Row 1 for Seamless Loop -->
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="g-review-card-item">
+          <div>
+            <div class="g-card-header">
+              <div class="g-avatar" style="background:#0d9488;">B</div>
+              <div class="g-author-info">
+                <div class="g-author-name">Bhoovaragan Venugopal</div>
+                <div style="display:flex;align-items:center;gap:6px;">
+                  <div class="g-card-stars">★★★★★</div>
+                  <span class="g-author-date">2 months ago</span>
+                </div>
+              </div>
+            </div>
+            <p class="g-card-body-text">"Mr. Anand and his team did a amazing job and that too during the closing time. They accommodated my request and made sure every inch is clean and polished without hurrying the customer request. The approach towards customer is excellent and they are new in a prime place..."</p>
+            <button type="button" class="g-read-more-btn" onclick="openReviewModal(event, 'Bhoovaragan Venugopal', 'B', '#0d9488', '2 months ago', '&ldquo;Mr. Anand and his team did a amazing job and that too during the closing time. They accommodated my request and made sure every inch is clean and polished without hurrying the customer request. The approach towards customer is excellent and they are new in a prime place. Even at night time around 8.30pm they are doing fantastic job towards customers request. The team is very humble and understands customers situations and do not force anything on them. They also wax polished the car and polished the car glasses as a value addition when I told them I travelling to bangalore in highway. The thought towards the customer counts. Job well done. Very satisfied with your service and care.&rdquo;')">Read more</button>
+          </div>
+          <div class="g-card-footer-branding">
+            <svg width="14" height="14" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
+            GOOGLE · CHENNAI
+          </div>
+        </a>
+
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="g-review-card-item">
+          <div>
+            <div class="g-card-header">
+              <div class="g-avatar" style="background:#0284c7;">S</div>
+              <div class="g-author-info">
+                <div class="g-author-name">Sathish Kumar</div>
+                <div class="g-card-stars">★★★★★</div>
+              </div>
+            </div>
+            <p class="g-card-body-text">"Went here for the first time to was my XUV 700 .. the team here is dedicated and clean the car in detail .. they also have a AC waiting area which is very comfortable."</p>
+          </div>
+          <div class="g-card-footer-branding">
+            <svg width="14" height="14" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
+            GOOGLE · CHENNAI
+          </div>
+        </a>
+
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="g-review-card-item">
+          <div>
+            <div class="g-card-header">
+              <div class="g-avatar" style="background:#16a34a;">G</div>
+              <div class="g-author-info">
+                <div class="g-author-name">Ganeshjr</div>
+                <div class="g-card-stars">★★★★★</div>
+              </div>
+            </div>
+            <p class="g-card-body-text">"Done a foam wash for my MT15 they did awesome and good customer attention highly recommend worth for money ,👍💪🩵"</p>
+          </div>
+          <div class="g-card-footer-branding">
+            <svg width="14" height="14" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
+            GOOGLE · CHENNAI
+          </div>
+        </a>
+
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="g-review-card-item">
+          <div>
+            <div class="g-card-header">
+              <div class="g-avatar" style="background:#ee2f76;">J</div>
+              <div class="g-author-info">
+                <div class="g-author-name">Jaikrishna</div>
+                <div class="g-card-stars">★★★★★</div>
+              </div>
+            </div>
+            <p class="g-card-body-text">"Excellent service and professional work. My vehicle looks clean and shiny after detailing. Friendly staff, good attention to detail, and reasonable pricing. Highly recommended!"</p>
+          </div>
+          <div class="g-card-footer-branding">
+            <svg width="14" height="14" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
+            GOOGLE · CHENNAI
+          </div>
+        </a>
       </div>
     </div>
-    
-    <div class="reviews-slider-wrapper">
-      <div class="reviews-slider" id="reviewsSlider">
-        <!-- REVIEW 01: Sathish Kumar -->
-        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="review-card-link reveal-card">
-          <div class="review-card reveal-card">
-            <div>
-              <div class="review-stars">★★★★★</div>
-              <div class="review-author-name">Sathish Kumar</div>
-              <div class="review-source">
-                <svg width="14" height="14" viewBox="0 0 24 24" style="margin-right:4px; flex-shrink:0;"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
-                Google Review
+
+    <!-- Row 2: Smooth Right Infinite Auto-Scroll -->
+    <div class="marquee-row-wrapper marquee-row-2" id="marqueeRow2">
+      <div class="marquee-row-track">
+        <!-- Original Set Row 2 -->
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="g-review-card-item">
+          <div>
+            <div class="g-card-header">
+              <div class="g-avatar" style="background:#2563eb;">R</div>
+              <div class="g-author-info">
+                <div class="g-author-name">Raj Sharan</div>
+                <div class="g-card-stars">★★★★★</div>
               </div>
-              <p class="review-text">Went here for the first time to was my XUV 700 .. the team here is dedicated and clean the car in detail .. they also have a AC waiting area which is very comfortable.</p>
             </div>
-            <div class="review-card-footer reveal-card">
-              <span class="review-date">3 months ago</span>
-              <span class="review-google-link">VIEW ON GOOGLE <span class="arrow">→</span></span>
-            </div>
+            <p class="g-card-body-text">"The service is really good and affordable it's a new shop and a new experience for me and a must visit place"</p>
+          </div>
+          <div class="g-card-footer-branding">
+            <svg width="14" height="14" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
+            GOOGLE · CHENNAI
           </div>
         </a>
 
-        <!-- REVIEW 02: Ganeshjr -->
-        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="review-card-link reveal-card">
-          <div class="review-card reveal-card">
-            <div>
-              <div class="review-stars">★★★★★</div>
-              <div class="review-author-name">Ganeshjr</div>
-              <div class="review-source">
-                <svg width="14" height="14" viewBox="0 0 24 24" style="margin-right:4px; flex-shrink:0;"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
-                Google Review
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="g-review-card-item">
+          <div>
+            <div class="g-card-header">
+              <div class="g-avatar" style="background:#ea580c;">P</div>
+              <div class="g-author-info">
+                <div class="g-author-name">Pon Vijay</div>
+                <div class="g-card-stars">★★★★★</div>
               </div>
-              <p class="review-text">Done a foam wash for my MT15 they did awesome and good customer attention highly recommend worth for money ,👍💪🩵 …</p>
             </div>
-            <div class="review-card-footer reveal-card">
-              <span class="review-date">3 months ago</span>
-              <span class="review-google-link">VIEW ON GOOGLE <span class="arrow">→</span></span>
-            </div>
+            <p class="g-card-body-text">"Excellent car wash service! My car looks absolutely brand new after the wash. The team was very professional and paid attention to every detail."</p>
+          </div>
+          <div class="g-card-footer-branding">
+            <svg width="14" height="14" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
+            GOOGLE · CHENNAI
           </div>
         </a>
 
-        <!-- REVIEW 03: Jaikrishna -->
-        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="review-card-link reveal-card">
-          <div class="review-card reveal-card">
-            <div>
-              <div class="review-stars">★★★★★</div>
-              <div class="review-author-name">Jaikrishna</div>
-              <div class="review-source">
-                <svg width="14" height="14" viewBox="0 0 24 24" style="margin-right:4px; flex-shrink:0;"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
-                Google Review
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="g-review-card-item">
+          <div>
+            <div class="g-card-header">
+              <div class="g-avatar" style="background:#7c3aed;">S</div>
+              <div class="g-author-info">
+                <div class="g-author-name">Sathish103 C</div>
+                <div class="g-card-stars">★★★★★</div>
               </div>
-              <p class="review-text">"Excellent service and professional work. My vehicle looks clean and shiny after detailing. Friendly staff, good attention to detail, and reasonable pricing. Highly recommended!" ⭐⭐⭐⭐⭐</p>
             </div>
-            <div class="review-card-footer reveal-card">
-              <span class="review-date">3 months ago</span>
-              <span class="review-google-link">VIEW ON GOOGLE <span class="arrow">→</span></span>
-            </div>
+            <p class="g-card-body-text">"People handling the car very well, it's very clean after foam wash. Must visit place"</p>
+          </div>
+          <div class="g-card-footer-branding">
+            <svg width="14" height="14" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
+            GOOGLE · CHENNAI
           </div>
         </a>
 
-        <!-- REVIEW 04: Raj Sharan -->
-        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="review-card-link reveal-card">
-          <div class="review-card reveal-card">
-            <div>
-              <div class="review-stars">★★★★★</div>
-              <div class="review-author-name">Raj Sharan</div>
-              <div class="review-source">
-                <svg width="14" height="14" viewBox="0 0 24 24" style="margin-right:4px; flex-shrink:0;"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
-                Google Review
+        <!-- Duplicate Set Row 2 for Seamless Loop -->
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="g-review-card-item">
+          <div>
+            <div class="g-card-header">
+              <div class="g-avatar" style="background:#2563eb;">R</div>
+              <div class="g-author-info">
+                <div class="g-author-name">Raj Sharan</div>
+                <div class="g-card-stars">★★★★★</div>
               </div>
-              <p class="review-text">The service is  really good and affordable it’s a new shop and a new experience for me and a must visit place</p>
             </div>
-            <div class="review-card-footer reveal-card">
-              <span class="review-date">4 months ago</span>
-              <span class="review-google-link">VIEW ON GOOGLE <span class="arrow">→</span></span>
-            </div>
+            <p class="g-card-body-text">"The service is really good and affordable it's a new shop and a new experience for me and a must visit place"</p>
+          </div>
+          <div class="g-card-footer-branding">
+            <svg width="14" height="14" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
+            GOOGLE · CHENNAI
           </div>
         </a>
 
-        <!-- REVIEW 05: Pon Vijay -->
-        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="review-card-link reveal-card">
-          <div class="review-card reveal-card">
-            <div>
-              <div class="review-stars">★★★★★</div>
-              <div class="review-author-name">Pon Vijay</div>
-              <div class="review-source">
-                <svg width="14" height="14" viewBox="0 0 24 24" style="margin-right:4px; flex-shrink:0;"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
-                Google Review
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="g-review-card-item">
+          <div>
+            <div class="g-card-header">
+              <div class="g-avatar" style="background:#ea580c;">P</div>
+              <div class="g-author-info">
+                <div class="g-author-name">Pon Vijay</div>
+                <div class="g-card-stars">★★★★★</div>
               </div>
-              <p class="review-text">"Excellent car wash service! My car looks absolutely brand new after the wash. The team was very professional and paid attention to every detail. I was especially impressed that they used high-quality branded materials for the foam wash and interior cleaning. The cleaning quality, shine, and freshness inside the car were outstanding. Highly recommended for anyone looking for premium car care service!"</p>
             </div>
-            <div class="review-card-footer reveal-card">
-              <span class="review-date">4 months ago</span>
-              <span class="review-google-link">VIEW ON GOOGLE <span class="arrow">→</span></span>
-            </div>
+            <p class="g-card-body-text">"Excellent car wash service! My car looks absolutely brand new after the wash. The team was very professional and paid attention to every detail."</p>
+          </div>
+          <div class="g-card-footer-branding">
+            <svg width="14" height="14" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
+            GOOGLE · CHENNAI
           </div>
         </a>
 
-        <!-- REVIEW 06: Sathish103 C -->
-        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="review-card-link reveal-card">
-          <div class="review-card reveal-card">
-            <div>
-              <div class="review-stars">★★★★★</div>
-              <div class="review-author-name">Sathish103 C</div>
-              <div class="review-source">
-                <svg width="14" height="14" viewBox="0 0 24 24" style="margin-right:4px; flex-shrink:0;"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
-                Google Review
+        <a href="https://www.google.com/maps/search/?api=1&amp;query=TRIEYE%20Detailing%20Studio%2C%201st%2C%2019%2C%206th%20Street%2C%20Main%20Rd%2C%20Baba%20Nagar%2C%20Villivakkam%2C%20Chennai%2C%20Tamil%20Nadu%20600049" target="_blank" rel="noopener noreferrer" class="g-review-card-item">
+          <div>
+            <div class="g-card-header">
+              <div class="g-avatar" style="background:#7c3aed;">S</div>
+              <div class="g-author-info">
+                <div class="g-author-name">Sathish103 C</div>
+                <div class="g-card-stars">★★★★★</div>
               </div>
-              <p class="review-text">"People handling the car very well,it's very clean after foamwash.must vist place"</p>
             </div>
-            <div class="review-card-footer reveal-card">
-              <span class="review-date">3 months ago</span>
-              <span class="review-google-link">VIEW ON GOOGLE <span class="arrow">→</span></span>
-            </div>
+            <p class="g-card-body-text">"People handling the car very well, it's very clean after foam wash. Must visit place"</p>
+          </div>
+          <div class="g-card-footer-branding">
+            <svg width="14" height="14" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
+            GOOGLE · CHENNAI
           </div>
         </a>
       </div>
@@ -4609,6 +5049,30 @@
   });
 </script>
 
+<!-- GOOGLE REVIEW FULL TEXT MODAL -->
+<div class="review-modal-backdrop" id="reviewModalBackdrop" aria-hidden="true">
+  <div class="review-modal-box">
+    <button class="review-modal-close" id="reviewModalClose" aria-label="Close Review">&times;</button>
+    <div class="g-card-header" style="margin-bottom:14px;">
+      <div class="g-avatar" id="reviewModalAvatar" style="background:#0d9488;">B</div>
+      <div class="g-author-info">
+        <div class="g-author-name" id="reviewModalAuthor">Bhoovaragan Venugopal</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-top:2px;">
+          <div class="g-card-stars">★★★★★</div>
+          <span class="g-author-date" id="reviewModalDate">2 months ago</span>
+        </div>
+      </div>
+    </div>
+    <div style="font-family:'Inter',sans-serif;font-size:14px;line-height:1.65;color:#374151;margin-bottom:20px;white-space:pre-line;" id="reviewModalBody">
+      <!-- Full text injected dynamically -->
+    </div>
+    <div class="g-card-footer-branding" style="padding-top:12px;border-top:1px solid #f1f5f9;">
+      <svg width="14" height="14" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z" fill="#EA4335"/></svg>
+      GOOGLE · CHENNAI
+    </div>
+  </div>
+</div>
+
 <!-- NEXT.JS DEV ISSUE INDICATOR PILL -->
 <div class="nextjs-indicator-pill" id="nextjsIndicatorPill" title="Next.js Issues & Compile Status">
   <div class="nextjs-indicator-icon">
@@ -4743,54 +5207,99 @@
   const selectedTheme = 'light';
   console.log('Initial theme:', selectedTheme);
 
-  // Smooth Google Reviews Slider Controller with Auto-Slide
-  (function initReviewsAutoSlide() {
-    const slider = document.getElementById('reviewsSlider');
-    if (!slider) return;
+  // Redesigned Google Reviews Interactive Touch & Drag Marquee Controller
+  (function initReviewsMarqueeController() {
+    const wrappers = document.querySelectorAll('.marquee-row-wrapper');
+    wrappers.forEach(wrapper => {
+      let isDown = false;
+      let startX = 0;
+      let scrollLeft = 0;
 
-    let autoSlideInterval = null;
-    const intervalTime = 3500; // 3.5 seconds auto slide
+      wrapper.addEventListener('mouseenter', () => {
+        wrapper.classList.add('is-interacting');
+      });
 
-    function nextSlide() {
-      const card = slider.querySelector('.review-card-link');
-      const step = card ? card.offsetWidth + 20 : 360;
-      // Loop back to start if reached end
-      if (Math.ceil(slider.scrollLeft + slider.clientWidth) >= slider.scrollWidth - 10) {
-        slider.scrollTo({ left: 0, behavior: 'smooth' });
-      } else {
-        slider.scrollBy({ left: step, behavior: 'smooth' });
+      wrapper.addEventListener('mouseleave', () => {
+        isDown = false;
+        wrapper.classList.remove('is-interacting');
+      });
+
+      wrapper.addEventListener('mousedown', (e) => {
+        isDown = true;
+        wrapper.classList.add('is-interacting');
+        startX = e.pageX - wrapper.offsetLeft;
+        scrollLeft = wrapper.scrollLeft;
+      });
+
+      wrapper.addEventListener('mouseup', () => {
+        isDown = false;
+        wrapper.classList.remove('is-interacting');
+      });
+
+      wrapper.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - wrapper.offsetLeft;
+        const walk = (x - startX) * 1.5;
+        wrapper.scrollLeft = scrollLeft - walk;
+      });
+
+      wrapper.addEventListener('touchstart', () => {
+        wrapper.classList.add('is-interacting');
+      }, { passive: true });
+
+      wrapper.addEventListener('touchend', () => {
+        wrapper.classList.remove('is-interacting');
+      }, { passive: true });
+    });
+
+    // Review Modal Open & Close Handler
+    const reviewModal = document.getElementById('reviewModalBackdrop');
+    const reviewModalClose = document.getElementById('reviewModalClose');
+    const reviewModalAuthor = document.getElementById('reviewModalAuthor');
+    const reviewModalAvatar = document.getElementById('reviewModalAvatar');
+    const reviewModalDate = document.getElementById('reviewModalDate');
+    const reviewModalBody = document.getElementById('reviewModalBody');
+
+    window.openReviewModal = function(e, author, avatarLetter, avatarBg, date, fullText) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
       }
-    }
-
-    function startAutoSlide() {
-      stopAutoSlide();
-      autoSlideInterval = setInterval(nextSlide, intervalTime);
-    }
-
-    function stopAutoSlide() {
-      if (autoSlideInterval) {
-        clearInterval(autoSlideInterval);
-        autoSlideInterval = null;
+      if (reviewModalAuthor) reviewModalAuthor.innerText = author;
+      if (reviewModalAvatar) {
+        reviewModalAvatar.innerText = avatarLetter;
+        reviewModalAvatar.style.background = avatarBg;
       }
-    }
-
-    // Manual navigation button click handler
-    window.slideReviews = function(dir) {
-      stopAutoSlide();
-      const card = slider.querySelector('.review-card-link');
-      const step = card ? card.offsetWidth + 20 : 360;
-      slider.scrollBy({ left: dir * step, behavior: 'smooth' });
-      startAutoSlide(); // Resume timer after manual click
+      if (reviewModalDate) reviewModalDate.innerText = date;
+      if (reviewModalBody) reviewModalBody.innerHTML = fullText;
+      if (reviewModal) {
+        reviewModal.classList.add('open');
+        reviewModal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+      }
     };
 
-    // Pause on hover or touch/swipe
-    slider.parentElement.addEventListener('mouseenter', stopAutoSlide);
-    slider.parentElement.addEventListener('mouseleave', startAutoSlide);
-    slider.parentElement.addEventListener('touchstart', stopAutoSlide, { passive: true });
-    slider.parentElement.addEventListener('touchend', startAutoSlide, { passive: true });
+    function closeReviewModal() {
+      if (reviewModal) {
+        reviewModal.classList.remove('open');
+        reviewModal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+      }
+    }
 
-    // Start auto slide on init
-    startAutoSlide();
+    if (reviewModalClose) reviewModalClose.addEventListener('click', closeReviewModal);
+    if (reviewModal) {
+      reviewModal.addEventListener('click', (e) => {
+        if (e.target === reviewModal) closeReviewModal();
+      });
+    }
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && reviewModal && reviewModal.classList.contains('open')) {
+        closeReviewModal();
+      }
+    });
   })();
 </script>
 
@@ -4862,5 +5371,6 @@
 
   <script src="assets/animations.js" defer></script>
   <script src="assets/scroll-reveal.js" defer></script>
+  <script src="assets/gallery-carousel.js" defer></script>
 </body>
 </html>

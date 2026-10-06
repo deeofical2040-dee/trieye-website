@@ -1,4 +1,4 @@
-  :root {
+:root {
     --bg: #ffffff;
     --bg-panel: #ffffff;
     --bg-panel-2: #f8f9fa;
@@ -4075,26 +4075,16 @@ header nav {
 }
 
 /* ==================================================
-   TRIEYE FOUR-CONCEPT SCROLL INTERACTION SYSTEM
-   01. REVEAL (Clip / Mask vertical & directional reveal)
-   02. HORIZONTAL SPLIT (Opposite side edge entrances)
-   03. HORIZONTAL CARD SPREAD (Slight opening effect for card rows)
-   04. MORPH (Selective frame shape transformation on major visual sections)
+   TRIEYE PREMIUM SCROLL INTERACTION & REVEAL SYSTEM
+   - Sequential text reveals (Eyebrow -> Heading -> Paragraph -> Buttons)
+   - Left / Right directional split entrances
+   - Enhanced Image entrances with scale + directional translation
+   - High-performance CSS transforms & opacity only
+   - Full reduced motion support
    ================================================== */
 
 @media (prefers-reduced-motion: reduce) {
-  .js-reveal-active .reveal-text,
-  .js-reveal-active .reveal-left-text,
-  .js-reveal-active .reveal-right-text,
-  .js-reveal-active .reveal-up,
-  .js-reveal-active .reveal-left,
-  .js-reveal-active .reveal-right,
-  .js-reveal-active .reveal-element,
-  .js-reveal-active .reveal-mask,
-  .js-reveal-active .reveal-card-left,
-  .js-reveal-active .reveal-card-right,
-  .js-reveal-active .reveal-card-up,
-  .js-reveal-active .reveal-morph {
+  .js-reveal-active * {
     opacity: 1 !important;
     transform: none !important;
     clip-path: none !important;
@@ -4103,198 +4093,954 @@ header nav {
   }
 }
 
-/* Ensure section wrappers clip horizontal translation to prevent overflow */
-section, .section, .sec-wrap, .split-grid, .intro-grid, .two-col, .grid-2-col, .cards-grid {
+/* Prevent horizontal scrollbar on animated entries */
+section, .section, .sec-wrap, .split-grid, .intro-grid, .two-col, .grid-2-col, .cards-grid, .explore-services-sec, .booking, .about-section {
   overflow-x: clip;
 }
 
-/* Base Transition Rules */
-.js-reveal-active .reveal-text,
-.js-reveal-active .reveal-left-text,
-.js-reveal-active .reveal-right-text,
-.js-reveal-active .reveal-up,
-.js-reveal-active .reveal-left,
-.js-reveal-active .reveal-right,
-.js-reveal-active .reveal-element,
-.js-reveal-active .reveal-mask,
-.js-reveal-active .reveal-card-left,
-.js-reveal-active .reveal-card-right,
-.js-reveal-active .reveal-card-up,
-.js-reveal-active .reveal-morph {
-  opacity: 0;
-  will-change: opacity, transform, clip-path;
-  transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-/* --------------------------------------------------
-   01. REVEAL (Clip / Mask vertical reveal for text & headers)
-   -------------------------------------------------- */
-.js-reveal-active .reveal-mask {
-  clip-path: inset(0 0 100% 0);
-  transform: translateY(30px);
-  transition: opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1), transform 0.85s cubic-bezier(0.22, 1, 0.36, 1), clip-path 0.85s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-/* Standard / Directional Text Entrances */
-.js-reveal-active .reveal-text,
-.js-reveal-active .reveal-left-text {
-  transform: translateX(-50px);
-}
-
-.js-reveal-active .reveal-right-text {
-  transform: translateX(50px);
-}
-
-.js-reveal-active .reveal-up,
-.js-reveal-active .reveal-element {
-  transform: translateY(25px);
-}
-
-/* --------------------------------------------------
-   02. HORIZONTAL / SPLIT SECTIONS
-   -------------------------------------------------- */
-.js-reveal-active .reveal-right {
-  transform: translateX(50px);
-  transition-delay: 100ms;
-}
-
-.js-reveal-active .reveal-left {
-  transform: translateX(-50px);
-  transition-delay: 100ms;
-}
-
-/* --------------------------------------------------
-   03. HORIZONTAL / CARD SPREAD ROWS
-   -------------------------------------------------- */
-.js-reveal-active .reveal-card-left {
-  transform: translateX(-25px);
-}
-.js-reveal-active .reveal-card-up {
-  transform: translateY(15px);
-}
-.js-reveal-active .reveal-card-right {
-  transform: translateX(25px);
-}
-
-/* --------------------------------------------------
-   04. MORPH (Controlled Entrance Shape Transformation)
-   -------------------------------------------------- */
-.js-reveal-active .reveal-morph {
-  clip-path: inset(6% 6% 6% 6% round 24px);
-  transform: scale(0.96);
-  transition: opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1), transform 0.9s cubic-bezier(0.22, 1, 0.36, 1), clip-path 0.9s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-/* --------------------------------------------------
-   TRIGGERED STATES (.is-visible or .revealed)
-   -------------------------------------------------- */
-.js-reveal-active .reveal-text.is-visible, .js-reveal-active .reveal-text.revealed,
-.js-reveal-active .reveal-left-text.is-visible, .js-reveal-active .reveal-left-text.revealed,
-.js-reveal-active .reveal-right-text.is-visible, .js-reveal-active .reveal-right-text.revealed,
-.js-reveal-active .reveal-up.is-visible, .js-reveal-active .reveal-up.revealed,
-.js-reveal-active .reveal-left.is-visible, .js-reveal-active .reveal-left.revealed,
-.js-reveal-active .reveal-right.is-visible, .js-reveal-active .reveal-right.revealed,
-.js-reveal-active .reveal-element.is-visible, .js-reveal-active .reveal-element.revealed,
-.js-reveal-active .reveal-card-left.is-visible, .js-reveal-active .reveal-card-left.revealed,
-.js-reveal-active .reveal-card-right.is-visible, .js-reveal-active .reveal-card-right.revealed,
-.js-reveal-active .reveal-card-up.is-visible, .js-reveal-active .reveal-card-up.revealed {
+/* Exclude navigation, headers, modals, mobile drawers from hidden states */
+.js-reveal-active header,
+.js-reveal-active header *,
+.js-reveal-active nav,
+.js-reveal-active nav *,
+.js-reveal-active .mobile-drawer,
+.js-reveal-active .mobile-drawer *,
+.js-reveal-active .modal,
+.js-reveal-active .modal * {
   opacity: 1 !important;
-  transform: translate(0, 0) !important;
-}
-
-.js-reveal-active .reveal-mask.is-visible,
-.js-reveal-active .reveal-mask.revealed {
-  opacity: 1 !important;
-  transform: translateY(0) !important;
-  clip-path: inset(0 0 0% 0) !important;
-}
-
-.js-reveal-active .reveal-morph.is-visible,
-.js-reveal-active .reveal-morph.revealed {
-  opacity: 1 !important;
-  transform: scale(1) !important;
-  clip-path: inset(0 0 0 0 round 12px) !important;
+  transform: none !important;
+  transition: none !important;
 }
 
 /* --------------------------------------------------
-   PREMIUM STAGGER TIMINGS
+   DESKTOP ANIMATIONS (min-width: 769px)
+   - translateY: 40px
+   - duration: 750ms - 850ms
+   - easing: cubic-bezier(0.22, 1, 0.36, 1)
    -------------------------------------------------- */
-.js-reveal-active .sec-tag,
-.js-reveal-active .sec-label,
-.js-reveal-active .reveal-tag { transition-delay: 0ms; }
+@media (min-width: 769px) {
+  /* Initial Hidden State for Vertical Elements */
+  .js-reveal-active .reveal-element,
+  .js-reveal-active .reveal-up,
+  .js-reveal-active .sec-tag,
+  .js-reveal-active .sec-label,
+  .js-reveal-active .reveal-tag,
+  .js-reveal-active .sec-title,
+  .js-reveal-active .reveal-title,
+  .js-reveal-active .sec-subtitle,
+  .js-reveal-active .reveal-subtitle,
+  .js-reveal-active .sec-desc,
+  .js-reveal-active .reveal-desc,
+  .js-reveal-active .sec-cta,
+  .js-reveal-active .reveal-cta,
+  .js-reveal-active .reveal-card,
+  .js-reveal-active .reveal-card-up,
+  .js-reveal-active .reveal-stagger > * {
+    opacity: 0;
+    transform: translateY(40px);
+    will-change: opacity, transform;
+    transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  }
 
-.js-reveal-active .sec-title,
-.js-reveal-active h2,
-.js-reveal-active .reveal-title { transition-delay: 80ms; }
+  /* Directional Text Left (translateX(-50px)) */
+  .js-reveal-active .reveal-text,
+  .js-reveal-active .reveal-left-text,
+  .js-reveal-active .reveal-left {
+    opacity: 0;
+    transform: translateX(-50px);
+    will-change: opacity, transform;
+    transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  }
 
-.js-reveal-active .sec-subtitle,
-.js-reveal-active h3,
-.js-reveal-active .lead-text,
-.js-reveal-active .reveal-subtitle { transition-delay: 160ms; }
+  /* Directional Text Right (translateX(50px)) */
+  .js-reveal-active .reveal-right-text {
+    opacity: 0;
+    transform: translateX(50px);
+    will-change: opacity, transform;
+    transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  }
 
-.js-reveal-active .sec-desc,
-.js-reveal-active p,
-.js-reveal-active .reveal-desc { transition-delay: 240ms; }
+  /* Directional Image Right (translateX(65px) + scale(0.97)) */
+  .js-reveal-active .reveal-right,
+  .js-reveal-active .reveal-image,
+  .js-reveal-active .split-grid > *:last-child img,
+  .js-reveal-active .two-col > *:last-child img {
+    opacity: 0;
+    transform: translateX(65px) scale(0.97);
+    will-change: opacity, transform;
+    transition: opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1), transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+  }
 
-.js-reveal-active .sec-cta,
-.js-reveal-active .btn,
-.js-reveal-active .btn-group,
-.js-reveal-active .reveal-cta { transition-delay: 320ms; }
+  /* Directional Image Left (translateX(-65px) + scale(0.97)) */
+  .js-reveal-active .reveal-image-left,
+  .js-reveal-active .split-grid.reversed > *:first-child img,
+  .js-reveal-active .two-col.reversed > *:first-child img {
+    opacity: 0;
+    transform: translateX(-65px) scale(0.97);
+    will-change: opacity, transform;
+    transition: opacity 0.85s cubic-bezier(0.22, 1, 0.36, 1), transform 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+  }
 
-/* Grid Card Stagger Delays */
-.js-reveal-active .reveal-stagger > *:nth-child(1),
-.js-reveal-active .reveal-stagger-1 { transition-delay: 0ms; }
-.js-reveal-active .reveal-stagger > *:nth-child(2),
-.js-reveal-active .reveal-stagger-2 { transition-delay: 80ms; }
-.js-reveal-active .reveal-stagger > *:nth-child(3),
-.js-reveal-active .reveal-stagger-3 { transition-delay: 160ms; }
-.js-reveal-active .reveal-stagger > *:nth-child(4),
-.js-reveal-active .reveal-stagger-4 { transition-delay: 240ms; }
+  /* Card Lateral Spread Entrances */
+  .js-reveal-active .reveal-card-left {
+    opacity: 0;
+    transform: translateX(-35px) translateY(20px);
+    will-change: opacity, transform;
+    transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .js-reveal-active .reveal-card-right {
+    opacity: 0;
+    transform: translateX(35px) translateY(20px);
+    will-change: opacity, transform;
+    transition: opacity 0.8s cubic-bezier(0.22, 1, 0.36, 1), transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Sequential Text Stagger Delays (Desktop) */
+  .js-reveal-active .sec-tag,
+  .js-reveal-active .sec-label,
+  .js-reveal-active .reveal-tag,
+  .js-reveal-active .process-step-num {
+    transition-delay: 0ms;
+  }
+
+  .js-reveal-active .sec-title,
+  .js-reveal-active h2,
+  .js-reveal-active h1,
+  .js-reveal-active .reveal-title,
+  .js-reveal-active .process-step-title {
+    transition-delay: 120ms;
+  }
+
+  .js-reveal-active .sec-subtitle,
+  .js-reveal-active h3,
+  .js-reveal-active p,
+  .js-reveal-active .sec-desc,
+  .js-reveal-active .lead-text,
+  .js-reveal-active .reveal-subtitle,
+  .js-reveal-active .reveal-desc,
+  .js-reveal-active .process-step-desc {
+    transition-delay: 240ms;
+  }
+
+  .js-reveal-active .sec-cta,
+  .js-reveal-active .btn,
+  .js-reveal-active .btn-group,
+  .js-reveal-active .reveal-cta {
+    transition-delay: 360ms;
+  }
+
+  /* Stagger Delays for Multi-Card Grids */
+  .js-reveal-active .reveal-stagger > *:nth-child(1),
+  .js-reveal-active .reveal-stagger-1 { transition-delay: 0ms; }
+  .js-reveal-active .reveal-stagger > *:nth-child(2),
+  .js-reveal-active .reveal-stagger-2 { transition-delay: 110ms; }
+  .js-reveal-active .reveal-stagger > *:nth-child(3),
+  .js-reveal-active .reveal-stagger-3 { transition-delay: 220ms; }
+  .js-reveal-active .reveal-stagger > *:nth-child(4),
+  .js-reveal-active .reveal-stagger-4 { transition-delay: 330ms; }
+  .js-reveal-active .reveal-stagger > *:nth-child(5),
+  .js-reveal-active .reveal-stagger-5 { transition-delay: 440ms; }
+}
 
 /* --------------------------------------------------
-   MOBILE OVERRIDES (<= 768px)
+   MOBILE ANIMATIONS (max-width: 768px)
+   - translateY: 26px
+   - duration: 600ms - 700ms
+   - easing: cubic-bezier(0.22, 1, 0.36, 1)
    -------------------------------------------------- */
 @media (max-width: 768px) {
-  .js-reveal-active .reveal-text,
-  .js-reveal-active .reveal-left-text {
-    transform: translateX(-18px);
-    transition-duration: 0.55s;
-  }
-  .js-reveal-active .reveal-right-text {
-    transform: translateX(18px);
-    transition-duration: 0.55s;
-  }
+  /* Initial Hidden State for Vertical Elements */
+  .js-reveal-active .reveal-element,
   .js-reveal-active .reveal-up,
-  .js-reveal-active .reveal-element {
-    transform: translateY(15px);
-    transition-duration: 0.5s;
+  .js-reveal-active .sec-tag,
+  .js-reveal-active .sec-label,
+  .js-reveal-active .reveal-tag,
+  .js-reveal-active .sec-title,
+  .js-reveal-active .reveal-title,
+  .js-reveal-active .sec-subtitle,
+  .js-reveal-active .reveal-subtitle,
+  .js-reveal-active .sec-desc,
+  .js-reveal-active .reveal-desc,
+  .js-reveal-active .sec-cta,
+  .js-reveal-active .reveal-cta,
+  .js-reveal-active .reveal-card,
+  .js-reveal-active .reveal-card-up,
+  .js-reveal-active .reveal-stagger > * {
+    opacity: 0;
+    transform: translateY(26px);
+    will-change: opacity, transform;
+    transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1), transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
   }
-  .js-reveal-active .reveal-right {
-    transform: translateX(18px);
-    transition-duration: 0.55s;
-    transition-delay: 60ms;
-  }
+
+  /* Directional Text Left (Mobile: translateX(-22px)) */
+  .js-reveal-active .reveal-text,
+  .js-reveal-active .reveal-left-text,
   .js-reveal-active .reveal-left {
-    transform: translateX(-18px);
-    transition-duration: 0.55s;
-    transition-delay: 60ms;
+    opacity: 0;
+    transform: translateX(-22px);
+    will-change: opacity, transform;
+    transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1), transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
   }
-  .js-reveal-active .reveal-card-left,
-  .js-reveal-active .reveal-card-right,
-  .js-reveal-active .reveal-card-up {
-    transform: translateY(14px) !important;
-    transition-duration: 0.5s;
+
+  /* Directional Text Right (Mobile: translateX(22px)) */
+  .js-reveal-active .reveal-right-text {
+    opacity: 0;
+    transform: translateX(22px);
+    will-change: opacity, transform;
+    transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1), transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
   }
-  .js-reveal-active .reveal-morph {
-    clip-path: none !important;
-    transform: scale(0.98);
-    transition-duration: 0.55s;
+
+  /* Directional Image Right (Mobile: translateX(25px) + scale(0.98)) */
+  .js-reveal-active .reveal-right,
+  .js-reveal-active .reveal-image,
+  .js-reveal-active .split-grid > *:last-child img,
+  .js-reveal-active .two-col > *:last-child img {
+    opacity: 0;
+    transform: translateX(25px) scale(0.98);
+    will-change: opacity, transform;
+    transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
   }
-  .js-reveal-active .reveal-tag, .js-reveal-active .sec-tag { transition-delay: 0ms; }
-  .js-reveal-active .reveal-title, .js-reveal-active .sec-title { transition-delay: 50ms; }
-  .js-reveal-active .reveal-subtitle, .js-reveal-active .sec-subtitle { transition-delay: 100ms; }
-  .js-reveal-active .reveal-desc, .js-reveal-active .sec-desc { transition-delay: 150ms; }
-  .js-reveal-active .reveal-cta, .js-reveal-active .sec-cta { transition-delay: 200ms; }
+
+  /* Directional Image Left (Mobile: translateX(-25px) + scale(0.98)) */
+  .js-reveal-active .reveal-image-left,
+  .js-reveal-active .split-grid.reversed > *:first-child img,
+  .js-reveal-active .two-col.reversed > *:first-child img {
+    opacity: 0;
+    transform: translateX(-25px) scale(0.98);
+    will-change: opacity, transform;
+    transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1), transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Card Lateral Spread Entrances (Mobile) */
+  .js-reveal-active .reveal-card-left {
+    opacity: 0;
+    transform: translateX(-18px) translateY(14px);
+    will-change: opacity, transform;
+    transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1), transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .js-reveal-active .reveal-card-right {
+    opacity: 0;
+    transform: translateX(18px) translateY(14px);
+    will-change: opacity, transform;
+    transition: opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1), transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Sequential Text Stagger Delays (Mobile) */
+  .js-reveal-active .sec-tag,
+  .js-reveal-active .sec-label,
+  .js-reveal-active .reveal-tag,
+  .js-reveal-active .process-step-num {
+    transition-delay: 0ms;
+  }
+
+  .js-reveal-active .sec-title,
+  .js-reveal-active h2,
+  .js-reveal-active h1,
+  .js-reveal-active .reveal-title,
+  .js-reveal-active .process-step-title {
+    transition-delay: 90ms;
+  }
+
+  .js-reveal-active .sec-subtitle,
+  .js-reveal-active h3,
+  .js-reveal-active p,
+  .js-reveal-active .sec-desc,
+  .js-reveal-active .lead-text,
+  .js-reveal-active .reveal-subtitle,
+  .js-reveal-active .reveal-desc,
+  .js-reveal-active .process-step-desc {
+    transition-delay: 180ms;
+  }
+
+  .js-reveal-active .sec-cta,
+  .js-reveal-active .btn,
+  .js-reveal-active .btn-group,
+  .js-reveal-active .reveal-cta {
+    transition-delay: 270ms;
+  }
+
+  /* Stagger Delays for Multi-Card Grids (Mobile) */
+  .js-reveal-active .reveal-stagger > *:nth-child(1),
+  .js-reveal-active .reveal-stagger-1 { transition-delay: 0ms; }
+  .js-reveal-active .reveal-stagger > *:nth-child(2),
+  .js-reveal-active .reveal-stagger-2 { transition-delay: 80ms; }
+  .js-reveal-active .reveal-stagger > *:nth-child(3),
+  .js-reveal-active .reveal-stagger-3 { transition-delay: 160ms; }
+  .js-reveal-active .reveal-stagger > *:nth-child(4),
+  .js-reveal-active .reveal-stagger-4 { transition-delay: 240ms; }
+  .js-reveal-active .reveal-stagger > *:nth-child(5),
+  .js-reveal-active .reveal-stagger-5 { transition-delay: 320ms; }
 }
 
+/* --------------------------------------------------
+   TRIGGERED ACTIVE REVEALED STATES
+   -------------------------------------------------- */
+.js-reveal-active .revealed,
+.js-reveal-active .is-visible,
+.js-reveal-active .sec-head.revealed .sec-tag,
+.js-reveal-active .sec-head.revealed .sec-label,
+.js-reveal-active .sec-head.revealed .reveal-tag,
+.js-reveal-active .sec-head.revealed .sec-title,
+.js-reveal-active .sec-head.revealed h2,
+.js-reveal-active .sec-head.revealed h1,
+.js-reveal-active .sec-head.revealed .reveal-title,
+.js-reveal-active .sec-head.revealed .sec-subtitle,
+.js-reveal-active .sec-head.revealed h3,
+.js-reveal-active .sec-head.revealed p,
+.js-reveal-active .sec-head.revealed .sec-desc,
+.js-reveal-active .sec-head.revealed .lead-text,
+.js-reveal-active .sec-head.revealed .reveal-subtitle,
+.js-reveal-active .sec-head.revealed .reveal-desc,
+.js-reveal-active .sec-head.revealed .sec-cta,
+.js-reveal-active .sec-head.revealed .btn,
+.js-reveal-active .sec-head.revealed .btn-group,
+.js-reveal-active .sec-head.revealed .reveal-cta,
+.js-reveal-active .process-card.revealed .process-step-num,
+.js-reveal-active .process-card.revealed .process-step-title,
+.js-reveal-active .process-card.revealed .process-step-desc,
+.js-reveal-active .process-card.revealed .process-card-media img {
+  opacity: 1 !important;
+  transform: translate(0, 0) scale(1) !important;
+}
 
+/* ==========================================================================
+   PROCESS / STAGE CARDS: DESKTOP & MOBILE STYLES
+   ========================================================================== */
+
+/* DESKTOP PROCESS CARDS (min-width: 769px) */
+@media (min-width: 769px) {
+  #process .process-horizontal-layout,
+  #process .process-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) !important;
+    gap: 20px !important;
+    padding-bottom: 20px !important;
+  }
+
+  #process .process-card {
+    position: static !important;
+    display: flex !important;
+    flex-direction: column !important;
+    background: #f8f9fa !important;
+    border-radius: 8px !important;
+    overflow: hidden !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: none !important;
+    margin-bottom: 0 !important;
+    height: 100% !important;
+  }
+
+  #process .process-card-media {
+    order: 1 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 0 !important;
+  }
+
+  #process .process-card-media img {
+    width: 100% !important;
+    aspect-ratio: 16/10 !important;
+    object-fit: cover !important;
+    display: block !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+  }
+
+  #process .process-card-content {
+    order: 2 !important;
+    padding: 18px !important;
+    background: transparent !important;
+    border-bottom: none !important;
+    flex-grow: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    text-align: left !important;
+  }
+
+  #process .process-card-row1 {
+    display: flex !important;
+    flex-direction: column !important;
+    margin-bottom: 8px !important;
+    gap: 4px !important;
+    text-align: left !important;
+  }
+
+  #process .process-step-num {
+    font-family: "IBM Plex Mono", monospace !important;
+    color: var(--pink, #ff3366) !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+  }
+
+  #process .process-step-title {
+    font-size: 16px !important;
+    font-weight: 700 !important;
+    color: #111 !important;
+    margin: 0 !important;
+    line-height: 1.3 !important;
+    text-transform: uppercase !important;
+  }
+
+  #process .process-step-desc {
+    color: #666 !important;
+    font-size: 13px !important;
+    line-height: 1.5 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}
+
+/* MOBILE PROCESS CARDS (max-width: 768px) */
+@media (max-width: 768px) {
+  #process {
+    position: relative !important;
+    overflow: visible !important;
+    padding: 40px 0 50px 0 !important;
+  }
+
+  #process .wrap {
+    padding: 0 16px !important;
+    overflow: visible !important;
+    max-width: 100% !important;
+  }
+
+  #process .process-horizontal-layout,
+  #process .process-grid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+    position: relative !important;
+    overflow: visible !important;
+    transform: none !important;
+    perspective: none !important;
+    filter: none !important;
+    clip-path: none !important;
+    padding-bottom: 24px !important;
+  }
+
+  /* Process Cards Base Sticky Styling */
+  #process .process-card {
+    position: sticky !important;
+    width: 100% !important;
+    min-width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    background: #0d0f12 !important;
+    border-radius: 18px !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    box-shadow: 0 -4px 18px rgba(0, 0, 0, 0.28), 0 14px 32px rgba(0, 0, 0, 0.32) !important;
+    margin-bottom: 28px !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    transform: translateZ(0) !important;
+    will-change: transform, top !important;
+  }
+
+  #process .process-card:last-child {
+    margin-bottom: 0 !important;
+  }
+
+  /* Staggered Sticky Top Offsets */
+  #process .process-card:nth-child(1) {
+    top: 70px !important;
+    z-index: 1 !important;
+  }
+
+  #process .process-card:nth-child(2) {
+    top: 102px !important;
+    z-index: 2 !important;
+  }
+
+  #process .process-card:nth-child(3) {
+    top: 134px !important;
+    z-index: 3 !important;
+  }
+
+  #process .process-card:nth-child(4) {
+    top: 166px !important;
+    z-index: 4 !important;
+  }
+
+  #process .process-card:nth-child(5) {
+    top: 198px !important;
+    z-index: 5 !important;
+  }
+
+  #process .process-card:nth-child(6) {
+    top: 230px !important;
+    z-index: 6 !important;
+  }
+
+  /* Top Text Content Area */
+  #process .process-card-content {
+    order: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 16px 18px 14px 18px !important;
+    background: #14171d !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+    height: auto !important;
+    min-height: auto !important;
+    box-sizing: border-box !important;
+    text-align: left !important;
+  }
+
+  /* ROW 1: STEP NUMBER + TITLE */
+  #process .process-card-row1 {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: baseline !important;
+    justify-content: flex-start !important;
+    flex-wrap: wrap !important;
+    gap: 8px 10px !important;
+    margin-bottom: 8px !important;
+    text-align: left !important;
+  }
+
+  #process .process-step-num {
+    font-family: "IBM Plex Mono", monospace !important;
+    color: #ff3366 !important;
+    font-weight: 700 !important;
+    font-size: 13px !important;
+    letter-spacing: 1px !important;
+    flex-shrink: 0 !important;
+    text-transform: uppercase !important;
+    white-space: nowrap !important;
+  }
+
+  #process .process-step-title {
+    color: #ffffff !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.5px !important;
+    margin: 0 !important;
+    white-space: normal !important;
+    text-overflow: clip !important;
+    overflow: visible !important;
+    text-transform: uppercase !important;
+    line-height: 1.35 !important;
+    text-align: left !important;
+  }
+
+  /* ROW 2: DESCRIPTION */
+  #process .process-step-desc {
+    color: #94a3b8 !important;
+    font-size: 13px !important;
+    line-height: 1.5 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    white-space: normal !important;
+    text-overflow: clip !important;
+    overflow: visible !important;
+    text-align: left !important;
+  }
+
+  /* BOTTOM IMAGE MEDIA */
+  #process .process-card-media {
+    order: 2 !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 0 !important;
+  }
+
+  #process .process-card-media img {
+    width: 100% !important;
+    height: 175px !important;
+    aspect-ratio: 16/9 !important;
+    object-fit: cover !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    display: block !important;
+  }
+}
+
+/* Accessibility: Support Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  #process .process-card {
+    position: static !important;
+    top: auto !important;
+    transform: none !important;
+    will-change: auto !important;
+    margin-bottom: 20px !important;
+  }
+}
+
+/* ==========================================================================
+   TRIEYE PREMIUM SHOWCASE GALLERY CAROUSEL
+   - Centered 3-card showcase layout (Active in center, faded on sides)
+   - Desktop & Mobile touch swipe & mouse drag
+   - Auto slide with hover / visibility pause
+   ========================================================================== */
+
+#gallery.gallery-showcase-section {
+  padding: 84px 0;
+  background-color: #ffffff;
+  position: relative;
+  overflow: hidden;
+}
+
+/* TOP HEADER ROW - CENTERED & CLEAN */
+.gallery-header-row {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  margin-bottom: 48px;
+  gap: 8px;
+}
+
+.gallery-sub-tag {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--pink, #ff3366);
+  letter-spacing: 2px;
+  margin-bottom: 4px;
+  text-transform: uppercase;
+}
+
+.gallery-main-heading {
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 800;
+  color: #111111;
+  letter-spacing: -0.5px;
+  margin: 0;
+  text-transform: uppercase;
+  line-height: 1.15;
+}
+
+.gallery-accent {
+  color: var(--pink, #ff3366);
+}
+
+.gallery-desc {
+  font-size: clamp(14px, 1.6vw, 16px);
+  color: #555555;
+  max-width: 580px;
+  margin: 8px auto 0 auto;
+  line-height: 1.5;
+}
+
+/* CAROUSEL WRAPPER */
+.gallery-carousel-container {
+  position: relative;
+  width: 100%;
+  max-width: 1140px;
+  margin: 0 auto;
+  user-select: none;
+}
+
+.gallery-viewport {
+  position: relative;
+  width: 100%;
+  height: 520px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.gallery-track {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* INDIVIDUAL SHOWCASE CARD */
+.gallery-card {
+  position: absolute;
+  width: 330px;
+  height: 480px;
+  border-radius: 24px;
+  overflow: hidden;
+  box-sizing: border-box;
+  background: #0c0d10;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+  transition: transform 0.65s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform, opacity;
+  cursor: pointer;
+}
+
+.gallery-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 24px;
+}
+
+.gallery-card-inner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.gallery-card[data-index="5"] .gallery-card-inner img {
+  object-position: center center;
+}
+
+.gallery-card[data-index="6"] .gallery-card-inner img {
+  object-position: 52% center;
+}
+
+.gallery-card.is-active:hover .gallery-card-inner img {
+  transform: scale(1.03);
+}
+
+/* CARD GRADIENT OVERLAY (Bottom protection for text readability) */
+.gallery-card-inner::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 180px;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.5) 50%, rgba(0, 0, 0, 0) 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* BOTTOM TEXT OVERLAY */
+.gallery-card-bottom {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 24px 22px;
+  z-index: 2;
+  text-align: left;
+}
+
+.gallery-item-tag {
+  font-family: "IBM Plex Mono", monospace;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--pink, #ff3366);
+  letter-spacing: 1.5px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.gallery-item-title {
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0;
+  line-height: 1.35;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+  text-transform: uppercase;
+}
+
+/* 3-CARD STACK POSITIONS (Desktop) */
+.gallery-card.is-active {
+  transform: translateX(0) scale(1);
+  opacity: 1;
+  z-index: 10;
+  cursor: default;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.24), 0 0 0 1px rgba(0, 0, 0, 0.06);
+  pointer-events: auto;
+}
+
+.gallery-card.is-prev {
+  transform: translateX(-310px) scale(0.88);
+  opacity: 0.45;
+  z-index: 5;
+  pointer-events: auto;
+}
+
+.gallery-card.is-next {
+  transform: translateX(310px) scale(0.88);
+  opacity: 0.45;
+  z-index: 5;
+  pointer-events: auto;
+}
+
+.gallery-card.is-hidden-left {
+  transform: translateX(-550px) scale(0.7);
+  opacity: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.gallery-card.is-hidden-right {
+  transform: translateX(550px) scale(0.7);
+  opacity: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* NAVIGATION ARROWS */
+.gallery-nav-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+  color: #111111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 20;
+  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.gallery-nav-btn:hover {
+  background: #111111;
+  color: #ffffff;
+  transform: translateY(-50%) scale(1.08);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.gallery-prev {
+  left: 24px;
+}
+
+.gallery-next {
+  right: 24px;
+}
+
+/* PAGINATION DOTS */
+.gallery-dots {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 28px;
+}
+
+.gallery-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #cbd5e1;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: width 0.3s ease, background 0.3s ease, border-radius 0.3s ease;
+}
+
+.gallery-dot.active {
+  width: 24px;
+  border-radius: 9999px;
+  background: var(--pink, #ff3366);
+}
+
+/* ==========================================================================
+   MOBILE RESPONSIVENESS (max-width: 768px)
+   ========================================================================== */
+@media (max-width: 768px) {
+  #gallery.gallery-showcase-section {
+    padding: 56px 0;
+  }
+
+  .gallery-header-row {
+    margin-bottom: 32px;
+    gap: 6px;
+  }
+
+  .gallery-sub-tag {
+    font-size: 11.5px;
+    letter-spacing: 1.5px;
+  }
+
+  .gallery-main-heading {
+    font-size: 26px;
+  }
+
+  .gallery-desc {
+    font-size: 14px;
+    padding: 0 12px;
+  }
+
+  .gallery-viewport {
+    height: 440px;
+  }
+
+  .gallery-card {
+    width: 270px;
+    height: 410px;
+    border-radius: 20px;
+  }
+
+  .gallery-card-inner {
+    border-radius: 20px;
+  }
+
+  .gallery-card-bottom {
+    padding: 20px 16px;
+  }
+
+  .gallery-item-title {
+    font-size: 13.5px;
+  }
+
+  /* 3-card stack on mobile with peeking side cards */
+  .gallery-card.is-active {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+    z-index: 10;
+  }
+
+  .gallery-card.is-prev {
+    transform: translateX(-220px) scale(0.88);
+    opacity: 0.45;
+    z-index: 5;
+  }
+
+  .gallery-card.is-next {
+    transform: translateX(220px) scale(0.88);
+    opacity: 0.45;
+    z-index: 5;
+  }
+
+  .gallery-card.is-hidden-left {
+    transform: translateX(-380px) scale(0.7);
+  }
+
+  .gallery-card.is-hidden-right {
+    transform: translateX(380px) scale(0.7);
+  }
+
+  .gallery-nav-btn {
+    width: 38px;
+    height: 38px;
+  }
+
+  .gallery-prev {
+    left: 8px;
+  }
+
+  .gallery-next {
+    right: 8px;
+  }
+}
+
+@media (max-width: 360px) {
+  .gallery-card {
+    width: 240px;
+    height: 380px;
+  }
+  .gallery-card.is-prev {
+    transform: translateX(-190px) scale(0.88);
+  }
+  .gallery-card.is-next {
+    transform: translateX(190px) scale(0.88);
+  }
+}

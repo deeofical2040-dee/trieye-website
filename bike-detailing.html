@@ -464,54 +464,70 @@
       <h2 style="font-size: clamp(28px, 4vw, 40px); font-weight: 800; text-transform: uppercase; color: #111;">A CAREFUL STEP-BY-STEP DETAIL</h2>
     </div>
 
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 20px;">
-      <!-- STEP 01 -->
-      <div style="background: #f8f9fa; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; display: flex; flex-direction: column;">
-        <img src="assets/bike/bike-intro.jpg" alt="Motorcycle inspection process" style="width: 100%; aspect-ratio: 16/10; object-fit: cover;" loading="lazy" width="600" height="375" decoding="async">
-        <div style="padding: 18px; flex-grow: 1;">
-          <div style="font-family: 'IBM Plex Mono', monospace; color: var(--pink); font-size: 12px; font-weight: 700; margin-bottom: 6px;">STEP 01</div>
-          <h3 style="font-size: 16px; font-weight: 700; color: #111; margin-bottom: 8px;">BIKE INSPECTION</h3>
-          <p style="color: #666; font-size: 13px; line-height: 1.5;">Review the motorcycle condition and identify areas requiring attention.</p>
+    <div class="process-horizontal-layout" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+
+      <div class="process-card">
+        <div class="process-card-content">
+          <div class="process-card-row1">
+            <span class="process-step-num">STEP 01</span>
+            <h3 class="process-step-title">BIKE INSPECTION</h3>
+          </div>
+          <p class="process-step-desc">Review the motorcycle condition and identify areas requiring attention.</p>
+        </div>
+        <div class="process-card-media">
+          <img src="assets/bike/bike-intro.jpg" alt="Motorcycle inspection process" loading="lazy" width="600" height="375" decoding="async">
         </div>
       </div>
 
-      <!-- STEP 02 -->
-      <div style="background: #f8f9fa; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; display: flex; flex-direction: column;">
-        <img src="assets/bike/bike-detail-wheels.jpg" alt="Motorcycle pre-wash cleaning" style="width: 100%; aspect-ratio: 16/10; object-fit: cover;" loading="lazy" width="600" height="375" decoding="async">
-        <div style="padding: 18px; flex-grow: 1;">
-          <div style="font-family: 'IBM Plex Mono', monospace; color: var(--pink); font-size: 12px; font-weight: 700; margin-bottom: 6px;">STEP 02</div>
-          <h3 style="font-size: 16px; font-weight: 700; color: #111; margin-bottom: 8px;">PRE-WASH &amp; CLEANING</h3>
-          <p style="color: #666; font-size: 13px; line-height: 1.5;">Controlled cleaning to remove loose dirt and road contamination.</p>
+      <div class="process-card">
+        <div class="process-card-content">
+          <div class="process-card-row1">
+            <span class="process-step-num">STEP 02</span>
+            <h3 class="process-step-title">PRE-WASH & CLEANING</h3>
+          </div>
+          <p class="process-step-desc">Controlled cleaning to remove loose dirt and road contamination.</p>
+        </div>
+        <div class="process-card-media">
+          <img src="assets/bike/bike-detail-wheels.jpg" alt="Motorcycle pre-wash cleaning" loading="lazy" width="600" height="375" decoding="async">
         </div>
       </div>
 
-      <!-- STEP 03 -->
-      <div style="background: #f8f9fa; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; display: flex; flex-direction: column;">
-        <img src="assets/bike/bike-detail-engine.jpg" alt="Detailed motorcycle component cleaning" style="width: 100%; aspect-ratio: 16/10; object-fit: cover;" loading="lazy" width="600" height="375" decoding="async">
-        <div style="padding: 18px; flex-grow: 1;">
-          <div style="font-family: 'IBM Plex Mono', monospace; color: var(--pink); font-size: 12px; font-weight: 700; margin-bottom: 6px;">STEP 03</div>
-          <h3 style="font-size: 16px; font-weight: 700; color: #111; margin-bottom: 8px;">DETAILED CLEANING</h3>
-          <p style="color: #666; font-size: 13px; line-height: 1.5;">Focused cleaning of bodywork, wheels and accessible components.</p>
+      <div class="process-card">
+        <div class="process-card-content">
+          <div class="process-card-row1">
+            <span class="process-step-num">STEP 03</span>
+            <h3 class="process-step-title">DETAILED CLEANING</h3>
+          </div>
+          <p class="process-step-desc">Focused cleaning of bodywork, wheels and accessible components.</p>
+        </div>
+        <div class="process-card-media">
+          <img src="assets/bike/bike-detail-engine.jpg" alt="Detailed motorcycle component cleaning" loading="lazy" width="600" height="375" decoding="async">
         </div>
       </div>
 
-      <!-- STEP 04 -->
-      <div style="background: #f8f9fa; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; display: flex; flex-direction: column;">
-        <img src="assets/bike/bike-detail-finish.jpg" alt="Motorcycle paint finishing and drying" style="width: 100%; aspect-ratio: 16/10; object-fit: cover;" loading="lazy" width="600" height="375" decoding="async">
-        <div style="padding: 18px; flex-grow: 1;">
-          <div style="font-family: 'IBM Plex Mono', monospace; color: var(--pink); font-size: 12px; font-weight: 700; margin-bottom: 6px;">STEP 04</div>
-          <h3 style="font-size: 16px; font-weight: 700; color: #111; margin-bottom: 8px;">FINISHING</h3>
-          <p style="color: #666; font-size: 13px; line-height: 1.5;">Careful drying and finishing of painted surfaces and trim.</p>
+      <div class="process-card">
+        <div class="process-card-content">
+          <div class="process-card-row1">
+            <span class="process-step-num">STEP 04</span>
+            <h3 class="process-step-title">FINISHING</h3>
+          </div>
+          <p class="process-step-desc">Careful drying and finishing of painted surfaces and trim.</p>
+        </div>
+        <div class="process-card-media">
+          <img src="assets/bike/bike-detail-finish.jpg" alt="Motorcycle paint finishing and drying" loading="lazy" width="600" height="375" decoding="async">
         </div>
       </div>
 
-      <!-- STEP 05 -->
-      <div style="background: #f8f9fa; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; display: flex; flex-direction: column;">
-        <img src="assets/bike/bike-hero.jpg" alt="Motorcycle detailing final inspection" style="width: 100%; aspect-ratio: 16/10; object-fit: cover;" loading="lazy" width="600" height="375" fetchpriority="high">
-        <div style="padding: 18px; flex-grow: 1;">
-          <div style="font-family: 'IBM Plex Mono', monospace; color: var(--pink); font-size: 12px; font-weight: 700; margin-bottom: 6px;">STEP 05</div>
-          <h3 style="font-size: 16px; font-weight: 700; color: #111; margin-bottom: 8px;">FINAL INSPECTION</h3>
-          <p style="color: #666; font-size: 13px; line-height: 1.5;">Final quality check of the completed motorcycle.</p>
+      <div class="process-card">
+        <div class="process-card-content">
+          <div class="process-card-row1">
+            <span class="process-step-num">STEP 05</span>
+            <h3 class="process-step-title">FINAL INSPECTION</h3>
+          </div>
+          <p class="process-step-desc">Final quality check of the completed motorcycle.</p>
+        </div>
+        <div class="process-card-media">
+          <img src="assets/bike/bike-hero.jpg" alt="Motorcycle detailing final inspection" loading="lazy" width="600" height="375" fetchpriority="high">
         </div>
       </div>
     </div>
