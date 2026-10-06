@@ -833,6 +833,83 @@
   
   .book-submit{width:100%;min-height:46px;margin-top:18px;justify-content:center;font-size:15px;}
   .form-note{margin-top:12px;font-size:12px;color:var(--muted);text-align:center;width:100%;}
+  
+  /* ---------- TRACK YOUR BOOKING SECONDARY CTA ---------- */
+  .booking-track-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 18px;
+    padding-top: 16px;
+    border-top: 1px dashed rgba(226, 232, 240, 0.9);
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .booking-track-prompt {
+    font-size: 13.5px;
+    font-weight: 500;
+    color: #64748b;
+  }
+  .btn-track-booking-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: #ffffff;
+    border: 1.5px solid #0f172a;
+    border-radius: 6px;
+    color: #0f172a;
+    font-family: 'Oswald', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    text-decoration: none !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  .btn-track-booking-secondary .track-arrow {
+    font-size: 14px;
+    transition: transform 0.2s ease, color 0.2s ease;
+    display: inline-block;
+  }
+  .btn-track-booking-secondary:hover {
+    background: #0f172a;
+    color: #ffffff !important;
+    border-color: #0f172a;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.15);
+    transform: translateY(-1px);
+  }
+  .btn-track-booking-secondary:hover .track-arrow {
+    transform: translateX(3px);
+    color: var(--green, #a6d331);
+  }
+  .btn-track-booking-secondary:active {
+    transform: translateY(0);
+  }
+
+  @media (max-width: 520px) {
+    .booking-track-row {
+      flex-direction: column;
+      gap: 10px;
+      margin-top: 16px;
+      padding-top: 14px;
+      text-align: center;
+    }
+    .booking-track-prompt {
+      font-size: 13px;
+    }
+    .btn-track-booking-secondary {
+      width: 100%;
+      min-height: 44px;
+      font-size: 13.5px;
+      box-sizing: border-box;
+    }
+  }
 
   /* ---------- GALLERY ---------- */
   .gallery-grid{display:grid;grid-template-columns:repeat(4, minmax(0, 1fr));gap:16px;width:100%;}
@@ -3634,6 +3711,13 @@
       </div>
       <button type="submit" class="btn btn-primary book-submit" id="btnSubmitBooking">Book Now →</button>
       <div class="form-note">⚡ Direct instant booking with WhatsApp confirmation dispatch.</div>
+      <div class="booking-track-row">
+        <span class="booking-track-prompt">Already booked?</span>
+        <a href="/track-booking" class="btn-track-booking-secondary">
+          <span>TRACK YOUR BOOKING</span>
+          <span class="track-arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      </div>
     </form>
   </div>
 </section>
