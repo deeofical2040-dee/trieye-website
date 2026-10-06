@@ -584,104 +584,156 @@ const TrieyeDB = {
     }
   },
 
-  // 3. SERVICES & PRICING
-  async getServices(fallbackDefaults) {
-    // 1. Supabase Database is the authoritative Single Source of Truth
+  // 3. AUTHORITATIVE PRICING ENGINE
+  _currentPricing: null,
+  _pricingSubscribers: new Set(),
+
+  subscribePricing(callback) {
+    if (typeof callback === 'function') {
+      this._pricingSubscribers.add(callback);
+      if (this._currentPricing) {
+        try { callback(this._currentPricing); } catch (e) { console.error(e); }
+      }
+    }
+  },
+
+  getCurrentPricing() {
+    return this._currentPricing;
+  },
+
+  normalizePricingData(data) {
+    if (!data || typeof data !== 'object') return null;
+    const servicesList = Array.isArray(data) ? data : Object.values(data);
+    if (servicesList.length === 0) return null;
+
+    const normalizedMap = {};
+    servicesList.forEach(s => {
+      if (!s || !s.name) return;
+      const name = String(s.name).trim();
+      const p = s.pricing || {};
+
+      const parsePrice = (v1, v2, v3) => {
+        const val = (v1 !== null && v1 !== undefined && v1 !== '') ? v1 :
+                    (v2 !== null && v2 !== undefined && v2 !== '') ? v2 : v3;
+        if (val === null || val === undefined || val === '' || isNaN(Number(val))) return null;
+        const num = Number(val);
+        return num > 0 ? num : null;
+      };
+
+      const hatch = parsePrice(s.hatchback_price, p['Hatchback'], null);
+      const sedan = parsePrice(s.sedan_price, p['Sedan'], s.base_price);
+      const suv = parsePrice(s.suv_price, p['SUV / 4x4'] || p['SUV'], s.base_price);
+      const bike = parsePrice(s.bike_price, p['Superbike'] || p['Bike'] || p['Superbike / Bike'], s.base_price);
+      const base = parsePrice(s.base_price, sedan, null);
+
+      normalizedMap[name] = {
+        id: s.id || null,
+        name: name,
+        desc: s.desc || s.description || '',
+        duration_minutes: s.duration_minutes || null,
+        base_price: base,
+        hatchback_price: hatch,
+        sedan_price: sedan,
+        suv_price: suv,
+        bike_price: bike,
+        pricing: {
+          'Hatchback': hatch,
+          'Sedan': sedan,
+          'SUV / 4x4': suv,
+          'Superbike': bike
+        },
+        active: s.active !== false
+      };
+    });
+
+    return Object.keys(normalizedMap).length > 0 ? normalizedMap : null;
+  },
+
+  async loadAuthoritativePricing() {
+    const timestamp = Date.now();
+    let rawData = null;
+
+    // 1. Authoritative Source: Supabase Database (if configured and reachable)
     const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
     if (sb) {
       try {
         const { data, error } = await sb.from('services').select('*').order('created_at', { ascending: true });
         if (!error && Array.isArray(data) && data.length > 0) {
-          const map = {};
-          data.forEach(s => {
-            const hatch = s.hatchback_price !== null && s.hatchback_price !== undefined ? Number(s.hatchback_price) : (s.base_price !== null && s.base_price !== undefined ? Number(s.base_price) : null);
-            const sedan = s.sedan_price !== null && s.sedan_price !== undefined ? Number(s.sedan_price) : (s.base_price !== null && s.base_price !== undefined ? Number(s.base_price) : null);
-            const suv = s.suv_price !== null && s.suv_price !== undefined ? Number(s.suv_price) : (s.base_price !== null && s.base_price !== undefined ? Number(s.base_price) : null);
-            const bike = s.bike_price !== null && s.bike_price !== undefined ? Number(s.bike_price) : (s.base_price !== null && s.base_price !== undefined ? Number(s.base_price) : null);
-            const base = s.base_price !== null && s.base_price !== undefined ? Number(s.base_price) : (sedan || 0);
-
-            map[s.name] = {
-              id: s.id,
-              name: s.name,
-              desc: s.description || '',
-              base_price: base,
-              hatchback_price: hatch,
-              sedan_price: sedan,
-              suv_price: suv,
-              bike_price: bike,
-              duration_minutes: s.duration_minutes || null,
-              pricing: {
-                'Hatchback': hatch,
-                'Sedan': sedan,
-                'SUV / 4x4': suv,
-                'Superbike': bike
-              },
-              active: s.active !== false
-            };
-          });
-
-          // Sync freshly fetched Supabase data to localStorage cache for offline/instant initial paint
-          try {
-            localStorage.setItem('trieye_services_matrix', JSON.stringify(map));
-            localStorage.setItem('trieye_services_last_updated', String(Date.now()));
-          } catch (e) {}
-
-          // Also keep local dev server file synced if available
-          try {
-            fetch('/api/services', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(map)
-            }).catch(() => {});
-          } catch (e) {}
-
-          return map;
+          rawData = data;
         } else if (error) {
-          TrieyeDB.logError('services', 'SELECT', error);
+          console.warn('⚠️ [Supabase Pricing Read Warning]:', error.message);
         }
       } catch (err) {
-        console.error('🚨 [Supabase Network Error on getServices]:', err);
+        console.warn('⚠️ [Supabase Pricing Network Warning]:', err.message);
       }
     }
 
-    // 2. Secondary fallback: Local Server REST API if offline
-    try {
-      const apiRes = await fetch('/api/services', { method: 'GET', cache: 'no-store' });
-      if (apiRes.ok) {
-        const apiData = await apiRes.json();
-        if (apiData && typeof apiData === 'object' && Object.keys(apiData).length > 0) {
-          localStorage.setItem('trieye_services_matrix', JSON.stringify(apiData));
-          return apiData;
+    // 2. Authoritative Source: REST Backend API (Direct from server disk with strict cache-busting)
+    if (!rawData) {
+      try {
+        const res = await fetch(`/api/services?_t=${timestamp}`, {
+          method: 'GET',
+          cache: 'no-store',
+          headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' }
+        });
+        if (res.ok) {
+          const apiData = await res.json();
+          if (apiData && typeof apiData === 'object' && Object.keys(apiData).length > 0) {
+            rawData = apiData;
+          }
         }
+      } catch (err) {
+        console.warn('⚠️ [API Services Network Warning]:', err.message);
       }
-    } catch (e) {}
+    }
 
-    // 3. Static JSON asset fallback
-    try {
-      const staticRes = await fetch('/assets/services-data.json', { method: 'GET', cache: 'no-store' });
-      if (staticRes.ok) {
-        const staticData = await staticRes.json();
-        if (staticData && typeof staticData === 'object' && Object.keys(staticData).length > 0) {
-          localStorage.setItem('trieye_services_matrix', JSON.stringify(staticData));
-          return staticData;
+    // 3. Static JSON asset fallback with strict cache-busting
+    if (!rawData) {
+      try {
+        const res = await fetch(`/assets/services-data.json?_t=${timestamp}`, {
+          method: 'GET',
+          cache: 'no-store',
+          headers: { 'Cache-Control': 'no-cache, no-store, must-revalidate', 'Pragma': 'no-cache' }
+        });
+        if (res.ok) {
+          const json = await res.json();
+          if (json && typeof json === 'object' && Object.keys(json).length > 0) {
+            rawData = json;
+          }
         }
-      }
-    } catch (e) {}
+      } catch (err) {}
+    }
 
-    // 4. LocalStorage fallback
-    try {
-      const localStr = localStorage.getItem('trieye_services_matrix');
-      if (localStr) {
-        const localSaved = JSON.parse(localStr);
-        if (localSaved && Object.keys(localSaved).length > 0) return localSaved;
-      }
-    } catch (e) {}
+    const normalized = this.normalizePricingData(rawData);
+    if (normalized) {
+      this._currentPricing = normalized;
+      // Sync in-memory cache
+      try {
+        localStorage.setItem('trieye_services_matrix', JSON.stringify(normalized));
+      } catch (e) {}
 
-    return fallbackDefaults || {};
+      // Notify all connected UI consumers (Desktop Table, Mobile Cards, Booking Form) with the SAME single dataset
+      this._pricingSubscribers.forEach(cb => {
+        try { cb(normalized); } catch (e) { console.error(e); }
+      });
+    }
+
+    return this._currentPricing;
+  },
+
+  async getServices(fallbackDefaults) {
+    const live = await this.loadAuthoritativePricing();
+    if (live) return live;
+    return this.normalizePricingData(fallbackDefaults) || {};
   },
 
   async saveServices(servicesMap) {
     const timestamp = Date.now();
+    const normalized = this.normalizePricingData(servicesMap);
+    if (normalized) {
+      this._currentPricing = normalized;
+    }
+
     try {
       localStorage.setItem('trieye_services_matrix', JSON.stringify(servicesMap));
       localStorage.setItem('trieye_services_last_updated', String(timestamp));
@@ -691,7 +743,7 @@ const TrieyeDB = {
     try {
       if (typeof BroadcastChannel !== 'undefined') {
         const channel = new BroadcastChannel('trieye_pricing_sync');
-        channel.postMessage({ type: 'PRICING_UPDATED', matrix: servicesMap, timestamp: timestamp });
+        channel.postMessage({ type: 'PRICING_UPDATED', matrix: normalized || servicesMap, timestamp: timestamp });
       }
     } catch (e) {}
 
@@ -700,7 +752,7 @@ const TrieyeDB = {
       await fetch('/api/services', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(servicesMap)
+        body: JSON.stringify(normalized || servicesMap)
       });
     } catch (e) {}
 
@@ -753,7 +805,11 @@ const TrieyeDB = {
         console.error('🚨 [Supabase Network Error on saveServices]:', err);
       }
     }
-    return { success: true, matrix: servicesMap };
+
+    // Re-fetch and notify all subscribers with verified fresh state
+    await this.loadAuthoritativePricing();
+
+    return { success: true, matrix: this._currentPricing || servicesMap };
   },
 
   // 4. DETAILING BAYS

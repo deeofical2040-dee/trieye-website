@@ -37,17 +37,25 @@ const server = http.createServer((req, res) => {
   const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
   const pathname = parsedUrl.pathname;
 
-  // 1. API Endpoint: GET /api/services
-  if (pathname === '/api/services' && req.method === 'GET') {
+  // 1. API Endpoint: GET / HEAD /api/services
+  if (pathname === '/api/services' && (req.method === 'GET' || req.method === 'HEAD')) {
+    const noCacheHeaders = {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0',
+      'Pragma': 'no-cache',
+      'Expires': '0',
+      'Surrogate-Control': 'no-store'
+    };
+
     if (fs.existsSync(DATA_FILE)) {
       try {
         const data = fs.readFileSync(DATA_FILE, 'utf-8');
-        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.writeHead(200, noCacheHeaders);
         res.end(data);
         return;
       } catch (e) {}
     }
-    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.writeHead(200, noCacheHeaders);
     res.end(JSON.stringify({}));
     return;
   }
@@ -61,7 +69,10 @@ const server = http.createServer((req, res) => {
         const json = JSON.parse(body);
         fs.writeFileSync(DATA_FILE, JSON.stringify(json, null, 2), 'utf-8');
         console.log('⚡ [Server] Saved services pricing matrix permanently to disk.');
-        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.writeHead(200, {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'no-store, no-cache, must-revalidate'
+        });
         res.end(JSON.stringify({ success: true, saved: json }));
       } catch (err) {
         res.writeHead(400, { 'Content-Type': 'application/json' });

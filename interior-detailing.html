@@ -1516,22 +1516,68 @@
     });
   }
 
-  async function syncFromSupabase() {
+  async function syncAuthoritativePricing() {
     try {
-      let servicesMap = null;
-      if (window.TrieyeDB && typeof window.TrieyeDB.getServices === 'function') {
-        servicesMap = await window.TrieyeDB.getServices(defaultServices);
-      } else {
-        const local = localStorage.getItem('trieye_services_matrix');
-        servicesMap = local ? JSON.parse(local) : defaultServices;
-      }
-      if (servicesMap && Object.keys(servicesMap).length > 0) {
-        renderPublicServices(servicesMap);
+      if (window.TrieyeDB && typeof window.TrieyeDB.loadAuthoritativePricing === 'function') {
+        const fresh = await window.TrieyeDB.loadAuthoritativePricing();
+        if (fresh) renderPublicServices(fresh);
       }
     } catch (e) {
-      console.warn('⚠️ [Trieye Supabase sync error]:', e);
+      console.warn('⚠️ [Trieye Pricing sync error]:', e);
     }
   }
+
+  // 1. Subscribe to reactive runtime pricing engine
+  if (window.TrieyeDB && typeof window.TrieyeDB.subscribePricing === 'function') {
+    window.TrieyeDB.subscribePricing(renderPublicServices);
+  }
+
+  // 2. Fetch fresh authoritative pricing on script start and DOM load
+  syncAuthoritativePricing();
+  window.addEventListener('DOMContentLoaded', () => {
+    syncAuthoritativePricing();
+  });
+
+  // 3. Cross-tab BroadcastChannel listener for zero-delay local updates
+  try {
+    if (typeof BroadcastChannel !== 'undefined') {
+      const pricingChan = new BroadcastChannel('trieye_pricing_sync');
+      pricingChan.onmessage = (msg) => {
+        if (msg.data && msg.data.type === 'PRICING_UPDATED' && msg.data.matrix) {
+          console.log('⚡ [Pricing synced dynamically via BroadcastChannel]');
+          renderPublicServices(msg.data.matrix);
+        }
+      };
+    }
+  } catch (e) {}
+
+  // 4. Supabase Realtime Subscription
+  if (window.TrieyeDB) {
+    window.TrieyeDB.subscribeToChanges((table) => {
+      console.log('⚡ [Realtime Notification received on interior-detailing.html for table]:', table);
+      syncAuthoritativePricing();
+    });
+  }
+
+  // 5. Visibility & Focus listener for instant fresh pricing when returning to tab/app
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      syncAuthoritativePricing();
+    }
+  });
+  window.addEventListener('focus', () => {
+    syncAuthoritativePricing();
+  });
+
+  // 6. Cross-tab local storage sync listener
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'trieye_services_matrix' && e.newValue) {
+      try {
+        const matrix = JSON.parse(e.newValue);
+        if (matrix) renderPublicServices(matrix);
+      } catch (err) {}
+    }
+  });
 
   // Toast Function
   const toast = document.getElementById('toast');
@@ -1712,54 +1758,7 @@
     });
   }
 
-  // Immediate initial render from localStorage or catalog fallback (0ms delay)
-  try {
-    const cached = JSON.parse(localStorage.getItem('trieye_services_matrix'));
-    if (cached && Object.keys(cached).length > 0) {
-      renderPublicServices(cached);
-    } else {
-      renderPublicServices(defaultServices);
-    }
-  } catch (e) {
-    renderPublicServices(defaultServices);
-  }
 
-  // Initial backend/Supabase sync on script run & DOMContentLoaded
-  syncFromSupabase();
-  window.addEventListener('DOMContentLoaded', () => {
-    syncFromSupabase();
-  });
-
-  // Cross-tab BroadcastChannel listener for zero-delay live updates
-  try {
-    if (typeof BroadcastChannel !== 'undefined') {
-      const pricingChan = new BroadcastChannel('trieye_pricing_sync');
-      pricingChan.onmessage = (msg) => {
-        if (msg.data && msg.data.type === 'PRICING_UPDATED' && msg.data.matrix) {
-          console.log('⚡ [Pricing synced dynamically via BroadcastChannel]');
-          renderPublicServices(msg.data.matrix);
-        }
-      };
-    }
-  } catch (e) {}
-
-  // Establish Supabase Realtime Subscription
-  if (window.TrieyeDB) {
-    window.TrieyeDB.subscribeToChanges((table) => {
-      console.log('⚡ [Realtime Notification received on index.html for table]:', table);
-      syncFromSupabase();
-    });
-  }
-
-  // Cross-tab local storage sync listener
-  window.addEventListener('storage', (e) => {
-    if (e.key === 'trieye_services_matrix') {
-      try {
-        const matrix = JSON.parse(e.newValue);
-        if (matrix) renderPublicServices(matrix);
-      } catch (err) {}
-    }
-  });
 </script>
 
 <!-- NEXT.JS DEV ISSUE INDICATOR PILL -->

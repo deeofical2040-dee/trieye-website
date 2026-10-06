@@ -1182,83 +1182,12 @@
   // Slot Selection State
   let selectedSlot = '';
 
-  // Default Studio Services Catalog Matrix (Seed catalog matching active services)
-  const defaultServices = {
-    'Foam Wash': {
-      name: 'Foam Wash',
-      desc: 'Snow Foam Pre-Wash & Decontamination detailing',
-      duration_minutes: 45,
-      base_price: 699,
-      hatchback_price: 566,
-      sedan_price: 699,
-      suv_price: 874,
-      bike_price: 350,
-      pricing: {
-        'Hatchback': 566,
-        'Sedan': 699,
-        'SUV / 4x4': 874,
-        'Superbike': 350
-      },
-      active: true
-    },
-    'Full Detail Combo': {
-      name: 'Full Detail Combo',
-      desc: 'Comprehensive detailing package (Foam Wash + Rubbing Polish + Interior Deep Cleaning)',
-      duration_minutes: 180,
-      base_price: 4999,
-      hatchback_price: 3999,
-      sedan_price: 4999,
-      suv_price: 6249,
-      bike_price: 2500,
-      pricing: {
-        'Hatchback': 3999,
-        'Sedan': 4999,
-        'SUV / 4x4': 6249,
-        'Superbike': 2500
-      },
-      active: true
-    },
-    'Interior Deep Cleaning': {
-      name: 'Interior Deep Cleaning',
-      desc: 'Steam extraction & interior upholstery deep clean',
-      duration_minutes: 90,
-      base_price: 2299,
-      hatchback_price: 1839,
-      sedan_price: 2299,
-      suv_price: 2874,
-      bike_price: 1150,
-      pricing: {
-        'Hatchback': 1839,
-        'Sedan': 2299,
-        'SUV / 4x4': 2874,
-        'Superbike': 1150
-      },
-      active: true
-    },
-    'Rubbing Polish': {
-      name: 'Rubbing Polish',
-      desc: 'Dual-Action Rubbing Polish & Paint Correction',
-      duration_minutes: 120,
-      base_price: 97,
-      hatchback_price: 69,
-      sedan_price: 97,
-      suv_price: 84,
-      bike_price: 60,
-      pricing: {
-        'Hatchback': 69,
-        'Sedan': 97,
-        'SUV / 4x4': 84,
-        'Superbike': 60
-      },
-      active: true
-    }
-  };
-
-  // Dynamic Service Table & Booking Dropdown Rendering from Backend/Admin
+  // Single Authoritative Runtime Pricing State
+  window.trieyeCurrentPricing = null;
   let activeServicesList = [];
 
   function formatPriceDisplay(price) {
-    if (price === null || price === undefined || isNaN(price) || price <= 0) {
+    if (price === null || price === undefined || isNaN(price) || Number(price) <= 0) {
       return '—';
     }
     return `₹${Number(price).toLocaleString('en-IN')}`;
@@ -1271,20 +1200,20 @@
     let val = undefined;
 
     if (vt.includes('hatch')) {
-      val = service.hatchback_price !== null && service.hatchback_price !== undefined && service.hatchback_price !== ''
+      val = (service.hatchback_price !== null && service.hatchback_price !== undefined && service.hatchback_price !== '')
         ? service.hatchback_price
         : (p['Hatchback'] !== undefined ? p['Hatchback'] : service.base_price);
     } else if (vt.includes('suv') || vt.includes('4x4') || vt.includes('4*4')) {
-      val = service.suv_price !== null && service.suv_price !== undefined && service.suv_price !== ''
+      val = (service.suv_price !== null && service.suv_price !== undefined && service.suv_price !== '')
         ? service.suv_price
         : (p['SUV / 4x4'] !== undefined ? p['SUV / 4x4'] : (p['SUV'] !== undefined ? p['SUV'] : service.base_price));
     } else if (vt.includes('bike') || vt.includes('superbike') || vt.includes('motorcycle') || vt.includes('two')) {
-      val = service.bike_price !== null && service.bike_price !== undefined && service.bike_price !== ''
+      val = (service.bike_price !== null && service.bike_price !== undefined && service.bike_price !== '')
         ? service.bike_price
         : (p['Superbike'] !== undefined ? p['Superbike'] : (p['Bike'] !== undefined ? p['Bike'] : (p['Superbike / Bike'] !== undefined ? p['Superbike / Bike'] : service.base_price)));
     } else {
       // Default Sedan / Car
-      val = service.sedan_price !== null && service.sedan_price !== undefined && service.sedan_price !== ''
+      val = (service.sedan_price !== null && service.sedan_price !== undefined && service.sedan_price !== '')
         ? service.sedan_price
         : (p['Sedan'] !== undefined ? p['Sedan'] : service.base_price);
     }
@@ -1309,7 +1238,7 @@
       const price = getVehiclePrice(s, currentVeh);
       const opt = document.createElement('option');
       opt.value = s.name;
-      opt.innerText = price ? `${s.name} (₹${price.toLocaleString('en-IN')})` : s.name;
+      opt.innerText = price ? `${s.name} (₹${price.toLocaleString('en-IN')})` : `${s.name} (—)`;
       selectEl.appendChild(opt);
     });
 
@@ -1325,6 +1254,7 @@
     const services = Object.values(servicesMap).filter(s => s && s.active !== false);
     if (services.length === 0) return;
 
+    window.trieyeCurrentPricing = servicesMap;
     activeServicesList = services;
 
     const tableEl = document.getElementById('public-services-table');
@@ -1362,7 +1292,7 @@
         ${services.map(s => `<div class="cell">${escapeHtml(s.name)}</div>`).join('')}
       </div>`;
 
-      // 2. Build Vehicle Tier Rows
+      // 2. Build Vehicle Tier Rows (Desktop Table + Mobile Cards styled via CSS media queries)
       let bodyHtml = vehRows.map(veh => {
         const cellsHtml = services.map(s => {
           const price = getVehiclePrice(s, veh.key);
@@ -1408,22 +1338,78 @@
     });
   }
 
-  async function syncFromSupabase() {
+  async function syncAuthoritativePricing() {
     try {
-      let servicesMap = null;
-      if (window.TrieyeDB && typeof window.TrieyeDB.getServices === 'function') {
-        servicesMap = await window.TrieyeDB.getServices(defaultServices);
-      } else {
-        const local = localStorage.getItem('trieye_services_matrix');
-        servicesMap = local ? JSON.parse(local) : defaultServices;
-      }
-      if (servicesMap && Object.keys(servicesMap).length > 0) {
-        renderPublicServices(servicesMap);
+      if (window.TrieyeDB && typeof window.TrieyeDB.loadAuthoritativePricing === 'function') {
+        const fresh = await window.TrieyeDB.loadAuthoritativePricing();
+        if (fresh) renderPublicServices(fresh);
       }
     } catch (e) {
-      console.warn('⚠️ [Trieye Supabase sync error]:', e);
+      console.warn('⚠️ [Trieye Pricing sync error]:', e);
     }
   }
+
+  // 1. Subscribe to reactive runtime pricing engine
+  if (window.TrieyeDB && typeof window.TrieyeDB.subscribePricing === 'function') {
+    window.TrieyeDB.subscribePricing(renderPublicServices);
+  }
+
+  // 2. Fetch fresh authoritative pricing on script start and DOM load
+  syncAuthoritativePricing();
+  window.addEventListener('DOMContentLoaded', () => {
+    syncAuthoritativePricing();
+  });
+
+  // 3. Cross-tab BroadcastChannel listener for zero-delay local updates
+  try {
+    if (typeof BroadcastChannel !== 'undefined') {
+      const pricingChan = new BroadcastChannel('trieye_pricing_sync');
+      pricingChan.onmessage = (msg) => {
+        if (msg.data && msg.data.type === 'PRICING_UPDATED' && msg.data.matrix) {
+          console.log('⚡ [Pricing synced dynamically via BroadcastChannel]');
+          renderPublicServices(msg.data.matrix);
+        }
+      };
+    }
+  } catch (e) {}
+
+  // 4. Supabase Realtime Subscription
+  if (window.TrieyeDB) {
+    window.TrieyeDB.subscribeToChanges((table) => {
+      console.log('⚡ [Realtime Notification received on ppf.html for table]:', table);
+      syncAuthoritativePricing();
+    });
+  }
+
+  // 5. Visibility & Focus listener for instant fresh pricing when returning to tab/app
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      syncAuthoritativePricing();
+    }
+  });
+  window.addEventListener('focus', () => {
+    syncAuthoritativePricing();
+  });
+
+  // 6. Cross-tab local storage sync listener
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'trieye_services_matrix' && e.newValue) {
+      try {
+        const matrix = JSON.parse(e.newValue);
+        if (matrix) renderPublicServices(matrix);
+      } catch (err) {}
+    }
+  });
+
+  // Listen to vehicle type selector changes to immediately adjust service dropdown prices
+  const vehicleTypeSelect = document.getElementById('vt');
+  if (vehicleTypeSelect) {
+    vehicleTypeSelect.addEventListener('change', () => {
+      updateBookingDropdownPrices();
+    });
+  }
+
+
 
   // Toast Function
   const toast = document.getElementById('toast');
@@ -1604,54 +1590,6 @@
     });
   }
 
-  // Immediate initial render from localStorage or catalog fallback (0ms delay)
-  try {
-    const cached = JSON.parse(localStorage.getItem('trieye_services_matrix'));
-    if (cached && Object.keys(cached).length > 0) {
-      renderPublicServices(cached);
-    } else {
-      renderPublicServices(defaultServices);
-    }
-  } catch (e) {
-    renderPublicServices(defaultServices);
-  }
-
-  // Initial backend/Supabase sync on script run & DOMContentLoaded
-  syncFromSupabase();
-  window.addEventListener('DOMContentLoaded', () => {
-    syncFromSupabase();
-  });
-
-  // Cross-tab BroadcastChannel listener for zero-delay live updates
-  try {
-    if (typeof BroadcastChannel !== 'undefined') {
-      const pricingChan = new BroadcastChannel('trieye_pricing_sync');
-      pricingChan.onmessage = (msg) => {
-        if (msg.data && msg.data.type === 'PRICING_UPDATED' && msg.data.matrix) {
-          console.log('⚡ [Pricing synced dynamically via BroadcastChannel]');
-          renderPublicServices(msg.data.matrix);
-        }
-      };
-    }
-  } catch (e) {}
-
-  // Establish Supabase Realtime Subscription
-  if (window.TrieyeDB) {
-    window.TrieyeDB.subscribeToChanges((table) => {
-      console.log('⚡ [Realtime Notification received on index.html for table]:', table);
-      syncFromSupabase();
-    });
-  }
-
-  // Cross-tab local storage sync listener
-  window.addEventListener('storage', (e) => {
-    if (e.key === 'trieye_services_matrix') {
-      try {
-        const matrix = JSON.parse(e.newValue);
-        if (matrix) renderPublicServices(matrix);
-      } catch (err) {}
-    }
-  });
 </script>
 
 <!-- NEXT.JS DEV ISSUE INDICATOR PILL -->
