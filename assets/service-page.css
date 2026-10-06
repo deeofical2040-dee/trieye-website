@@ -3285,6 +3285,12 @@ img, svg, video {
   transform: translateY(-2px) !important;
 }
 
+@media (min-width: 1025px) {
+  .explore-services-grid > .explore-card:last-child {
+    grid-column: 2;
+  }
+}
+
 @media (max-width: 1024px) {
   .explore-services-grid {
     grid-template-columns: repeat(2, 1fr);

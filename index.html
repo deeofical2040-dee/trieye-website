@@ -2583,11 +2583,6 @@
     gap: 18px;
     margin-top: 28px;
   }
-  .explore-featured-row {
-    display: flex;
-    justify-content: center;
-    margin-top: 18px;
-  }
   .explore-card {
     display: flex;
     flex-direction: column;
@@ -2737,24 +2732,16 @@
     transform: translateX(4px);
   }
 
-  /* Featured Bike Card */
-  .explore-card-featured {
-    width: min(420px, 100%);
-  }
-  .explore-card-featured .explore-card-img-wrap {
-    height: 165px;
-  }
-  .explore-card-featured .explore-card-body {
-    padding: 18px 18px 20px;
+  @media (min-width: 1025px) {
+    .explore-services-grid > .explore-card:last-child {
+      grid-column: 2;
+    }
   }
 
   @media (max-width: 1024px) {
     .explore-services-grid {
       grid-template-columns: repeat(2, 1fr);
       gap: 20px;
-    }
-    .explore-card-featured {
-      width: 100%;
     }
   }
 
@@ -3571,14 +3558,10 @@
           <p class="explore-card-desc reveal-card">Self-healing TPU film protecting your paint from rock chips &amp; road debris.</p>
           <span class="explore-card-btn reveal-card">EXPLORE PPF <span class="arrow">&rarr;</span></span>
         </div>
-      </a>
-    </div>
-
-    <!-- ROW 3: 07 BIKE DETAILING (FEATURED CENTERED CARD) -->
-    <div class="explore-featured-row">
-      <a href="/bike-detailing" class="explore-card explore-card-featured reveal-card">
+      <!-- 07 BIKE DETAILING -->
+      <a href="/bike-detailing" class="explore-card reveal-element reveal-card">
         <div class="explore-card-img-wrap reveal-card">
-          <img src="assets/bike/bike-hero.jpg" alt="Professional motorcycle detailing at TRIEYE" loading="lazy" fetchpriority="high">
+          <img src="assets/bike/bike-hero.jpg" alt="Professional motorcycle detailing at TRIEYE" loading="lazy" decoding="async">
           <div class="explore-card-overlay reveal-card">
             <span class="overlay-title">EXPLORE FULL SERVICE <span class="arrow">&rarr;</span></span>
             <span class="overlay-sub">View process, benefits &amp; complete details</span>
