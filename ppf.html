@@ -1182,30 +1182,74 @@
   // Slot Selection State
   let selectedSlot = '';
 
-  // Default Studio Services Catalog Matrix
+  // Default Studio Services Catalog Matrix (Seed catalog matching active services)
   const defaultServices = {
     'Foam Wash': {
       name: 'Foam Wash',
       desc: 'Snow Foam Pre-Wash & Decontamination detailing',
       duration_minutes: 45,
+      base_price: 699,
+      hatchback_price: 566,
+      sedan_price: 699,
+      suv_price: 874,
+      bike_price: 350,
+      pricing: {
+        'Hatchback': 566,
+        'Sedan': 699,
+        'SUV / 4x4': 874,
+        'Superbike': 350
+      },
       active: true
     },
     'Full Detail Combo': {
       name: 'Full Detail Combo',
       desc: 'Comprehensive detailing package (Foam Wash + Rubbing Polish + Interior Deep Cleaning)',
       duration_minutes: 180,
+      base_price: 4999,
+      hatchback_price: 3999,
+      sedan_price: 4999,
+      suv_price: 6249,
+      bike_price: 2500,
+      pricing: {
+        'Hatchback': 3999,
+        'Sedan': 4999,
+        'SUV / 4x4': 6249,
+        'Superbike': 2500
+      },
       active: true
     },
     'Interior Deep Cleaning': {
       name: 'Interior Deep Cleaning',
       desc: 'Steam extraction & interior upholstery deep clean',
       duration_minutes: 90,
+      base_price: 2299,
+      hatchback_price: 1839,
+      sedan_price: 2299,
+      suv_price: 2874,
+      bike_price: 1150,
+      pricing: {
+        'Hatchback': 1839,
+        'Sedan': 2299,
+        'SUV / 4x4': 2874,
+        'Superbike': 1150
+      },
       active: true
     },
     'Rubbing Polish': {
       name: 'Rubbing Polish',
       desc: 'Dual-Action Rubbing Polish & Paint Correction',
       duration_minutes: 120,
+      base_price: 97,
+      hatchback_price: 69,
+      sedan_price: 97,
+      suv_price: 84,
+      bike_price: 60,
+      pricing: {
+        'Hatchback': 69,
+        'Sedan': 97,
+        'SUV / 4x4': 84,
+        'Superbike': 60
+      },
       active: true
     }
   };
@@ -1213,21 +1257,43 @@
   // Dynamic Service Table & Booking Dropdown Rendering from Backend/Admin
   let activeServicesList = [];
 
+  function formatPriceDisplay(price) {
+    if (price === null || price === undefined || isNaN(price) || price <= 0) {
+      return '—';
+    }
+    return `₹${Number(price).toLocaleString('en-IN')}`;
+  }
+
   function getVehiclePrice(service, vehicleType) {
-    if (!service) return 0;
-    const vt = (vehicleType || '').toLowerCase();
+    if (!service) return null;
+    const vt = (vehicleType || '').toLowerCase().trim();
     const p = service.pricing || {};
+    let val = undefined;
+
     if (vt.includes('hatch')) {
-      return Number(service.hatchback_price !== null && service.hatchback_price !== undefined ? service.hatchback_price : (p['Hatchback'] !== undefined ? p['Hatchback'] : service.base_price || 0));
+      val = service.hatchback_price !== null && service.hatchback_price !== undefined && service.hatchback_price !== ''
+        ? service.hatchback_price
+        : (p['Hatchback'] !== undefined ? p['Hatchback'] : service.base_price);
+    } else if (vt.includes('suv') || vt.includes('4x4') || vt.includes('4*4')) {
+      val = service.suv_price !== null && service.suv_price !== undefined && service.suv_price !== ''
+        ? service.suv_price
+        : (p['SUV / 4x4'] !== undefined ? p['SUV / 4x4'] : (p['SUV'] !== undefined ? p['SUV'] : service.base_price));
+    } else if (vt.includes('bike') || vt.includes('superbike') || vt.includes('motorcycle') || vt.includes('two')) {
+      val = service.bike_price !== null && service.bike_price !== undefined && service.bike_price !== ''
+        ? service.bike_price
+        : (p['Superbike'] !== undefined ? p['Superbike'] : (p['Bike'] !== undefined ? p['Bike'] : (p['Superbike / Bike'] !== undefined ? p['Superbike / Bike'] : service.base_price)));
+    } else {
+      // Default Sedan / Car
+      val = service.sedan_price !== null && service.sedan_price !== undefined && service.sedan_price !== ''
+        ? service.sedan_price
+        : (p['Sedan'] !== undefined ? p['Sedan'] : service.base_price);
     }
-    if (vt.includes('suv') || vt.includes('4x4')) {
-      return Number(service.suv_price !== null && service.suv_price !== undefined ? service.suv_price : (p['SUV / 4x4'] !== undefined ? p['SUV / 4x4'] : service.base_price || 0));
+
+    if (val === undefined || val === null || val === '' || isNaN(Number(val))) {
+      return null;
     }
-    if (vt.includes('bike') || vt.includes('superbike') || vt.includes('motorcycle') || vt.includes('two')) {
-      return Number(service.bike_price !== null && service.bike_price !== undefined ? service.bike_price : (p['Superbike'] !== undefined ? p['Superbike'] : service.base_price || 0));
-    }
-    // Default Sedan / Car
-    return Number(service.sedan_price !== null && service.sedan_price !== undefined ? service.sedan_price : (p['Sedan'] !== undefined ? p['Sedan'] : service.base_price || 0));
+    const num = Number(val);
+    return num > 0 ? num : null;
   }
 
   function updateBookingDropdownPrices() {
@@ -1243,7 +1309,7 @@
       const price = getVehiclePrice(s, currentVeh);
       const opt = document.createElement('option');
       opt.value = s.name;
-      opt.innerText = `${s.name} (₹${price.toLocaleString('en-IN')})`;
+      opt.innerText = price ? `${s.name} (₹${price.toLocaleString('en-IN')})` : s.name;
       selectEl.appendChild(opt);
     });
 
@@ -1256,8 +1322,9 @@
     if (!servicesMap || typeof servicesMap !== 'object') return;
 
     // Filter only active services
-    const services = Object.values(servicesMap).filter(s => s.active !== false);
+    const services = Object.values(servicesMap).filter(s => s && s.active !== false);
     if (services.length === 0) return;
+
     activeServicesList = services;
 
     const tableEl = document.getElementById('public-services-table');
@@ -1299,7 +1366,7 @@
       let bodyHtml = vehRows.map(veh => {
         const cellsHtml = services.map(s => {
           const price = getVehiclePrice(s, veh.key);
-          const isHigh = price >= 2000;
+          const isHigh = price && price >= 2000;
           let label = 'per visit';
           if (s.name && s.name.toLowerCase().includes('wash')) {
             label = 'per wash';
@@ -1307,8 +1374,10 @@
             label = 'chain & deep clean';
           }
 
+          const formatted = formatPriceDisplay(price);
+
           return `<div class="cell" data-label="${escapeHtml(s.name)}">
-            <span class="price mono ${isHigh ? 'hi' : ''}">₹${price.toLocaleString('en-IN')}</span>
+            <span class="price mono ${isHigh ? 'hi' : ''}">${formatted}</span>
             <span class="price-lbl">${label}</span>
           </div>`;
         }).join('');

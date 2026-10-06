@@ -594,11 +594,11 @@ const TrieyeDB = {
         if (!error && Array.isArray(data) && data.length > 0) {
           const map = {};
           data.forEach(s => {
-            const hatch = Number(s.hatchback_price !== null && s.hatchback_price !== undefined ? s.hatchback_price : (s.base_price || 0));
-            const sedan = Number(s.sedan_price !== null && s.sedan_price !== undefined ? s.sedan_price : (s.base_price || 0));
-            const suv = Number(s.suv_price !== null && s.suv_price !== undefined ? s.suv_price : (s.base_price || 0));
-            const bike = Number(s.bike_price !== null && s.bike_price !== undefined ? s.bike_price : (s.base_price || 0));
-            const base = Number(s.base_price !== null && s.base_price !== undefined ? s.base_price : sedan);
+            const hatch = s.hatchback_price !== null && s.hatchback_price !== undefined ? Number(s.hatchback_price) : (s.base_price !== null && s.base_price !== undefined ? Number(s.base_price) : null);
+            const sedan = s.sedan_price !== null && s.sedan_price !== undefined ? Number(s.sedan_price) : (s.base_price !== null && s.base_price !== undefined ? Number(s.base_price) : null);
+            const suv = s.suv_price !== null && s.suv_price !== undefined ? Number(s.suv_price) : (s.base_price !== null && s.base_price !== undefined ? Number(s.base_price) : null);
+            const bike = s.bike_price !== null && s.bike_price !== undefined ? Number(s.bike_price) : (s.base_price !== null && s.base_price !== undefined ? Number(s.base_price) : null);
+            const base = s.base_price !== null && s.base_price !== undefined ? Number(s.base_price) : (sedan || 0);
 
             map[s.name] = {
               id: s.id,
@@ -656,7 +656,19 @@ const TrieyeDB = {
       }
     } catch (e) {}
 
-    // 3. Tertiary fallback: LocalStorage
+    // 3. Static JSON asset fallback
+    try {
+      const staticRes = await fetch('/assets/services-data.json', { method: 'GET', cache: 'no-store' });
+      if (staticRes.ok) {
+        const staticData = await staticRes.json();
+        if (staticData && typeof staticData === 'object' && Object.keys(staticData).length > 0) {
+          localStorage.setItem('trieye_services_matrix', JSON.stringify(staticData));
+          return staticData;
+        }
+      }
+    } catch (e) {}
+
+    // 4. LocalStorage fallback
     try {
       const localStr = localStorage.getItem('trieye_services_matrix');
       if (localStr) {
