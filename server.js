@@ -98,8 +98,8 @@ function startServer(port) {
   server.listen(port, () => {
     console.log(`\n==================================================`);
     console.log(`🚀 Trieye Studio Server running at: http://localhost:${port}/`);
-    console.log(`📄 Customer Website: http://localhost:${port}/index.html`);
-    console.log(`📊 Admin Dashboard: http://localhost:${port}/dashboard.html`);
+    console.log(`📄 Customer Website: http://localhost:${port}/`);
+    console.log(`📊 Admin Dashboard: http://localhost:${port}/dashboard`);
     console.log(`⚡ Persistent Pricing API active at: http://localhost:${port}/api/services`);
     console.log(`==================================================\n`);
   });
@@ -107,9 +107,9 @@ function startServer(port) {
 
 server.on('error', (err) => {
   if (err.code === 'EADDRINUSE') {
-    const nextPort = PORT === 3000 ? 8080 : Number(PORT) + 1;
-    console.warn(`⚠️ Port ${PORT} in use, trying port ${nextPort}...`);
-    startServer(nextPort);
+    console.error(`\n❌ [Error] Port ${PORT} is already in use by another process.`);
+    console.error(`👉 Stop the existing process on port ${PORT} or check 'lsof -i :${PORT}'\n`);
+    process.exit(1);
   } else {
     console.error('Server error:', err);
   }
