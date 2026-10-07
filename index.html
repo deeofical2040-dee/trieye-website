@@ -3700,8 +3700,8 @@
         </div>
         <div class="field">
           <label for="vnum">Vehicle No (Registration)</label>
-          <input type="text" id="vnum" placeholder="TN 01 AB 1234" maxlength="13" autocomplete="off" style="text-transform:uppercase;">
-          <div class="field-error-msg" id="vnum-error">Enter vehicle number in format TN 01 AB 1234</div>
+          <input type="text" id="vnum" placeholder="TN 01 AB 1234" maxlength="14" autocomplete="off" style="text-transform:uppercase;" required>
+          <div class="field-error-msg" id="vnum-error">Enter a valid vehicle number (e.g. TN 01 AB 1234)</div>
         </div>
       </div>
       <button type="submit" class="btn btn-primary book-submit" id="btnSubmitBooking">Book Now →</button>
@@ -4916,7 +4916,7 @@
     }
     const isValid = window.TrieyeDB && typeof window.TrieyeDB.validateVehicleReg === 'function'
       ? window.TrieyeDB.validateVehicleReg(val)
-      : /^[A-Z]{2}\s\d{2}\s[A-Z]{2}\s\d{4}$/.test(val);
+      : /^[A-Z0-9\s]{5,14}$/.test(val);
 
     if (!isValid) {
       if (showError && vnumError) {
@@ -4938,7 +4938,10 @@
         : e.target.value.toUpperCase();
       vnumInput.value = formatted;
       if (vnumError && vnumError.classList.contains('visible')) {
-        if (/^[A-Z]{2}\s\d{2}\s[A-Z]{2}\s\d{4}$/.test(formatted)) {
+        const isValidNow = window.TrieyeDB && typeof window.TrieyeDB.validateVehicleReg === 'function'
+          ? window.TrieyeDB.validateVehicleReg(formatted)
+          : false;
+        if (isValidNow) {
           vnumError.classList.remove('visible');
           vnumInput.classList.remove('is-invalid');
         }

@@ -1237,38 +1237,79 @@ const TrieyeDB = {
   formatVehicleReg(raw) {
     if (!raw) return '';
     const clean = String(raw).toUpperCase().replace(/[^A-Z0-9]/g, '');
-    let res = '';
-    for (let i = 0; i < clean.length; i++) {
-      const char = clean[i];
-      const normLen = res.replace(/ /g, '').length;
-      if (normLen === 10) break;
-      if (normLen < 2) {
-        if (/[A-Z]/.test(char)) res += char;
-        else break;
-      } else if (normLen < 4) {
-        if (/[0-9]/.test(char)) {
-          if (normLen === 2 && !res.endsWith(' ')) res += ' ';
-          res += char;
-        } else break;
-      } else if (normLen < 6) {
-        if (/[A-Z]/.test(char)) {
-          if (normLen === 4 && !res.endsWith(' ')) res += ' ';
-          res += char;
-        } else break;
-      } else if (normLen < 10) {
-        if (/[0-9]/.test(char)) {
-          if (normLen === 6 && !res.endsWith(' ')) res += ' ';
-          res += char;
-        } else break;
+    if (!clean) return '';
+
+    // 1. Bharat (BH) Series: e.g. 22 BH 1234 AA or 22 BH 1234 A
+    if (/^\d{2}B/.test(clean)) {
+      const yr = clean.slice(0, 2);
+      const rest = clean.slice(2);
+      const m = rest.match(/^([A-Z]{1,2})?(\d{1,4})?([A-Z]{1,2})?/);
+      if (m) {
+        return [yr, m[1], m[2], m[3]].filter(Boolean).join(' ');
       }
     }
-    return res.trim();
+
+    // 2. Standard Indian Registration:
+    // Starts with 2 letters (State code, e.g. TN, KA, DL, PY, MH, KL, etc.)
+    if (/^[A-Z]{1,2}/.test(clean)) {
+      const state = clean.slice(0, 2);
+      const rest = clean.slice(2);
+      if (!rest) return state;
+
+      // Next is RTO code (1-2 digits)
+      const rtoMatch = rest.match(/^(\d{1,2})/);
+      if (!rtoMatch) {
+        return clean.slice(0, 10);
+      }
+
+      const rto = rtoMatch[1];
+      const afterRto = rest.slice(rto.length);
+      if (!afterRto) return `${state} ${rto}`;
+
+      // After RTO:
+      // Option A: Series letters (1-3 letters) + Number (1-4 digits)
+      // Option B: Number (1-4 digits) directly
+      const seriesMatch = afterRto.match(/^([A-Z]{1,3})/);
+      if (seriesMatch) {
+        const series = seriesMatch[1];
+        const afterSeries = afterRto.slice(series.length);
+        const numMatch = afterSeries.match(/^(\d{1,4})/);
+        const num = numMatch ? numMatch[1] : '';
+        return [state, rto, series, num].filter(Boolean).join(' ');
+      } else {
+        const numMatch = afterRto.match(/^(\d{1,4})/);
+        const num = numMatch ? numMatch[1] : '';
+        return [state, rto, num].filter(Boolean).join(' ');
+      }
+    }
+
+    // Fallback: limit length to 14 chars
+    return clean.slice(0, 14);
   },
 
   validateVehicleReg(val) {
     if (!val) return false;
-    const regex = /^[A-Z]{2}\s\d{2}\s[A-Z]{2}\s\d{4}$/;
-    return regex.test(String(val).trim());
+    const str = String(val).trim().toUpperCase();
+    const clean = str.replace(/[^A-Z0-9]/g, '');
+    
+    if (clean.length < 5 || clean.length > 11) return false;
+
+    // 1. Standard: State (2 letters) + RTO (1-2 digits) + optional series (0-3 letters) + number (1-4 digits)
+    const m = clean.match(/^([A-Z]{2})(\d{1,2})([A-Z]{0,3})(\d{1,4})$/);
+    if (m) {
+      const num = m[4];
+      if (num && parseInt(num, 10) > 0) return true;
+    }
+
+    // 2. Bharat (BH) Series: 2 digits year + BH + 4 digits + 1-2 letters (e.g. 22 BH 1234 AA)
+    const mBH = clean.match(/^(\d{2})BH(\d{4})([A-Z]{1,2})$/);
+    if (mBH && parseInt(mBH[2], 10) > 0) return true;
+
+    // 3. Vintage / Old 3-letter formats: e.g. TMN 1234, MSX 1234
+    const mVin = clean.match(/^([A-Z]{3})(\d{1,4})$/);
+    if (mVin && parseInt(mVin[2], 10) > 0) return true;
+
+    return false;
   },
 
   // 10. PUBLIC SECURE TRACK BOOKING LOOKUP
