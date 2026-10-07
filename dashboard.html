@@ -1451,7 +1451,7 @@
           </div>
           <div class="form-group">
             <label class="form-label">Vehicle Number *</label>
-            <input type="text" id="mb-reg" class="form-input" placeholder="e.g. TN 01 AB 1234" maxlength="14" autocomplete="off" style="text-transform:uppercase;" required>
+            <input type="text" id="mb-reg" class="form-input" placeholder="TN 01 AB 1234" maxlength="13" autocomplete="off" spellcheck="false" style="text-transform:uppercase;" required>
           </div>
           <div class="form-group">
             <label class="form-label">Vehicle Type *</label>
@@ -1623,7 +1623,7 @@
       </div>
       <div style="width:48%; background:#f9f9f9; padding:10px; border-left:4px solid #a3e635;">
         <div style="font-size:11px; color:#777; font-weight:600; text-transform:uppercase; margin-bottom:5px;">Vehicle Details</div>
-        <div style="font-size:16px; font-weight:700; margin-bottom:2px;" id="inv-veh-reg">TN 00 0000</div>
+        <div style="font-size:16px; font-weight:700; margin-bottom:2px;" id="inv-veh-reg">TN 01 AB 1234</div>
         <div style="font-size:13px; color:#333;" id="inv-veh-model">Sedan</div>
       </div>
     </div>
@@ -3208,8 +3208,8 @@
         if (existing.vehicleType) document.getElementById('walkin-vehicle').value = existing.vehicleType;
         if (existing.model) document.getElementById('walkin-model').value = existing.model;
         if (existing.reg) {
-          const formattedReg = window.TrieyeDB && typeof window.TrieyeDB.formatVehicleReg === 'function'
-            ? window.TrieyeDB.formatVehicleReg(existing.reg)
+          const formattedReg = window.TrieyeDB && typeof window.TrieyeDB.formatVehicleNumber === 'function'
+            ? window.TrieyeDB.formatVehicleNumber(existing.reg)
             : existing.reg;
           document.getElementById('walkin-reg').value = formattedReg;
         }
@@ -3259,17 +3259,19 @@
       const val = walkinRegInput.value.trim();
       if (!val) {
         if (showError && walkinRegError) {
+          walkinRegError.innerText = "Enter vehicle number in TN 01 AB 1234 format";
           walkinRegError.classList.add('visible');
           walkinRegInput.classList.add('is-invalid');
         }
         return false;
       }
-      const isValid = window.TrieyeDB && typeof window.TrieyeDB.validateVehicleReg === 'function'
-        ? window.TrieyeDB.validateVehicleReg(val)
-        : /^[A-Z]{2}\s\d{2}\s[A-Z]{2}\s\d{4}$/.test(val);
+      const isValid = window.TrieyeDB && typeof window.TrieyeDB.validateVehicleNumber === 'function'
+        ? window.TrieyeDB.validateVehicleNumber(val)
+        : /^[A-Z]{2}\s[0-9]{2}\s[A-Z]{2}\s[0-9]{4}$/.test(val);
 
       if (!isValid) {
         if (showError && walkinRegError) {
+          walkinRegError.innerText = "Enter vehicle number in TN 01 AB 1234 format";
           walkinRegError.classList.add('visible');
           walkinRegInput.classList.add('is-invalid');
         }
@@ -3282,24 +3284,28 @@
     }
 
     if (walkinRegInput) {
-      walkinRegInput.addEventListener('input', (e) => {
-        const formatted = window.TrieyeDB && typeof window.TrieyeDB.formatVehicleReg === 'function'
-          ? window.TrieyeDB.formatVehicleReg(e.target.value)
-          : e.target.value.toUpperCase();
-        walkinRegInput.value = formatted;
-        if (walkinRegError && walkinRegError.classList.contains('visible')) {
-          if (/^[A-Z]{2}\s\d{2}\s[A-Z]{2}\s\d{4}$/.test(formatted)) {
-            walkinRegError.classList.remove('visible');
-            walkinRegInput.classList.remove('is-invalid');
+      if (window.TrieyeDB && typeof window.TrieyeDB.attachVehicleInput === 'function') {
+        window.TrieyeDB.attachVehicleInput(walkinRegInput, walkinRegError);
+      } else {
+        walkinRegInput.addEventListener('input', (e) => {
+          const formatted = window.TrieyeDB && typeof window.TrieyeDB.formatVehicleNumber === 'function'
+            ? window.TrieyeDB.formatVehicleNumber(e.target.value)
+            : e.target.value.toUpperCase();
+          walkinRegInput.value = formatted;
+          if (walkinRegError && walkinRegError.classList.contains('visible')) {
+            if (/^[A-Z]{2}\s[0-9]{2}\s[A-Z]{2}\s[0-9]{4}$/.test(formatted)) {
+              walkinRegError.classList.remove('visible');
+              walkinRegInput.classList.remove('is-invalid');
+            }
           }
-        }
-      });
+        });
 
-      walkinRegInput.addEventListener('blur', () => {
-        if (walkinRegInput.value.trim().length > 0) {
-          validateWalkinReg(true);
-        }
-      });
+        walkinRegInput.addEventListener('blur', () => {
+          if (walkinRegInput.value.trim().length > 0) {
+            validateWalkinReg(true);
+          }
+        });
+      }
     }
 
     function handleWalkinSubmit(e) {
@@ -3314,7 +3320,10 @@
         walkinRegInput?.focus();
         return;
       }
-      const reg = walkinRegInput ? walkinRegInput.value.trim().toUpperCase() : 'TN 01 AB 1234';
+      const rawReg = walkinRegInput ? walkinRegInput.value.trim() : '';
+      const reg = window.TrieyeDB && typeof window.TrieyeDB.formatVehicleNumber === 'function'
+        ? window.TrieyeDB.formatVehicleNumber(rawReg)
+        : rawReg.toUpperCase();
 
       const service = document.getElementById('walkin-service').value;
       const bay = document.getElementById('walkin-bay').value;
@@ -4012,7 +4021,7 @@
             </div>
             <div style="display:flex; justify-content:space-between;">
               <span style="color:var(--muted);">Registration Number:</span>
-              <strong style="font-family:'IBM Plex Mono'; color:var(--pink);">${escapeHtml(b.reg || 'TN 01 NO REG')}</strong>
+              <strong style="font-family:'IBM Plex Mono'; color:var(--pink);">${escapeHtml(window.TrieyeDB && typeof window.TrieyeDB.formatVehicleNumber === 'function' ? (window.TrieyeDB.formatVehicleNumber(b.reg) || b.reg || 'TN 01 AB 1234') : (b.reg || 'TN 01 AB 1234'))}</strong>
             </div>
           </div>
 
@@ -5200,17 +5209,17 @@ async function makeBill() {
     return;
   }
 
-  const reg = window.TrieyeDB && typeof window.TrieyeDB.formatVehicleReg === 'function'
-    ? window.TrieyeDB.formatVehicleReg(rawReg)
+  const reg = window.TrieyeDB && typeof window.TrieyeDB.formatVehicleNumber === 'function'
+    ? window.TrieyeDB.formatVehicleNumber(rawReg)
     : rawReg.toUpperCase();
   document.getElementById('mb-reg').value = reg;
 
-  const isValidReg = window.TrieyeDB && typeof window.TrieyeDB.validateVehicleReg === 'function'
-    ? window.TrieyeDB.validateVehicleReg(reg)
-    : /^[A-Z0-9\s]{5,14}$/.test(reg);
+  const isValidReg = window.TrieyeDB && typeof window.TrieyeDB.validateVehicleNumber === 'function'
+    ? window.TrieyeDB.validateVehicleNumber(reg)
+    : /^[A-Z]{2}\s[0-9]{2}\s[A-Z]{2}\s[0-9]{4}$/.test(reg);
 
   if (!isValidReg) {
-    errorMsg.innerText = "Enter a valid vehicle number (e.g. TN 01 AB 1234)";
+    errorMsg.innerText = "Enter vehicle number in TN 01 AB 1234 format";
     errorMsg.style.display = 'inline';
     document.getElementById('mb-reg').focus();
     return;
@@ -5349,14 +5358,20 @@ async function makeBill() {
 document.addEventListener('DOMContentLoaded', () => {
     mbAddServiceRow();
     const mbRegInput = document.getElementById('mb-reg');
+    const mbError = document.getElementById('mb-error');
     if (mbRegInput) {
-      mbRegInput.addEventListener('input', function() {
-        if (window.TrieyeDB && typeof window.TrieyeDB.formatVehicleReg === 'function') {
-          this.value = window.TrieyeDB.formatVehicleReg(this.value);
-        } else {
-          this.value = this.value.toUpperCase();
-        }
-      });
+      if (window.TrieyeDB && typeof window.TrieyeDB.attachVehicleInput === 'function') {
+        window.TrieyeDB.attachVehicleInput(mbRegInput, mbError);
+      } else {
+        mbRegInput.addEventListener('input', function() {
+          const val = this.value;
+          if (window.TrieyeDB && typeof window.TrieyeDB.formatVehicleNumber === 'function') {
+            this.value = window.TrieyeDB.formatVehicleNumber(val);
+          } else {
+            this.value = val.toUpperCase();
+          }
+        });
+      }
     }
 });
 // ==========================================

@@ -1439,17 +1439,19 @@
     const val = vnumInput.value.trim();
     if (!val) {
       if (showError && vnumError) {
+        vnumError.innerText = "Enter vehicle number in TN 01 AB 1234 format";
         vnumError.classList.add('visible');
         vnumInput.classList.add('is-invalid');
       }
       return false;
     }
-    const isValid = window.TrieyeDB && typeof window.TrieyeDB.validateVehicleReg === 'function'
-      ? window.TrieyeDB.validateVehicleReg(val)
-      : /^[A-Z]{2}\s\d{2}\s[A-Z]{2}\s\d{4}$/.test(val);
+    const isValid = window.TrieyeDB && typeof window.TrieyeDB.validateVehicleNumber === 'function'
+      ? window.TrieyeDB.validateVehicleNumber(val)
+      : /^[A-Z]{2}\s[0-9]{2}\s[A-Z]{2}\s[0-9]{4}$/.test(val);
 
     if (!isValid) {
       if (showError && vnumError) {
+        vnumError.innerText = "Enter vehicle number in TN 01 AB 1234 format";
         vnumError.classList.add('visible');
         vnumInput.classList.add('is-invalid');
       }
@@ -1462,24 +1464,28 @@
   }
 
   if (vnumInput) {
-    vnumInput.addEventListener('input', (e) => {
-      const formatted = window.TrieyeDB && typeof window.TrieyeDB.formatVehicleReg === 'function'
-        ? window.TrieyeDB.formatVehicleReg(e.target.value)
-        : e.target.value.toUpperCase();
-      vnumInput.value = formatted;
-      if (vnumError && vnumError.classList.contains('visible')) {
-        if (/^[A-Z]{2}\s\d{2}\s[A-Z]{2}\s\d{4}$/.test(formatted)) {
-          vnumError.classList.remove('visible');
-          vnumInput.classList.remove('is-invalid');
+    if (window.TrieyeDB && typeof window.TrieyeDB.attachVehicleInput === 'function') {
+      window.TrieyeDB.attachVehicleInput(vnumInput, vnumError);
+    } else {
+      vnumInput.addEventListener('input', (e) => {
+        const formatted = window.TrieyeDB && typeof window.TrieyeDB.formatVehicleNumber === 'function'
+          ? window.TrieyeDB.formatVehicleNumber(e.target.value)
+          : e.target.value.toUpperCase();
+        vnumInput.value = formatted;
+        if (vnumError && vnumError.classList.contains('visible')) {
+          if (/^[A-Z]{2}\s[0-9]{2}\s[A-Z]{2}\s[0-9]{4}$/.test(formatted)) {
+            vnumError.classList.remove('visible');
+            vnumInput.classList.remove('is-invalid');
+          }
         }
-      }
-    });
+      });
 
-    vnumInput.addEventListener('blur', () => {
-      if (vnumInput.value.trim().length > 0) {
-        validateVnumField(true);
-      }
-    });
+      vnumInput.addEventListener('blur', () => {
+        if (vnumInput.value.trim().length > 0) {
+          validateVnumField(true);
+        }
+      });
+    }
   }
 
   // Booking Form Submission via Secure Supabase RPC
@@ -1499,7 +1505,10 @@
         vnumInput?.focus();
         return;
       }
-      const vnum = vnumInput ? vnumInput.value.trim().toUpperCase() : 'TN 01 AB 1234';
+      const rawVnum = vnumInput ? vnumInput.value.trim() : '';
+      const vnum = window.TrieyeDB && typeof window.TrieyeDB.formatVehicleNumber === 'function'
+        ? window.TrieyeDB.formatVehicleNumber(rawVnum)
+        : rawVnum.toUpperCase();
 
       if (!phone || phone.replace(/\D/g, '').length < 10) {
         alert('Please enter a valid 10-digit mobile number.');

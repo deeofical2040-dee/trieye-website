@@ -535,7 +535,7 @@
           </div>
           <div class="info-box-line">
             <span class="info-box-lbl">Registration Number:</span>
-            <span class="info-box-val highlight" id="veh-reg">TN 01 NO REG</span>
+            <span class="info-box-val highlight" id="veh-reg">TN 01 AB 1234</span>
           </div>
         </div>
       </div>
@@ -662,7 +662,7 @@
         document.getElementById('cust-name').innerText = inv.customer_name || 'Valued Customer';
         document.getElementById('cust-phone').innerText = inv.customer_phone || 'N/A';
         document.getElementById('veh-type').innerText = inv.vehicle_type || 'Car';
-        document.getElementById('veh-reg').innerText = (inv.reg_number || 'N/A').toUpperCase();
+        document.getElementById('veh-reg').innerText = window.TrieyeDB && typeof window.TrieyeDB.formatVehicleNumber === 'function' ? (window.TrieyeDB.formatVehicleNumber(inv.reg_number || '') || inv.reg_number || 'N/A') : (inv.reg_number || 'N/A').toUpperCase();
 
         // Service Table
         document.getElementById('item-title').innerText = inv.service_name || 'Detailing & Foam Wash';

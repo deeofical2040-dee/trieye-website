@@ -329,6 +329,16 @@ const TrieyeDB = {
 
   // 1. SECURE PUBLIC ONLINE BOOKING RPC
   async createOnlineBooking(params) {
+    // Strict Vehicle Registration Validation & Normalization
+    const normalizedReg = this.formatVehicleNumber(params.reg);
+    if (!this.validateVehicleNumber(normalizedReg)) {
+      return {
+        success: false,
+        error: "Enter vehicle number in TN 01 AB 1234 format"
+      };
+    }
+    params.reg = normalizedReg;
+
     const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
     
     if (sb) {
@@ -337,7 +347,7 @@ const TrieyeDB = {
           p_customer_name: params.name || 'Valued Customer',
           p_customer_phone: params.phone || '',
           p_vehicle_type: params.vehicleType || 'Car',
-          p_reg_number: params.reg || 'STANDARD',
+          p_reg_number: params.reg || 'TN 01 AB 1234',
           p_service_name: params.service || 'Foam Wash',
           p_booking_date: params.date || new Date().toISOString().split('T')[0]
         });
@@ -346,7 +356,7 @@ const TrieyeDB = {
           p_customer_name: params.name || 'Valued Customer',
           p_customer_phone: params.phone || '',
           p_vehicle_type: params.vehicleType || 'Car',
-          p_reg_number: params.reg || 'STANDARD',
+          p_reg_number: params.reg || 'TN 01 AB 1234',
           p_service_name: params.service || 'Foam Wash',
           p_booking_date: params.date || new Date().toISOString().split('T')[0]
         });
@@ -569,12 +579,13 @@ const TrieyeDB = {
         if (custErr) {
           TrieyeDB.logError('customers', 'UPSERT', custErr);
         } else if (custData && (customerObj.reg || customerObj.vehicleType)) {
+          const normReg = customerObj.reg ? TrieyeDB.formatVehicleNumber(customerObj.reg) : 'TN 01 AB 1234';
           const { error: vehErr } = await sb
             .from('vehicles')
             .upsert({
               customer_id: custData.id,
               vehicle_type: customerObj.vehicleType || 'Car',
-              reg_number: customerObj.reg || 'NO REG'
+              reg_number: normReg
             });
           if (vehErr) TrieyeDB.logError('vehicles', 'UPSERT', vehErr);
         }
@@ -1080,6 +1091,18 @@ const TrieyeDB = {
     if (!sb) return { success: false, error: 'Database service is unavailable.' };
 
     try {
+      // Validate & normalize vehicle reg
+      if (payload.vehicle) {
+        const normReg = this.formatVehicleNumber(payload.vehicle.reg_number);
+        if (!this.validateVehicleNumber(normReg)) {
+          return {
+            success: false,
+            error: "Enter vehicle number in TN 01 AB 1234 format"
+          };
+        }
+        payload.vehicle.reg_number = normReg;
+      }
+
       // 1. Ensure Customer Exists
       let customerId = payload.customer.id;
       if (!customerId) {
@@ -1113,7 +1136,7 @@ const TrieyeDB = {
             .insert({
               customer_id: customerId,
               vehicle_type: payload.vehicle.vehicle_type || 'Car',
-              reg_number: payload.vehicle.reg_number || 'NO REG'
+              reg_number: payload.vehicle.reg_number || 'TN 01 AB 1234'
             })
             .select('id')
             .single();
@@ -1233,83 +1256,122 @@ const TrieyeDB = {
     return null;
   },
 
-  // 9. INDIAN VEHICLE REGISTRATION FORMATTER & VALIDATOR
-  formatVehicleReg(raw) {
+  // 9. STRICT INDIAN VEHICLE REGISTRATION FORMATTER & VALIDATOR (AA 00 AA 0000 format)
+  formatVehicleNumber(raw) {
     if (!raw) return '';
-    const clean = String(raw).toUpperCase().replace(/[^A-Z0-9]/g, '');
-    if (!clean) return '';
-
-    // 1. Bharat (BH) Series: e.g. 22 BH 1234 AA or 22 BH 1234 A
-    if (/^\d{2}B/.test(clean)) {
-      const yr = clean.slice(0, 2);
-      const rest = clean.slice(2);
-      const m = rest.match(/^([A-Z]{1,2})?(\d{1,4})?([A-Z]{1,2})?/);
-      if (m) {
-        return [yr, m[1], m[2], m[3]].filter(Boolean).join(' ');
+    const str = String(raw).toUpperCase().replace(/[^A-Z0-9]/g, '');
+    let clean = '';
+    for (let i = 0; i < str.length && clean.length < 10; i++) {
+      const ch = str[i];
+      const pos = clean.length;
+      if (pos === 0 || pos === 1) {
+        // Positions 1-2: Letters only
+        if (/[A-Z]/.test(ch)) clean += ch;
+      } else if (pos === 2 || pos === 3) {
+        // Positions 3-4: Numbers only
+        if (/[0-9]/.test(ch)) clean += ch;
+      } else if (pos === 4 || pos === 5) {
+        // Positions 5-6: Letters only
+        if (/[A-Z]/.test(ch)) clean += ch;
+      } else if (pos >= 6 && pos <= 9) {
+        // Positions 7-10: Numbers only
+        if (/[0-9]/.test(ch)) clean += ch;
       }
     }
+    if (clean.length <= 2) return clean;
+    if (clean.length <= 4) return clean.slice(0, 2) + ' ' + clean.slice(2);
+    if (clean.length <= 6) return clean.slice(0, 2) + ' ' + clean.slice(2, 4) + ' ' + clean.slice(4);
+    return clean.slice(0, 2) + ' ' + clean.slice(2, 4) + ' ' + clean.slice(4, 6) + ' ' + clean.slice(6, 10);
+  },
 
-    // 2. Standard Indian Registration:
-    // Starts with 2 letters (State code, e.g. TN, KA, DL, PY, MH, KL, etc.)
-    if (/^[A-Z]{1,2}/.test(clean)) {
-      const state = clean.slice(0, 2);
-      const rest = clean.slice(2);
-      if (!rest) return state;
+  validateVehicleNumber(val) {
+    if (!val) return false;
+    return /^[A-Z]{2}\s[0-9]{2}\s[A-Z]{2}\s[0-9]{4}$/.test(String(val).trim().toUpperCase());
+  },
 
-      // Next is RTO code (1-2 digits)
-      const rtoMatch = rest.match(/^(\d{1,2})/);
-      if (!rtoMatch) {
-        return clean.slice(0, 10);
-      }
+  normalizeVehicleNumber(raw) {
+    if (!raw) return '';
+    return this.formatVehicleNumber(raw);
+  },
 
-      const rto = rtoMatch[1];
-      const afterRto = rest.slice(rto.length);
-      if (!afterRto) return `${state} ${rto}`;
-
-      // After RTO:
-      // Option A: Series letters (1-3 letters) + Number (1-4 digits)
-      // Option B: Number (1-4 digits) directly
-      const seriesMatch = afterRto.match(/^([A-Z]{1,3})/);
-      if (seriesMatch) {
-        const series = seriesMatch[1];
-        const afterSeries = afterRto.slice(series.length);
-        const numMatch = afterSeries.match(/^(\d{1,4})/);
-        const num = numMatch ? numMatch[1] : '';
-        return [state, rto, series, num].filter(Boolean).join(' ');
-      } else {
-        const numMatch = afterRto.match(/^(\d{1,4})/);
-        const num = numMatch ? numMatch[1] : '';
-        return [state, rto, num].filter(Boolean).join(' ');
-      }
-    }
-
-    // Fallback: limit length to 14 chars
-    return clean.slice(0, 14);
+  // Backward compatible aliases
+  formatVehicleReg(raw) {
+    return this.formatVehicleNumber(raw);
   },
 
   validateVehicleReg(val) {
-    if (!val) return false;
-    const str = String(val).trim().toUpperCase();
-    const clean = str.replace(/[^A-Z0-9]/g, '');
-    
-    if (clean.length < 5 || clean.length > 11) return false;
+    return this.validateVehicleNumber(val);
+  },
 
-    // 1. Standard: State (2 letters) + RTO (1-2 digits) + optional series (0-3 letters) + number (1-4 digits)
-    const m = clean.match(/^([A-Z]{2})(\d{1,2})([A-Z]{0,3})(\d{1,4})$/);
-    if (m) {
-      const num = m[4];
-      if (num && parseInt(num, 10) > 0) return true;
-    }
+  normalizeVehicleReg(raw) {
+    return this.normalizeVehicleNumber(raw);
+  },
 
-    // 2. Bharat (BH) Series: 2 digits year + BH + 4 digits + 1-2 letters (e.g. 22 BH 1234 AA)
-    const mBH = clean.match(/^(\d{2})BH(\d{4})([A-Z]{1,2})$/);
-    if (mBH && parseInt(mBH[2], 10) > 0) return true;
+  attachVehicleInput(inputEl, errorEl) {
+    if (!inputEl) return;
+    inputEl.setAttribute('maxlength', '13');
+    inputEl.setAttribute('placeholder', 'TN 01 AB 1234');
+    inputEl.setAttribute('autocomplete', 'off');
+    inputEl.setAttribute('spellcheck', 'false');
+    inputEl.style.textTransform = 'uppercase';
 
-    // 3. Vintage / Old 3-letter formats: e.g. TMN 1234, MSX 1234
-    const mVin = clean.match(/^([A-Z]{3})(\d{1,4})$/);
-    if (mVin && parseInt(mVin[2], 10) > 0) return true;
+    const formatAndUpdate = () => {
+      const start = inputEl.selectionStart;
+      const oldVal = inputEl.value;
+      const formatted = this.formatVehicleNumber(oldVal);
+      if (oldVal !== formatted) {
+        inputEl.value = formatted;
+        if (start !== null && start < oldVal.length) {
+          const diff = formatted.length - oldVal.length;
+          const newPos = Math.max(0, Math.min(formatted.length, start + diff));
+          inputEl.setSelectionRange(newPos, newPos);
+        }
+      }
+      if (errorEl && (errorEl.classList.contains('visible') || errorEl.style.display === 'inline' || errorEl.style.display === 'block')) {
+        if (this.validateVehicleNumber(formatted)) {
+          errorEl.classList.remove('visible');
+          if (errorEl.style.display === 'inline' || errorEl.style.display === 'block') errorEl.style.display = 'none';
+          inputEl.classList.remove('is-invalid');
+        }
+      }
+    };
 
-    return false;
+    inputEl.addEventListener('input', formatAndUpdate);
+
+    inputEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace' && inputEl.selectionStart === inputEl.selectionEnd) {
+        const pos = inputEl.selectionStart;
+        if (pos > 0 && inputEl.value[pos - 1] === ' ') {
+          e.preventDefault();
+          const before = inputEl.value.slice(0, pos - 2);
+          const after = inputEl.value.slice(pos);
+          inputEl.value = this.formatVehicleNumber(before + after);
+          const newPos = Math.max(0, pos - 2);
+          inputEl.setSelectionRange(newPos, newPos);
+        }
+      }
+    });
+
+    inputEl.addEventListener('blur', () => {
+      if (inputEl.value.trim().length > 0) {
+        const formatted = this.formatVehicleNumber(inputEl.value);
+        inputEl.value = formatted;
+        if (!this.validateVehicleNumber(formatted)) {
+          if (errorEl) {
+            errorEl.innerText = "Enter vehicle number in TN 01 AB 1234 format";
+            errorEl.classList.add('visible');
+            if (errorEl.style.display === 'none') errorEl.style.display = 'inline';
+          }
+          inputEl.classList.add('is-invalid');
+        } else {
+          if (errorEl) {
+            errorEl.classList.remove('visible');
+            if (errorEl.style.display === 'inline' || errorEl.style.display === 'block') errorEl.style.display = 'none';
+          }
+          inputEl.classList.remove('is-invalid');
+        }
+      }
+    });
   },
 
   // 10. PUBLIC SECURE TRACK BOOKING LOOKUP
@@ -1322,22 +1384,30 @@ const TrieyeDB = {
     }
 
     const rawInput = String(bookingRefOrVeh).trim().toUpperCase();
-    const cleanRef = rawInput.replace(/^#/, '').replace(/^TRI-/, '');
-    const cleanReg = rawInput.replace(/[^A-Z0-9]/g, '');
     const cleanPhone = String(phone).replace(/\D/g, '').slice(-10);
-
-    if (!cleanRef && !cleanReg) {
-      return {
-        success: false,
-        error: "Please enter a valid Vehicle Number (e.g., TN 01 AB 1234) or Booking Reference."
-      };
-    }
 
     if (!cleanPhone || cleanPhone.length < 10) {
       return {
         success: false,
         error: "Please enter a valid 10-digit registered phone number."
       };
+    }
+
+    const isTriRef = rawInput.startsWith('TRI-') || /^[0-9A-F]{8}$/i.test(rawInput);
+    let cleanRef = isTriRef ? rawInput.replace(/^#/, '').replace(/^TRI-/, '') : '';
+    let cleanReg = '';
+    
+    if (isTriRef) {
+      cleanRef = rawInput.replace(/^#/, '').replace(/^TRI-/, '');
+    } else {
+      const formattedVeh = this.formatVehicleNumber(rawInput);
+      cleanReg = formattedVeh.replace(/[^A-Z0-9]/g, '');
+      if (!cleanReg) {
+        return {
+          success: false,
+          error: "Enter vehicle number in TN 01 AB 1234 format"
+        };
+      }
     }
 
     const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
@@ -1422,7 +1492,7 @@ const TrieyeDB = {
             phone: match.phone || (match.customers && match.customers.phone) || '',
             service: match.service || (match.services && match.services.name) || 'Car Detailing',
             vehicleType: match.vehicleType || (match.vehicles && match.vehicles.vehicle_type) || 'Car',
-            reg: match.reg || (match.vehicles && match.vehicles.reg_number) || 'N/A',
+            reg: match.reg || (match.vehicles && match.vehicles.reg_number) || 'TN 01 AB 1234',
             booking_date: match.date || match.booking_date || '',
             booking_time: match.bookingTime || match.slot || (match.slots && match.slots.slot_time) || 'Standard Slot',
             price: Number(match.price || match.total_amount || 0),
@@ -1458,7 +1528,7 @@ const TrieyeDB = {
       phone: cust.phone || '',
       service: svc.name || 'Car Detailing',
       vehicleType: veh.vehicle_type || 'Car',
-      reg: veh.reg_number || 'N/A',
+      reg: veh.reg_number || 'TN 01 AB 1234',
       booking_date: b.booking_date || '',
       booking_time: b.booking_time || slot.slot_time || 'Standard Slot',
       price: totalAmt,
@@ -1469,5 +1539,14 @@ const TrieyeDB = {
 };
 
 window.TrieyeDB = TrieyeDB;
+
+if (typeof window !== 'undefined') {
+  window.formatVehicleNumber = TrieyeDB.formatVehicleNumber.bind(TrieyeDB);
+  window.validateVehicleNumber = TrieyeDB.validateVehicleNumber.bind(TrieyeDB);
+  window.normalizeVehicleNumber = TrieyeDB.normalizeVehicleNumber.bind(TrieyeDB);
+  window.formatVehicleReg = TrieyeDB.formatVehicleReg.bind(TrieyeDB);
+  window.validateVehicleReg = TrieyeDB.validateVehicleReg.bind(TrieyeDB);
+  window.normalizeVehicleReg = TrieyeDB.normalizeVehicleReg.bind(TrieyeDB);
+}
 
 
