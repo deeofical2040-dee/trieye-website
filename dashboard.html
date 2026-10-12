@@ -988,10 +988,9 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: space-between;
-      gap: 0.75rem;
-      margin-bottom: 1rem;
-      padding: 0.75rem 1rem;
+      gap: 0.65rem;
+      margin-bottom: 0;
+      padding: 0.45rem 0.75rem;
       background: var(--bg-panel);
       border: 1px solid var(--line);
       border-radius: 10px;
@@ -1096,9 +1095,12 @@
       border: 1px solid var(--line);
       border-radius: 10px;
       padding: 1rem;
-      margin-bottom: 1rem;
-      animation: calSlideDown 0.2s ease;
+      margin-bottom: 0;
+      align-self: flex-end;
+      width: 100%;
       max-width: 440px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+      animation: calSlideDown 0.2s ease;
     }
     @keyframes calSlideDown {
       from { opacity: 0; transform: translateY(-6px); }
@@ -1221,6 +1223,7 @@
       .completed-calendar-toolbar {
         flex-direction: column;
         align-items: stretch;
+        width: 100%;
       }
       .cal-nav-group {
         justify-content: space-between;
@@ -1235,6 +1238,7 @@
       }
       .completed-calendar-panel {
         max-width: 100%;
+        align-self: stretch;
       }
     }
 
@@ -2196,27 +2200,27 @@
             <div class="section-title"><span>✅</span> Completed Job Archives</div>
             <div class="section-subtitle">Detailed history of finished and delivered detailing jobs</div>
           </div>
-        </div>
 
-        <!-- Monthly Calendar Filter Toolbar -->
-        <div class="completed-calendar-toolbar">
-          <div class="cal-nav-group">
-            <button type="button" class="cal-nav-btn" onclick="navCompletedMonth(-1)" title="Previous Month" aria-label="Previous Month">◀</button>
-            <div class="cal-month-pill" id="cal-month-pill-btn" onclick="toggleCompletedCalendar()" title="Click to view/hide interactive month calendar">
-              <span class="cal-icon">📅</span>
-              <span id="completed-month-label" class="cal-month-text">October 2026</span>
-              <span class="cal-dropdown-arrow" id="cal-toggle-arrow">▼</span>
+          <!-- Monthly Calendar Filter Toolbar -->
+          <div class="completed-calendar-toolbar">
+            <div class="cal-nav-group">
+              <button type="button" class="cal-nav-btn" onclick="navCompletedMonth(-1)" title="Previous Month" aria-label="Previous Month">◀</button>
+              <div class="cal-month-pill" id="cal-month-pill-btn" onclick="toggleCompletedCalendar()" title="Click to view/hide interactive month calendar">
+                <span class="cal-icon">📅</span>
+                <span id="completed-month-label" class="cal-month-text">October 2026</span>
+                <span class="cal-dropdown-arrow" id="cal-toggle-arrow">▼</span>
+              </div>
+              <button type="button" class="cal-nav-btn" onclick="navCompletedMonth(1)" title="Next Month" aria-label="Next Month">▶</button>
+              
+              <button type="button" id="btn-clear-date" class="cal-clear-btn" style="display:none;" onclick="clearCompletedSelectedDate()">
+                ✕ Clear Date (Show All Month)
+              </button>
             </div>
-            <button type="button" class="cal-nav-btn" onclick="navCompletedMonth(1)" title="Next Month" aria-label="Next Month">▶</button>
-            
-            <button type="button" id="btn-clear-date" class="cal-clear-btn" style="display:none;" onclick="clearCompletedSelectedDate()">
-              ✕ Clear Date (Show All Month)
-            </button>
-          </div>
 
-          <div class="cal-meta-group">
-            <span id="completed-count-pill" class="cal-count-pill">0 Jobs</span>
-            <input type="text" id="completed-search-input" class="form-input" placeholder="Search customer or vehicle..." oninput="renderCompletedJobsTable()" style="font-size:0.78rem; width:220px;">
+            <div class="cal-meta-group">
+              <span id="completed-count-pill" class="cal-count-pill">0 Jobs</span>
+              <input type="text" id="completed-search-input" class="form-input" placeholder="Search customer or vehicle..." oninput="renderCompletedJobsTable()" style="font-size:0.78rem; width:220px;">
+            </div>
           </div>
         </div>
 
