@@ -236,6 +236,8 @@ const TrieyeDB = {
               checkInTime: '',
               created: b.created_at || null,
               created_at: b.created_at || null,
+              completed_at: b.completed_at || b.completedDate || null,
+              completedDate: b.completed_at || b.completedDate || null,
               customers: cust,
               vehicles: veh,
               services: svc,
@@ -474,9 +476,18 @@ const TrieyeDB = {
         if (booking.bayId) updatePayload.bay_id = booking.bayId;
         if (booking.slotId) updatePayload.slot_id = booking.slotId;
         if (booking.price) updatePayload.total_amount = Number(booking.price);
+        if (booking.completed_at) updatePayload.completed_at = booking.completed_at;
 
         const { error } = await sb.from('bookings').update(updatePayload).eq('id', booking.id);
-        if (error) TrieyeDB.logError('bookings', 'UPDATE', error);
+        if (error) {
+          if (error.code === '42703' || (error.message && error.message.includes('completed_at'))) {
+            // Column completed_at not yet present in Supabase; retry without it so status update succeeds
+            delete updatePayload.completed_at;
+            await sb.from('bookings').update(updatePayload).eq('id', booking.id);
+          } else {
+            TrieyeDB.logError('bookings', 'UPDATE', error);
+          }
+        }
       } catch (err) {
         console.warn('⚠️ [Supabase saveBooking warning]:', err);
       }

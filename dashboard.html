@@ -983,6 +983,261 @@
       .sidebar { width: 100%; height: auto; position: static; }
     }
 
+    /* Completed Jobs Monthly Calendar Filter */
+    .completed-calendar-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      padding: 0.75rem 1rem;
+      background: var(--bg-panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+    }
+    .cal-nav-group {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+    }
+    .cal-nav-btn {
+      background: var(--bg-panel-2);
+      border: 1px solid var(--line);
+      color: var(--text);
+      font-size: 0.82rem;
+      padding: 0.45rem 0.7rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      user-select: none;
+    }
+    .cal-nav-btn:hover {
+      border-color: var(--pink);
+      color: var(--pink);
+      background: var(--pink-dim);
+    }
+    .cal-month-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--bg-panel-2);
+      border: 1px solid var(--line);
+      padding: 0.45rem 0.85rem;
+      border-radius: 6px;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s ease;
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--text);
+    }
+    .cal-month-pill:hover,
+    .cal-month-pill.active {
+      border-color: var(--pink);
+      background: var(--pink-dim);
+      color: var(--pink);
+      box-shadow: 0 0 12px var(--pink-glow);
+    }
+    .cal-dropdown-arrow {
+      font-size: 0.65rem;
+      transition: transform 0.2s ease;
+      color: var(--muted);
+      display: inline-block;
+    }
+    .cal-clear-btn {
+      background: var(--pink-dim);
+      border: 1px solid var(--pink);
+      color: var(--pink);
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.45rem 0.75rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      user-select: none;
+    }
+    .cal-clear-btn:hover {
+      background: var(--pink);
+      color: #fff;
+      box-shadow: 0 0 10px var(--pink-glow);
+    }
+    .cal-meta-group {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+    .cal-count-pill {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.38rem 0.75rem;
+      border-radius: 20px;
+      background: rgba(16, 185, 129, 0.12);
+      color: var(--green);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      white-space: nowrap;
+    }
+    .cal-count-pill.has-date {
+      background: var(--pink-dim);
+      color: var(--pink);
+      border-color: var(--pink);
+    }
+    .completed-calendar-panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+      animation: calSlideDown 0.2s ease;
+      max-width: 440px;
+    }
+    @keyframes calSlideDown {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .cal-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--line);
+      gap: 0.5rem;
+    }
+    .cal-panel-title {
+      font-weight: 600;
+      font-size: 0.88rem;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+    .cal-weekdays-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+    }
+    .cal-days-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 0.3rem;
+    }
+    .cal-day-cell {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 0.45rem 0.2rem;
+      border-radius: 6px;
+      background: var(--bg-panel-2);
+      border: 1px solid transparent;
+      color: var(--text);
+      font-size: 0.78rem;
+      font-family: 'IBM Plex Mono', monospace;
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.15s ease;
+      min-height: 42px;
+    }
+    .cal-day-cell.empty {
+      background: transparent;
+      cursor: default;
+      border: none;
+    }
+    .cal-day-cell:not(.empty):hover {
+      border-color: var(--pink);
+      background: rgba(238, 47, 118, 0.08);
+      color: var(--pink);
+    }
+    .cal-day-cell.today {
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+    .cal-day-cell.has-jobs {
+      font-weight: 700;
+    }
+    .cal-day-cell.has-jobs::after {
+      content: '';
+      position: absolute;
+      bottom: 3px;
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--green);
+    }
+    .cal-day-cell.selected {
+      background: var(--pink) !important;
+      color: #ffffff !important;
+      border-color: var(--pink) !important;
+      box-shadow: 0 0 12px var(--pink-glow);
+      font-weight: 700;
+    }
+    .cal-day-cell.selected::after {
+      background: #ffffff !important;
+    }
+    .cal-day-badge {
+      font-size: 0.6rem;
+      padding: 1px 4px;
+      border-radius: 8px;
+      background: rgba(16, 185, 129, 0.2);
+      color: var(--green);
+      margin-top: 1px;
+      line-height: 1;
+    }
+    .cal-day-cell.selected .cal-day-badge {
+      background: rgba(255, 255, 255, 0.25);
+      color: #ffffff;
+    }
+    .btn-xs {
+      background: var(--bg-panel-2);
+      border: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 0.72rem;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    .btn-xs:hover {
+      border-color: var(--pink);
+      color: var(--pink);
+    }
+    @media (max-width: 640px) {
+      .completed-calendar-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .cal-nav-group {
+        justify-content: space-between;
+      }
+      .cal-meta-group {
+        justify-content: space-between;
+      }
+      .cal-meta-group input {
+        width: 100% !important;
+        max-width: 100% !important;
+        flex: 1;
+      }
+      .completed-calendar-panel {
+        max-width: 100%;
+      }
+    }
+
     /* Customer Profile Card & History Styles */
     .customer-profile-card {
       background: var(--bg-panel);
@@ -1941,8 +2196,48 @@
             <div class="section-title"><span>✅</span> Completed Job Archives</div>
             <div class="section-subtitle">Detailed history of finished and delivered detailing jobs</div>
           </div>
-          <div style="display:flex; gap:0.5rem;">
-            <input type="text" id="completed-search-input" class="form-input" placeholder="Search customer or vehicle..." oninput="renderCompletedJobsTable()" style="font-size:0.78rem;">
+        </div>
+
+        <!-- Monthly Calendar Filter Toolbar -->
+        <div class="completed-calendar-toolbar">
+          <div class="cal-nav-group">
+            <button type="button" class="cal-nav-btn" onclick="navCompletedMonth(-1)" title="Previous Month" aria-label="Previous Month">◀</button>
+            <div class="cal-month-pill" id="cal-month-pill-btn" onclick="toggleCompletedCalendar()" title="Click to view/hide interactive month calendar">
+              <span class="cal-icon">📅</span>
+              <span id="completed-month-label" class="cal-month-text">October 2026</span>
+              <span class="cal-dropdown-arrow" id="cal-toggle-arrow">▼</span>
+            </div>
+            <button type="button" class="cal-nav-btn" onclick="navCompletedMonth(1)" title="Next Month" aria-label="Next Month">▶</button>
+            
+            <button type="button" id="btn-clear-date" class="cal-clear-btn" style="display:none;" onclick="clearCompletedSelectedDate()">
+              ✕ Clear Date (Show All Month)
+            </button>
+          </div>
+
+          <div class="cal-meta-group">
+            <span id="completed-count-pill" class="cal-count-pill">0 Jobs</span>
+            <input type="text" id="completed-search-input" class="form-input" placeholder="Search customer or vehicle..." oninput="renderCompletedJobsTable()" style="font-size:0.78rem; width:220px;">
+          </div>
+        </div>
+
+        <!-- Expandable Interactive Calendar Panel -->
+        <div id="completed-calendar-dropdown" class="completed-calendar-panel" style="display:none;">
+          <div class="cal-panel-header">
+            <div class="cal-panel-title">
+              <span id="cal-panel-month-name">October 2026</span>
+              <span style="font-size:0.72rem; color:var(--muted); font-weight:normal; margin-left:0.5rem;">Select date to filter • Days with completed jobs marked with •</span>
+            </div>
+            <div style="display:flex; gap:0.4rem; align-items:center;">
+              <button type="button" class="btn-xs" onclick="jumpCompletedToCurrentMonth()">Current Month</button>
+              <button type="button" class="btn-xs" onclick="clearCompletedSelectedDate()">All Month</button>
+              <button type="button" class="btn-xs" onclick="toggleCompletedCalendar(false)">Close ✕</button>
+            </div>
+          </div>
+          <div class="cal-weekdays-grid">
+            <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+          </div>
+          <div id="completed-calendar-days-grid" class="cal-days-grid">
+            <!-- Injected via JS -->
           </div>
         </div>
 
@@ -1957,7 +2252,7 @@
                   <th>Service Package</th>
                   <th>Total Price</th>
                   <th>Payment</th>
-                  <th>Booked At</th>
+                  <th>Completed At</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -2682,6 +2977,9 @@
         renderServicesTable();
         populateServiceSelects();
       }
+      if (secId === 'completed-sec') {
+        renderCompletedJobsTable();
+      }
     }
 
     // Storage Getters / Setters (TrieyeDB with Supabase + LocalStorage Fallback)
@@ -3060,7 +3358,13 @@
       if (target) {
         target.status = newStatus;
         if (newStatus === 'COMPLETED') {
-          target.completedDate = new Date().toISOString();
+          if (!target.completed_at && !target.completedDate) {
+            target.completed_at = new Date().toISOString();
+          }
+          if (!target.completed_at && target.completedDate) {
+            target.completed_at = target.completedDate;
+          }
+          target.completedDate = target.completed_at;
           showToast(`Job ${id} marked COMPLETED & Archived!`);
         }
         saveBookings(bookings);
@@ -4642,13 +4946,12 @@ TRIEYE WATERWASH & DETAILING`;
       openBillInvoiceModal(bookingId);
     }
 
-    // Helper to format booking creation timestamp in Chennai timezone (Asia/Kolkata)
-    // Date on first line (e.g. 12 Oct 2026), Time directly underneath (e.g. 01:45 PM)
-    function formatBookingCreatedAt(rawTimestamp) {
-      if (!rawTimestamp) return null;
-      const d = new Date(rawTimestamp);
-      if (isNaN(d.getTime())) return null;
+    // ==============================================================================
+    // 10. COMPLETED JOBS ARCHIVES & MONTHLY CALENDAR FILTER
+    // ==============================================================================
 
+    // Helper: Extract Asia/Kolkata date and time parts
+    function getKolkataDateParts(d) {
       const timeZone = 'Asia/Kolkata';
       try {
         const dateDtf = new Intl.DateTimeFormat('en-US', {
@@ -4661,6 +4964,19 @@ TRIEYE WATERWASH & DETAILING`;
         dateDtf.formatToParts(d).forEach(p => { dateParts[p.type] = p.value; });
         const formattedDate = (dateParts.day || '') + ' ' + (dateParts.month || '') + ' ' + (dateParts.year || '');
 
+        const numDtf = new Intl.DateTimeFormat('en-US', {
+          timeZone,
+          year: 'numeric',
+          month: 'numeric',
+          day: 'numeric'
+        });
+        const numParts = {};
+        numDtf.formatToParts(d).forEach(p => { numParts[p.type] = p.value; });
+        const year = parseInt(numParts.year, 10);
+        const month = parseInt(numParts.month, 10);
+        const day = parseInt(numParts.day, 10);
+        const dateString = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
         const timeDtf = new Intl.DateTimeFormat('en-US', {
           timeZone,
           hour: '2-digit',
@@ -4669,61 +4985,291 @@ TRIEYE WATERWASH & DETAILING`;
         });
         const formattedTime = timeDtf.format(d);
 
-        return {
-          date: formattedDate.trim(),
-          time: formattedTime
-        };
-      } catch (err) {
+        return { year, month, day, dateString, formattedDate, formattedTime };
+      } catch (e) {
         return null;
       }
     }
 
-    // 10. COMPLETED JOBS ARCHIVE
+    // Helper: Determine authoritative completion timestamp or safe legacy archive date
+    function getJobCompletionDateDetails(job) {
+      if (!job) return null;
+
+      // 1. Authoritative completion timestamp (completed_at or completedDate)
+      const compIso = job.completed_at || job.completedDate || null;
+      if (compIso) {
+        const d = new Date(compIso);
+        if (!isNaN(d.getTime())) {
+          const parts = getKolkataDateParts(d);
+          if (parts) {
+            return {
+              hasRealCompletion: true,
+              completionTime: d.getTime(),
+              year: parts.year,
+              month: parts.month,
+              day: parts.day,
+              dateString: parts.dateString,
+              formattedDate: parts.formattedDate,
+              formattedTime: parts.formattedTime
+            };
+          }
+        }
+      }
+
+      // 2. Safe legacy fallback for historical jobs lacking recorded completed_at:
+      // Uses booking creation / service date strictly for month/calendar bucketing
+      // Never fabricates a completion time!
+      let legacyDate = null;
+      if (job.created_at) {
+        const d = new Date(job.created_at);
+        if (!isNaN(d.getTime())) legacyDate = d;
+      } else if (job.booking_date) {
+        const d = new Date(job.booking_date + 'T12:00:00+05:30');
+        if (!isNaN(d.getTime())) legacyDate = d;
+      } else if (job.date) {
+        const d = new Date(job.date + 'T12:00:00+05:30');
+        if (!isNaN(d.getTime())) legacyDate = d;
+      }
+
+      if (legacyDate) {
+        const parts = getKolkataDateParts(legacyDate);
+        if (parts) {
+          return {
+            hasRealCompletion: false,
+            completionTime: legacyDate.getTime(),
+            year: parts.year,
+            month: parts.month,
+            day: parts.day,
+            dateString: parts.dateString,
+            formattedDate: parts.formattedDate,
+            formattedTime: null // Explicitly null: Do NOT invent time!
+          };
+        }
+      }
+
+      return null;
+    }
+
+    // Calendar Filter State
+    const COMPLETED_MONTH_NAMES = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+
+    const initialKolkataToday = getKolkataDateParts(new Date()) || { year: 2026, month: 10, day: 12, dateString: '2026-10-12' };
+    let completedFilterYear = initialKolkataToday.year;
+    let completedFilterMonth = initialKolkataToday.month; // 1-12
+    let completedFilterSelectedDate = null; // 'YYYY-MM-DD' or null
+    let completedCalendarOpen = false;
+
+    // Navigation and Calendar controls
+    function navCompletedMonth(delta) {
+      completedFilterMonth += delta;
+      if (completedFilterMonth > 12) {
+        completedFilterMonth = 1;
+        completedFilterYear += 1;
+      } else if (completedFilterMonth < 1) {
+        completedFilterMonth = 12;
+        completedFilterYear -= 1;
+      }
+      completedFilterSelectedDate = null;
+      renderCompletedJobsTable();
+    }
+
+    function jumpCompletedToCurrentMonth() {
+      const today = getKolkataDateParts(new Date()) || { year: 2026, month: 10 };
+      completedFilterYear = today.year;
+      completedFilterMonth = today.month;
+      completedFilterSelectedDate = null;
+      renderCompletedJobsTable();
+    }
+
+    function selectCompletedDate(dateStr) {
+      if (completedFilterSelectedDate === dateStr) {
+        // Clicking active date clears it back to full month view
+        completedFilterSelectedDate = null;
+      } else {
+        completedFilterSelectedDate = dateStr;
+      }
+      renderCompletedJobsTable();
+    }
+
+    function clearCompletedSelectedDate() {
+      completedFilterSelectedDate = null;
+      renderCompletedJobsTable();
+    }
+
+    function toggleCompletedCalendar(forcedState) {
+      const panel = document.getElementById('completed-calendar-dropdown');
+      const arrow = document.getElementById('cal-toggle-arrow');
+      const pill = document.getElementById('cal-month-pill-btn');
+      if (!panel) return;
+      if (typeof forcedState === 'boolean') {
+        completedCalendarOpen = forcedState;
+      } else {
+        completedCalendarOpen = !completedCalendarOpen;
+      }
+      panel.style.display = completedCalendarOpen ? 'block' : 'none';
+      if (arrow) arrow.style.transform = completedCalendarOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+      if (pill) pill.classList.toggle('active', completedCalendarOpen);
+    }
+
+    function renderCompletedCalendarGrid(monthJobs) {
+      const monthTitle = `${COMPLETED_MONTH_NAMES[completedFilterMonth - 1]} ${completedFilterYear}`;
+      const lbl = document.getElementById('completed-month-label');
+      if (lbl) lbl.textContent = monthTitle;
+      const panelTitle = document.getElementById('cal-panel-month-name');
+      if (panelTitle) panelTitle.textContent = monthTitle;
+
+      const clearBtn = document.getElementById('btn-clear-date');
+      if (clearBtn) {
+        if (completedFilterSelectedDate) {
+          clearBtn.style.display = 'inline-flex';
+          const p = completedFilterSelectedDate.split('-');
+          const mShort = COMPLETED_MONTH_NAMES[parseInt(p[1], 10) - 1].substring(0, 3);
+          clearBtn.innerHTML = `✕ Clear Date (${p[2]} ${mShort})`;
+        } else {
+          clearBtn.style.display = 'none';
+        }
+      }
+
+      // Count completed jobs per day in this month
+      const countsByDate = {};
+      (monthJobs || []).forEach(j => {
+        const details = getJobCompletionDateDetails(j);
+        if (details && details.dateString) {
+          countsByDate[details.dateString] = (countsByDate[details.dateString] || 0) + 1;
+        }
+      });
+
+      const grid = document.getElementById('completed-calendar-days-grid');
+      if (grid) {
+        const daysInMonth = new Date(completedFilterYear, completedFilterMonth, 0).getDate();
+        const firstDayDate = new Date(`${completedFilterYear}-${String(completedFilterMonth).padStart(2, '0')}-01T12:00:00+05:30`);
+        const startDayOfWeek = firstDayDate.getDay(); // 0 is Sun
+        const todayStr = (getKolkataDateParts(new Date()) || {}).dateString;
+
+        let html = '';
+        for (let i = 0; i < startDayOfWeek; i++) {
+          html += '<div class="cal-day-cell empty"></div>';
+        }
+        for (let d = 1; d <= daysInMonth; d++) {
+          const dStr = `${completedFilterYear}-${String(completedFilterMonth).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+          const isToday = (dStr === todayStr);
+          const isSelected = (dStr === completedFilterSelectedDate);
+          const count = countsByDate[dStr] || 0;
+          const classes = ['cal-day-cell'];
+          if (isToday) classes.push('today');
+          if (isSelected) classes.push('selected');
+          if (count > 0) classes.push('has-jobs');
+
+          html += `
+            <div class="${classes.join(' ')}" onclick="selectCompletedDate('${dStr}')" title="${dStr}${count > 0 ? ` (${count} completed jobs)` : ''}">
+              <span>${d}</span>
+              ${count > 0 ? `<span class="cal-day-badge">${count}</span>` : ''}
+            </div>
+          `;
+        }
+        grid.innerHTML = html;
+      }
+    }
+
+    // Main Completed Jobs Table Render
     function renderCompletedJobsTable() {
       const bookings = getBookings();
-      const q = (document.getElementById('completed-search-input')?.value || '').toLowerCase().trim();
-      const tbody = document.getElementById('completed-tbody');
-      if (!tbody) return;
-      tbody.innerHTML = '';
+      const allCompleted = bookings.filter(b => (b.status || '').toUpperCase() === 'COMPLETED');
 
-      const completed = bookings.filter(b => b.status === 'COMPLETED').filter(b => {
+      // 1. Filter jobs strictly belonging to currently selected calendar month
+      const monthCompleted = allCompleted.filter(b => {
+        const details = getJobCompletionDateDetails(b);
+        if (!details) return false;
+        return details.year === completedFilterYear && details.month === completedFilterMonth;
+      });
+
+      // 2. Render monthly calendar UI controls and day grid
+      renderCompletedCalendarGrid(monthCompleted);
+
+      // 3. Filter by specific date if selected
+      let dateFiltered = monthCompleted;
+      if (completedFilterSelectedDate) {
+        dateFiltered = dateFiltered.filter(b => {
+          const details = getJobCompletionDateDetails(b);
+          return details && details.dateString === completedFilterSelectedDate;
+        });
+      }
+
+      // 4. Update count badge
+      const countPill = document.getElementById('completed-count-pill');
+      if (countPill) {
+        if (completedFilterSelectedDate) {
+          const p = completedFilterSelectedDate.split('-');
+          const mShort = COMPLETED_MONTH_NAMES[completedFilterMonth - 1].substring(0, 3);
+          countPill.textContent = `${dateFiltered.length} Jobs (${p[2]} ${mShort})`;
+          countPill.classList.add('has-date');
+        } else {
+          countPill.textContent = `${monthCompleted.length} Jobs (${COMPLETED_MONTH_NAMES[completedFilterMonth - 1]} ${completedFilterYear})`;
+          countPill.classList.remove('has-date');
+        }
+      }
+
+      // 5. Filter by customer / vehicle search query
+      const q = (document.getElementById('completed-search-input')?.value || '').toLowerCase().trim();
+      const displayedJobs = dateFiltered.filter(b => {
         if (!q) return true;
         return (b.name || '').toLowerCase().includes(q) || (b.reg || '').toLowerCase().includes(q) || (b.vehicleModel || '').toLowerCase().includes(q);
       });
 
-      if (completed.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:2rem; color:var(--muted);">No completed wash jobs archived yet.</td></tr>`;
+      const tbody = document.getElementById('completed-tbody');
+      if (!tbody) return;
+      tbody.innerHTML = '';
+
+      if (displayedJobs.length === 0) {
+        let periodLabel = `${COMPLETED_MONTH_NAMES[completedFilterMonth - 1]} ${completedFilterYear}`;
+        if (completedFilterSelectedDate) {
+          const p = completedFilterSelectedDate.split('-');
+          periodLabel = `${p[2]} ${COMPLETED_MONTH_NAMES[completedFilterMonth - 1]} ${completedFilterYear}`;
+        }
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:2.5rem; color:var(--muted); font-size:0.85rem;">No completed jobs for this period (${escapeHtml(periodLabel)}).</td></tr>`;
         return;
       }
 
-      // Sort all completed jobs by actual bookings.created_at timestamp DESC (newest booking first)
-      completed.sort((a, b) => {
-        const rawA = a.created_at || a.created || null;
-        const rawB = b.created_at || b.created || null;
-        const timeA = rawA ? new Date(rawA).getTime() : 0;
-        const timeB = rawB ? new Date(rawB).getTime() : 0;
-        const validA = !isNaN(timeA) ? timeA : 0;
-        const validB = !isNaN(timeB) ? timeB : 0;
-        if (validB !== validA) {
-          return validB - validA;
+      // 6. Chronological Sorting by actual completion timestamp DESC (newest first)
+      displayedJobs.sort((a, b) => {
+        const detailsA = getJobCompletionDateDetails(a);
+        const detailsB = getJobCompletionDateDetails(b);
+        const timeA = detailsA ? detailsA.completionTime : 0;
+        const timeB = detailsB ? detailsB.completionTime : 0;
+        if (timeB !== timeA) {
+          return timeB - timeA;
         }
         return String(b.id || '').localeCompare(String(a.id || ''));
       });
 
-      completed.forEach(b => {
+      // 7. Render rows with 2-line completion date/time
+      displayedJobs.forEach(b => {
         const tr = document.createElement('tr');
         const displayRef = b.invoice_ref || (b.id && b.id.length > 8 ? `TRI-${b.id.substring(0, 8).toUpperCase()}` : (b.id || 'TRI-INVOICE'));
         const bookingPrice = Number(b.price !== undefined && b.price !== null ? b.price : (b.total_amount || 0));
 
-        // Format real booking creation date & time in Asia/Kolkata timezone
-        const rawCreated = b.created_at || b.created || null;
-        const formattedCreated = formatBookingCreatedAt(rawCreated);
-        const bookedAtCellHtml = formattedCreated
-          ? `<div style="white-space:nowrap; line-height:1.25;">
-              <div style="font-family:'IBM Plex Mono',monospace; font-size:0.78rem; font-weight:600; color:var(--text);">${escapeHtml(formattedCreated.date)}</div>
-              <div style="font-family:'IBM Plex Mono',monospace; font-size:0.72rem; color:var(--muted); margin-top:2px;">${escapeHtml(formattedCreated.time)}</div>
-            </div>`
-          : `<span style="font-family:'IBM Plex Mono',monospace; font-size:0.78rem; color:var(--muted);">—</span>`;
+        const dateDetails = getJobCompletionDateDetails(b);
+        let completedAtHtml = '';
+        if (dateDetails && dateDetails.hasRealCompletion) {
+          completedAtHtml = `
+            <div style="white-space:nowrap; line-height:1.25;">
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:0.78rem; font-weight:600; color:var(--text);">${escapeHtml(dateDetails.formattedDate)}</div>
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:0.72rem; color:var(--muted); margin-top:2px;">${escapeHtml(dateDetails.formattedTime)}</div>
+            </div>
+          `;
+        } else if (dateDetails) {
+          completedAtHtml = `
+            <div style="white-space:nowrap; line-height:1.25;">
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:0.78rem; color:var(--muted); font-weight:600;">—</div>
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:0.68rem; color:rgba(238, 47, 118, 0.7); margin-top:2px;">Legacy Archive</div>
+            </div>
+          `;
+        } else {
+          completedAtHtml = `<span style="font-family:'IBM Plex Mono',monospace; font-size:0.78rem; color:var(--muted);">—</span>`;
+        }
 
         tr.innerHTML = `
           <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">${escapeHtml(displayRef)}</strong></td>
@@ -4735,7 +5281,7 @@ TRIEYE WATERWASH & DETAILING`;
           <td>${escapeHtml(b.service)}</td>
           <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${bookingPrice.toLocaleString()}</strong></td>
           <td><span class="pay-badge pay-${(b.payStatus||'paid').toLowerCase()}">${escapeHtml(b.payStatus||'PAID')}</span></td>
-          <td style="white-space:nowrap;">${bookedAtCellHtml}</td>
+          <td style="white-space:nowrap;">${completedAtHtml}</td>
           <td>
             <div class="action-btn-group">
               <button class="action-btn" title="View & Print Bill Invoice" onclick="openBillInvoiceModal('${b.id}')">🧾 Receipt</button>
