@@ -234,7 +234,8 @@ const TrieyeDB = {
               payStatus: payStatus,
               payMethod: payMethod,
               checkInTime: '',
-              created: b.created_at || new Date().toISOString(),
+              created: b.created_at || null,
+              created_at: b.created_at || null,
               customers: cust,
               vehicles: veh,
               services: svc,
@@ -399,7 +400,8 @@ const TrieyeDB = {
             source: 'ONLINE',
             payStatus: 'UNPAID',
             payMethod: 'Pending (Counter/UPI)',
-            created: new Date().toISOString()
+            created: (data && data.created_at) || new Date().toISOString(),
+            created_at: (data && data.created_at) || new Date().toISOString()
           };
           try {
             const local = JSON.parse(localStorage.getItem('trieye_bookings')) || [];
@@ -437,7 +439,8 @@ const TrieyeDB = {
       source: 'ONLINE',
       payStatus: 'UNPAID',
       payMethod: 'Pending (Counter/UPI)',
-      created: new Date().toISOString()
+      created: new Date().toISOString(),
+      created_at: new Date().toISOString()
     };
     try {
       const local = JSON.parse(localStorage.getItem('trieye_bookings')) || [];

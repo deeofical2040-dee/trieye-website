@@ -1957,7 +1957,7 @@
                   <th>Service Package</th>
                   <th>Total Price</th>
                   <th>Payment</th>
-                  <th>Completed Date</th>
+                  <th>Booked At</th>
                   <th>Actions</th>
                 </tr>
               </thead>
@@ -3369,7 +3369,8 @@
         payStatus: payStatus,
         payMethod: payMethod,
         checkInTime: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        created: new Date().toISOString()
+        created: new Date().toISOString(),
+        created_at: new Date().toISOString()
       };
 
       const bookings = getBookings();
@@ -4641,6 +4642,42 @@ TRIEYE WATERWASH & DETAILING`;
       openBillInvoiceModal(bookingId);
     }
 
+    // Helper to format booking creation timestamp in Chennai timezone (Asia/Kolkata)
+    // Date on first line (e.g. 12 Oct 2026), Time directly underneath (e.g. 01:45 PM)
+    function formatBookingCreatedAt(rawTimestamp) {
+      if (!rawTimestamp) return null;
+      const d = new Date(rawTimestamp);
+      if (isNaN(d.getTime())) return null;
+
+      const timeZone = 'Asia/Kolkata';
+      try {
+        const dateDtf = new Intl.DateTimeFormat('en-US', {
+          timeZone,
+          day: '2-digit',
+          month: 'short',
+          year: 'numeric'
+        });
+        const dateParts = {};
+        dateDtf.formatToParts(d).forEach(p => { dateParts[p.type] = p.value; });
+        const formattedDate = (dateParts.day || '') + ' ' + (dateParts.month || '') + ' ' + (dateParts.year || '');
+
+        const timeDtf = new Intl.DateTimeFormat('en-US', {
+          timeZone,
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true
+        });
+        const formattedTime = timeDtf.format(d);
+
+        return {
+          date: formattedDate.trim(),
+          time: formattedTime
+        };
+      } catch (err) {
+        return null;
+      }
+    }
+
     // 10. COMPLETED JOBS ARCHIVE
     function renderCompletedJobsTable() {
       const bookings = getBookings();
@@ -4659,10 +4696,34 @@ TRIEYE WATERWASH & DETAILING`;
         return;
       }
 
+      // Sort all completed jobs by actual bookings.created_at timestamp DESC (newest booking first)
+      completed.sort((a, b) => {
+        const rawA = a.created_at || a.created || null;
+        const rawB = b.created_at || b.created || null;
+        const timeA = rawA ? new Date(rawA).getTime() : 0;
+        const timeB = rawB ? new Date(rawB).getTime() : 0;
+        const validA = !isNaN(timeA) ? timeA : 0;
+        const validB = !isNaN(timeB) ? timeB : 0;
+        if (validB !== validA) {
+          return validB - validA;
+        }
+        return String(b.id || '').localeCompare(String(a.id || ''));
+      });
+
       completed.forEach(b => {
         const tr = document.createElement('tr');
         const displayRef = b.invoice_ref || (b.id && b.id.length > 8 ? `TRI-${b.id.substring(0, 8).toUpperCase()}` : (b.id || 'TRI-INVOICE'));
         const bookingPrice = Number(b.price !== undefined && b.price !== null ? b.price : (b.total_amount || 0));
+
+        // Format real booking creation date & time in Asia/Kolkata timezone
+        const rawCreated = b.created_at || b.created || null;
+        const formattedCreated = formatBookingCreatedAt(rawCreated);
+        const bookedAtCellHtml = formattedCreated
+          ? `<div style="white-space:nowrap; line-height:1.25;">
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:0.78rem; font-weight:600; color:var(--text);">${escapeHtml(formattedCreated.date)}</div>
+              <div style="font-family:'IBM Plex Mono',monospace; font-size:0.72rem; color:var(--muted); margin-top:2px;">${escapeHtml(formattedCreated.time)}</div>
+            </div>`
+          : `<span style="font-family:'IBM Plex Mono',monospace; font-size:0.78rem; color:var(--muted);">—</span>`;
 
         tr.innerHTML = `
           <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">${escapeHtml(displayRef)}</strong></td>
@@ -4674,7 +4735,7 @@ TRIEYE WATERWASH & DETAILING`;
           <td>${escapeHtml(b.service)}</td>
           <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${bookingPrice.toLocaleString()}</strong></td>
           <td><span class="pay-badge pay-${(b.payStatus||'paid').toLowerCase()}">${escapeHtml(b.payStatus||'PAID')}</span></td>
-          <td><span style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--muted);">${escapeHtml(b.date || b.booking_date || 'Today')}</span></td>
+          <td style="white-space:nowrap;">${bookedAtCellHtml}</td>
           <td>
             <div class="action-btn-group">
               <button class="action-btn" title="View & Print Bill Invoice" onclick="openBillInvoiceModal('${b.id}')">🧾 Receipt</button>
