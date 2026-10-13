@@ -140,6 +140,54 @@
       gap: 0.65rem;
     }
 
+    .sync-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 500;
+      padding: 0.35rem 0.7rem;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--bg-panel-2);
+      color: var(--muted);
+      cursor: pointer;
+      user-select: none;
+      transition: all 0.2s ease;
+    }
+    .sync-status-badge:hover {
+      border-color: var(--muted);
+      background: var(--bg-panel-3);
+    }
+    .sync-status-badge .sync-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      display: inline-block;
+    }
+    .sync-status-badge.syncing {
+      border-color: rgba(245, 166, 35, 0.4);
+      color: var(--gold);
+    }
+    .sync-status-badge.syncing .sync-dot {
+      background: var(--gold);
+      animation: syncPulse 1s infinite alternate;
+    }
+    .sync-status-badge.error {
+      border-color: rgba(255, 75, 75, 0.45);
+      color: #ff6b6b;
+      background: rgba(255, 75, 75, 0.08);
+    }
+    .sync-status-badge.error .sync-dot {
+      background: #ff4d4d;
+    }
+    @keyframes syncPulse {
+      0% { opacity: 0.3; transform: scale(0.85); }
+      100% { opacity: 1; transform: scale(1.15); }
+    }
+
     .btn {
       display: inline-flex;
       align-items: center;
@@ -1436,6 +1484,10 @@
     </div>
 
     <div class="top-actions">
+      <div id="syncStatusBadge" class="sync-status-badge synced" onclick="syncFromSupabase()" title="Click to refresh live bookings from Supabase">
+        <span class="sync-dot"></span>
+        <span id="syncStatusText">Live Synced</span>
+      </div>
       <button class="theme-toggle-btn" id="dashThemeToggleBtn" title="Toggle Dark / Light Theme" aria-label="Toggle Theme">
         <div class="theme-toggle-thumb">
           <svg class="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>
@@ -1607,7 +1659,10 @@
           <div style="display:flex; gap:0.5rem;">
             <select class="form-select" id="queue-filter-select" onchange="renderQueueTable()" style="width:auto; font-size:0.78rem;">
               <option value="ALL">All Active &amp; Queued Jobs</option>
+              <option value="CONFIRMED">Confirmed</option>
               <option value="ARRIVED">Arrived</option>
+              <option value="IN PROGRESS">In Progress</option>
+              <option value="QUALITY CHECK">Quality Check</option>
             </select>
             <button class="btn btn-primary" onclick="showSection('walkin-sec')">+ Add Vehicle</button>
           </div>
@@ -1647,14 +1702,14 @@
         </div>
 
         <div class="filter-bar">
-          <button class="filter-pill active" onclick="filterOnlineBookings('TODAY', this)">Today</button>
+          <button class="filter-pill active" onclick="filterOnlineBookings('ALL', this)">All Online</button>
+          <button class="filter-pill" onclick="filterOnlineBookings('TODAY', this)">Today</button>
           <button class="filter-pill" onclick="filterOnlineBookings('TOMORROW', this)">Tomorrow</button>
           <button class="filter-pill" onclick="filterOnlineBookings('UPCOMING', this)">Upcoming</button>
           <button class="filter-pill" onclick="filterOnlineBookings('PENDING', this)">Pending</button>
           <button class="filter-pill" onclick="filterOnlineBookings('CONFIRMED', this)">Confirmed</button>
           <button class="filter-pill" onclick="filterOnlineBookings('COMPLETED', this)">Completed</button>
           <button class="filter-pill" onclick="filterOnlineBookings('CANCELLED', this)">Cancelled</button>
-          <button class="filter-pill" onclick="filterOnlineBookings('ALL', this)">All Online</button>
         </div>
 
         <div class="panel">
@@ -2809,14 +2864,96 @@
     ];
 
     let currentSelectedDate = formatDateIso(new Date());
-    let onlineFilterState = 'TODAY';
+    let onlineFilterState = 'ALL';
+
+    // Status and source normalization & filtering helpers
+    function normalizeStatus(status) {
+      if (!status) return 'CONFIRMED';
+      let s = String(status).toUpperCase().trim();
+      if (s === 'IN_PROGRESS') return 'IN PROGRESS';
+      if (s === 'QUALITY_CHECK') return 'QUALITY CHECK';
+      if (s === 'CANCELED' || s === 'CANCEL') return 'CANCELLED';
+      if (s === 'PENDING_CONFIRMATION') return 'PENDING';
+      if (s === 'DONE' || s === 'FINISHED') return 'COMPLETED';
+      return s;
+    }
+
+    function normalizeSource(source) {
+      if (!source) return 'WALK-IN';
+      let s = String(source).toUpperCase().trim();
+      if (s === 'WALKIN' || s === 'WALK IN') return 'WALK-IN';
+      return s;
+    }
+
+    function isQueueActive(status) {
+      const s = normalizeStatus(status);
+      return s !== 'COMPLETED' && s !== 'CANCELLED';
+    }
+
+    function getLocalDateStr(d) {
+      if (!d) return '';
+      if (typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d.trim())) return d.trim();
+      const dateObj = typeof d === 'string' ? new Date(d) : d;
+      if (isNaN(dateObj.getTime())) return String(d).trim().slice(0, 10);
+      const y = dateObj.getFullYear();
+      const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const day = String(dateObj.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+
+    function getFilteredQueueBookings(bookings, filter) {
+      const filterNorm = (filter || 'ALL').toUpperCase().trim();
+      return bookings.filter(b => {
+        const s = normalizeStatus(b.status);
+        if (filterNorm === 'ALL') return isQueueActive(s);
+        return s === filterNorm;
+      });
+    }
+
+    function getFilteredOnlineBookings(bookings, state) {
+      const localToday = getLocalDateStr(new Date());
+      const tomDate = new Date();
+      tomDate.setDate(tomDate.getDate() + 1);
+      const localTomorrow = getLocalDateStr(tomDate);
+      const mode = (state || 'ALL').toUpperCase().trim();
+
+      return bookings.filter(b => {
+        if (normalizeSource(b.source) !== 'ONLINE') return false;
+        const bDate = getLocalDateStr(b.booking_date || b.date);
+        const s = normalizeStatus(b.status);
+
+        if (mode === 'TODAY') return bDate === localToday;
+        if (mode === 'TOMORROW') return bDate === localTomorrow;
+        if (mode === 'UPCOMING') return bDate > localTomorrow && s !== 'CANCELLED';
+        if (mode === 'PENDING') return s === 'PENDING';
+        if (mode === 'CONFIRMED') return s === 'CONFIRMED';
+        if (mode === 'COMPLETED') return s === 'COMPLETED';
+        if (mode === 'CANCELLED') return s === 'CANCELLED';
+        // 'ALL'
+        return true;
+      });
+    }
+
+    function setSyncStatus(state, msg) {
+      const badge = document.getElementById('syncStatusBadge');
+      const text = document.getElementById('syncStatusText');
+      if (!badge || !text) return;
+      badge.classList.remove('synced', 'syncing', 'error');
+      if (state === 'syncing') {
+        badge.classList.add('syncing');
+        text.innerText = msg || 'Syncing...';
+      } else if (state === 'error') {
+        badge.classList.add('error');
+        text.innerText = msg || 'Sync Error (Retry)';
+      } else {
+        badge.classList.add('synced');
+        text.innerText = msg || 'Live Synced';
+      }
+    }
 
     // Helper functions
     function formatDateIso(d) {
-      const y = d.getFullYear();
-      const m = String(d.getMonth() + 1).padStart(2, '0');
-      const day = String(d.getDate()).padStart(2, '0');
-      return `${y}-${m}-${day}`;
+      return getLocalDateStr(d);
     }
     function escapeHtml(str) {
       if (!str) return '';
@@ -3120,6 +3257,7 @@
     async function syncFromSupabase() {
       if (!window.TrieyeDB) return;
       try {
+        setSyncStatus('syncing');
         const [remoteBookings, remoteCustomers, remoteServices, remoteBays, remoteSchedules] = await Promise.allSettled([
           window.TrieyeDB.getBookings(),
           window.TrieyeDB.getCustomers(),
@@ -3129,11 +3267,21 @@
         ]);
 
         let hasUpdates = false;
+        let bookingsError = false;
 
-        if (remoteBookings.status === 'fulfilled' && Array.isArray(remoteBookings.value)) {
-          localStorage.setItem(BOOKINGS_KEY, JSON.stringify(remoteBookings.value));
-          hasUpdates = true;
+        if (remoteBookings.status === 'fulfilled') {
+          if (remoteBookings.value && remoteBookings.value._hasError) {
+            bookingsError = true;
+            console.warn('⚠️ [Trieye Dashboard] Bookings query error:', remoteBookings.value._error);
+          } else if (Array.isArray(remoteBookings.value)) {
+            localStorage.setItem(BOOKINGS_KEY, JSON.stringify(remoteBookings.value));
+            hasUpdates = true;
+          }
+        } else if (remoteBookings.status === 'rejected') {
+          bookingsError = true;
+          console.warn('⚠️ [Trieye Dashboard] Bookings promise rejected:', remoteBookings.reason);
         }
+
         if (remoteCustomers.status === 'fulfilled' && remoteCustomers.value && Object.keys(remoteCustomers.value).length > 0) {
           localStorage.setItem(CUSTOMERS_KEY, JSON.stringify(remoteCustomers.value));
           hasUpdates = true;
@@ -3151,12 +3299,19 @@
           hasUpdates = true;
         }
 
+        if (bookingsError) {
+          setSyncStatus('error', 'Sync Error — Click to retry');
+        } else {
+          setSyncStatus('synced', 'Live Synced');
+        }
+
         if (hasUpdates) {
           console.log('⚡ [Trieye Dashboard] Live data synchronized from Supabase.');
           renderAll();
         }
       } catch (err) {
         console.warn('⚠️ [Trieye Dashboard] Async sync error:', err);
+        setSyncStatus('error', 'Sync Error — Click to retry');
       }
     }
 
@@ -3196,38 +3351,25 @@
     // 1. UPDATE KPI CARDS & OVERVIEW
     function updateKPICards() {
       const bookings = getBookings();
-      const now = new Date();
-      const todayYear = now.getFullYear();
-      const todayMonth = String(now.getMonth() + 1).padStart(2, '0');
-      const todayDay = String(now.getDate()).padStart(2, '0');
-      const localToday = `${todayYear}-${todayMonth}-${todayDay}`;
-
-      const allOnline = bookings.filter(b => (b.source || '').toUpperCase() === 'ONLINE');
-      const todayOnline = allOnline.filter(b => {
-        const bDate = (b.booking_date || b.date || '').trim().slice(0, 10);
-        return bDate === localToday;
-      });
-
-      console.log('Total online bookings:', allOnline.length);
-      console.log('Today local date:', localToday);
-      console.log('Today online bookings:', todayOnline.length);
+      const localToday = getLocalDateStr(new Date());
 
       const todayBookings = bookings.filter(b => {
-        const bDate = (b.booking_date || b.date || '').trim().slice(0, 10);
-        return bDate === localToday || (b.date && b.date.includes('Today'));
+        const bDate = getLocalDateStr(b.booking_date || b.date);
+        return bDate === localToday || (b.date && String(b.date).includes('Today'));
       });
       
       const revenue = todayBookings
-        .filter(b => b.status !== 'CANCELLED' && (b.payStatus || '').toUpperCase() === 'PAID')
+        .filter(b => normalizeStatus(b.status) !== 'CANCELLED' && (b.payStatus || '').toUpperCase() === 'PAID')
         .reduce((sum, b) => sum + (Number(b.price) || 0), 0);
 
-      const activeVehicles = bookings.filter(b => b.status === 'IN PROGRESS' || b.status === 'ARRIVED' || b.status === 'QUALITY CHECK').length;
-      const onlineToday = todayOnline.length;
-      const walkinToday = todayBookings.filter(b => (b.source || '').toUpperCase() !== 'ONLINE').length;
-      const completedToday = todayBookings.filter(b => b.status === 'COMPLETED').length;
+      // Total active queue vehicles in studio (CONFIRMED, ARRIVED, IN PROGRESS, QUALITY CHECK, PENDING)
+      const activeVehicles = bookings.filter(b => isQueueActive(b.status)).length;
+      const onlineToday = todayBookings.filter(b => normalizeSource(b.source) === 'ONLINE').length;
+      const walkinToday = todayBookings.filter(b => normalizeSource(b.source) !== 'ONLINE').length;
+      const completedToday = todayBookings.filter(b => normalizeStatus(b.status) === 'COMPLETED').length;
 
       const pendingPay = todayBookings
-        .filter(b => b.payStatus === 'UNPAID' || b.payStatus === 'PARTIAL')
+        .filter(b => (b.payStatus || '').toUpperCase() === 'UNPAID' || (b.payStatus || '').toUpperCase() === 'PARTIAL')
         .reduce((sum, b) => sum + (Number(b.price) || 0), 0);
 
       const custs = getCustomers();
@@ -3252,10 +3394,16 @@
       setText('kpi-bay-occupancy', bayRatio + '%');
       setText('kpi-bay-fraction', `${occupiedBays}/${bays.length} Bays Active`);
 
-      setText('badge-active-queue', activeVehicles);
-      setText('badge-online-count', onlineToday);
+      // Synchronize Sidebar Counter Badges with their corresponding modules
+      const curQueueFilter = (document.getElementById('queue-filter-select')?.value || 'ALL');
+      const displayedQueueCount = getFilteredQueueBookings(bookings, curQueueFilter).length;
+      setText('badge-active-queue', displayedQueueCount);
+
+      const displayedOnlineCount = getFilteredOnlineBookings(bookings, onlineFilterState).length;
+      setText('badge-online-count', displayedOnlineCount);
+
       setText('badge-customers-count', totalCustCount);
-      setText('badge-done-count', bookings.filter(b => b.status === 'COMPLETED').length);
+      setText('badge-done-count', bookings.filter(b => normalizeStatus(b.status) === 'COMPLETED').length);
       setText('badge-bays-occupied', `${occupiedBays}/${bays.length}`);
       setText('top-bay-pill-text', `${bays.length} BAYS (${occupiedBays} IN USE)`);
 
@@ -3268,6 +3416,7 @@
         } else {
           todayBookings.slice(0, 5).forEach(b => {
             const div = document.createElement('div');
+            const normStatus = normalizeStatus(b.status);
             div.style = 'display:flex; align-items:center; justify-content:space-between; background:var(--bg-panel-2); padding:0.6rem 0.85rem; border-radius:6px; border:1px solid var(--line); font-size:0.8rem;';
             div.innerHTML = `
               <div>
@@ -3276,7 +3425,7 @@
                 <div style="font-size:0.75rem; color:var(--muted);">${escapeHtml(b.service)} · ${escapeHtml(b.name)}</div>
               </div>
               <div style="text-align:right;">
-                <span class="status-badge status-${(b.status || 'CONFIRMED').toLowerCase().replace(/\s+/g,'')}">${escapeHtml(b.status || 'CONFIRMED')}</span>
+                <span class="status-badge status-${normStatus.toLowerCase().replace(/\s+/g,'')}">${escapeHtml(normStatus)}</span>
                 <div style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--green); font-weight:600; margin-top:2px;">₹${(b.price || 0).toLocaleString()}</div>
               </div>
             `;
@@ -3289,15 +3438,16 @@
     // 2. LIVE STUDIO QUEUE TABLE & STATUS LIFECYCLE
     function renderQueueTable() {
       const bookings = getBookings();
-      const filter = document.getElementById('queue-filter-select').value;
+      const filter = document.getElementById('queue-filter-select')?.value || 'ALL';
       const tbody = document.getElementById('live-queue-tbody');
       if (!tbody) return;
       tbody.innerHTML = '';
 
-      const activeQueue = bookings.filter(b => {
-        if (filter === 'ALL') return b.status !== 'COMPLETED' && b.status !== 'CANCELLED';
-        return b.status === filter;
-      });
+      const activeQueue = getFilteredQueueBookings(bookings, filter);
+
+      // Keep badge-active-queue strictly synchronized with current view
+      const badgeEl = document.getElementById('badge-active-queue');
+      if (badgeEl) badgeEl.innerText = activeQueue.length;
 
       if (activeQueue.length === 0) {
         tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:2rem; color:var(--muted);">No vehicles currently in queue matching selected status.</td></tr>`;
@@ -3306,7 +3456,8 @@
 
       activeQueue.forEach(b => {
         const tr = document.createElement('tr');
-        const statusClass = 'status-' + b.status.toLowerCase().replace(/\s+/g, '');
+        const normStatus = normalizeStatus(b.status);
+        const statusClass = 'status-' + normStatus.toLowerCase().replace(/\s+/g, '');
         const payClass = 'pay-' + (b.payStatus || 'unpaid').toLowerCase();
 
         tr.innerHTML = `
@@ -3324,18 +3475,19 @@
           </td>
           <td>
             <span style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--white);">${escapeHtml(b.bay || 'Unassigned')}</span>
-            <span style="font-size:0.68rem; color:var(--muted); display:block;">[${escapeHtml(b.source || 'Walk-In')}]</span>
+            <span style="font-size:0.68rem; color:var(--muted); display:block;">[${escapeHtml(normalizeSource(b.source))}]</span>
           </td>
           <td>
             <div style="font-family:'IBM Plex Mono'; font-size:0.75rem;">${escapeHtml(b.slot || 'Immediate')}</div>
           </td>
           <td>
             <select class="form-select" onchange="changeJobStatus('${b.id}', this.value)" style="font-size:0.72rem; padding:0.2rem 0.4rem; font-family:'IBM Plex Mono';">
-              <option value="CONFIRMED" ${b.status==='CONFIRMED'?'selected':''}>CONFIRMED</option>
-              <option value="ARRIVED" ${b.status==='ARRIVED'?'selected':''}>ARRIVED</option>
-
-              <option value="COMPLETED" ${b.status==='COMPLETED'?'selected':''}>COMPLETED</option>
-              <option value="CANCELLED" ${b.status==='CANCELLED'?'selected':''}>CANCELLED</option>
+              <option value="CONFIRMED" ${normStatus==='CONFIRMED'?'selected':''}>CONFIRMED</option>
+              <option value="ARRIVED" ${normStatus==='ARRIVED'?'selected':''}>ARRIVED</option>
+              <option value="IN PROGRESS" ${normStatus==='IN PROGRESS'?'selected':''}>IN PROGRESS</option>
+              <option value="QUALITY CHECK" ${normStatus==='QUALITY CHECK'?'selected':''}>QUALITY CHECK</option>
+              <option value="COMPLETED" ${normStatus==='COMPLETED'?'selected':''}>COMPLETED</option>
+              <option value="CANCELLED" ${normStatus==='CANCELLED'?'selected':''}>CANCELLED</option>
             </select>
           </td>
           <td>
@@ -3360,8 +3512,8 @@
       const bookings = getBookings();
       const target = bookings.find(b => b.id === id);
       if (target) {
-        target.status = newStatus;
-        if (newStatus === 'COMPLETED') {
+        target.status = normalizeStatus(newStatus);
+        if (target.status === 'COMPLETED') {
           if (!target.completed_at && !target.completedDate) {
             target.completed_at = new Date().toISOString();
           }
@@ -3389,7 +3541,7 @@
     // 3. ONLINE BOOKINGS TABLE & ACTIONS
     function filterOnlineBookings(mode, btn) {
       onlineFilterState = mode;
-      document.querySelectorAll('.filter-bar .filter-pill').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('#online-sec .filter-bar .filter-pill').forEach(p => p.classList.remove('active'));
       if (btn) btn.classList.add('active');
       renderOnlineBookingsTable();
     }
@@ -3400,50 +3552,11 @@
       if (!tbody) return;
       tbody.innerHTML = '';
 
-      // Calculate local YYYY-MM-DD dates without UTC/timezone shifting
-      const now = new Date();
-      const todayYear = now.getFullYear();
-      const todayMonth = String(now.getMonth() + 1).padStart(2, '0');
-      const todayDay = String(now.getDate()).padStart(2, '0');
-      const localToday = `${todayYear}-${todayMonth}-${todayDay}`;
+      const filtered = getFilteredOnlineBookings(bookings, onlineFilterState);
 
-      const tomDate = new Date(todayYear, now.getMonth(), now.getDate() + 1);
-      const tomYear = tomDate.getFullYear();
-      const tomMonth = String(tomDate.getMonth() + 1).padStart(2, '0');
-      const tomDay = String(tomDate.getDate()).padStart(2, '0');
-      const localTomorrow = `${tomYear}-${tomMonth}-${tomDay}`;
-
-      const filtered = bookings.filter(b => {
-        const isOnline = (b.source || '').toUpperCase() === 'ONLINE';
-        if (!isOnline) return false;
-
-        // Treat booking_date strictly as a date-only YYYY-MM-DD string
-        const bDate = (b.booking_date || b.date || '').trim().slice(0, 10);
-
-        if (onlineFilterState === 'TODAY') {
-          return bDate === localToday;
-        }
-        if (onlineFilterState === 'TOMORROW') {
-          return bDate === localTomorrow;
-        }
-        if (onlineFilterState === 'UPCOMING') {
-          return bDate > localTomorrow && (b.status || '').toUpperCase() !== 'CANCELLED';
-        }
-        if (onlineFilterState === 'PENDING') {
-          return (b.status || '').toUpperCase() === 'PENDING';
-        }
-        if (onlineFilterState === 'CONFIRMED') {
-          return (b.status || '').toUpperCase() === 'CONFIRMED';
-        }
-        if (onlineFilterState === 'COMPLETED') {
-          return (b.status || '').toUpperCase() === 'COMPLETED';
-        }
-        if (onlineFilterState === 'CANCELLED') {
-          return (b.status || '').toUpperCase() === 'CANCELLED';
-        }
-        // ALL or default: show all online bookings (including CANCELLED)
-        return true;
-      });
+      // Keep badge-online-count strictly synchronized with the Online Bookings section
+      const badgeEl = document.getElementById('badge-online-count');
+      if (badgeEl) badgeEl.innerText = filtered.length;
 
       if (filtered.length === 0) {
         tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:2rem; color:var(--muted);">No online bookings found for selected filter.</td></tr>`;
@@ -3455,6 +3568,7 @@
         const vehType = b.vehicleType || 'Car';
         const regNum = b.reg || '';
         const shortId = (b.id && b.id.length > 12) ? `${b.id.slice(0, 8)}…` : (b.id || 'N/A');
+        const normStatus = normalizeStatus(b.status);
 
         tr.innerHTML = `
           <td>
@@ -3473,16 +3587,16 @@
             <div style="font-family:'IBM Plex Mono', monospace; font-weight:600; color:var(--green); font-size:0.84rem; margin-top:2px;">₹${(b.price || 0).toLocaleString()}</div>
           </td>
           <td>
-            <div style="font-family:'IBM Plex Mono', monospace; font-size:0.82rem; font-weight:500; color:var(--white);">${escapeHtml(b.date || 'Today')}</div>
+            <div style="font-family:'IBM Plex Mono', monospace; font-size:0.82rem; font-weight:500; color:var(--white);">${escapeHtml(b.booking_date || b.date || 'Immediate')}</div>
           </td>
           <td>
-            <span class="status-badge status-${(b.status || 'CONFIRMED').toLowerCase().replace(/\s+/g,'')}">${escapeHtml(b.status || 'CONFIRMED')}</span>
+            <span class="status-badge status-${normStatus.toLowerCase().replace(/\s+/g,'')}">${escapeHtml(normStatus)}</span>
           </td>
           <td>
             <div class="action-btn-group">
               ${(b.payStatus || 'UNPAID').toUpperCase() !== 'PAID' ? `<button class="action-btn" style="background:rgba(0,230,118,0.12); color:var(--green); border-color:var(--green);" title="Record Payment" onclick="openMarkPaidModal('${b.id}')">💳 Pay</button>` : ''}
-              ${(b.status || '').toUpperCase() === 'CONFIRMED' || (b.status || '').toUpperCase() === 'PENDING' ? `<button class="action-btn arrive" onclick="changeJobStatus('${b.id}', 'ARRIVED')" title="Mark Vehicle Arrived">🚗 Arrived</button>` : ''}
-              ${(b.status || '').toUpperCase() !== 'CANCELLED' && (b.status || '').toUpperCase() !== 'COMPLETED' ? `<button class="action-btn" style="background:rgba(239,68,68,0.12); color:var(--red); border-color:var(--red);" onclick="changeJobStatus('${b.id}', 'CANCELLED')" title="Cancel Booking">🚫 Cancel</button>` : ''}
+              ${normStatus === 'CONFIRMED' || normStatus === 'PENDING' ? `<button class="action-btn arrive" onclick="changeJobStatus('${b.id}', 'ARRIVED')" title="Mark Vehicle Arrived">🚗 Arrived</button>` : ''}
+              ${normStatus !== 'CANCELLED' && normStatus !== 'COMPLETED' ? `<button class="action-btn" style="background:rgba(239,68,68,0.12); color:var(--red); border-color:var(--red);" onclick="changeJobStatus('${b.id}', 'CANCELLED')" title="Cancel Booking">🚫 Cancel</button>` : ''}
               <button class="action-btn" title="View & Print Bill Invoice" onclick="openBillInvoiceModal('${b.id}')">🧾 Bill</button>
               <button class="action-btn wa" title="Share Bill on WhatsApp" onclick="shareBillWhatsApp('${b.id}')">💬 WA Bill</button>
               ${b.phone ? `<a href="tel:${cleanPhone(b.phone)}" class="action-btn call" title="Call Customer">📞 Call</a>` : ''}
@@ -5523,7 +5637,7 @@ TRIEYE WATERWASH & DETAILING`;
     document.addEventListener('DOMContentLoaded', () => {
       const datePicker = document.getElementById('overview-date-picker');
       if (datePicker) {
-        const today = new Date().toISOString().split('T')[0];
+        const today = getLocalDateStr(new Date());
         datePicker.value = today;
         updateDateBookingsCount();
       }
@@ -5564,18 +5678,36 @@ TRIEYE WATERWASH & DETAILING`;
       renderAll();
 
       // Check Supabase session first before loading sensitive admin data
-      await checkAdminAuth();
+      const isAuthed = await checkAdminAuth();
+      if (isAuthed) {
+        await syncFromSupabase();
+      }
 
-      // Perform immediate sync from Supabase
-      await syncFromSupabase();
-
-      // Setup live Realtime subscription from Supabase
-      if (window.TrieyeDB) {
-        window.TrieyeDB.subscribeToChanges((table) => {
+      // Single Live Realtime subscription from Supabase
+      if (!realtimeChannel && window.TrieyeDB && typeof window.TrieyeDB.subscribeToChanges === 'function') {
+        realtimeChannel = window.TrieyeDB.subscribeToChanges((table) => {
           console.log('⚡ [Realtime Notification received on dashboard.html for table]:', table);
           syncFromSupabase();
         });
       }
+
+      // Cross-Device Tab Visibility and Window Focus Sync
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          console.log('⚡ [Trieye Dashboard] Tab visible, synchronizing latest bookings from Supabase...');
+          syncFromSupabase();
+        }
+      });
+      window.addEventListener('focus', () => {
+        syncFromSupabase();
+      });
+
+      // Background Periodic Sync Fallback (every 30 seconds)
+      setInterval(() => {
+        if (document.visibilityState === 'visible') {
+          syncFromSupabase();
+        }
+      }, 30000);
 
       // Cross-tab BroadcastChannel listener
       try {

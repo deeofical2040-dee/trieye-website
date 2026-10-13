@@ -28,6 +28,41 @@ const TrieyeDB = {
     );
   },
 
+  // Status and source normalization
+  normalizeStatus(status) {
+    if (!status) return 'CONFIRMED';
+    let s = String(status).toUpperCase().trim();
+    if (s === 'IN_PROGRESS') return 'IN PROGRESS';
+    if (s === 'QUALITY_CHECK') return 'QUALITY CHECK';
+    if (s === 'CANCELED' || s === 'CANCEL') return 'CANCELLED';
+    if (s === 'PENDING_CONFIRMATION') return 'PENDING';
+    if (s === 'DONE' || s === 'FINISHED') return 'COMPLETED';
+    return s;
+  },
+
+  normalizeSource(source) {
+    if (!source) return 'WALK-IN';
+    let s = String(source).toUpperCase().trim();
+    if (s === 'WALKIN' || s === 'WALK IN') return 'WALK-IN';
+    return s;
+  },
+
+  isQueueActive(status) {
+    const s = this.normalizeStatus(status);
+    return s !== 'COMPLETED' && s !== 'CANCELLED';
+  },
+
+  getLocalDateIso(d = new Date()) {
+    if (!d) d = new Date();
+    if (typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d.trim())) return d.trim();
+    const dateObj = typeof d === 'string' ? new Date(d) : d;
+    if (isNaN(dateObj.getTime())) return String(d).trim().slice(0, 10);
+    const y = dateObj.getFullYear();
+    const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+    const day = String(dateObj.getDate()).padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  },
+
   // Helper to check for an active Supabase authenticated session
   async getSession() {
     const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
@@ -177,8 +212,11 @@ const TrieyeDB = {
 
         if (error) {
           TrieyeDB.logError('bookings', 'SELECT', error);
-          // When Supabase is connected and returns an error, do not silently replace with demo data
-          return [];
+          // Return array with error tag so failures are not silently converted to 0
+          const errArr = [];
+          errArr._hasError = true;
+          errArr._error = error;
+          return errArr;
         }
 
         if (Array.isArray(data)) {
@@ -201,6 +239,8 @@ const TrieyeDB = {
             const payMethod = pay.method ? (pay.method.toUpperCase() === 'PENDING' ? 'Pending' : pay.method) : 'Pending';
 
             let normStatus = (b.status || 'CONFIRMED').toUpperCase().trim();
+            if (normStatus === 'IN_PROGRESS') normStatus = 'IN PROGRESS';
+            if (normStatus === 'QUALITY_CHECK') normStatus = 'QUALITY CHECK';
             if (normStatus === 'CANCELED' || normStatus === 'CANCEL') normStatus = 'CANCELLED';
             if (normStatus === 'PENDING_CONFIRMATION') normStatus = 'PENDING';
             if (normStatus === 'DONE' || normStatus === 'FINISHED') normStatus = 'COMPLETED';
@@ -212,7 +252,7 @@ const TrieyeDB = {
               booking_date: b.booking_date || '',
               total_amount: totalAmt,
               status: normStatus,
-              source: (b.source || 'ONLINE').toUpperCase(),
+              source: (b.source || 'ONLINE').toUpperCase().trim(),
               customer_id: b.customer_id,
               vehicle_id: b.vehicle_id,
               service_id: b.service_id,
@@ -249,7 +289,10 @@ const TrieyeDB = {
         }
       } catch (err) {
         console.error('🚨 [Supabase Network Error on bookings SELECT]:', err);
-        return [];
+        const errArr = [];
+        errArr._hasError = true;
+        errArr._error = err;
+        return errArr;
       }
     }
     // Fallback to LocalStorage only if Supabase client is not configured
@@ -346,13 +389,14 @@ const TrieyeDB = {
     
     if (sb) {
       try {
+        const bookingDateVal = this.getLocalDateIso(params.date);
         console.log('⚡ [Supabase RPC] Invoking public.create_online_booking with 6 params:', {
           p_customer_name: params.name || 'Valued Customer',
           p_customer_phone: params.phone || '',
           p_vehicle_type: params.vehicleType || 'Car',
           p_reg_number: params.reg || 'TN 01 AB 1234',
           p_service_name: params.service || 'Foam Wash',
-          p_booking_date: params.date || new Date().toISOString().split('T')[0]
+          p_booking_date: bookingDateVal
         });
         
         const { data, error } = await sb.rpc('create_online_booking', {
@@ -361,7 +405,7 @@ const TrieyeDB = {
           p_vehicle_type: params.vehicleType || 'Car',
           p_reg_number: params.reg || 'TN 01 AB 1234',
           p_service_name: params.service || 'Foam Wash',
-          p_booking_date: params.date || new Date().toISOString().split('T')[0]
+          p_booking_date: bookingDateVal
         });
 
         if (error) {
