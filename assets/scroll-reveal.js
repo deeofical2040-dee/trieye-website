@@ -66,8 +66,8 @@
       });
 
       targets.forEach(function(target) {
-        // Exclude navigation, mobile drawer, modals
-        if (target.closest(".mobile-drawer") || target.closest(".modal") || target.closest("header") || target.closest("nav")) {
+        // Exclude navigation, mobile drawer, modals, footer
+        if (target.closest(".mobile-drawer") || target.closest(".modal") || target.closest("header") || target.closest("nav") || target.closest("footer") || target.closest(".site-footer")) {
           target.classList.add("revealed");
           return;
         }

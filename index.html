@@ -2149,27 +2149,24 @@
   .footer-bottom{
     padding-top:22px;
     border-top:1px solid var(--line);
-    display:flex;
-    justify-content:space-between;
+    display:flex !important;
+    justify-content:center;
     align-items:center;
-    flex-wrap:wrap;
-    gap:14px;
+    text-align:center;
     width:100%;
     box-sizing:border-box;
+    opacity:1 !important;
+    transform:none !important;
+    visibility:visible !important;
   }
 
   .footer-copy{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:12px;
+    font-family:'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size:13px;
     color:var(--muted);
-  }
-
-  .footer-sub-tag{
-    font-family:'IBM Plex Mono', monospace;
-    font-size:11px;
-    letter-spacing:0.14em;
-    color:var(--muted);
-    text-transform:uppercase;
+    text-align:center;
+    margin:0;
+    width:100%;
   }
 
   @media (max-width: 768px){
@@ -4459,8 +4456,8 @@
     </div>
 
     <!-- Bottom Footer -->
-    <div class="footer-bottom reveal-element">
-      <div class="footer-copy">&copy; 2026 TRIEYE Detailing Studio. All rights reserved.</div>
+    <div class="footer-bottom">
+      <div class="footer-copy">&copy; <span class="current-year">2026</span> TRIEYE Detailing Studio. All Rights Reserved.</div>
     </div>
   </div>
 </footer>
