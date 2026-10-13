@@ -1409,12 +1409,13 @@ const TrieyeDB = {
 
     const isTriRef = rawInput.startsWith('TRI-') || /^[0-9A-F]{8}$/i.test(rawInput);
     let cleanRef = isTriRef ? rawInput.replace(/^#/, '').replace(/^TRI-/, '') : '';
+    let formattedVeh = '';
     let cleanReg = '';
     
     if (isTriRef) {
       cleanRef = rawInput.replace(/^#/, '').replace(/^TRI-/, '');
     } else {
-      const formattedVeh = this.formatVehicleNumber(rawInput);
+      formattedVeh = this.formatVehicleNumber(rawInput);
       cleanReg = formattedVeh.replace(/[^A-Z0-9]/g, '');
       if (!cleanReg) {
         return {
@@ -1426,60 +1427,52 @@ const TrieyeDB = {
 
     const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
 
+    // 1. SUPABASE SECURE RPC LOOKUP (SECURITY DEFINER)
     if (sb) {
       try {
-        const { data, error } = await sb
-          .from('bookings')
-          .select(`
-            id,
-            booking_date,
-            booking_time,
-            status,
-            total_amount,
-            source,
-            created_at,
-            customers!inner (id, name, phone),
-            vehicles (id, vehicle_type, reg_number),
-            services (id, name, base_price),
-            bays (id, name),
-            slots (id, slot_time)
-          `)
-          .order('created_at', { ascending: false });
+        console.log('⚡ [TrieyeDB] Calling RPC track_vehicle_bookings...');
+        const { data: rpcData, error: rpcError } = await sb.rpc('track_vehicle_bookings', {
+          p_reg_number: formattedVeh || rawInput,
+          p_phone: cleanPhone
+        });
 
-        if (error) {
-          TrieyeDB.logError('bookings:trackBooking', 'SELECT', error);
-        } else if (Array.isArray(data) && data.length > 0) {
-          const match = data.find(b => {
-            const custPhone = b.customers && b.customers.phone ? String(b.customers.phone).replace(/\D/g, '').slice(-10) : '';
-            const phoneMatches = custPhone === cleanPhone;
-            if (!phoneMatches) return false;
+        if (rpcError) {
+          console.warn('⚠️ [Supabase RPC track_vehicle_bookings error]:', rpcError.message);
+          // If RPC returned an intentional error message, log it
+        } else if (rpcData && typeof rpcData === 'object') {
+          if (rpcData.success) {
+            const rawHistory = Array.isArray(rpcData.history) ? rpcData.history : [];
+            const formattedHistory = rawHistory.map(item => this._formatTrackBookingItem(item, rpcData));
+            const latestBooking = formattedHistory.length > 0 ? formattedHistory[0] : this._formatTrackBookingItem(rpcData.booking, rpcData);
 
-            const bRef = b.id ? `TRI-${String(b.id).substring(0, 8).toUpperCase()}` : '';
-            const rawId = String(b.id || '').toUpperCase();
-            const refMatches = cleanRef && (cleanRef === bRef.replace('TRI-', '') || rawId.startsWith(cleanRef));
-
-            const vReg = b.vehicles && b.vehicles.reg_number ? String(b.vehicles.reg_number).toUpperCase().replace(/[^A-Z0-9]/g, '') : '';
-            const regMatches = cleanReg && vReg && (vReg === cleanReg || vReg.includes(cleanReg) || cleanReg.includes(vReg));
-
-            return refMatches || regMatches;
-          });
-
-          if (match) {
             return {
               success: true,
-              booking: this._formatTrackBookingResult(match)
+              customer_name: rpcData.customer_name || (latestBooking && latestBooking.customer_name) || 'Valued Customer',
+              vehicle_type: rpcData.vehicle_type || (latestBooking && latestBooking.vehicleType) || 'Car',
+              reg_number: rpcData.reg_number || (latestBooking && latestBooking.reg) || formattedVeh,
+              total_visits: rpcData.total_visits || formattedHistory.length,
+              booking: latestBooking,
+              history: formattedHistory
+            };
+          } else if (rpcData.error) {
+            return {
+              success: false,
+              error: rpcData.error
             };
           }
         }
       } catch (err) {
-        console.error('🚨 [Supabase Network Error on trackBooking]:', err);
+        console.warn('⚠️ [TrieyeDB RPC network exception]:', err);
       }
     }
 
-    // Fallback to local cache (for offline / offline-generated bookings)
+    // 2. LOCAL CACHE FALLBACK (Supports offline mode, multi-visit history, multi-vehicle isolation)
     try {
-      const local = JSON.parse(localStorage.getItem('trieye_bookings')) || [];
-      const match = local.find(b => {
+      const localBookings = JSON.parse(localStorage.getItem('trieye_bookings')) || [];
+      const localInvoices = JSON.parse(localStorage.getItem('trieye_invoices')) || [];
+
+      // Filter bookings matching THIS customer's phone AND THIS specific vehicle
+      const matchingVisits = localBookings.filter(b => {
         const custPhone = String(b.phone || (b.customers && b.customers.phone) || '').replace(/\D/g, '').slice(-10);
         const phoneMatches = custPhone === cleanPhone;
         if (!phoneMatches) return false;
@@ -1493,62 +1486,106 @@ const TrieyeDB = {
         return refMatches || regMatches;
       });
 
-      if (match) {
-        let normStatus = (match.status || 'CONFIRMED').toUpperCase().trim();
-        if (normStatus === 'CANCELED' || normStatus === 'CANCEL') normStatus = 'CANCELLED';
-        if (normStatus === 'DONE' || normStatus === 'FINISHED') normStatus = 'COMPLETED';
+      if (matchingVisits.length > 0) {
+        // Sort visits newest to oldest (by date then created)
+        matchingVisits.sort((a, b) => {
+          const dateA = a.booking_date || a.date || a.created_at || a.created || '';
+          const dateB = b.booking_date || b.date || b.created_at || b.created || '';
+          return dateB.localeCompare(dateA);
+        });
+
+        // Format all visits for this vehicle
+        const history = matchingVisits.map(m => {
+          // Check if an invoice is linked to this visit
+          const linkedInv = localInvoices.find(inv => 
+            (inv.booking_id && (inv.booking_id === m.id || inv.booking_id === m.booking_id)) ||
+            (inv.invoice_number && inv.invoice_number === m.invoice_ref)
+          );
+          if (linkedInv) {
+            m.has_invoice = true;
+            m.invoice_status = linkedInv.status || 'ISSUED';
+          }
+          return this._formatTrackBookingItem(m);
+        });
+
+        const latest = history[0];
 
         return {
           success: true,
-          booking: {
-            booking_ref: match.invoice_ref || (match.id ? `TRI-${String(match.id).substring(0, 8).toUpperCase()}` : 'TRI-BOOKING'),
-            customer_name: match.name || (match.customers && match.customers.name) || 'Valued Customer',
-            phone: match.phone || (match.customers && match.customers.phone) || '',
-            service: match.service || (match.services && match.services.name) || 'Car Detailing',
-            vehicleType: match.vehicleType || (match.vehicles && match.vehicles.vehicle_type) || 'Car',
-            reg: match.reg || (match.vehicles && match.vehicles.reg_number) || 'TN 01 AB 1234',
-            booking_date: match.date || match.booking_date || '',
-            booking_time: match.bookingTime || match.slot || (match.slots && match.slots.slot_time) || 'Standard Slot',
-            price: Number(match.price || match.total_amount || 0),
-            status: normStatus,
-            created_at: match.created || match.created_at || new Date().toISOString()
-          }
+          customer_name: latest.customer_name || 'Valued Customer',
+          vehicle_type: latest.vehicleType || 'Car',
+          reg_number: latest.reg || formattedVeh,
+          total_visits: history.length,
+          booking: latest,
+          history: history
         };
       }
-    } catch (e) {}
+
+      // Check if phone exists but with a different vehicle (so we give a clean informative error without leaking details)
+      const phoneExists = localBookings.some(b => {
+        const p = String(b.phone || (b.customers && b.customers.phone) || '').replace(/\D/g, '').slice(-10);
+        return p === cleanPhone;
+      });
+
+      if (phoneExists && cleanReg) {
+        return {
+          success: false,
+          error: `No bookings found for vehicle ${formattedVeh || cleanReg} under phone ending in ${cleanPhone.slice(-4)}.`
+        };
+      }
+    } catch (e) {
+      console.error('🚨 [Local Track Booking Error]:', e);
+    }
 
     return {
       success: false,
-      error: "We couldn't find a booking matching those details. Please check your vehicle number and phone number."
+      error: "We couldn't find a booking matching those details. Please check your vehicle number and registered phone number."
     };
   },
 
-  _formatTrackBookingResult(b) {
+  _formatTrackBookingItem(b, parentContext = {}) {
+    if (!b) return null;
     const cust = b.customers || {};
     const veh = b.vehicles || {};
     const svc = b.services || {};
     const slot = b.slots || {};
 
-    const shortRef = b.id && String(b.id).length > 8 ? `TRI-${String(b.id).substring(0, 8).toUpperCase()}` : (b.id || 'TRI-BOOKING');
-    const totalAmt = Number(b.total_amount !== null && b.total_amount !== undefined ? b.total_amount : (svc.base_price || 0));
+    const shortRef = b.booking_ref || (b.id && String(b.id).length > 8 ? `TRI-${String(b.id).substring(0, 8).toUpperCase()}` : (b.id || b.invoice_ref || 'TRI-BOOKING'));
+    const totalAmt = Number(b.price !== undefined ? b.price : (b.total_amount !== undefined ? b.total_amount : (svc.base_price || 0)));
 
-    let normStatus = (b.status || 'CONFIRMED').toUpperCase().trim();
+    let normStatus = String(b.status || 'CONFIRMED').toUpperCase().trim();
     if (normStatus === 'CANCELED' || normStatus === 'CANCEL') normStatus = 'CANCELLED';
     if (normStatus === 'DONE' || normStatus === 'FINISHED') normStatus = 'COMPLETED';
 
+    const bDate = b.booking_date || b.date || '';
+    // Do not invent booking times if no slot was assigned
+    const rawTime = b.booking_time || b.slot || (slot && slot.slot_time) || null;
+    const bTime = (rawTime && rawTime !== 'Standard Slot' && rawTime !== '10:00 AM') ? rawTime : (rawTime === 'Standard Slot' ? null : rawTime);
+
+    const hasInvoice = Boolean(b.has_invoice || b.invoice_number || b.invoice_id || b.invoice_ref);
+    const shareToken = b.share_token || null;
+
     return {
+      booking_id: b.id || b.booking_id || shortRef,
       booking_ref: shortRef,
-      customer_name: cust.name || 'Valued Customer',
-      phone: cust.phone || '',
-      service: svc.name || 'Car Detailing',
-      vehicleType: veh.vehicle_type || 'Car',
-      reg: veh.reg_number || 'TN 01 AB 1234',
-      booking_date: b.booking_date || '',
-      booking_time: b.booking_time || slot.slot_time || 'Standard Slot',
+      customer_name: b.customer_name || b.name || cust.name || parentContext.customer_name || 'Valued Customer',
+      phone: b.phone || cust.phone || '',
+      service: b.service || svc.name || 'Detailing Service',
+      vehicleType: b.vehicleType || veh.vehicle_type || parentContext.vehicle_type || 'Car',
+      reg: b.reg || veh.reg_number || parentContext.reg_number || 'TN 01 AB 1234',
+      booking_date: bDate,
+      booking_time: bTime, // null if no slot was assigned
       price: totalAmt,
       status: normStatus,
-      created_at: b.created_at || new Date().toISOString()
+      created_at: b.created_at || b.created || new Date().toISOString(),
+      has_invoice: hasInvoice,
+      invoice_status: b.invoice_status || (hasInvoice ? 'ISSUED' : 'PENDING'),
+      share_token: shareToken
     };
+  },
+
+  _formatTrackBookingResult(b) {
+    return this._formatTrackBookingItem(b);
   }
 };
 

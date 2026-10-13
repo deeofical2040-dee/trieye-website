@@ -286,6 +286,362 @@
     font-weight: 700;
   }
 
+  /* Bill Action Area */
+  .result-bill-box {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .bill-action-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+
+  .bill-info-label {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .bill-info-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--white);
+  }
+
+  .bill-info-desc {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .btn-view-bill {
+    background: var(--pink, #ee2f76);
+    color: #ffffff;
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 14px rgba(238, 47, 118, 0.25);
+  }
+
+  .btn-view-bill:hover {
+    background: #d61f63;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(238, 47, 118, 0.35);
+    color: #ffffff;
+  }
+
+  .btn-request-bill {
+    background: var(--green, #a6d331);
+    color: #000000;
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 14px rgba(104, 159, 14, 0.25);
+  }
+
+  .btn-request-bill:hover {
+    background: #5a8a0b;
+    color: #ffffff;
+    transform: translateY(-2px);
+  }
+
+  .bill-badge-pending {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: #f1f5f9;
+    color: #64748b;
+    border-radius: 6px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .bill-security-note {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f8fafc;
+    border: 1px dashed var(--line);
+    padding: 9px 14px;
+    border-radius: 6px;
+    line-height: 1.45;
+  }
+
+  .bill-security-note svg {
+    flex-shrink: 0;
+    color: var(--pink);
+  }
+
+  /* History / Previous Visits Card */
+  .history-card {
+    display: none;
+    background: #ffffff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 36px 32px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+    margin-top: 28px;
+    animation: fadeInUp 0.4s ease forwards;
+  }
+
+  .history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .history-sec-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--pink);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: block;
+    line-height: 1.4;
+  }
+
+  .history-title-wrap h2 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: var(--white);
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  .history-count-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--pink);
+    background: rgba(238, 47, 118, 0.08);
+    border: 1px solid rgba(238, 47, 118, 0.2);
+    padding: 5px 12px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .history-filters {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  .filter-pill {
+    background: #f8f9fa;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .filter-pill:hover {
+    border-color: var(--pink);
+    color: var(--pink);
+  }
+
+  .filter-pill.active {
+    background: var(--pink);
+    border-color: var(--pink);
+    color: #ffffff;
+  }
+
+  .history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .history-item {
+    background: #fcfdfe;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: all 0.2s ease;
+  }
+
+  .history-item:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+    transform: translateY(-1px);
+  }
+
+  .history-item-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .history-service-name {
+    font-family: 'Oswald', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--white);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  .history-date-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    color: var(--muted);
+    background: #f1f5f9;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  .history-item-mid {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 13.5px;
+    color: var(--muted);
+  }
+
+  .history-ref {
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--muted);
+  }
+
+  .history-ref span {
+    color: var(--white);
+    font-weight: 600;
+  }
+
+  .history-price {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    color: var(--green);
+    font-size: 15px;
+  }
+
+  .history-item-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #f1f5f9;
+  }
+
+  .history-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 12px;
+  }
+
+  .history-btn-bill {
+    font-family: 'Inter', sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 6px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+
+  .history-btn-bill.view-btn {
+    background: rgba(238, 47, 118, 0.1);
+    color: var(--pink);
+    border: 1px solid rgba(238, 47, 118, 0.25);
+  }
+
+  .history-btn-bill.view-btn:hover {
+    background: var(--pink);
+    color: #ffffff;
+  }
+
+  .history-btn-bill.req-btn {
+    background: rgba(104, 159, 14, 0.1);
+    color: #4c750a;
+    border: 1px solid rgba(104, 159, 14, 0.25);
+  }
+
+  .history-btn-bill.req-btn:hover {
+    background: var(--green);
+    color: #000000;
+  }
+
+  .history-empty-note {
+    background: #f8fafc;
+    border: 1px dashed var(--line);
+    border-radius: 8px;
+    padding: 24px;
+    text-align: center;
+    color: var(--muted);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
   /* Footer Navigation Links */
   .footer-nav {
     display: flex;
@@ -318,12 +674,33 @@
     .track-hero-section {
       padding: 36px 16px 60px;
     }
-    .track-card, .result-card {
+    .track-card, .result-card, .history-card {
       padding: 24px 18px;
     }
     .result-grid {
       grid-template-columns: 1fr;
       gap: 16px;
+    }
+    .bill-action-row {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .btn-view-bill, .btn-request-bill {
+      justify-content: center;
+      width: 100%;
+    }
+    .history-header {
+      flex-direction: column;
+      gap: 10px;
+    }
+    .history-item-bottom {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .history-btn-bill {
+      width: 100%;
+      justify-content: center;
     }
     .footer-nav {
       gap: 12px 18px;
@@ -546,6 +923,28 @@
           <span class="result-value" id="resStatusText">CONFIRMED</span>
         </div>
       </div>
+
+      <!-- LATEST BILL ACTION CONTAINER -->
+      <div id="latestBillContainer" class="result-bill-box">
+        <!-- Injected dynamically by renderBookingResult -->
+      </div>
+    </div>
+
+    <!-- PREVIOUS VISITS / VEHICLE SERVICE HISTORY CARD -->
+    <div id="trackHistoryCard" class="history-card reveal-card">
+      <div class="history-header">
+        <div class="history-title-wrap">
+          <div class="history-sec-tag">// VEHICLE SERVICE HISTORY</div>
+          <h2>PREVIOUS VISITS (<span id="histRegNumber">--</span>)</h2>
+        </div>
+        <div id="histVisitsCount" class="history-count-badge">0 VISITS RECORDED</div>
+      </div>
+
+      <!-- Month Filter Pills Container -->
+      <div id="historyMonthFilters" class="history-filters" style="display:none;"></div>
+
+      <!-- Visits List Container -->
+      <div id="historyVisitsList" class="history-list"></div>
     </div>
 
   </div>
@@ -752,9 +1151,11 @@
         const res = await window.TrieyeDB.trackBooking(refVal, phoneVal);
 
         if (res && res.success && res.booking) {
+          const historyData = Array.isArray(res.history) && res.history.length > 0 ? res.history : [res.booking];
           renderBookingResult(res.booking);
+          renderHistory(historyData, res.reg_number || refVal);
         } else {
-          showError((res && res.error) || "We couldn't find a booking matching those details. Please check your booking reference and phone number.");
+          showError((res && res.error) || "We couldn't find a booking matching those details. Please check your vehicle number and registered phone number.");
         }
       } catch (err) {
         console.error('🚨 [Track Booking Exception]:', err);
@@ -788,8 +1189,25 @@
     if (trackError) trackError.style.display = 'none';
   }
 
+  const trackHistoryCard = document.getElementById('trackHistoryCard');
   function hideResult() {
     if (trackResultCard) trackResultCard.style.display = 'none';
+    if (trackHistoryCard) trackHistoryCard.style.display = 'none';
+  }
+
+  function formatDisplayDate(dateStr) {
+    if (!dateStr) return 'Standard Date';
+    try {
+      const clean = String(dateStr).split('T')[0];
+      const parts = clean.split('-');
+      if (parts.length === 3) {
+        const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+        if (!isNaN(d.getTime())) {
+          return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+      }
+    } catch (e) {}
+    return dateStr;
   }
 
   function renderBookingResult(b) {
@@ -801,17 +1219,11 @@
     document.getElementById('resReg').textContent = b.reg || 'N/A';
     
     // Format Date
-    let formattedDate = b.booking_date || 'Standard Entry';
-    if (b.booking_date && b.booking_date.includes('-')) {
-      try {
-        const d = new Date(b.booking_date);
-        if (!isNaN(d.getTime())) {
-          formattedDate = d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-        }
-      } catch (e) {}
-    }
+    const formattedDate = formatDisplayDate(b.booking_date);
     document.getElementById('resDate').textContent = formattedDate;
-    document.getElementById('resTime').textContent = b.booking_time || '10:00 AM';
+
+    // Slot/Time: Never invent booking times if no slot was assigned
+    document.getElementById('resTime').textContent = b.booking_time ? b.booking_time : 'Scheduled Day (Slot Not Assigned)';
 
     const priceNum = Number(b.price || 0);
     document.getElementById('resPrice').textContent = priceNum > 0 ? `₹${priceNum.toLocaleString()}` : '₹---';
@@ -838,10 +1250,223 @@
       }
     }
 
+    // Secure View Bill / Request Bill Button Handling
+    const billContainer = document.getElementById('latestBillContainer');
+    if (billContainer) {
+      if (b.has_invoice && b.share_token) {
+        billContainer.innerHTML = `
+          <div class="bill-action-row">
+            <div class="bill-info-label">
+              <span class="bill-info-title">OFFICIAL INVOICE ISSUED</span>
+              <span class="bill-info-desc">Verified single-use invoice access link is ready for viewing.</span>
+            </div>
+            <a href="/invoice?token=${encodeURIComponent(b.share_token)}" target="_blank" rel="noopener noreferrer" class="btn-view-bill">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              <span>VIEW BILL →</span>
+            </a>
+          </div>
+          <div class="bill-security-note">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span>Single-purpose encrypted token issued. Only authorized holders of this link may view detailed pricing.</span>
+          </div>
+        `;
+      } else if (b.has_invoice) {
+        const waMsg = encodeURIComponent(`Hi TRIEYE Detailing Studio, I would like to request the official invoice for my vehicle ${b.reg} (Booking Ref: ${b.booking_ref}, Visit Date: ${formattedDate}).`);
+        const waUrl = `https://wa.me/919940181934?text=${waMsg}`;
+        billContainer.innerHTML = `
+          <div class="bill-action-row">
+            <div class="bill-info-label">
+              <span class="bill-info-title">OFFICIAL BILL ISSUED</span>
+              <span class="bill-info-desc">Direct invoice access requires staff security verification.</span>
+            </div>
+            <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="btn-request-bill">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.762.459 3.48 1.332 5.001l-1.416 5.169 5.297-1.389c1.472.802 3.133 1.224 4.774 1.225h.004c5.505 0 9.988-4.478 9.989-9.985 0-2.668-1.039-5.176-2.927-7.063a9.927 9.927 0 0 0-7.063-2.942zm5.79 14.195c-.244.688-1.419 1.314-1.956 1.396-.51.077-1.163.116-3.701-.931-3.24-1.339-5.326-4.636-5.487-4.851-.161-.215-1.309-1.741-1.309-3.322 0-1.58.827-2.357 1.121-2.68.294-.323.644-.404.859-.404.215 0 .43.002.617.01.198.008.465-.075.728.556.27.646.918 2.241.998 2.403.08.162.134.35.027.565-.107.215-.161.35-.322.538-.161.188-.338.42-.483.564-.16.162-.328.338-.14.661.188.323.834 1.378 1.79 2.23 1.23 1.096 2.268 1.436 2.59 1.597.323.161.511.134.7-.08.188-.215.806-.941 1.021-1.263.215-.323.43-.269.725-.161.296.107 1.88.886 2.202 1.047.323.161.538.242.618.376.08.134.08.779-.164 1.467z"/></svg>
+              <span>REQUEST BILL ON WHATSAPP →</span>
+            </a>
+          </div>
+          <div class="bill-security-note">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span>Security Protected: To prevent unauthorized viewing of invoices, tap above to receive your verified access link on WhatsApp.</span>
+          </div>
+        `;
+      } else {
+        const waMsg = encodeURIComponent(`Hi TRIEYE Detailing Studio, I am following up on booking ${b.booking_ref} for vehicle ${b.reg}.`);
+        const waUrl = `https://wa.me/919940181934?text=${waMsg}`;
+        billContainer.innerHTML = `
+          <div class="bill-action-row">
+            <div class="bill-info-label">
+              <span class="bill-info-title">BILLING STATUS</span>
+              <span class="bill-info-desc">Invoice is generated upon service completion and studio checkout.</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+              <span class="bill-badge-pending">⏳ PENDING</span>
+              <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="btn-request-bill" style="padding: 8px 16px; font-size: 13px;">
+                <span>Inquire on WhatsApp</span>
+              </a>
+            </div>
+          </div>
+        `;
+      }
+    }
+
     if (trackResultCard) {
       trackResultCard.style.display = 'block';
       trackResultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
+  }
+
+  // Multi-Visit History Manager
+  let currentHistoryData = [];
+  let currentActiveMonth = 'ALL';
+
+  function renderHistory(history, reg) {
+    currentHistoryData = Array.isArray(history) ? history : [];
+    currentActiveMonth = 'ALL';
+
+    const regSpan = document.getElementById('histRegNumber');
+    if (regSpan) regSpan.textContent = reg || 'VEHICLE';
+
+    const countBadge = document.getElementById('histVisitsCount');
+    if (countBadge) countBadge.textContent = `${currentHistoryData.length} ${currentHistoryData.length === 1 ? 'VISIT' : 'VISITS'} RECORDED`;
+
+    const filtersContainer = document.getElementById('historyMonthFilters');
+    const visitsList = document.getElementById('historyVisitsList');
+
+    if (!visitsList) return;
+
+    if (currentHistoryData.length <= 1) {
+      if (filtersContainer) filtersContainer.style.display = 'none';
+      visitsList.innerHTML = `
+        <div class="history-empty-note">
+          <strong>First Recorded Visit</strong><br>
+          This is the current registered visit for this vehicle at TRIEYE Detailing Studio. Any future detailing appointments, ceramic maintenance, or washes will be logged chronologically right here.
+        </div>
+      `;
+      if (trackHistoryCard) trackHistoryCard.style.display = 'block';
+      return;
+    }
+
+    // Extract unique year-months from dates
+    const monthMap = {};
+    currentHistoryData.forEach(item => {
+      const dStr = item.booking_date || '';
+      if (dStr && dStr.includes('-')) {
+        const parts = dStr.split('T')[0].split('-');
+        if (parts.length >= 2) {
+          const ymKey = `${parts[0]}-${parts[1]}`;
+          const d = new Date(Number(parts[0]), Number(parts[1]) - 1, 1);
+          const label = d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+          monthMap[ymKey] = { label, count: (monthMap[ymKey] ? monthMap[ymKey].count : 0) + 1 };
+        }
+      }
+    });
+
+    const monthKeys = Object.keys(monthMap);
+
+    if (monthKeys.length > 1 && filtersContainer) {
+      filtersContainer.style.display = 'flex';
+      let html = `<button type="button" class="filter-pill active" data-month="ALL">All Visits (${currentHistoryData.length})</button>`;
+      monthKeys.forEach(k => {
+        html += `<button type="button" class="filter-pill" data-month="${k}">${monthMap[k].label} (${monthMap[k].count})</button>`;
+      });
+      filtersContainer.innerHTML = html;
+
+      filtersContainer.querySelectorAll('.filter-pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+          filtersContainer.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentActiveMonth = btn.getAttribute('data-month');
+          renderFilteredVisits();
+        });
+      });
+    } else if (filtersContainer) {
+      filtersContainer.style.display = 'none';
+    }
+
+    renderFilteredVisits();
+
+    if (trackHistoryCard) trackHistoryCard.style.display = 'block';
+  }
+
+  function renderFilteredVisits() {
+    const visitsList = document.getElementById('historyVisitsList');
+    if (!visitsList) return;
+
+    let filtered = currentHistoryData;
+    if (currentActiveMonth !== 'ALL') {
+      filtered = currentHistoryData.filter(item => {
+        const dStr = item.booking_date || '';
+        return dStr.startsWith(currentActiveMonth);
+      });
+    }
+
+    if (filtered.length === 0) {
+      visitsList.innerHTML = `<div class="history-empty-note">No visits found for the selected time filter.</div>`;
+      return;
+    }
+
+    let html = '';
+    filtered.forEach((v, idx) => {
+      const fDate = formatDisplayDate(v.booking_date);
+      const isLatest = idx === 0 && currentActiveMonth === 'ALL';
+      const st = String(v.status || 'CONFIRMED').toUpperCase();
+      let stClass = 'status-confirmed';
+      let stLabel = `✓ ${st}`;
+      if (st === 'COMPLETED' || st === 'FINISHED' || st === 'DONE') {
+        stClass = 'status-completed';
+      } else if (st === 'CANCELLED' || st === 'CANCELED') {
+        stClass = 'status-cancelled';
+        stLabel = `✕ ${st}`;
+      }
+
+      const priceVal = Number(v.price || 0);
+      const priceFormatted = priceVal > 0 ? `₹${priceVal.toLocaleString()}` : '₹---';
+      const timeStr = v.booking_time ? v.booking_time : '';
+
+      // Action button
+      let actionHtml = '';
+      if (v.has_invoice && v.share_token) {
+        actionHtml = `
+          <a href="/invoice?token=${encodeURIComponent(v.share_token)}" target="_blank" rel="noopener noreferrer" class="history-btn-bill view-btn">
+            📄 View Bill →
+          </a>
+        `;
+      } else if (v.has_invoice) {
+        const waMsg = encodeURIComponent(`Hi TRIEYE Studio, please share the verified invoice for vehicle ${v.reg} for visit on ${fDate} (Ref: ${v.booking_ref}).`);
+        actionHtml = `
+          <a href="https://wa.me/919940181934?text=${waMsg}" target="_blank" rel="noopener noreferrer" class="history-btn-bill req-btn">
+            💬 Request Bill
+          </a>
+        `;
+      } else {
+        actionHtml = `<span class="bill-badge-pending" style="font-size:11px; padding:3px 8px;">⏳ Bill Pending</span>`;
+      }
+
+      html += `
+        <div class="history-item">
+          <div class="history-item-top">
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+              <span class="history-service-name">${v.service || 'Detailing Service'}</span>
+              ${isLatest ? '<span style="font-family:\'IBM Plex Mono\',monospace; font-size:10.5px; background:rgba(238,47,118,0.1); color:var(--pink); padding:2px 7px; border-radius:4px; font-weight:600;">LATEST</span>' : ''}
+            </div>
+            <span class="history-date-badge">${fDate}</span>
+          </div>
+
+          <div class="history-item-mid">
+            <div class="history-ref">Ref: <span>${v.booking_ref || '--'}</span></div>
+            ${timeStr ? `<div>Slot: <strong style="color:var(--white);">${timeStr}</strong></div>` : ''}
+            <div class="history-price">${priceFormatted}</div>
+          </div>
+
+          <div class="history-item-bottom">
+            <span class="history-status-badge ${stClass}">${stLabel}</span>
+            <div>${actionHtml}</div>
+          </div>
+        </div>
+      `;
+    });
+
+    visitsList.innerHTML = html;
   }
 </script>
 
