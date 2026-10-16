@@ -1702,10 +1702,10 @@
         </div>
 
         <div class="filter-bar">
-          <button class="filter-pill active" onclick="filterOnlineBookings('ALL', this)">All Online</button>
-          <button class="filter-pill" onclick="filterOnlineBookings('TODAY', this)">Today</button>
+          <button class="filter-pill active" onclick="filterOnlineBookings('TODAY', this)">Today</button>
           <button class="filter-pill" onclick="filterOnlineBookings('TOMORROW', this)">Tomorrow</button>
           <button class="filter-pill" onclick="filterOnlineBookings('UPCOMING', this)">Upcoming</button>
+          <button class="filter-pill" onclick="filterOnlineBookings('ALL', this)">All Online</button>
           <button class="filter-pill" onclick="filterOnlineBookings('PENDING', this)">Pending</button>
           <button class="filter-pill" onclick="filterOnlineBookings('CONFIRMED', this)">Confirmed</button>
           <button class="filter-pill" onclick="filterOnlineBookings('COMPLETED', this)">Completed</button>
@@ -2864,7 +2864,7 @@
     ];
 
     let currentSelectedDate = formatDateIso(new Date());
-    let onlineFilterState = 'ALL';
+    let onlineFilterState = 'TODAY';
 
     // Status and source normalization & filtering helpers
     function normalizeStatus(status) {
@@ -2891,14 +2891,38 @@
     }
 
     function getLocalDateStr(d) {
+      return getKolkataDateStr(d);
+    }
+
+    function getKolkataDateStr(d) {
       if (!d) return '';
       if (typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d.trim())) return d.trim();
       const dateObj = typeof d === 'string' ? new Date(d) : d;
       if (isNaN(dateObj.getTime())) return String(d).trim().slice(0, 10);
-      const y = dateObj.getFullYear();
-      const m = String(dateObj.getMonth() + 1).padStart(2, '0');
-      const day = String(dateObj.getDate()).padStart(2, '0');
-      return `${y}-${m}-${day}`;
+      try {
+        return new Intl.DateTimeFormat('en-CA', {
+          timeZone: 'Asia/Kolkata',
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit'
+        }).format(dateObj);
+      } catch (e) {
+        const utcTime = dateObj.getTime() + (dateObj.getTimezoneOffset() * 60000);
+        const kolkataTime = new Date(utcTime + (5.5 * 3600000));
+        const y = kolkataTime.getFullYear();
+        const m = String(kolkataTime.getMonth() + 1).padStart(2, '0');
+        const day = String(kolkataTime.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+      }
+    }
+
+    function getKolkataTodayAndTomorrow() {
+      const now = new Date();
+      const todayStr = getKolkataDateStr(now);
+      const [y, m, d] = todayStr.split('-').map(Number);
+      const tomDate = new Date(Date.UTC(y, m - 1, d + 1));
+      const tomStr = tomDate.toISOString().slice(0, 10);
+      return { todayStr, tomStr };
     }
 
     function getFilteredQueueBookings(bookings, filter) {
@@ -2911,15 +2935,12 @@
     }
 
     function getFilteredOnlineBookings(bookings, state) {
-      const localToday = getLocalDateStr(new Date());
-      const tomDate = new Date();
-      tomDate.setDate(tomDate.getDate() + 1);
-      const localTomorrow = getLocalDateStr(tomDate);
-      const mode = (state || 'ALL').toUpperCase().trim();
+      const { todayStr: localToday, tomStr: localTomorrow } = getKolkataTodayAndTomorrow();
+      const mode = (state || 'TODAY').toUpperCase().trim();
 
       return bookings.filter(b => {
         if (normalizeSource(b.source) !== 'ONLINE') return false;
-        const bDate = getLocalDateStr(b.booking_date || b.date);
+        const bDate = getKolkataDateStr(b.booking_date || b.date);
         const s = normalizeStatus(b.status);
 
         if (mode === 'TODAY') return bDate === localToday;
@@ -3111,6 +3132,10 @@
       const navEl = document.getElementById(navMap[secId]);
       if (navEl) navEl.classList.add('active');
 
+      if (secId === 'online-sec') {
+        const todayBtn = document.querySelector('#online-sec .filter-bar button[onclick*="TODAY"]');
+        filterOnlineBookings('TODAY', todayBtn);
+      }
       if (secId === 'customers-sec') {
         renderCustomersTable();
       }
@@ -3399,8 +3424,8 @@
       const displayedQueueCount = getFilteredQueueBookings(bookings, curQueueFilter).length;
       setText('badge-active-queue', displayedQueueCount);
 
-      const displayedOnlineCount = getFilteredOnlineBookings(bookings, onlineFilterState).length;
-      setText('badge-online-count', displayedOnlineCount);
+      const allOnlineCount = bookings.filter(b => normalizeSource(b.source) === 'ONLINE').length;
+      setText('badge-online-count', allOnlineCount);
 
       setText('badge-customers-count', totalCustCount);
       setText('badge-done-count', bookings.filter(b => normalizeStatus(b.status) === 'COMPLETED').length);
@@ -3542,7 +3567,8 @@
     function filterOnlineBookings(mode, btn) {
       onlineFilterState = mode;
       document.querySelectorAll('#online-sec .filter-bar .filter-pill').forEach(p => p.classList.remove('active'));
-      if (btn) btn.classList.add('active');
+      const activeBtn = btn || document.querySelector(`#online-sec .filter-bar button[onclick*="'${mode}'"]`);
+      if (activeBtn) activeBtn.classList.add('active');
       renderOnlineBookingsTable();
     }
 
@@ -3554,12 +3580,16 @@
 
       const filtered = getFilteredOnlineBookings(bookings, onlineFilterState);
 
-      // Keep badge-online-count strictly synchronized with the Online Bookings section
+      // Keep existing sidebar booking count unchanged; represents ALL online bookings
+      const allOnlineCount = bookings.filter(b => normalizeSource(b.source) === 'ONLINE').length;
       const badgeEl = document.getElementById('badge-online-count');
-      if (badgeEl) badgeEl.innerText = filtered.length;
+      if (badgeEl) badgeEl.innerText = allOnlineCount;
 
       if (filtered.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:2rem; color:var(--muted);">No online bookings found for selected filter.</td></tr>`;
+        const emptyMsg = onlineFilterState === 'TODAY'
+          ? 'No online bookings scheduled for today.'
+          : 'No online bookings found for selected filter.';
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:2.5rem 1rem; color:var(--muted);"><div style="font-size:1.4rem; margin-bottom:0.35rem;">📅</div><div style="font-weight:600; color:var(--white); font-size:0.9rem; margin-bottom:0.25rem;">${emptyMsg}</div><div style="font-size:0.78rem;">Click "All Online" or another filter to view other reservations.</div></td></tr>`;
         return;
       }
 
