@@ -843,11 +843,17 @@
       cursor: pointer;
       transition: all 0.15s ease;
     }
-    .filter-pill:hover, .filter-pill.active {
-      background: var(--pink);
-      border-color: var(--pink);
-      color: #fff;
+    .filter-pill:hover {
+      border-color: rgba(255, 43, 120, 0.45);
+      color: var(--pink);
+      background: rgba(255, 43, 120, 0.08);
+    }
+    .filter-pill.active, .filter-pill.active:hover {
+      background: var(--pink) !important;
+      border-color: var(--pink) !important;
+      color: #fff !important;
       font-weight: 600;
+      box-shadow: 0 0 10px rgba(255, 43, 120, 0.35);
     }
     .filter-pill-count {
       display: inline-block;
@@ -1886,14 +1892,14 @@
         </div>
 
         <div class="filter-bar">
-          <button class="filter-pill active" onclick="filterOnlineBookings('TODAY', this)">Today <span id="online-today-count-badge" class="filter-pill-count">0</span></button>
-          <button class="filter-pill" onclick="filterOnlineBookings('TOMORROW', this)">Tomorrow</button>
-          <button class="filter-pill" onclick="filterOnlineBookings('UPCOMING', this)">Upcoming</button>
-          <button class="filter-pill" onclick="filterOnlineBookings('ALL', this)">All Online</button>
-          <button class="filter-pill" onclick="filterOnlineBookings('PENDING', this)">Pending</button>
-          <button class="filter-pill" onclick="filterOnlineBookings('CONFIRMED', this)">Confirmed</button>
-          <button class="filter-pill" onclick="filterOnlineBookings('COMPLETED', this)">Completed</button>
-          <button class="filter-pill" onclick="filterOnlineBookings('CANCELLED', this)">Cancelled</button>
+          <button type="button" class="filter-pill active" data-filter="TODAY" onclick="filterOnlineBookings('TODAY', this)">Today <span id="online-today-count-badge" class="filter-pill-count">0</span></button>
+          <button type="button" class="filter-pill" data-filter="TOMORROW" onclick="filterOnlineBookings('TOMORROW', this)">Tomorrow <span id="online-tomorrow-count-badge" class="filter-pill-count">0</span></button>
+          <button type="button" class="filter-pill" data-filter="UPCOMING" onclick="filterOnlineBookings('UPCOMING', this)">Upcoming</button>
+          <button type="button" class="filter-pill" data-filter="ALL" onclick="filterOnlineBookings('ALL', this)">All Online</button>
+          <button type="button" class="filter-pill" data-filter="PENDING" onclick="filterOnlineBookings('PENDING', this)">Pending</button>
+          <button type="button" class="filter-pill" data-filter="CONFIRMED" onclick="filterOnlineBookings('CONFIRMED', this)">Confirmed</button>
+          <button type="button" class="filter-pill" data-filter="COMPLETED" onclick="filterOnlineBookings('COMPLETED', this)">Completed</button>
+          <button type="button" class="filter-pill" data-filter="CANCELLED" onclick="filterOnlineBookings('CANCELLED', this)">Cancelled</button>
         </div>
 
         <div class="panel">
@@ -3080,9 +3086,32 @@
 
     function getKolkataDateStr(d) {
       if (!d) return '';
-      if (typeof d === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(d.trim())) return d.trim();
+      if (typeof d === 'string') {
+        const trimmed = d.trim();
+        // Exact YYYY-MM-DD
+        if (/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return trimmed;
+        // Timestamp string with date prefix
+        if (/^\d{4}-\d{2}-\d{2}[T\s]/.test(trimmed)) {
+          // If ends with Z or explicit offset, convert to Asia/Kolkata
+          if (trimmed.endsWith('Z') || /[+-]\d{2}:?\d{2}$/.test(trimmed)) {
+            const dateObj = new Date(trimmed);
+            if (!isNaN(dateObj.getTime())) {
+              try {
+                return new Intl.DateTimeFormat('en-CA', {
+                  timeZone: 'Asia/Kolkata',
+                  year: 'numeric',
+                  month: '2-digit',
+                  day: '2-digit'
+                }).format(dateObj);
+              } catch (e) {}
+            }
+          }
+          // Default clean date prefix
+          return trimmed.slice(0, 10);
+        }
+      }
       const dateObj = typeof d === 'string' ? new Date(d) : d;
-      if (isNaN(dateObj.getTime())) return String(d).trim().slice(0, 10);
+      if (!dateObj || isNaN(dateObj.getTime())) return String(d).trim().slice(0, 10);
       try {
         return new Intl.DateTimeFormat('en-CA', {
           timeZone: 'Asia/Kolkata',
@@ -3102,11 +3131,30 @@
 
     function getKolkataTodayAndTomorrow() {
       const now = new Date();
-      const todayStr = getKolkataDateStr(now);
+      let todayStr = '';
+      try {
+        todayStr = new Intl.DateTimeFormat('en-CA', {
+          timeZone: 'Asia/Kolkata',
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit'
+        }).format(now);
+      } catch (e) {
+        todayStr = getKolkataDateStr(now);
+      }
       const [y, m, d] = todayStr.split('-').map(Number);
       const tomDate = new Date(Date.UTC(y, m - 1, d + 1));
       const tomStr = tomDate.toISOString().slice(0, 10);
       return { todayStr, tomStr };
+    }
+
+    function getBookingServiceDate(b) {
+      if (!b) return '';
+      // Rule: Strictly use booking_date first, then date (service date).
+      // NEVER fall back to created_at or created timestamp for Today/Tomorrow calculation!
+      const raw = b.booking_date || b.date;
+      if (!raw) return '';
+      return getKolkataDateStr(raw);
     }
 
     const MONTH_NAMES = [
@@ -3190,6 +3238,18 @@
       currentOnlineMonth = m - 1;
       currentOnlineSpecificDate = null;
       onlineFilterState = 'TODAY';
+      syncOnlineFilterPills();
+    }
+
+    function syncOnlineFilterPills() {
+      const pills = document.querySelectorAll('#online-sec .filter-bar .filter-pill');
+      if (!pills.length) return;
+      pills.forEach(p => {
+        const filterAttr = p.getAttribute('data-filter') || '';
+        const onclickAttr = p.getAttribute('onclick') || '';
+        const isMatch = filterAttr === onlineFilterState || onclickAttr.includes(`'${onlineFilterState}'`);
+        p.classList.toggle('active', isMatch);
+      });
     }
 
     initOnlineCalendarState();
@@ -3288,9 +3348,7 @@
 
       if (['TODAY', 'TOMORROW', 'UPCOMING'].includes(onlineFilterState)) {
         onlineFilterState = 'ALL';
-        document.querySelectorAll('#online-sec .filter-bar .filter-pill').forEach(p => p.classList.remove('active'));
-        const allBtn = document.querySelector('#online-sec .filter-bar button[onclick*="\'ALL\'"]');
-        if (allBtn) allBtn.classList.add('active');
+        syncOnlineFilterPills();
       }
 
       renderOnlineBookingsTable();
@@ -3299,9 +3357,7 @@
     function clearOnlineSelectedDate() {
       currentOnlineSpecificDate = null;
       onlineFilterState = 'ALL';
-      document.querySelectorAll('#online-sec .filter-bar .filter-pill').forEach(p => p.classList.remove('active'));
-      const allBtn = document.querySelector('#online-sec .filter-bar button[onclick*="\'ALL\'"]');
-      if (allBtn) allBtn.classList.add('active');
+      syncOnlineFilterPills();
       renderOnlineBookingsTable();
     }
 
@@ -3312,9 +3368,7 @@
       currentOnlineMonth = m - 1;
       currentOnlineSpecificDate = null;
       onlineFilterState = 'TODAY';
-      document.querySelectorAll('#online-sec .filter-bar .filter-pill').forEach(p => p.classList.remove('active'));
-      const todayBtn = document.querySelector('#online-sec .filter-bar button[onclick*="\'TODAY\'"]');
-      if (todayBtn) todayBtn.classList.add('active');
+      syncOnlineFilterPills();
       toggleOnlineCalendar(false);
       renderOnlineBookingsTable();
     }
@@ -3333,9 +3387,7 @@
       // Automatically open that month's bookings
       if (['TODAY', 'TOMORROW', 'UPCOMING'].includes(onlineFilterState)) {
         onlineFilterState = 'ALL';
-        document.querySelectorAll('#online-sec .filter-bar .filter-pill').forEach(p => p.classList.remove('active'));
-        const allBtn = document.querySelector('#online-sec .filter-bar button[onclick*="\'ALL\'"]');
-        if (allBtn) allBtn.classList.add('active');
+        syncOnlineFilterPills();
       }
 
       renderOnlineBookingsTable();
@@ -3360,7 +3412,8 @@
 
       return bookings.filter(b => {
         if (normalizeSource(b.source) !== 'ONLINE') return false;
-        const bDate = getKolkataDateStr(b.booking_date || b.date);
+        const bDate = getBookingServiceDate(b);
+        if (!bDate) return false;
         const s = normalizeStatus(b.status);
 
         // 1. TODAY: Strictly today in Asia/Kolkata across all statuses
@@ -3368,7 +3421,7 @@
           return bDate === localToday;
         }
 
-        // 2. TOMORROW: Strictly tomorrow in Asia/Kolkata
+        // 2. TOMORROW: Strictly tomorrow in Asia/Kolkata across all statuses
         if (mode === 'TOMORROW') {
           return bDate === localTomorrow;
         }
@@ -3575,8 +3628,7 @@
 
       if (secId === 'online-sec') {
         initOnlineCalendarState();
-        const todayBtn = document.querySelector('#online-sec .filter-bar button[onclick*="TODAY"]');
-        filterOnlineBookings('TODAY', todayBtn);
+        filterOnlineBookings('TODAY');
       }
       if (secId === 'customers-sec') {
         renderCustomersTable();
@@ -3870,11 +3922,14 @@
       const actionRequiredCount = getActionRequiredOnlineBookingsCount(bookings);
       setText('badge-online-count', actionRequiredCount);
 
-      // Today filter count badge (Asia/Kolkata)
-      const { todayStr: kolkataToday } = getKolkataTodayAndTomorrow();
-      const todayCount = bookings.filter(b => normalizeSource(b.source) === 'ONLINE' && getKolkataDateStr(b.booking_date || b.date) === kolkataToday).length;
+      // Today & Tomorrow filter count badges (Asia/Kolkata)
+      const { todayStr: kolkataToday, tomStr: kolkataTomorrow } = getKolkataTodayAndTomorrow();
+      const todayCount = bookings.filter(b => normalizeSource(b.source) === 'ONLINE' && getBookingServiceDate(b) === kolkataToday).length;
+      const tomorrowCount = bookings.filter(b => normalizeSource(b.source) === 'ONLINE' && getBookingServiceDate(b) === kolkataTomorrow).length;
       const todayBadge = document.getElementById('online-today-count-badge');
       if (todayBadge) todayBadge.innerText = todayCount;
+      const tomBadge = document.getElementById('online-tomorrow-count-badge');
+      if (tomBadge) tomBadge.innerText = tomorrowCount;
 
       setText('badge-customers-count', totalCustCount);
       setText('badge-done-count', bookings.filter(b => normalizeStatus(b.status) === 'COMPLETED').length);
@@ -4014,31 +4069,28 @@
 
     // 3. ONLINE BOOKINGS TABLE & ACTIONS
     function filterOnlineBookings(mode, btn) {
-      onlineFilterState = mode;
+      onlineFilterState = (mode || 'TODAY').toUpperCase().trim();
 
-      if (mode === 'TODAY') {
+      if (onlineFilterState === 'TODAY') {
         const { todayStr } = getKolkataTodayAndTomorrow();
         const [y, m] = todayStr.split('-').map(Number);
         currentOnlineYear = y;
         currentOnlineMonth = m - 1;
         currentOnlineSpecificDate = null;
         toggleOnlineCalendar(false);
-      } else if (mode === 'TOMORROW') {
+      } else if (onlineFilterState === 'TOMORROW') {
         const { tomStr } = getKolkataTodayAndTomorrow();
         const [y, m] = tomStr.split('-').map(Number);
         currentOnlineYear = y;
         currentOnlineMonth = m - 1;
         currentOnlineSpecificDate = null;
         toggleOnlineCalendar(false);
-      } else if (mode === 'UPCOMING') {
+      } else if (onlineFilterState === 'UPCOMING') {
         currentOnlineSpecificDate = null;
         toggleOnlineCalendar(false);
       }
 
-      document.querySelectorAll('#online-sec .filter-bar .filter-pill').forEach(p => p.classList.remove('active'));
-      const activeBtn = btn || document.querySelector(`#online-sec .filter-bar button[onclick*="'${mode}'"]`);
-      if (activeBtn) activeBtn.classList.add('active');
-
+      syncOnlineFilterPills();
       renderOnlineBookingsTable();
     }
 
@@ -4055,8 +4107,8 @@
 
       const monthOnlineBookings = bookings.filter(b => {
         if (normalizeSource(b.source) !== 'ONLINE') return false;
-        const bDate = getKolkataDateStr(b.booking_date || b.date);
-        return bDate.startsWith(selMonthPrefix);
+        const bDate = getBookingServiceDate(b);
+        return bDate && bDate.startsWith(selMonthPrefix);
       });
 
       renderOnlineCalendarGrid(monthOnlineBookings);
@@ -4067,16 +4119,21 @@
         countPill.innerText = `${monthOnlineBookings.length} Booking${monthOnlineBookings.length === 1 ? '' : 's'}`;
       }
 
-      // Today filter count badge
+      // Today & Tomorrow filter count badges (Asia/Kolkata)
       const { todayStr: localToday, tomStr: localTomorrow } = getKolkataTodayAndTomorrow();
-      const todayCount = bookings.filter(b => normalizeSource(b.source) === 'ONLINE' && getKolkataDateStr(b.booking_date || b.date) === localToday).length;
+      const todayCount = bookings.filter(b => normalizeSource(b.source) === 'ONLINE' && getBookingServiceDate(b) === localToday).length;
+      const tomorrowCount = bookings.filter(b => normalizeSource(b.source) === 'ONLINE' && getBookingServiceDate(b) === localTomorrow).length;
       const todayBadge = document.getElementById('online-today-count-badge');
       if (todayBadge) todayBadge.innerText = todayCount;
+      const tomBadge = document.getElementById('online-tomorrow-count-badge');
+      if (tomBadge) tomBadge.innerText = tomorrowCount;
 
       // Sidebar Action-Required Badge
       const actionRequiredCount = getActionRequiredOnlineBookingsCount(bookings);
       const sidebarBadge = document.getElementById('badge-online-count');
       if (sidebarBadge) sidebarBadge.innerText = actionRequiredCount;
+
+      syncOnlineFilterPills();
 
       const filtered = getFilteredOnlineBookings(bookings, onlineFilterState);
 
@@ -6236,23 +6293,44 @@ TRIEYE WATERWASH & DETAILING`;
         });
       }
 
+      // Automatic Date Change Detection (Recalculates Today and Tomorrow dates/counts across Chennai midnight)
+      let lastKnownKolkataDate = getKolkataTodayAndTomorrow().todayStr;
+      function checkKolkataMidnightTransition() {
+        const currentKolkataDate = getKolkataTodayAndTomorrow().todayStr;
+        if (currentKolkataDate !== lastKnownKolkataDate) {
+          console.log(`⚡ [Trieye Dashboard] Midnight crossed in Chennai (${lastKnownKolkataDate} -> ${currentKolkataDate}). Recalculating Today & Tomorrow...`);
+          lastKnownKolkataDate = currentKolkataDate;
+          if (onlineFilterState === 'TODAY' || onlineFilterState === 'TOMORROW') {
+            const { todayStr } = getKolkataTodayAndTomorrow();
+            const [y, m] = todayStr.split('-').map(Number);
+            currentOnlineYear = y;
+            currentOnlineMonth = m - 1;
+            currentOnlineSpecificDate = null;
+          }
+          renderAll();
+        }
+      }
+
       // Cross-Device Tab Visibility and Window Focus Sync
       document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') {
           console.log('⚡ [Trieye Dashboard] Tab visible, synchronizing latest bookings from Supabase...');
+          checkKolkataMidnightTransition();
           syncFromSupabase();
         }
       });
       window.addEventListener('focus', () => {
+        checkKolkataMidnightTransition();
         syncFromSupabase();
       });
 
-      // Background Periodic Sync Fallback (every 30 seconds)
+      // Background Periodic Sync Fallback (every 15 seconds)
       setInterval(() => {
+        checkKolkataMidnightTransition();
         if (document.visibilityState === 'visible') {
           syncFromSupabase();
         }
-      }, 30000);
+      }, 15000);
 
       // Cross-tab BroadcastChannel listener
       try {
