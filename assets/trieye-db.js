@@ -208,7 +208,8 @@ const TrieyeDB = {
             slots (id, slot_time, status),
             payments (id, amount, method, status)
           `)
-          .order('created_at', { ascending: false });
+          .order('created_at', { ascending: false })
+          .limit(5000);
 
         if (error) {
           TrieyeDB.logError('bookings', 'SELECT', error);
