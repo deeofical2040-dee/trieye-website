@@ -849,6 +849,17 @@
       color: #fff;
       font-weight: 600;
     }
+    .filter-pill-count {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.22);
+      color: inherit;
+      padding: 0.1rem 0.45rem;
+      border-radius: 999px;
+      font-size: 0.7rem;
+      margin-left: 0.35rem;
+      line-height: 1.1;
+      font-weight: 700;
+    }
 
     /* Compact Online Bookings Month & Calendar Bar */
     .online-calendar-bar {
@@ -1832,26 +1843,50 @@
 
         </div>
 
-        <!-- Month & Calendar Navigation Bar -->
-        <div class="online-calendar-bar">
-          <div class="month-nav-group">
-            <button type="button" class="cal-nav-btn" onclick="navOnlineMonth(-1)" title="Previous Month">◀</button>
-            <span id="online-month-label" class="month-label">October 2026</span>
-            <button type="button" class="cal-nav-btn" onclick="navOnlineMonth(1)" title="Next Month">▶</button>
+        <!-- Monthly Calendar Filter Toolbar -->
+        <div class="completed-calendar-toolbar" style="margin-bottom:0.75rem;">
+          <div class="cal-nav-group">
+            <button type="button" class="cal-nav-btn" onclick="navOnlineMonth(-1)" title="Previous Month" aria-label="Previous Month">◀</button>
+            <div class="cal-month-pill" id="online-cal-month-pill-btn" onclick="toggleOnlineCalendar()" title="Click to view/hide interactive month calendar">
+              <span class="cal-icon">📅</span>
+              <span id="online-month-label" class="cal-month-text">October 2026</span>
+              <span class="cal-dropdown-arrow" id="online-cal-toggle-arrow">▼</span>
+            </div>
+            <button type="button" class="cal-nav-btn" onclick="navOnlineMonth(1)" title="Next Month" aria-label="Next Month">▶</button>
+            
+            <button type="button" id="online-btn-clear-date" class="cal-clear-btn" style="display:none;" onclick="clearOnlineSelectedDate()">
+              ✕ Clear Date (Show All Month)
+            </button>
           </div>
-          <div class="date-picker-group">
-            <label for="online-date-picker" class="date-picker-label">Pick Date:</label>
-            <input type="date" id="online-date-picker" class="cal-date-input" onchange="handleOnlineDatePick(this.value)" title="Filter by specific date">
-            <button type="button" id="online-clear-date-btn" class="cal-clear-btn" style="display:none;" onclick="clearOnlineDateFilter()" title="Clear date filter and view all in month">✕ Clear Date</button>
+
+          <div class="cal-meta-group">
+            <span id="online-count-pill" class="cal-count-pill">0 Bookings</span>
           </div>
-          <div class="active-period-indicator">
-            <span id="online-period-badge" class="period-badge">Showing: Today</span>
-            <span id="online-filtered-count-badge" class="count-badge">0 bookings</span>
+        </div>
+
+        <!-- Expandable Interactive Calendar Panel -->
+        <div id="online-calendar-dropdown" class="completed-calendar-panel" style="display:none; margin-bottom:0.75rem;">
+          <div class="cal-panel-header">
+            <div class="cal-panel-title">
+              <span id="online-cal-panel-month-name">October 2026</span>
+              <span style="font-size:0.72rem; color:var(--muted); font-weight:normal; margin-left:0.5rem;">Select date to filter • Days with bookings marked with •</span>
+            </div>
+            <div style="display:flex; gap:0.4rem; align-items:center;">
+              <button type="button" class="btn-xs" onclick="jumpOnlineToCurrentMonth()">Current Month</button>
+              <button type="button" class="btn-xs" onclick="clearOnlineSelectedDate()">All Month</button>
+              <button type="button" class="btn-xs" onclick="toggleOnlineCalendar(false)">Close ✕</button>
+            </div>
+          </div>
+          <div class="cal-weekdays-grid">
+            <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+          </div>
+          <div id="online-calendar-days-grid" class="cal-days-grid">
+            <!-- Injected via JS -->
           </div>
         </div>
 
         <div class="filter-bar">
-          <button class="filter-pill active" onclick="filterOnlineBookings('TODAY', this)">Today</button>
+          <button class="filter-pill active" onclick="filterOnlineBookings('TODAY', this)">Today <span id="online-today-count-badge" class="filter-pill-count">0</span></button>
           <button class="filter-pill" onclick="filterOnlineBookings('TOMORROW', this)">Tomorrow</button>
           <button class="filter-pill" onclick="filterOnlineBookings('UPCOMING', this)">Upcoming</button>
           <button class="filter-pill" onclick="filterOnlineBookings('ALL', this)">All Online</button>
@@ -3082,6 +3117,71 @@
     let currentOnlineYear = 2026;
     let currentOnlineMonth = 9; // 0-indexed (9 = Oct)
     let currentOnlineSpecificDate = null;
+    let onlineCalendarOpen = false;
+
+    // Acknowledgment & New-Booking Tracking
+    const ACK_STORAGE_KEY = 'trieye_ack_bookings';
+
+    function getAcknowledgedBookingIds() {
+      try {
+        return JSON.parse(localStorage.getItem(ACK_STORAGE_KEY)) || [];
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function isBookingAcknowledged(b) {
+      if (!b) return false;
+      if (b.acknowledged === true) return true;
+      const ackIds = getAcknowledgedBookingIds();
+      if (b.id && ackIds.includes(b.id)) return true;
+      if (b.notes && typeof b.notes === 'string' && b.notes.includes('[ACK]')) return true;
+      return false;
+    }
+
+    function markBookingAcknowledged(bookingId) {
+      const ackIds = getAcknowledgedBookingIds();
+      if (!ackIds.includes(bookingId)) {
+        ackIds.push(bookingId);
+        localStorage.setItem(ACK_STORAGE_KEY, JSON.stringify(ackIds));
+      }
+      const bookings = getBookings();
+      const b = bookings.find(item => item.id === bookingId);
+      if (b) {
+        b.acknowledged = true;
+        localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookings));
+        if (b.phone && window.TrieyeDB && typeof window.TrieyeDB.saveCustomer === 'function') {
+          const custs = getCustomers();
+          const cleanP = cleanPhone(b.phone);
+          const c = custs[cleanP] || { name: b.name, phone: cleanP };
+          if (!c.notes || !c.notes.includes('[ACK]')) {
+            c.notes = (c.notes ? c.notes + ' ' : '') + '[ACK]';
+            window.TrieyeDB.saveCustomer(cleanP, c).catch(() => {});
+          }
+        }
+      }
+      updateKPICards();
+      renderOnlineBookingsTable();
+    }
+
+    function isActionRequiredOnlineBooking(b) {
+      if (normalizeSource(b.source) !== 'ONLINE') return false;
+      const s = normalizeStatus(b.status);
+      if (['COMPLETED', 'CANCELLED', 'ARRIVED', 'IN PROGRESS', 'QUALITY CHECK', 'READY'].includes(s)) {
+        return false;
+      }
+      if (b.bay || b.bay_id || b.bayId) {
+        return false;
+      }
+      if (isBookingAcknowledged(b)) {
+        return false;
+      }
+      return true;
+    }
+
+    function getActionRequiredOnlineBookingsCount(bookings) {
+      return (bookings || []).filter(isActionRequiredOnlineBooking).length;
+    }
 
     function initOnlineCalendarState() {
       const { todayStr } = getKolkataTodayAndTomorrow();
@@ -3090,10 +3190,6 @@
       currentOnlineMonth = m - 1;
       currentOnlineSpecificDate = null;
       onlineFilterState = 'TODAY';
-      const dateInput = document.getElementById('online-date-picker');
-      if (dateInput) dateInput.value = '';
-      const clearBtn = document.getElementById('online-clear-date-btn');
-      if (clearBtn) clearBtn.style.display = 'none';
     }
 
     initOnlineCalendarState();
@@ -3109,29 +3205,118 @@
       }
     }
 
-    function updateOnlineMonthUI() {
-      const monthLabel = document.getElementById('online-month-label');
-      if (monthLabel) {
-        monthLabel.innerText = `${MONTH_NAMES[currentOnlineMonth]} ${currentOnlineYear}`;
+    function toggleOnlineCalendar(forcedState) {
+      const panel = document.getElementById('online-calendar-dropdown');
+      const arrow = document.getElementById('online-cal-toggle-arrow');
+      const pill = document.getElementById('online-cal-month-pill-btn');
+      if (!panel) return;
+      if (typeof forcedState === 'boolean') {
+        onlineCalendarOpen = forcedState;
+      } else {
+        onlineCalendarOpen = !onlineCalendarOpen;
       }
+      panel.style.display = onlineCalendarOpen ? 'block' : 'none';
+      if (arrow) arrow.style.transform = onlineCalendarOpen ? 'rotate(180deg)' : 'rotate(0deg)';
+      if (pill) pill.classList.toggle('active', onlineCalendarOpen);
+    }
 
-      const periodBadge = document.getElementById('online-period-badge');
-      if (periodBadge) {
-        const { todayStr, tomStr } = getKolkataTodayAndTomorrow();
-        if (onlineFilterState === 'TODAY') {
-          periodBadge.innerText = `Showing: Today (${formatHumanDate(todayStr)})`;
-        } else if (onlineFilterState === 'TOMORROW') {
-          periodBadge.innerText = `Showing: Tomorrow (${formatHumanDate(tomStr)})`;
-        } else if (onlineFilterState === 'UPCOMING') {
-          periodBadge.innerText = `Showing: Upcoming Bookings`;
-        } else if (currentOnlineSpecificDate) {
-          const statusSuffix = onlineFilterState !== 'ALL' ? ` · ${onlineFilterState}` : '';
-          periodBadge.innerText = `Showing: ${formatHumanDate(currentOnlineSpecificDate)}${statusSuffix}`;
+    function renderOnlineCalendarGrid(monthBookings) {
+      const monthTitle = `${MONTH_NAMES[currentOnlineMonth]} ${currentOnlineYear}`;
+      const lbl = document.getElementById('online-month-label');
+      if (lbl) lbl.textContent = monthTitle;
+      const panelTitle = document.getElementById('online-cal-panel-month-name');
+      if (panelTitle) panelTitle.textContent = monthTitle;
+
+      const clearBtn = document.getElementById('online-btn-clear-date');
+      if (clearBtn) {
+        if (currentOnlineSpecificDate) {
+          clearBtn.style.display = 'inline-flex';
+          const p = currentOnlineSpecificDate.split('-');
+          const mShort = MONTH_NAMES[parseInt(p[1], 10) - 1].substring(0, 3);
+          clearBtn.innerHTML = `✕ Clear Date (${p[2]} ${mShort})`;
         } else {
-          const statusSuffix = onlineFilterState !== 'ALL' ? ` · ${onlineFilterState}` : '';
-          periodBadge.innerText = `Showing: ${MONTH_NAMES[currentOnlineMonth]} ${currentOnlineYear}${statusSuffix}`;
+          clearBtn.style.display = 'none';
         }
       }
+
+      const countsByDate = {};
+      (monthBookings || []).forEach(b => {
+        const bDate = getKolkataDateStr(b.booking_date || b.date);
+        if (bDate) {
+          countsByDate[bDate] = (countsByDate[bDate] || 0) + 1;
+        }
+      });
+
+      const grid = document.getElementById('online-calendar-days-grid');
+      if (grid) {
+        const daysInMonth = new Date(currentOnlineYear, currentOnlineMonth + 1, 0).getDate();
+        const firstDayDate = new Date(`${currentOnlineYear}-${String(currentOnlineMonth + 1).padStart(2, '0')}-01T12:00:00+05:30`);
+        const startDayOfWeek = firstDayDate.getDay();
+        const { todayStr } = getKolkataTodayAndTomorrow();
+
+        let html = '';
+        for (let i = 0; i < startDayOfWeek; i++) {
+          html += '<div class="cal-day-cell empty"></div>';
+        }
+        for (let d = 1; d <= daysInMonth; d++) {
+          const dStr = `${currentOnlineYear}-${String(currentOnlineMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+          const isToday = (dStr === todayStr);
+          const isSelected = (dStr === currentOnlineSpecificDate);
+          const count = countsByDate[dStr] || 0;
+          const classes = ['cal-day-cell'];
+          if (isToday) classes.push('today');
+          if (isSelected) classes.push('selected');
+          if (count > 0) classes.push('has-jobs');
+
+          html += `
+            <div class="${classes.join(' ')}" onclick="selectOnlineDate('${dStr}')" title="${dStr}${count > 0 ? ` (${count} bookings)` : ''}">
+              <span>${d}</span>
+              ${count > 0 ? `<span class="cal-day-badge">${count}</span>` : ''}
+            </div>
+          `;
+        }
+        grid.innerHTML = html;
+      }
+    }
+
+    function selectOnlineDate(dateStr) {
+      if (currentOnlineSpecificDate === dateStr) {
+        currentOnlineSpecificDate = null;
+      } else {
+        currentOnlineSpecificDate = dateStr;
+      }
+
+      if (['TODAY', 'TOMORROW', 'UPCOMING'].includes(onlineFilterState)) {
+        onlineFilterState = 'ALL';
+        document.querySelectorAll('#online-sec .filter-bar .filter-pill').forEach(p => p.classList.remove('active'));
+        const allBtn = document.querySelector('#online-sec .filter-bar button[onclick*="\'ALL\'"]');
+        if (allBtn) allBtn.classList.add('active');
+      }
+
+      renderOnlineBookingsTable();
+    }
+
+    function clearOnlineSelectedDate() {
+      currentOnlineSpecificDate = null;
+      onlineFilterState = 'ALL';
+      document.querySelectorAll('#online-sec .filter-bar .filter-pill').forEach(p => p.classList.remove('active'));
+      const allBtn = document.querySelector('#online-sec .filter-bar button[onclick*="\'ALL\'"]');
+      if (allBtn) allBtn.classList.add('active');
+      renderOnlineBookingsTable();
+    }
+
+    function jumpOnlineToCurrentMonth() {
+      const { todayStr } = getKolkataTodayAndTomorrow();
+      const [y, m] = todayStr.split('-').map(Number);
+      currentOnlineYear = y;
+      currentOnlineMonth = m - 1;
+      currentOnlineSpecificDate = null;
+      onlineFilterState = 'TODAY';
+      document.querySelectorAll('#online-sec .filter-bar .filter-pill').forEach(p => p.classList.remove('active'));
+      const todayBtn = document.querySelector('#online-sec .filter-bar button[onclick*="\'TODAY\'"]');
+      if (todayBtn) todayBtn.classList.add('active');
+      toggleOnlineCalendar(false);
+      renderOnlineBookingsTable();
     }
 
     function navOnlineMonth(delta) {
@@ -3144,10 +3329,6 @@
         currentOnlineYear++;
       }
       currentOnlineSpecificDate = null;
-      const dateInput = document.getElementById('online-date-picker');
-      if (dateInput) dateInput.value = '';
-      const clearBtn = document.getElementById('online-clear-date-btn');
-      if (clearBtn) clearBtn.style.display = 'none';
 
       // Automatically open that month's bookings
       if (['TODAY', 'TOMORROW', 'UPCOMING'].includes(onlineFilterState)) {
@@ -3157,44 +3338,6 @@
         if (allBtn) allBtn.classList.add('active');
       }
 
-      updateOnlineMonthUI();
-      renderOnlineBookingsTable();
-    }
-
-    function handleOnlineDatePick(val) {
-      if (!val) return;
-      currentOnlineSpecificDate = val;
-      const [y, m] = val.split('-').map(Number);
-      currentOnlineYear = y;
-      currentOnlineMonth = m - 1;
-
-      const clearBtn = document.getElementById('online-clear-date-btn');
-      if (clearBtn) clearBtn.style.display = 'inline-flex';
-
-      if (['TODAY', 'TOMORROW', 'UPCOMING'].includes(onlineFilterState)) {
-        onlineFilterState = 'ALL';
-        document.querySelectorAll('#online-sec .filter-bar .filter-pill').forEach(p => p.classList.remove('active'));
-        const allBtn = document.querySelector('#online-sec .filter-bar button[onclick*="\'ALL\'"]');
-        if (allBtn) allBtn.classList.add('active');
-      }
-
-      updateOnlineMonthUI();
-      renderOnlineBookingsTable();
-    }
-
-    function clearOnlineDateFilter() {
-      currentOnlineSpecificDate = null;
-      const dateInput = document.getElementById('online-date-picker');
-      if (dateInput) dateInput.value = '';
-      const clearBtn = document.getElementById('online-clear-date-btn');
-      if (clearBtn) clearBtn.style.display = 'none';
-
-      onlineFilterState = 'ALL';
-      document.querySelectorAll('#online-sec .filter-bar .filter-pill').forEach(p => p.classList.remove('active'));
-      const allBtn = document.querySelector('#online-sec .filter-bar button[onclick*="\'ALL\'"]');
-      if (allBtn) allBtn.classList.add('active');
-
-      updateOnlineMonthUI();
       renderOnlineBookingsTable();
     }
 
@@ -3432,7 +3575,6 @@
 
       if (secId === 'online-sec') {
         initOnlineCalendarState();
-        updateOnlineMonthUI();
         const todayBtn = document.querySelector('#online-sec .filter-bar button[onclick*="TODAY"]');
         filterOnlineBookings('TODAY', todayBtn);
       }
@@ -3724,8 +3866,15 @@
       const displayedQueueCount = getFilteredQueueBookings(bookings, curQueueFilter).length;
       setText('badge-active-queue', displayedQueueCount);
 
-      const allOnlineCount = bookings.filter(b => normalizeSource(b.source) === 'ONLINE').length;
-      setText('badge-online-count', allOnlineCount);
+      // Sidebar Counter Badge: NEW / ACTION-REQUIRED online bookings
+      const actionRequiredCount = getActionRequiredOnlineBookingsCount(bookings);
+      setText('badge-online-count', actionRequiredCount);
+
+      // Today filter count badge (Asia/Kolkata)
+      const { todayStr: kolkataToday } = getKolkataTodayAndTomorrow();
+      const todayCount = bookings.filter(b => normalizeSource(b.source) === 'ONLINE' && getKolkataDateStr(b.booking_date || b.date) === kolkataToday).length;
+      const todayBadge = document.getElementById('online-today-count-badge');
+      if (todayBadge) todayBadge.innerText = todayCount;
 
       setText('badge-customers-count', totalCustCount);
       setText('badge-done-count', bookings.filter(b => normalizeStatus(b.status) === 'COMPLETED').length);
@@ -3873,33 +4022,23 @@
         currentOnlineYear = y;
         currentOnlineMonth = m - 1;
         currentOnlineSpecificDate = null;
-        const dateInput = document.getElementById('online-date-picker');
-        if (dateInput) dateInput.value = '';
-        const clearBtn = document.getElementById('online-clear-date-btn');
-        if (clearBtn) clearBtn.style.display = 'none';
+        toggleOnlineCalendar(false);
       } else if (mode === 'TOMORROW') {
         const { tomStr } = getKolkataTodayAndTomorrow();
         const [y, m] = tomStr.split('-').map(Number);
         currentOnlineYear = y;
         currentOnlineMonth = m - 1;
         currentOnlineSpecificDate = null;
-        const dateInput = document.getElementById('online-date-picker');
-        if (dateInput) dateInput.value = '';
-        const clearBtn = document.getElementById('online-clear-date-btn');
-        if (clearBtn) clearBtn.style.display = 'none';
+        toggleOnlineCalendar(false);
       } else if (mode === 'UPCOMING') {
         currentOnlineSpecificDate = null;
-        const dateInput = document.getElementById('online-date-picker');
-        if (dateInput) dateInput.value = '';
-        const clearBtn = document.getElementById('online-clear-date-btn');
-        if (clearBtn) clearBtn.style.display = 'none';
+        toggleOnlineCalendar(false);
       }
 
       document.querySelectorAll('#online-sec .filter-bar .filter-pill').forEach(p => p.classList.remove('active'));
       const activeBtn = btn || document.querySelector(`#online-sec .filter-bar button[onclick*="'${mode}'"]`);
       if (activeBtn) activeBtn.classList.add('active');
 
-      updateOnlineMonthUI();
       renderOnlineBookingsTable();
     }
 
@@ -3909,22 +4048,39 @@
       if (!tbody) return;
       tbody.innerHTML = '';
 
-      updateOnlineMonthUI();
+      // Month online bookings
+      const selYearStr = String(currentOnlineYear);
+      const selMonthStr = String(currentOnlineMonth + 1).padStart(2, '0');
+      const selMonthPrefix = `${selYearStr}-${selMonthStr}`;
+
+      const monthOnlineBookings = bookings.filter(b => {
+        if (normalizeSource(b.source) !== 'ONLINE') return false;
+        const bDate = getKolkataDateStr(b.booking_date || b.date);
+        return bDate.startsWith(selMonthPrefix);
+      });
+
+      renderOnlineCalendarGrid(monthOnlineBookings);
+
+      // Selected month's total booking count
+      const countPill = document.getElementById('online-count-pill');
+      if (countPill) {
+        countPill.innerText = `${monthOnlineBookings.length} Booking${monthOnlineBookings.length === 1 ? '' : 's'}`;
+      }
+
+      // Today filter count badge
+      const { todayStr: localToday, tomStr: localTomorrow } = getKolkataTodayAndTomorrow();
+      const todayCount = bookings.filter(b => normalizeSource(b.source) === 'ONLINE' && getKolkataDateStr(b.booking_date || b.date) === localToday).length;
+      const todayBadge = document.getElementById('online-today-count-badge');
+      if (todayBadge) todayBadge.innerText = todayCount;
+
+      // Sidebar Action-Required Badge
+      const actionRequiredCount = getActionRequiredOnlineBookingsCount(bookings);
+      const sidebarBadge = document.getElementById('badge-online-count');
+      if (sidebarBadge) sidebarBadge.innerText = actionRequiredCount;
 
       const filtered = getFilteredOnlineBookings(bookings, onlineFilterState);
 
-      // Keep existing sidebar booking count unchanged; represents ALL online bookings
-      const allOnlineCount = bookings.filter(b => normalizeSource(b.source) === 'ONLINE').length;
-      const badgeEl = document.getElementById('badge-online-count');
-      if (badgeEl) badgeEl.innerText = allOnlineCount;
-
-      const countBadge = document.getElementById('online-filtered-count-badge');
-      if (countBadge) {
-        countBadge.innerText = `${filtered.length} booking${filtered.length === 1 ? '' : 's'}`;
-      }
-
       if (filtered.length === 0) {
-        const { todayStr: localToday, tomStr: localTomorrow } = getKolkataTodayAndTomorrow();
         let emptyTitle = 'No Online Bookings Found';
         let emptyDesc = 'No reservations match the active filter criteria.';
         if (onlineFilterState === 'TODAY') {
@@ -3940,7 +4096,7 @@
           emptyTitle = `No Bookings In ${MONTH_NAMES[currentOnlineMonth]} ${currentOnlineYear}`;
           emptyDesc = `No online reservations were found for this month (${onlineFilterState !== 'ALL' ? onlineFilterState : 'All'}).`;
         }
-        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:2.5rem 1rem; color:var(--muted);"><div style="font-size:1.4rem; margin-bottom:0.35rem;">📅</div><div style="font-weight:600; color:var(--white); font-size:0.95rem; margin-bottom:0.25rem;">${escapeHtml(emptyTitle)}</div><div style="font-size:0.8rem; color:var(--muted);">${escapeHtml(emptyDesc)}</div></td></tr>`;
+        tbody.innerHTML = `<tr class="empty-row"><td colspan="7" style="text-align:center; padding:2.5rem 1rem; color:var(--muted);"><div style="font-size:1.4rem; margin-bottom:0.35rem;">📅</div><div style="font-weight:600; color:var(--white); font-size:0.95rem; margin-bottom:0.25rem;">${escapeHtml(emptyTitle)}</div><div style="font-size:0.8rem; color:var(--muted);">${escapeHtml(emptyDesc)}</div></td></tr>`;
         return;
       }
 
@@ -3950,10 +4106,12 @@
         const regNum = b.reg || '';
         const shortId = (b.id && b.id.length > 12) ? `${b.id.slice(0, 8)}…` : (b.id || 'N/A');
         const normStatus = normalizeStatus(b.status);
+        const isAck = isBookingAcknowledged(b);
 
         tr.innerHTML = `
           <td>
             <span class="booking-id-tag" title="${escapeHtml(b.id)}">#${escapeHtml(shortId)}</span>
+            ${!isAck && !['COMPLETED', 'CANCELLED', 'ARRIVED'].includes(normStatus) ? `<span style="display:inline-block; margin-left:4px; font-size:0.65rem; background:rgba(255,43,120,0.2); color:var(--pink); padding:1px 5px; border-radius:4px; font-weight:600;">NEW</span>` : ''}
           </td>
           <td>
             <div style="font-weight:600; color:var(--white); font-size:0.88rem;">${escapeHtml(b.name || 'Valued Customer')}</div>
@@ -3975,8 +4133,9 @@
           </td>
           <td>
             <div class="action-btn-group">
+              ${!isAck && !['COMPLETED', 'CANCELLED', 'ARRIVED'].includes(normStatus) ? `<button class="action-btn" style="background:rgba(255,43,120,0.14); color:var(--pink); border-color:var(--pink); font-weight:600;" onclick="markBookingAcknowledged('${b.id}')" title="Acknowledge Booking">✓ Ack</button>` : ''}
               ${(b.payStatus || 'UNPAID').toUpperCase() !== 'PAID' ? `<button class="action-btn" style="background:rgba(0,230,118,0.12); color:var(--green); border-color:var(--green);" title="Record Payment" onclick="openMarkPaidModal('${b.id}')">💳 Pay</button>` : ''}
-              ${normStatus === 'CONFIRMED' || normStatus === 'PENDING' ? `<button class="action-btn arrive" onclick="changeJobStatus('${b.id}', 'ARRIVED')" title="Mark Vehicle Arrived">🚗 Arrived</button>` : ''}
+              ${normStatus === 'CONFIRMED' || normStatus === 'PENDING' ? `<button class="action-btn arrive" onclick="markBookingArrived('${b.id}')" title="Mark Vehicle Arrived">🚗 Arrived</button>` : ''}
               ${normStatus !== 'CANCELLED' && normStatus !== 'COMPLETED' ? `<button class="action-btn" style="background:rgba(239,68,68,0.12); color:var(--red); border-color:var(--red);" onclick="changeJobStatus('${b.id}', 'CANCELLED')" title="Cancel Booking">🚫 Cancel</button>` : ''}
               <button class="action-btn" title="View & Print Bill Invoice" onclick="openBillInvoiceModal('${b.id}')">🧾 Bill</button>
               <button class="action-btn wa" title="Share Bill on WhatsApp" onclick="shareBillWhatsApp('${b.id}')">💬 WA Bill</button>
@@ -3986,6 +4145,11 @@
         `;
         tbody.appendChild(tr);
       });
+    }
+
+    function markBookingArrived(id) {
+      markBookingAcknowledged(id);
+      changeJobStatus(id, 'ARRIVED');
     }
 
     // 4. EXPRESS WALKIN ENTRY FLOW
