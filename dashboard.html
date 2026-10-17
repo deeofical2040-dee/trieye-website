@@ -1895,7 +1895,7 @@
           <button type="button" class="filter-pill active" data-filter="TODAY" onclick="filterOnlineBookings('TODAY', this)">Today <span id="online-today-count-badge" class="filter-pill-count">0</span></button>
           <button type="button" class="filter-pill" data-filter="TOMORROW" onclick="filterOnlineBookings('TOMORROW', this)">Tomorrow <span id="online-tomorrow-count-badge" class="filter-pill-count">0</span></button>
           <button type="button" class="filter-pill" data-filter="UPCOMING" onclick="filterOnlineBookings('UPCOMING', this)">Upcoming</button>
-          <button type="button" class="filter-pill" data-filter="ALL" onclick="filterOnlineBookings('ALL', this)">All Online</button>
+          <button type="button" class="filter-pill" data-filter="ALL" onclick="filterOnlineBookings('ALL', this)">All Online <span id="online-all-count-badge" class="filter-pill-count">0</span></button>
           <button type="button" class="filter-pill" data-filter="PENDING" onclick="filterOnlineBookings('PENDING', this)">Pending</button>
           <button type="button" class="filter-pill" data-filter="CONFIRMED" onclick="filterOnlineBookings('CONFIRMED', this)">Confirmed</button>
           <button type="button" class="filter-pill" data-filter="COMPLETED" onclick="filterOnlineBookings('COMPLETED', this)">Completed</button>
@@ -3393,6 +3393,31 @@
       renderOnlineBookingsTable();
     }
 
+    window.navOnlineMonth = navOnlineMonth;
+    window.setOnlineMonth = function(monthStrOrYear, maybeMonth) {
+      if (typeof monthStrOrYear === 'string') {
+        const clean = monthStrOrYear.trim();
+        if (/^\d{4}-\d{2}/.test(clean)) {
+          const parts = clean.slice(0, 7).split('-').map(Number);
+          currentOnlineYear = parts[0];
+          currentOnlineMonth = parts[1] - 1;
+        } else {
+          MONTH_NAMES.forEach((name, idx) => {
+            if (clean.toLowerCase().includes(name.toLowerCase())) {
+              currentOnlineMonth = idx;
+            }
+          });
+          const matchYear = clean.match(/\d{4}/);
+          if (matchYear) currentOnlineYear = Number(matchYear[0]);
+        }
+      } else if (typeof monthStrOrYear === 'number' && typeof maybeMonth === 'number') {
+        currentOnlineYear = monthStrOrYear;
+        currentOnlineMonth = (maybeMonth >= 1 && maybeMonth <= 12) ? maybeMonth - 1 : maybeMonth;
+      }
+      currentOnlineSpecificDate = null;
+      renderOnlineBookingsTable();
+    };
+
     function getFilteredQueueBookings(bookings, filter) {
       const filterNorm = (filter || 'ALL').toUpperCase().trim();
       return bookings.filter(b => {
@@ -3818,8 +3843,12 @@
           hasUpdates = true;
         }
 
+        window.trieyeSupabaseFetchError = bookingsError;
         if (bookingsError) {
           setSyncStatus('error', 'Sync Error — Click to retry');
+          if (!getBookings() || getBookings().length === 0) {
+            renderAll();
+          }
         } else {
           setSyncStatus('synced', 'Live Synced');
         }
@@ -3830,7 +3859,11 @@
         }
       } catch (err) {
         console.warn('⚠️ [Trieye Dashboard] Async sync error:', err);
+        window.trieyeSupabaseFetchError = true;
         setSyncStatus('error', 'Sync Error — Click to retry');
+        if (!getBookings() || getBookings().length === 0) {
+          renderAll();
+        }
       }
     }
 
@@ -3922,14 +3955,24 @@
       const actionRequiredCount = getActionRequiredOnlineBookingsCount(bookings);
       setText('badge-online-count', actionRequiredCount);
 
-      // Today & Tomorrow filter count badges (Asia/Kolkata)
+      // Today, Tomorrow & All Online filter count badges (Asia/Kolkata)
       const { todayStr: kolkataToday, tomStr: kolkataTomorrow } = getKolkataTodayAndTomorrow();
       const todayCount = bookings.filter(b => normalizeSource(b.source) === 'ONLINE' && getBookingServiceDate(b) === kolkataToday).length;
       const tomorrowCount = bookings.filter(b => normalizeSource(b.source) === 'ONLINE' && getBookingServiceDate(b) === kolkataTomorrow).length;
+
+      const selYearStr = String(currentOnlineYear || new Date().getFullYear());
+      const selMonthStr = String((currentOnlineMonth !== undefined ? currentOnlineMonth : new Date().getMonth()) + 1).padStart(2, '0');
+      const selMonthPrefix = `${selYearStr}-${selMonthStr}`;
+      const allOnlineMonthCount = bookings.filter(b => normalizeSource(b.source) === 'ONLINE' && (getBookingServiceDate(b) || '').startsWith(selMonthPrefix)).length;
+
+      const hasFetchError = window.trieyeSupabaseFetchError && (!bookings || bookings.length === 0);
+
       const todayBadge = document.getElementById('online-today-count-badge');
-      if (todayBadge) todayBadge.innerText = todayCount;
+      if (todayBadge) todayBadge.innerText = hasFetchError ? '—' : todayCount;
       const tomBadge = document.getElementById('online-tomorrow-count-badge');
-      if (tomBadge) tomBadge.innerText = tomorrowCount;
+      if (tomBadge) tomBadge.innerText = hasFetchError ? '—' : tomorrowCount;
+      const allBadge = document.getElementById('online-all-count-badge');
+      if (allBadge) allBadge.innerText = hasFetchError ? '—' : allOnlineMonthCount;
 
       setText('badge-customers-count', totalCustCount);
       setText('badge-done-count', bookings.filter(b => normalizeStatus(b.status) === 'COMPLETED').length);
@@ -4088,6 +4131,8 @@
       } else if (onlineFilterState === 'UPCOMING') {
         currentOnlineSpecificDate = null;
         toggleOnlineCalendar(false);
+      } else if (onlineFilterState === 'ALL') {
+        currentOnlineSpecificDate = null;
       }
 
       syncOnlineFilterPills();
@@ -4119,14 +4164,20 @@
         countPill.innerText = `${monthOnlineBookings.length} Booking${monthOnlineBookings.length === 1 ? '' : 's'}`;
       }
 
-      // Today & Tomorrow filter count badges (Asia/Kolkata)
+      // Today, Tomorrow & All Online filter count badges (Asia/Kolkata)
       const { todayStr: localToday, tomStr: localTomorrow } = getKolkataTodayAndTomorrow();
       const todayCount = bookings.filter(b => normalizeSource(b.source) === 'ONLINE' && getBookingServiceDate(b) === localToday).length;
       const tomorrowCount = bookings.filter(b => normalizeSource(b.source) === 'ONLINE' && getBookingServiceDate(b) === localTomorrow).length;
+      const allOnlineMonthCount = monthOnlineBookings.length;
+
+      const hasFetchError = window.trieyeSupabaseFetchError && (!bookings || bookings.length === 0);
+
       const todayBadge = document.getElementById('online-today-count-badge');
-      if (todayBadge) todayBadge.innerText = todayCount;
+      if (todayBadge) todayBadge.innerText = hasFetchError ? '—' : todayCount;
       const tomBadge = document.getElementById('online-tomorrow-count-badge');
-      if (tomBadge) tomBadge.innerText = tomorrowCount;
+      if (tomBadge) tomBadge.innerText = hasFetchError ? '—' : tomorrowCount;
+      const allBadge = document.getElementById('online-all-count-badge');
+      if (allBadge) allBadge.innerText = hasFetchError ? '—' : allOnlineMonthCount;
 
       // Sidebar Action-Required Badge
       const actionRequiredCount = getActionRequiredOnlineBookingsCount(bookings);
@@ -6310,6 +6361,20 @@ TRIEYE WATERWASH & DETAILING`;
           renderAll();
         }
       }
+
+      function scheduleKolkataMidnightTimer() {
+        const now = new Date();
+        const kolkataStr = now.toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
+        const kolkataNow = new Date(kolkataStr);
+        const nextMidnight = new Date(kolkataNow);
+        nextMidnight.setHours(24, 0, 0, 100);
+        const msUntilMidnight = Math.max(1000, nextMidnight.getTime() - kolkataNow.getTime());
+        setTimeout(() => {
+          checkKolkataMidnightTransition();
+          scheduleKolkataMidnightTimer();
+        }, msUntilMidnight);
+      }
+      scheduleKolkataMidnightTimer();
 
       // Cross-Device Tab Visibility and Window Focus Sync
       document.addEventListener('visibilitychange', () => {
