@@ -1685,7 +1685,7 @@
             <a><span>💳 Payments Ledger</span></a>
           </li>
           <li class="nav-item" id="nav-completed" onclick="showSection('completed-sec')">
-            <a><span>✅ Completed Jobs</span><span class="nav-counter" id="badge-done-count">0</span></a>
+            <a><span>✅ Completed Jobs</span></a>
           </li>
         </ul>
       </div>
@@ -3975,7 +3975,6 @@
       if (allBadge) allBadge.innerText = hasFetchError ? '—' : allOnlineMonthCount;
 
       setText('badge-customers-count', totalCustCount);
-      setText('badge-done-count', bookings.filter(b => normalizeStatus(b.status) === 'COMPLETED').length);
       setText('badge-bays-occupied', `${occupiedBays}/${bays.length}`);
       setText('top-bay-pill-text', `${bays.length} BAYS (${occupiedBays} IN USE)`);
 
@@ -4941,6 +4940,45 @@
       });
     }
 
+    function getCustomerBookingSortScore(b) {
+      if (!b) return 0;
+      const dateStr = getBookingServiceDate(b) || (b.booking_date || b.date || '').slice(0, 10);
+      if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+        const cr = b.created_at || b.created;
+        if (cr) {
+          const t = new Date(cr).getTime();
+          return isNaN(t) ? 0 : t;
+        }
+        return 0;
+      }
+      let timeMs = 0;
+      const timeRaw = b.booking_time || b.bookingTime || '';
+      if (timeRaw) {
+        try {
+          const parsed = new Date(`${dateStr} ${timeRaw}`);
+          if (!isNaN(parsed.getTime())) return parsed.getTime();
+        } catch (e) {}
+      }
+      if (b.slot && typeof b.slot === 'string') {
+        const match = b.slot.match(/\d{1,2}:\d{2}\s*(?:AM|PM)?/i);
+        if (match) {
+          try {
+            const parsed = new Date(`${dateStr} ${match[0]}`);
+            if (!isNaN(parsed.getTime())) return parsed.getTime();
+          } catch (e) {}
+        }
+      }
+      const cr = b.created_at || b.created;
+      if (cr) {
+        const crDate = new Date(cr);
+        if (!isNaN(crDate.getTime())) {
+          timeMs = (crDate.getUTCHours() * 3600000) + (crDate.getUTCMinutes() * 60000) + (crDate.getUTCSeconds() * 1000);
+        }
+      }
+      const base = new Date(dateStr + 'T00:00:00Z').getTime();
+      return (isNaN(base) ? 0 : base) + timeMs;
+    }
+
     function renderCustomersTable() {
       const custs = getCustomers();
       const bookings = getBookings();
@@ -4950,36 +4988,80 @@
       if (!tbody) return;
       tbody.innerHTML = '';
 
-      const keys = Object.keys(custs).filter(k => {
+      // Calculate visits, totalSpent, and authoritative lastVisit across all customers
+      const allCustomerList = Object.keys(custs).map(k => {
         const c = custs[k];
+        const cleanK = cleanPhone(k);
+        const customerBookings = bookings.filter(b => cleanPhone(b.phone) === cleanK || (c.name && b.name && b.name.toLowerCase() === c.name.toLowerCase()));
+
+        let lastVisit = '—';
+        let sortScore = -1;
+
+        if (customerBookings.length > 0) {
+          const sorted = [...customerBookings].sort((a, b) => getCustomerBookingSortScore(b) - getCustomerBookingSortScore(a));
+          const latest = sorted[0];
+          const latestDate = getBookingServiceDate(latest) || (latest.booking_date || latest.date || '').slice(0, 10);
+          if (latestDate && latestDate.length >= 10) {
+            lastVisit = latestDate;
+            sortScore = getCustomerBookingSortScore(latest);
+          }
+        }
+
+        // If no bookings match, check if customer profile has a pre-existing recorded lastVisit date
+        if (sortScore === -1 && c.lastVisit && c.lastVisit !== '—') {
+          const parsedTime = new Date(c.lastVisit).getTime();
+          if (!isNaN(parsedTime)) {
+            lastVisit = c.lastVisit.slice(0, 10);
+            sortScore = parsedTime;
+          }
+        }
+
+        const visits = customerBookings.length || c.visits || 0;
+        const totalSpent = customerBookings.reduce((sum, b) => sum + (Number(b.price) || 0), 0) || c.spent || 0;
+        const vehDisplay = c.reg ? `${c.vehicleType || 'Car'} (${c.reg})` : (c.model || c.vehicleType || 'Car');
+
+        return {
+          key: k,
+          customer: c,
+          visits,
+          totalSpent,
+          lastVisit,
+          sortScore,
+          vehDisplay
+        };
+      });
+
+      // Sort ALL customers by their actual LAST VISIT date, newest first (descending). Customers with no visits at the bottom.
+      allCustomerList.sort((a, b) => {
+        if (b.sortScore !== a.sortScore) {
+          return b.sortScore - a.sortScore;
+        }
+        return (a.customer.name || '').localeCompare(b.customer.name || '');
+      });
+
+      // Filter by search query across the sorted dataset
+      const filteredList = allCustomerList.filter(item => {
         if (!q) return true;
+        const c = item.customer;
         const nameMatch = (c.name || '').toLowerCase().includes(q);
-        const phoneMatch = k.includes(cleanQ && cleanQ.length >= 2 ? cleanQ : q);
+        const phoneMatch = item.key.includes(cleanQ && cleanQ.length >= 2 ? cleanQ : q);
         const regMatch = (c.reg || '').toLowerCase().includes(q) || 
                          (Array.isArray(c.vehicles) && c.vehicles.some(v => (v.reg || '').toLowerCase().includes(q)));
         return nameMatch || phoneMatch || regMatch;
       });
 
-      if (keys.length === 0) {
+      if (filteredList.length === 0) {
         tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:2rem; color:var(--muted);">No customer profiles found. Use "+ New Customer Profile" to add one.</td></tr>`;
         return;
       }
 
-      keys.forEach(k => {
-        const c = custs[k];
-        const cleanK = cleanPhone(k);
-        const customerBookings = bookings.filter(b => cleanPhone(b.phone) === cleanK || (c.name && b.name && b.name.toLowerCase() === c.name.toLowerCase()));
-        
-        const visits = customerBookings.length || c.visits || 1;
-        const totalSpent = customerBookings.reduce((sum, b) => sum + (Number(b.price) || 0), 0) || c.spent || 0;
-        
-        let lastVisit = c.lastVisit || '—';
-        if (customerBookings.length > 0) {
-          const sorted = [...customerBookings].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-          if (sorted[0] && sorted[0].date) lastVisit = sorted[0].date;
-        }
-
-        const vehDisplay = c.reg ? `${c.vehicleType || 'Car'} (${c.reg})` : (c.model || c.vehicleType || 'Car');
+      filteredList.forEach(item => {
+        const k = item.key;
+        const c = item.customer;
+        const visits = item.visits;
+        const totalSpent = item.totalSpent;
+        const lastVisit = item.lastVisit;
+        const vehDisplay = item.vehDisplay;
 
         const tr = document.createElement('tr');
         tr.style.cursor = 'pointer';
