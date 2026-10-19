@@ -4794,6 +4794,45 @@
       }
     }
 
+    function getCustomerBookingSortScore(b) {
+      if (!b) return 0;
+      const dateStr = getBookingServiceDate(b) || (b.booking_date || b.date || '').slice(0, 10);
+      if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
+        const cr = b.created_at || b.created;
+        if (cr) {
+          const t = new Date(cr).getTime();
+          return isNaN(t) ? 0 : t;
+        }
+        return 0;
+      }
+      let timeMs = 0;
+      const timeRaw = b.booking_time || b.bookingTime || '';
+      if (timeRaw) {
+        try {
+          const parsed = new Date(`${dateStr} ${timeRaw}`);
+          if (!isNaN(parsed.getTime())) return parsed.getTime();
+        } catch (e) {}
+      }
+      if (b.slot && typeof b.slot === 'string') {
+        const match = b.slot.match(/\d{1,2}:\d{2}\s*(?:AM|PM)?/i);
+        if (match) {
+          try {
+            const parsed = new Date(`${dateStr} ${match[0]}`);
+            if (!isNaN(parsed.getTime())) return parsed.getTime();
+          } catch (e) {}
+        }
+      }
+      const cr = b.created_at || b.created;
+      if (cr) {
+        const crDate = new Date(cr);
+        if (!isNaN(crDate.getTime())) {
+          timeMs = (crDate.getUTCHours() * 3600000) + (crDate.getUTCMinutes() * 60000) + (crDate.getUTCSeconds() * 1000);
+        }
+      }
+      const base = new Date(dateStr + 'T00:00:00Z').getTime();
+      return (isNaN(base) ? 0 : base) + timeMs;
+    }
+
     function showCustomerProfile(phoneKey) {
       selectedCustomerPhone = phoneKey;
       const custs = getCustomers();
@@ -4815,8 +4854,10 @@
       
       let lastVisit = c.lastVisit || '—';
       if (customerBookings.length > 0) {
-        const sorted = [...customerBookings].sort((a, b) => (b.date || '').localeCompare(a.date || ''));
-        if (sorted[0] && sorted[0].date) lastVisit = sorted[0].date;
+        const sorted = [...customerBookings].sort((a, b) => getCustomerBookingSortScore(b) - getCustomerBookingSortScore(a));
+        const latest = sorted[0];
+        const latestDate = getBookingServiceDate(latest) || (latest.booking_date || latest.date || '').slice(0, 10);
+        if (latestDate && latestDate.length >= 10) lastVisit = latestDate;
       }
 
       // Vehicle details
@@ -4889,7 +4930,10 @@
 
       window._historyBookingsMap = window._historyBookingsMap || {};
 
-      customerBookings.forEach((b, idx) => {
+      // Sort bookings newest-first (descending) by actual service date / timestamp
+      const sortedBookings = [...customerBookings].sort((a, b) => getCustomerBookingSortScore(b) - getCustomerBookingSortScore(a));
+
+      sortedBookings.forEach((b, idx) => {
         const tr = document.createElement('tr');
         const isPaid = (b.payStatus || '').toUpperCase() === 'PAID';
         const payStatus = isPaid ? 'PAID' : 'UNPAID';
@@ -4938,45 +4982,6 @@
         `;
         historyTbody.appendChild(tr);
       });
-    }
-
-    function getCustomerBookingSortScore(b) {
-      if (!b) return 0;
-      const dateStr = getBookingServiceDate(b) || (b.booking_date || b.date || '').slice(0, 10);
-      if (!dateStr || !/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) {
-        const cr = b.created_at || b.created;
-        if (cr) {
-          const t = new Date(cr).getTime();
-          return isNaN(t) ? 0 : t;
-        }
-        return 0;
-      }
-      let timeMs = 0;
-      const timeRaw = b.booking_time || b.bookingTime || '';
-      if (timeRaw) {
-        try {
-          const parsed = new Date(`${dateStr} ${timeRaw}`);
-          if (!isNaN(parsed.getTime())) return parsed.getTime();
-        } catch (e) {}
-      }
-      if (b.slot && typeof b.slot === 'string') {
-        const match = b.slot.match(/\d{1,2}:\d{2}\s*(?:AM|PM)?/i);
-        if (match) {
-          try {
-            const parsed = new Date(`${dateStr} ${match[0]}`);
-            if (!isNaN(parsed.getTime())) return parsed.getTime();
-          } catch (e) {}
-        }
-      }
-      const cr = b.created_at || b.created;
-      if (cr) {
-        const crDate = new Date(cr);
-        if (!isNaN(crDate.getTime())) {
-          timeMs = (crDate.getUTCHours() * 3600000) + (crDate.getUTCMinutes() * 60000) + (crDate.getUTCSeconds() * 1000);
-        }
-      }
-      const base = new Date(dateStr + 'T00:00:00Z').getTime();
-      return (isNaN(base) ? 0 : base) + timeMs;
     }
 
     function renderCustomersTable() {
