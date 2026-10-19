@@ -9,7 +9,7 @@
     {
       id: 1,
       type: "image",
-      src: "assets/foam-wash.jpg",
+      src: "/assets/foam-wash.jpg",
       tag: "01 / FOAM WASH",
       title: "HIGH-DENSITY SNOW FOAM & DECON",
       alt: "Snow Foam Pre-Wash and Decon at TRIEYE Detailing Studio"
@@ -17,7 +17,7 @@
     {
       id: 2,
       type: "image",
-      src: "assets/rubbing-polish.jpg",
+      src: "/assets/rubbing-polish.jpg",
       tag: "02 / PAINT CORRECTION",
       title: "DUAL-ACTION MACHINE POLISHING",
       alt: "Dual-Action Paint Correction Rubbing Polish"
@@ -25,7 +25,7 @@
     {
       id: 3,
       type: "image",
-      src: "assets/interior-clean.jpg",
+      src: "/assets/interior-clean.jpg",
       tag: "03 / INTERIOR DETAILING",
       title: "DEEP STEAM EXTRACTION & LEATHER SPA",
       alt: "Interior Detailing Steam Extraction and Leather Spa"
@@ -33,7 +33,7 @@
     {
       id: 4,
       type: "image",
-      src: "assets/ceramic-coating.jpg",
+      src: "/assets/ceramic-coating.jpg",
       tag: "04 / CERAMIC COATING",
       title: "9H HYDROPHOBIC SURFACE SHIELD",
       alt: "Hydrophobic 9H Ceramic Coating Protection"
@@ -41,7 +41,7 @@
     {
       id: 5,
       type: "image",
-      src: "assets/ppf/ppf-installation.jpg",
+      src: "/assets/ppf/ppf-installation.jpg",
       tag: "05 / PPF INSTALLATION",
       title: "PRECISION PAINT PROTECTION FILM",
       alt: "Paint Protection Film Installation at TRIEYE Studio"
@@ -49,7 +49,7 @@
     {
       id: 6,
       type: "image",
-      src: "assets/graphene/graphene-workmanship.jpg",
+      src: "/assets/graphene/graphene-workmanship.jpg",
       tag: "06 / GRAPHENE MATRIX",
       title: "PRECISION APPLICATION & FINISH",
       alt: "Precision Graphene Matrix Coating Application and Inspection"
@@ -57,7 +57,7 @@
     {
       id: 7,
       type: "image",
-      src: "assets/bike/bike-detail-finish.jpg",
+      src: "/assets/bike/bike-detail-finish.jpg",
       tag: "07 / SUPERBIKE DETAILING",
       title: "FULL MOTORCYCLE RESTORATION",
       alt: "Superbike Detailing and Hand Polishing at TRIEYE Studio"

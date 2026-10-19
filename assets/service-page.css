@@ -341,7 +341,7 @@
     width:100%;max-width:100%;
     padding: 100px 0;
     display:flex;align-items:center;
-    background-image:url('trieye-hero-car.jpg');
+    background-image:url('/assets/trieye-hero-car.jpg');
     background-size:cover;
     background-position:92% center;
     background-repeat:no-repeat;
@@ -1206,7 +1206,7 @@
   .loc-card-map-layer{
     position: absolute;
     inset: 0;
-    background-image: url('trieye-map-bg.png');
+    background-image: url('/assets/trieye-map-bg.png');
     background-size: cover;
     background-position: center;
     opacity: 0.35;
