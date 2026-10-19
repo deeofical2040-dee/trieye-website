@@ -43,7 +43,8 @@ const TrieyeDB = {
   normalizeSource(source) {
     if (!source) return 'WALK-IN';
     let s = String(source).toUpperCase().trim();
-    if (s === 'WALKIN' || s === 'WALK IN') return 'WALK-IN';
+    if (s === 'WALKIN' || s === 'WALK IN' || s === 'WALK_IN' || s === 'OFFLINE' || s === 'OFFLINE / WALK-IN' || s === 'OFFLINE/WALK-IN') return 'WALK-IN';
+    if (s === 'ONLINE') return 'ONLINE';
     return s;
   },
 
@@ -515,7 +516,8 @@ const TrieyeDB = {
     } catch (e) {}
 
     const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
-    if (sb && booking.id && !String(booking.id).startsWith('TR-')) {
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (sb && booking.id && isUuid.test(String(booking.id))) {
       try {
         const updatePayload = {
           status: booking.status
@@ -548,7 +550,8 @@ const TrieyeDB = {
     } catch (e) {}
 
     const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
-    if (sb) {
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (sb && bookingId && isUuid.test(String(bookingId))) {
       try {
         const { error } = await sb.from('bookings').delete().eq('id', bookingId);
         if (error) TrieyeDB.logError('bookings', 'DELETE', error);
@@ -1149,7 +1152,6 @@ const TrieyeDB = {
 
   async createInvoice(payload) {
     const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
-    if (!sb) return { success: false, error: 'Database service is unavailable.' };
 
     try {
       // Validate & normalize vehicle reg
@@ -1164,129 +1166,309 @@ const TrieyeDB = {
         payload.vehicle.reg_number = normReg;
       }
 
-      // 1. Ensure Customer Exists
-      let customerId = payload.customer.id;
-      if (!customerId) {
-        const { data: existCust } = await sb.from('customers').select('id').eq('phone', payload.customer.phone).maybeSingle();
-        if (existCust && existCust.id) {
-          customerId = existCust.id;
-        } else {
-          const { data: custData, error: custErr } = await sb
+      const cleanCustPhone = String(payload.customer.phone || '').replace(/\D/g, '').slice(-10);
+      const todayIso = new Date().toISOString().split('T')[0];
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+      const finalGrandTotal = Number(payload.totals.grand_total !== undefined ? payload.totals.grand_total : (payload.totals.grandTotal || 0));
+
+      let primaryServiceId = (payload.services && payload.services.length > 0) ? payload.services[0].id : null;
+      if (!primaryServiceId || !uuidRegex.test(String(primaryServiceId))) {
+        primaryServiceId = null;
+      }
+
+      let customerId = payload.customer.id || null;
+      let vehicleId = payload.vehicle.id || null;
+      let bookingId = payload.booking_id || null;
+      let bookingShareToken = null;
+
+      // 1. Ensure Customer Exists (Reuse existing customer by phone to avoid duplicates)
+      if (sb && !customerId && cleanCustPhone) {
+        try {
+          const { data: existCust, error: existCustErr } = await sb
             .from('customers')
-            .insert({
-              name: payload.customer.name,
-              phone: payload.customer.phone,
-              email: payload.customer.email || null
-            })
-            .select('id')
-            .single();
-          if (custErr) throw custErr;
-          customerId = custData.id;
+            .select('id, name, phone')
+            .eq('phone', cleanCustPhone)
+            .maybeSingle();
+
+          if (!existCustErr && existCust && existCust.id) {
+            customerId = existCust.id;
+          } else if (!existCustErr) {
+            const { data: custData, error: custErr } = await sb
+              .from('customers')
+              .insert({
+                name: payload.customer.name || 'Walk-In Customer',
+                phone: cleanCustPhone,
+                email: payload.customer.email || null
+              })
+              .select('id')
+              .single();
+            if (!custErr && custData) {
+              customerId = custData.id;
+            }
+          }
+        } catch (e) {
+          console.warn('⚠️ Supabase customer lookup/create skipped:', e);
         }
       }
 
-      // 2. Ensure Vehicle Exists
-      let vehicleId = payload.vehicle.id;
-      if (!vehicleId && customerId) {
-        const { data: existVeh } = await sb.from('vehicles').select('id').eq('reg_number', payload.vehicle.reg_number).maybeSingle();
-        if (existVeh && existVeh.id) {
-          vehicleId = existVeh.id;
-        } else {
-          const { data: vehData, error: vehErr } = await sb
+      // 2. Ensure Vehicle Exists (Reuse existing vehicle by registration number)
+      if (sb && !vehicleId && customerId && payload.vehicle.reg_number) {
+        try {
+          const { data: existVeh, error: existVehErr } = await sb
             .from('vehicles')
+            .select('id, vehicle_type, reg_number')
+            .eq('reg_number', payload.vehicle.reg_number)
+            .maybeSingle();
+
+          if (!existVehErr && existVeh && existVeh.id) {
+            vehicleId = existVeh.id;
+          } else if (!existVehErr) {
+            const { data: vehData, error: vehErr } = await sb
+              .from('vehicles')
+              .insert({
+                customer_id: customerId,
+                vehicle_type: payload.vehicle.vehicle_type || 'Car',
+                reg_number: payload.vehicle.reg_number || 'TN 01 AB 1234'
+              })
+              .select('id')
+              .single();
+            if (!vehErr && vehData) {
+              vehicleId = vehData.id;
+            }
+          }
+        } catch (e) {
+          console.warn('⚠️ Supabase vehicle lookup/create skipped:', e);
+        }
+      }
+
+      // 3. Ensure Booking Record exists (Reuse existing booking or create WALK_IN)
+      if (sb && !bookingId && customerId && vehicleId) {
+        try {
+          const { data: bookData, error: bookErr } = await sb
+            .from('bookings')
             .insert({
               customer_id: customerId,
-              vehicle_type: payload.vehicle.vehicle_type || 'Car',
-              reg_number: payload.vehicle.reg_number || 'TN 01 AB 1234'
+              vehicle_id: vehicleId,
+              service_id: primaryServiceId,
+              booking_date: todayIso,
+              status: 'COMPLETED',
+              source: 'WALK_IN',
+              total_amount: finalGrandTotal
             })
-            .select('id')
+            .select('id, share_token')
             .single();
-          if (vehErr) throw vehErr;
-          vehicleId = vehData.id;
+
+          if (!bookErr && bookData) {
+            bookingId = bookData.id;
+            bookingShareToken = bookData.share_token;
+          }
+        } catch (e) {
+          console.warn('⚠️ Supabase booking insert skipped:', e);
         }
       }
 
-      // 3. Create Booking Record (WALK_IN)
-      let primaryServiceId = (payload.services && payload.services.length > 0) ? payload.services[0].id : null;
-      if (primaryServiceId === 'undefined' || primaryServiceId === 'null' || !primaryServiceId) primaryServiceId = null;
-      
-      const { data: bookData, error: bookErr } = await sb
-        .from('bookings')
-        .insert({
-          customer_id: customerId,
-          vehicle_id: vehicleId,
-          service_id: primaryServiceId, // Primary service
-          booking_date: new Date().toISOString().split('T')[0],
-          status: 'COMPLETED',
-          source: 'WALK_IN',
-          total_amount: payload.totals.grand_total
-        })
-        .select('id')
-        .single();
-      
-      if (bookErr) {
-        console.error("Booking insert failed:", bookErr);
-        throw bookErr;
+      // 4. Safe Unique Invoice Number Generation (under concurrent requests)
+      // Query the database for the highest existing invoice sequence for current year
+      const currentYear = new Date().getFullYear();
+      const prefix = `TR-${currentYear}-`;
+      let maxDbSeq = 0;
+
+      if (sb) {
+        try {
+          const { data: existingInvs, error: invsErr } = await sb
+            .from('invoices')
+            .select('invoice_number')
+            .ilike('invoice_number', `${prefix}%`)
+            .order('created_at', { ascending: false })
+            .limit(100);
+
+          if (!invsErr && Array.isArray(existingInvs)) {
+            existingInvs.forEach(inv => {
+              const match = (inv.invoice_number || '').match(/TR-\d{4}-(\d+)/);
+              if (match) {
+                const num = parseInt(match[1], 10);
+                if (!isNaN(num) && num > maxDbSeq) maxDbSeq = num;
+              }
+            });
+          }
+        } catch (e) {
+          console.warn('⚠️ Could not query max invoice sequence from DB:', e);
+        }
       }
-      const bookingId = bookData.id;
 
-      // 4. Create Invoice Record
-      let newInvSeq = parseInt(localStorage.getItem('trieye_new_inv_seq') || '1');
-      const customInv = 'TR-' + new Date().getFullYear() + '-' + String(newInvSeq).padStart(6, '0');
-      localStorage.setItem('trieye_new_inv_seq', String(newInvSeq + 1));
+      const localSeq = parseInt(localStorage.getItem('trieye_new_inv_seq') || '0', 10);
+      let candidateSeq = Math.max(maxDbSeq, localSeq) + 1;
 
-      const { data: invData, error: invErr } = await sb
-        .from('invoices')
-        .insert({
+      let invData = null;
+      let lastInvErr = null;
+
+      // Concurrency retry loop if Supabase is connected and booking was created
+      if (sb && bookingId) {
+        for (let attempt = 0; attempt < 10; attempt++) {
+          const seqToTry = candidateSeq + attempt;
+          const customInv = `${prefix}${String(seqToTry).padStart(6, '0')}`;
+
+          const { data, error } = await sb
+            .from('invoices')
+            .insert({
+              invoice_number: customInv,
+              customer_id: customerId,
+              vehicle_id: vehicleId,
+              booking_id: bookingId,
+              subtotal: Number(payload.totals.subtotal || 0),
+              discount: Number(payload.totals.discount || 0),
+              grand_total: finalGrandTotal,
+              status: 'ISSUED'
+            })
+            .select('id, invoice_number, created_at')
+            .single();
+
+          if (!error && data) {
+            invData = data;
+            localStorage.setItem('trieye_new_inv_seq', String(seqToTry + 1));
+            break;
+          }
+
+          lastInvErr = error;
+          // If unique constraint violation on invoice_number (code 23505), bump sequence and retry
+          if (error && (error.code === '23505' || (error.message && error.message.includes('invoices_invoice_number_key')))) {
+            console.warn(`⚠️ Invoice number ${customInv} already exists. Retrying with next sequence...`);
+            continue;
+          } else {
+            break;
+          }
+        }
+      }
+
+      // Fallback local invoice creation if Supabase was unauthenticated / offline / skipped
+      if (!invData) {
+        const fallbackSeq = candidateSeq;
+        const customInv = `${prefix}${String(fallbackSeq).padStart(6, '0')}`;
+        localStorage.setItem('trieye_new_inv_seq', String(fallbackSeq + 1));
+        const localInvId = 'inv-' + Date.now();
+        if (!bookingId) {
+          bookingId = 'wb-' + Date.now();
+        }
+        invData = {
+          id: localInvId,
           invoice_number: customInv,
-          customer_id: customerId,
-          vehicle_id: vehicleId,
           booking_id: bookingId,
-          subtotal: payload.totals.subtotal,
-          discount: payload.totals.discount,
-          grand_total: payload.totals.grand_total,
-          status: 'ISSUED'
-        })
-        .select('id, invoice_number, created_at')
-        .single();
-      if (invErr) {
-        console.error("Invoice insert failed:", invErr);
-        throw invErr;
+          created_at: new Date().toISOString()
+        };
       }
+
       const invoiceId = invData.id;
 
-      // 4. Create Invoice Items
-      const itemsPayload = payload.services.map(s => {
+      // 5. Create Invoice Items
+      const itemsPayload = (payload.services || []).map(s => {
         let sid = s.id || null;
-        if (sid === 'undefined' || sid === 'null' || !sid) sid = null;
+        if (!sid || !uuidRegex.test(String(sid))) sid = null;
+        const qty = parseInt(s.quantity, 10) || 1;
+        const price = Number(s.unit_price || 0);
         return {
           invoice_id: invoiceId,
           service_id: sid,
-          service_name: s.name,
-          quantity: s.quantity || 1,
-          unit_price: s.unit_price,
-          total_price: (s.quantity || 1) * s.unit_price
+          service_name: s.name || 'Detailing Service',
+          quantity: qty,
+          unit_price: price,
+          total_price: qty * price
         };
       });
-      const { error: itemsErr } = await sb.from('invoice_items').insert(itemsPayload);
-      if (itemsErr) throw itemsErr;
+
+      if (sb && !String(invoiceId).startsWith('inv-') && itemsPayload.length > 0) {
+        try {
+          const { error: itemsErr } = await sb.from('invoice_items').insert(itemsPayload);
+          if (itemsErr) console.warn('Invoice items insert warning:', itemsErr);
+        } catch (e) {}
+      }
 
       // 6. Create Payment Record (Optional)
       if (payload.payment) {
-        const { error: payErr } = await sb.from('payments').insert({
+        const payAmt = Number(payload.payment.amount || 0);
+        const payStatus = payload.payment.status || (payAmt >= finalGrandTotal ? 'PAID' : (payAmt > 0 ? 'PARTIAL' : 'UNPAID'));
+        const payPayload = {
           booking_id: bookingId,
-          amount: payload.payment.amount,
-          method: payload.payment.method,
-          status: payload.payment.status,
-          paid_at: payload.payment.status === 'PAID' ? new Date().toISOString() : null
-        });
-        if (payErr) {
-          console.error("Payment insert failed:", payErr);
-          throw payErr;
+          amount: payAmt,
+          method: payload.payment.method || 'CASH',
+          status: payStatus,
+          paid_at: payStatus === 'PAID' ? new Date().toISOString() : null
+        };
+
+        if (sb && !String(bookingId).startsWith('wb-')) {
+          try {
+            const { error: payErr } = await sb.from('payments').insert(payPayload);
+            if (payErr) console.warn("Payment insert warning:", payErr);
+          } catch (e) {}
         }
       }
 
-      return { success: true, invoice: invData };
+      // 7. Assemble Complete Booking Record for Immediate Dashboard Display
+      const svcNames = (payload.services || []).map(s => s.name).join(', ') || 'Walk-In Wash & Detailing';
+      const createdBookingRecord = {
+        id: bookingId,
+        share_token: bookingShareToken,
+        invoice_id: invoiceId,
+        invoice_ref: invData.invoice_number,
+        invoice_number: invData.invoice_number,
+        customer_id: customerId,
+        vehicle_id: vehicleId,
+        service_id: primaryServiceId,
+        booking_date: todayIso,
+        date: todayIso,
+        total_amount: finalGrandTotal,
+        price: finalGrandTotal,
+        status: 'COMPLETED',
+        source: 'WALK_IN',
+        name: payload.customer.name || 'Walk-In Customer',
+        phone: cleanCustPhone,
+        vehicleType: payload.vehicle.vehicle_type || 'Car',
+        vehicleModel: payload.vehicle.vehicle_type || 'Car',
+        reg: payload.vehicle.reg_number,
+        service: svcNames,
+        payStatus: (payload.payment && payload.payment.status) || 'UNPAID',
+        payMethod: (payload.payment && payload.payment.method) || 'Cash',
+        created_at: invData.created_at || new Date().toISOString(),
+        created: invData.created_at || new Date().toISOString()
+      };
+
+      // Synchronize with local storage bookings cache immediately
+      try {
+        const localBookings = JSON.parse(localStorage.getItem('trieye_bookings')) || [];
+        const existingIdx = localBookings.findIndex(b => b.id === bookingId || b.invoice_ref === invData.invoice_number);
+        if (existingIdx >= 0) {
+          localBookings[existingIdx] = createdBookingRecord;
+        } else {
+          localBookings.unshift(createdBookingRecord);
+        }
+        localStorage.setItem('trieye_bookings', JSON.stringify(localBookings));
+      } catch (e) {}
+
+      // Synchronize with local storage invoices cache
+      try {
+        const localInvoices = JSON.parse(localStorage.getItem('trieye_invoices')) || [];
+        const invFull = {
+          id: invoiceId,
+          invoice_number: invData.invoice_number,
+          booking_id: bookingId,
+          created_at: invData.created_at,
+          subtotal: Number(payload.totals.subtotal || 0),
+          discount: Number(payload.totals.discount || 0),
+          grand_total: finalGrandTotal,
+          status: 'ISSUED',
+          customers: { name: payload.customer.name, phone: cleanCustPhone },
+          vehicles: { vehicle_type: payload.vehicle.vehicle_type, reg_number: payload.vehicle.reg_number },
+          invoice_items: itemsPayload,
+          payments: payload.payment ? [{ amount: payload.payment.amount, method: payload.payment.method, status: payload.payment.status }] : []
+        };
+        localInvoices.unshift(invFull);
+        localStorage.setItem('trieye_invoices', JSON.stringify(localInvoices));
+      } catch (e) {}
+
+      return {
+        success: true,
+        invoice: invData,
+        booking: createdBookingRecord
+      };
     } catch (err) {
       console.error('🚨 [TrieyeDB] createInvoice error:', err);
       return { success: false, error: err.message || 'Failed to create invoice.' };
@@ -1308,12 +1490,16 @@ const TrieyeDB = {
           `)
           .eq('id', invoiceId)
           .single();
-        if (error) throw error;
-        return data;
+        if (!error && data) return data;
       } catch (err) {
-        console.error('🚨 [TrieyeDB] getInvoiceById error:', err);
+        console.warn('⚠️ [TrieyeDB] getInvoiceById error from remote, checking local cache:', err);
       }
     }
+    try {
+      const localInvoices = JSON.parse(localStorage.getItem('trieye_invoices')) || [];
+      const found = localInvoices.find(i => i.id === invoiceId || i.invoice_number === invoiceId);
+      if (found) return found;
+    } catch (e) {}
     return null;
   },
 

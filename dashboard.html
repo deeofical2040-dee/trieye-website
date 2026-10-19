@@ -867,6 +867,54 @@
       font-weight: 700;
     }
 
+    .source-pill {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 0.75rem;
+      padding: 0.32rem 0.85rem;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--bg-panel);
+      color: var(--muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+    .source-pill:hover {
+      border-color: rgba(56, 189, 248, 0.45);
+      color: var(--blue);
+      background: rgba(56, 189, 248, 0.08);
+    }
+    .source-pill.active, .source-pill.active:hover {
+      background: var(--blue) !important;
+      border-color: var(--blue) !important;
+      color: #fff !important;
+      font-weight: 700;
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.35);
+    }
+    .source-badge {
+      display: inline-block;
+      font-size: 0.65rem;
+      padding: 1px 6px;
+      border-radius: 4px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      margin-top: 4px;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+    .source-badge.source-online {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--blue);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+    }
+    .source-badge.source-walkin {
+      background: rgba(166, 211, 49, 0.15);
+      color: var(--green);
+      border: 1px solid rgba(166, 211, 49, 0.35);
+    }
+
     /* Compact Online Bookings Month & Calendar Bar */
     .online-calendar-bar {
       display: flex;
@@ -1891,11 +1939,19 @@
           </div>
         </div>
 
+        <!-- Source Filter: All Sources, Online, Walk-In -->
+        <div style="display:flex; align-items:center; gap:0.4rem; margin-bottom:0.65rem; flex-wrap:wrap;">
+          <span style="font-size:0.75rem; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:0.5px; margin-right:0.25rem;">Source:</span>
+          <button type="button" class="source-pill active" data-source="ALL" onclick="filterOnlineSource('ALL', this)">All Sources</button>
+          <button type="button" class="source-pill" data-source="ONLINE" onclick="filterOnlineSource('ONLINE', this)">🌐 Online</button>
+          <button type="button" class="source-pill" data-source="WALKIN" onclick="filterOnlineSource('WALKIN', this)">⚡ Walk-In</button>
+        </div>
+
         <div class="filter-bar">
           <button type="button" class="filter-pill active" data-filter="TODAY" onclick="filterOnlineBookings('TODAY', this)">Today <span id="online-today-count-badge" class="filter-pill-count">0</span></button>
           <button type="button" class="filter-pill" data-filter="TOMORROW" onclick="filterOnlineBookings('TOMORROW', this)">Tomorrow <span id="online-tomorrow-count-badge" class="filter-pill-count">0</span></button>
           <button type="button" class="filter-pill" data-filter="UPCOMING" onclick="filterOnlineBookings('UPCOMING', this)">Upcoming</button>
-          <button type="button" class="filter-pill" data-filter="ALL" onclick="filterOnlineBookings('ALL', this)">All Online <span id="online-all-count-badge" class="filter-pill-count">0</span></button>
+          <button type="button" class="filter-pill" data-filter="ALL" onclick="filterOnlineBookings('ALL', this)"><span id="online-all-label">All Online</span> <span id="online-all-count-badge" class="filter-pill-count">0</span></button>
           <button type="button" class="filter-pill" data-filter="PENDING" onclick="filterOnlineBookings('PENDING', this)">Pending</button>
           <button type="button" class="filter-pill" data-filter="CONFIRMED" onclick="filterOnlineBookings('CONFIRMED', this)">Confirmed</button>
           <button type="button" class="filter-pill" data-filter="COMPLETED" onclick="filterOnlineBookings('COMPLETED', this)">Completed</button>
@@ -1907,11 +1963,11 @@
             <table class="data-table">
               <thead>
                 <tr>
-                  <th>Booking ID</th>
+                  <th>Booking / Bill ID</th>
                   <th>Customer</th>
                   <th>Vehicle &amp; Reg</th>
                   <th>Package &amp; Price</th>
-                  <th>Booking Date</th>
+                  <th>Date</th>
                   <th>Status</th>
                   <th>Actions</th>
                 </tr>
@@ -3068,11 +3124,22 @@
       return s;
     }
 
+    let onlineSourceFilter = 'ALL'; // 'ALL', 'ONLINE', 'WALKIN'
+
     function normalizeSource(source) {
       if (!source) return 'WALK-IN';
       let s = String(source).toUpperCase().trim();
-      if (s === 'WALKIN' || s === 'WALK IN') return 'WALK-IN';
+      if (s === 'WALKIN' || s === 'WALK IN' || s === 'WALK_IN' || s === 'OFFLINE' || s === 'OFFLINE / WALK-IN' || s === 'OFFLINE/WALK-IN') return 'WALK-IN';
+      if (s === 'ONLINE') return 'ONLINE';
       return s;
+    }
+
+    function filterOnlineSource(src, btn) {
+      onlineSourceFilter = (src || 'ALL').toUpperCase().trim();
+      document.querySelectorAll('.source-pill').forEach(b => {
+        b.classList.toggle('active', b.getAttribute('data-source') === onlineSourceFilter);
+      });
+      renderOnlineBookingsTable();
     }
 
     function isQueueActive(status) {
@@ -3151,8 +3218,8 @@
     function getBookingServiceDate(b) {
       if (!b) return '';
       // Rule: Strictly use booking_date first, then date (service date).
-      // NEVER fall back to created_at or created timestamp for Today/Tomorrow calculation!
-      const raw = b.booking_date || b.date;
+      // For walk-in records, if neither is provided, fall back to created_at
+      const raw = b.booking_date || b.date || (normalizeSource(b.source) === 'WALK-IN' ? (b.created_at || b.created) : '');
       if (!raw) return '';
       return getKolkataDateStr(raw);
     }
@@ -3436,7 +3503,10 @@
       const selMonthPrefix = `${selYearStr}-${selMonthStr}`;
 
       return bookings.filter(b => {
-        if (normalizeSource(b.source) !== 'ONLINE') return false;
+        const normSrc = normalizeSource(b.source);
+        if (onlineSourceFilter === 'ONLINE' && normSrc !== 'ONLINE') return false;
+        if (onlineSourceFilter === 'WALKIN' && normSrc !== 'WALK-IN') return false;
+
         const bDate = getBookingServiceDate(b);
         if (!bDate) return false;
         const s = normalizeStatus(b.status);
@@ -3802,8 +3872,9 @@
       if (!window.TrieyeDB) return;
       try {
         setSyncStatus('syncing');
-        const [remoteBookings, remoteCustomers, remoteServices, remoteBays, remoteSchedules] = await Promise.allSettled([
+        const [remoteBookings, remoteInvoices, remoteCustomers, remoteServices, remoteBays, remoteSchedules] = await Promise.allSettled([
           window.TrieyeDB.getBookings(),
+          window.TrieyeDB.getInvoices(),
           window.TrieyeDB.getCustomers(),
           window.TrieyeDB.getServices(defaultServices),
           window.TrieyeDB.getBays(defaultBays),
@@ -3813,17 +3884,71 @@
         let hasUpdates = false;
         let bookingsError = false;
 
+        let bookingsList = [];
         if (remoteBookings.status === 'fulfilled') {
           if (remoteBookings.value && remoteBookings.value._hasError) {
             bookingsError = true;
             console.warn('⚠️ [Trieye Dashboard] Bookings query error:', remoteBookings.value._error);
           } else if (Array.isArray(remoteBookings.value)) {
-            localStorage.setItem(BOOKINGS_KEY, JSON.stringify(remoteBookings.value));
+            bookingsList = remoteBookings.value.slice();
             hasUpdates = true;
           }
         } else if (remoteBookings.status === 'rejected') {
           bookingsError = true;
           console.warn('⚠️ [Trieye Dashboard] Bookings promise rejected:', remoteBookings.reason);
+        }
+
+        // Reconcile with remote invoices: link invoice details, and if any walk-in invoice does not have a linked booking,
+        // explicitly synthesize a display record from the invoice data model without inserting duplicates into Supabase.
+        if (remoteInvoices.status === 'fulfilled' && Array.isArray(remoteInvoices.value)) {
+          const invList = remoteInvoices.value;
+          invList.forEach(inv => {
+            const linkedBooking = bookingsList.find(b => b.id === inv.booking_id || b.invoice_ref === inv.invoice_number);
+            if (linkedBooking) {
+              linkedBooking.has_invoice = true;
+              linkedBooking.invoice_ref = inv.invoice_number || linkedBooking.invoice_ref;
+              linkedBooking.invoice_id = inv.id;
+            } else if (!linkedBooking && inv.id) {
+              const cust = inv.customers || {};
+              const veh = inv.vehicles || {};
+              const items = Array.isArray(inv.invoice_items) ? inv.invoice_items : [];
+              const svcName = items.length > 0 ? items.map(it => it.service_name).join(', ') : 'Studio Service';
+              const invDate = (inv.created_at || '').slice(0, 10) || new Date().toISOString().slice(0, 10);
+              
+              bookingsList.push({
+                id: inv.booking_id || inv.id,
+                invoice_id: inv.id,
+                invoice_ref: inv.invoice_number,
+                invoice_number: inv.invoice_number,
+                share_token: (inv.bookings && inv.bookings.share_token) || null,
+                booking_date: invDate,
+                date: invDate,
+                total_amount: Number(inv.grand_total || 0),
+                price: Number(inv.grand_total || 0),
+                status: 'COMPLETED',
+                source: 'WALK_IN',
+                customer_id: inv.customer_id,
+                vehicle_id: inv.vehicle_id,
+                name: cust.name || 'Walk-In Customer',
+                phone: cust.phone || '',
+                vehicleType: veh.vehicle_type || 'Car',
+                vehicleModel: veh.vehicle_type || 'Car',
+                reg: veh.reg_number || '',
+                service: svcName,
+                payStatus: (inv.status || 'PAID').toUpperCase(),
+                payMethod: 'Cash',
+                created: inv.created_at,
+                created_at: inv.created_at,
+                completed_at: inv.created_at,
+                completedDate: inv.created_at
+              });
+              hasUpdates = true;
+            }
+          });
+        }
+
+        if (bookingsList.length > 0 || hasUpdates) {
+          localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookingsList));
         }
 
         if (remoteCustomers.status === 'fulfilled' && remoteCustomers.value && Object.keys(remoteCustomers.value).length > 0) {
@@ -3955,15 +4080,31 @@
       const actionRequiredCount = getActionRequiredOnlineBookingsCount(bookings);
       setText('badge-online-count', actionRequiredCount);
 
-      // Today, Tomorrow & All Online filter count badges (Asia/Kolkata)
+      // Today, Tomorrow & All filter count badges (Asia/Kolkata), filtered by active source filter
       const { todayStr: kolkataToday, tomStr: kolkataTomorrow } = getKolkataTodayAndTomorrow();
-      const todayCount = bookings.filter(b => normalizeSource(b.source) === 'ONLINE' && getBookingServiceDate(b) === kolkataToday).length;
-      const tomorrowCount = bookings.filter(b => normalizeSource(b.source) === 'ONLINE' && getBookingServiceDate(b) === kolkataTomorrow).length;
+      const todayCount = bookings.filter(b => {
+        const normSrc = normalizeSource(b.source);
+        if (onlineSourceFilter === 'ONLINE' && normSrc !== 'ONLINE') return false;
+        if (onlineSourceFilter === 'WALKIN' && normSrc !== 'WALK-IN') return false;
+        return getBookingServiceDate(b) === kolkataToday;
+      }).length;
+
+      const tomorrowCount = bookings.filter(b => {
+        const normSrc = normalizeSource(b.source);
+        if (onlineSourceFilter === 'ONLINE' && normSrc !== 'ONLINE') return false;
+        if (onlineSourceFilter === 'WALKIN' && normSrc !== 'WALK-IN') return false;
+        return getBookingServiceDate(b) === kolkataTomorrow;
+      }).length;
 
       const selYearStr = String(currentOnlineYear || new Date().getFullYear());
       const selMonthStr = String((currentOnlineMonth !== undefined ? currentOnlineMonth : new Date().getMonth()) + 1).padStart(2, '0');
       const selMonthPrefix = `${selYearStr}-${selMonthStr}`;
-      const allOnlineMonthCount = bookings.filter(b => normalizeSource(b.source) === 'ONLINE' && (getBookingServiceDate(b) || '').startsWith(selMonthPrefix)).length;
+      const allMonthCount = bookings.filter(b => {
+        const normSrc = normalizeSource(b.source);
+        if (onlineSourceFilter === 'ONLINE' && normSrc !== 'ONLINE') return false;
+        if (onlineSourceFilter === 'WALKIN' && normSrc !== 'WALK-IN') return false;
+        return (getBookingServiceDate(b) || '').startsWith(selMonthPrefix);
+      }).length;
 
       const hasFetchError = window.trieyeSupabaseFetchError && (!bookings || bookings.length === 0);
 
@@ -3972,7 +4113,14 @@
       const tomBadge = document.getElementById('online-tomorrow-count-badge');
       if (tomBadge) tomBadge.innerText = hasFetchError ? '—' : tomorrowCount;
       const allBadge = document.getElementById('online-all-count-badge');
-      if (allBadge) allBadge.innerText = hasFetchError ? '—' : allOnlineMonthCount;
+      if (allBadge) allBadge.innerText = hasFetchError ? '—' : allMonthCount;
+
+      const allLabel = document.getElementById('online-all-label');
+      if (allLabel) {
+        if (onlineSourceFilter === 'ONLINE') allLabel.innerText = 'All Online';
+        else if (onlineSourceFilter === 'WALKIN') allLabel.innerText = 'All Walk-In';
+        else allLabel.innerText = 'All Bookings';
+      }
 
       setText('badge-customers-count', totalCustCount);
       setText('badge-bays-occupied', `${occupiedBays}/${bays.length}`);
@@ -4144,30 +4292,42 @@
       if (!tbody) return;
       tbody.innerHTML = '';
 
-      // Month online bookings
+      // Month bookings filtered by active source filter
       const selYearStr = String(currentOnlineYear);
       const selMonthStr = String(currentOnlineMonth + 1).padStart(2, '0');
       const selMonthPrefix = `${selYearStr}-${selMonthStr}`;
 
-      const monthOnlineBookings = bookings.filter(b => {
-        if (normalizeSource(b.source) !== 'ONLINE') return false;
+      const monthBookings = bookings.filter(b => {
+        const normSrc = normalizeSource(b.source);
+        if (onlineSourceFilter === 'ONLINE' && normSrc !== 'ONLINE') return false;
+        if (onlineSourceFilter === 'WALKIN' && normSrc !== 'WALK-IN') return false;
         const bDate = getBookingServiceDate(b);
         return bDate && bDate.startsWith(selMonthPrefix);
       });
 
-      renderOnlineCalendarGrid(monthOnlineBookings);
+      renderOnlineCalendarGrid(monthBookings);
 
       // Selected month's total booking count
       const countPill = document.getElementById('online-count-pill');
       if (countPill) {
-        countPill.innerText = `${monthOnlineBookings.length} Booking${monthOnlineBookings.length === 1 ? '' : 's'}`;
+        countPill.innerText = `${monthBookings.length} Booking${monthBookings.length === 1 ? '' : 's'}`;
       }
 
-      // Today, Tomorrow & All Online filter count badges (Asia/Kolkata)
+      // Today, Tomorrow & All filter count badges (Asia/Kolkata)
       const { todayStr: localToday, tomStr: localTomorrow } = getKolkataTodayAndTomorrow();
-      const todayCount = bookings.filter(b => normalizeSource(b.source) === 'ONLINE' && getBookingServiceDate(b) === localToday).length;
-      const tomorrowCount = bookings.filter(b => normalizeSource(b.source) === 'ONLINE' && getBookingServiceDate(b) === localTomorrow).length;
-      const allOnlineMonthCount = monthOnlineBookings.length;
+      const todayCount = bookings.filter(b => {
+        const normSrc = normalizeSource(b.source);
+        if (onlineSourceFilter === 'ONLINE' && normSrc !== 'ONLINE') return false;
+        if (onlineSourceFilter === 'WALKIN' && normSrc !== 'WALK-IN') return false;
+        return getBookingServiceDate(b) === localToday;
+      }).length;
+      const tomorrowCount = bookings.filter(b => {
+        const normSrc = normalizeSource(b.source);
+        if (onlineSourceFilter === 'ONLINE' && normSrc !== 'ONLINE') return false;
+        if (onlineSourceFilter === 'WALKIN' && normSrc !== 'WALK-IN') return false;
+        return getBookingServiceDate(b) === localTomorrow;
+      }).length;
+      const allMonthCount = monthBookings.length;
 
       const hasFetchError = window.trieyeSupabaseFetchError && (!bookings || bookings.length === 0);
 
@@ -4176,7 +4336,14 @@
       const tomBadge = document.getElementById('online-tomorrow-count-badge');
       if (tomBadge) tomBadge.innerText = hasFetchError ? '—' : tomorrowCount;
       const allBadge = document.getElementById('online-all-count-badge');
-      if (allBadge) allBadge.innerText = hasFetchError ? '—' : allOnlineMonthCount;
+      if (allBadge) allBadge.innerText = hasFetchError ? '—' : allMonthCount;
+
+      const allLabel = document.getElementById('online-all-label');
+      if (allLabel) {
+        if (onlineSourceFilter === 'ONLINE') allLabel.innerText = 'All Online';
+        else if (onlineSourceFilter === 'WALKIN') allLabel.innerText = 'All Walk-In';
+        else allLabel.innerText = 'All Bookings';
+      }
 
       // Sidebar Action-Required Badge
       const actionRequiredCount = getActionRequiredOnlineBookingsCount(bookings);
@@ -4188,20 +4355,20 @@
       const filtered = getFilteredOnlineBookings(bookings, onlineFilterState);
 
       if (filtered.length === 0) {
-        let emptyTitle = 'No Online Bookings Found';
+        let emptyTitle = 'No Bookings Found';
         let emptyDesc = 'No reservations match the active filter criteria.';
         if (onlineFilterState === 'TODAY') {
-          emptyTitle = 'No Online Bookings Scheduled For Today';
-          emptyDesc = `There are no online reservations scheduled for today (${formatHumanDate(localToday)}).`;
+          emptyTitle = 'No Bookings Scheduled For Today';
+          emptyDesc = `There are no reservations scheduled for today (${formatHumanDate(localToday)}).`;
         } else if (onlineFilterState === 'TOMORROW') {
-          emptyTitle = 'No Online Bookings Scheduled For Tomorrow';
-          emptyDesc = `There are no online reservations scheduled for tomorrow (${formatHumanDate(localTomorrow)}).`;
+          emptyTitle = 'No Bookings Scheduled For Tomorrow';
+          emptyDesc = `There are no reservations scheduled for tomorrow (${formatHumanDate(localTomorrow)}).`;
         } else if (currentOnlineSpecificDate) {
           emptyTitle = `No Bookings For ${formatHumanDate(currentOnlineSpecificDate)}`;
-          emptyDesc = `No online reservations were found for this selected date.`;
+          emptyDesc = `No reservations were found for this selected date.`;
         } else {
           emptyTitle = `No Bookings In ${MONTH_NAMES[currentOnlineMonth]} ${currentOnlineYear}`;
-          emptyDesc = `No online reservations were found for this month (${onlineFilterState !== 'ALL' ? onlineFilterState : 'All'}).`;
+          emptyDesc = `No reservations were found for this month (${onlineFilterState !== 'ALL' ? onlineFilterState : 'All'}).`;
         }
         tbody.innerHTML = `<tr class="empty-row"><td colspan="7" style="text-align:center; padding:2.5rem 1rem; color:var(--muted);"><div style="font-size:1.4rem; margin-bottom:0.35rem;">📅</div><div style="font-weight:600; color:var(--white); font-size:0.95rem; margin-bottom:0.25rem;">${escapeHtml(emptyTitle)}</div><div style="font-size:0.8rem; color:var(--muted);">${escapeHtml(emptyDesc)}</div></td></tr>`;
         return;
@@ -4211,14 +4378,24 @@
         const tr = document.createElement('tr');
         const vehType = b.vehicleType || 'Car';
         const regNum = b.reg || '';
-        const shortId = (b.id && b.id.length > 12) ? `${b.id.slice(0, 8)}…` : (b.id || 'N/A');
+        const isWalkIn = normalizeSource(b.source) === 'WALK-IN';
+        const displayId = (b.invoice_number || b.invoice_ref) 
+          ? (b.invoice_number || b.invoice_ref)
+          : ((b.id && b.id.length > 12) ? `${b.id.slice(0, 8)}…` : (b.id || 'N/A'));
         const normStatus = normalizeStatus(b.status);
         const isAck = isBookingAcknowledged(b);
+        const sourceLabel = isWalkIn ? 'OFFLINE / WALK-IN' : 'ONLINE';
+        const sourceBadgeClass = isWalkIn ? 'source-walkin' : 'source-online';
+        const payStatus = (b.payStatus || 'UNPAID').toUpperCase();
+        const payBadgeClass = payStatus === 'PAID' ? 'pay-paid' : (payStatus === 'PARTIAL' ? 'pay-partial' : 'pay-unpaid');
 
         tr.innerHTML = `
           <td>
-            <span class="booking-id-tag" title="${escapeHtml(b.id)}">#${escapeHtml(shortId)}</span>
-            ${!isAck && !['COMPLETED', 'CANCELLED', 'ARRIVED'].includes(normStatus) ? `<span style="display:inline-block; margin-left:4px; font-size:0.65rem; background:rgba(255,43,120,0.2); color:var(--pink); padding:1px 5px; border-radius:4px; font-weight:600;">NEW</span>` : ''}
+            <span class="booking-id-tag" title="${escapeHtml(b.id || displayId)}">#${escapeHtml(displayId)}</span>
+            <div style="margin-top:3px;">
+              <span class="source-badge ${sourceBadgeClass}">${escapeHtml(sourceLabel)}</span>
+              ${!isWalkIn && !isAck && !['COMPLETED', 'CANCELLED', 'ARRIVED'].includes(normStatus) ? `<span style="display:inline-block; margin-left:4px; font-size:0.65rem; background:rgba(255,43,120,0.2); color:var(--pink); padding:1px 5px; border-radius:4px; font-weight:600;">NEW</span>` : ''}
+            </div>
           </td>
           <td>
             <div style="font-weight:600; color:var(--white); font-size:0.88rem;">${escapeHtml(b.name || 'Valued Customer')}</div>
@@ -4237,15 +4414,18 @@
           </td>
           <td>
             <span class="status-badge status-${normStatus.toLowerCase().replace(/\s+/g,'')}">${escapeHtml(normStatus)}</span>
+            <div style="margin-top:4px;">
+              <span class="pay-badge ${payBadgeClass}" style="font-size:0.68rem; padding:1px 6px;">${escapeHtml(payStatus)}</span>
+            </div>
           </td>
           <td>
             <div class="action-btn-group">
-              ${!isAck && !['COMPLETED', 'CANCELLED', 'ARRIVED'].includes(normStatus) ? `<button class="action-btn" style="background:rgba(255,43,120,0.14); color:var(--pink); border-color:var(--pink); font-weight:600;" onclick="markBookingAcknowledged('${b.id}')" title="Acknowledge Booking">✓ Ack</button>` : ''}
-              ${(b.payStatus || 'UNPAID').toUpperCase() !== 'PAID' ? `<button class="action-btn" style="background:rgba(0,230,118,0.12); color:var(--green); border-color:var(--green);" title="Record Payment" onclick="openMarkPaidModal('${b.id}')">💳 Pay</button>` : ''}
-              ${normStatus === 'CONFIRMED' || normStatus === 'PENDING' ? `<button class="action-btn arrive" onclick="markBookingArrived('${b.id}')" title="Mark Vehicle Arrived">🚗 Arrived</button>` : ''}
-              ${normStatus !== 'CANCELLED' && normStatus !== 'COMPLETED' ? `<button class="action-btn" style="background:rgba(239,68,68,0.12); color:var(--red); border-color:var(--red);" onclick="changeJobStatus('${b.id}', 'CANCELLED')" title="Cancel Booking">🚫 Cancel</button>` : ''}
-              <button class="action-btn" title="View & Print Bill Invoice" onclick="openBillInvoiceModal('${b.id}')">🧾 Bill</button>
-              <button class="action-btn wa" title="Share Bill on WhatsApp" onclick="shareBillWhatsApp('${b.id}')">💬 WA Bill</button>
+              ${!isWalkIn && !isAck && !['COMPLETED', 'CANCELLED', 'ARRIVED'].includes(normStatus) ? `<button class="action-btn" style="background:rgba(255,43,120,0.14); color:var(--pink); border-color:var(--pink); font-weight:600;" onclick="markBookingAcknowledged('${escapeHtml(b.id)}')" title="Acknowledge Booking">✓ Ack</button>` : ''}
+              ${payStatus !== 'PAID' ? `<button class="action-btn" style="background:rgba(0,230,118,0.12); color:var(--green); border-color:var(--green);" title="Record Payment" onclick="openMarkPaidModal('${escapeHtml(b.id)}')" data-id="${escapeHtml(b.id)}">💳 Pay</button>` : ''}
+              ${!isWalkIn && (normStatus === 'CONFIRMED' || normStatus === 'PENDING') ? `<button class="action-btn arrive" onclick="markBookingArrived('${escapeHtml(b.id)}')" title="Mark Vehicle Arrived">🚗 Arrived</button>` : ''}
+              ${normStatus !== 'CANCELLED' && normStatus !== 'COMPLETED' ? `<button class="action-btn" style="background:rgba(239,68,68,0.12); color:var(--red); border-color:var(--red);" onclick="changeJobStatus('${escapeHtml(b.id)}', 'CANCELLED')" title="Cancel Booking">🚫 Cancel</button>` : ''}
+              <button class="action-btn" title="View & Print Bill Invoice" onclick="openBillInvoiceModal('${escapeHtml(b.id || b.invoice_number || '')}')">🧾 Bill</button>
+              <button class="action-btn wa" title="Share Bill on WhatsApp" onclick="shareBillWhatsApp('${escapeHtml(b.id || b.invoice_number || '')}')">💬 WA Bill</button>
               ${b.phone ? `<a href="tel:${cleanPhone(b.phone)}" class="action-btn call" title="Call Customer">📞 Call</a>` : ''}
             </div>
           </td>
@@ -5095,10 +5275,10 @@
 
     function resolveOriginalBooking(bookingOrId) {
       if (!bookingOrId) return null;
+      const all = getBookings();
       if (typeof bookingOrId === 'object') {
-        const all = getBookings();
-        if (bookingOrId.id && isUuid(bookingOrId.id)) {
-          const found = all.find(x => x.id === bookingOrId.id);
+        if (bookingOrId.id) {
+          const found = all.find(x => x.id === bookingOrId.id || (bookingOrId.invoice_number && x.invoice_number === bookingOrId.invoice_number));
           if (found) return { ...bookingOrId, ...found };
         }
         return bookingOrId;
@@ -5108,11 +5288,35 @@
         return window._historyBookingsMap[bookingOrId];
       }
 
-      const all = getBookings();
       const cleanStr = String(bookingOrId).trim();
-      if (isUuid(cleanStr)) {
-        const found = all.find(x => x.id === cleanStr);
-        if (found) return found;
+      let found = all.find(x => x.id === cleanStr);
+      if (found) return found;
+
+      found = all.find(x => (x.invoice_number && x.invoice_number === cleanStr) || (x.invoice_ref && x.invoice_ref === cleanStr) || (x.id && x.id.startsWith(cleanStr)));
+      if (found) return found;
+
+      if (window._invoicesCache && Array.isArray(window._invoicesCache)) {
+        const inv = window._invoicesCache.find(i => i.id === cleanStr || i.invoice_number === cleanStr || (i.booking_id && i.booking_id === cleanStr));
+        if (inv) {
+          return {
+            id: inv.booking_id || inv.id,
+            invoice_id: inv.id,
+            invoice_ref: inv.invoice_number,
+            invoice_number: inv.invoice_number,
+            name: inv.customers?.name || inv.customer_name || 'Walk-In Customer',
+            phone: inv.customers?.phone || inv.customer_phone || '',
+            vehicleType: inv.vehicles?.vehicle_type || inv.vehicle_type || 'Car',
+            vehicleModel: inv.vehicles?.model || '',
+            reg: inv.vehicles?.reg_number || inv.reg_number || '',
+            service: (inv.invoice_items && inv.invoice_items[0]?.service_name) || (inv.invoice_items && inv.invoice_items[0]?.item_description) || 'Car Detailing & Wash',
+            price: Number(inv.grand_total || inv.total_amount || 0),
+            date: inv.created_at ? inv.created_at.split('T')[0] : '',
+            booking_date: inv.created_at ? inv.created_at.split('T')[0] : '',
+            status: 'COMPLETED',
+            payStatus: (inv.status || 'PAID').toUpperCase(),
+            source: 'WALK_IN'
+          };
+        }
       }
       return null;
     }
@@ -6579,8 +6783,16 @@ function posLiveSearch() {
 // ==========================================
 
 function mbGetServices() {
-  const map = JSON.parse(localStorage.getItem('trieye_services_matrix')) || {};
-  return Object.values(map).filter(s => s.active !== false);
+  try {
+    const map = JSON.parse(localStorage.getItem('trieye_services_matrix'));
+    if (map && Object.keys(map).length > 0) {
+      return Object.values(map).filter(s => s.active !== false);
+    }
+  } catch (e) {}
+  if (typeof defaultServices !== 'undefined') {
+    return Object.values(defaultServices).filter(s => s.active !== false);
+  }
+  return [];
 }
 
 function mbAddServiceRow() {
@@ -6809,7 +7021,7 @@ async function makeBill() {
     
     if (res && res.success) {
       // Show Invoice
-      openInvoiceModal(res.invoice.id);
+      await openInvoiceModal(res.invoice.id);
       
       // Reset Form
       document.getElementById('mb-name').value = '';
@@ -6823,6 +7035,46 @@ async function makeBill() {
       
       // Refresh list if applicable
       if (typeof loadInvoices === 'function') loadInvoices();
+
+      // Sync Walk-In booking to local bookings array & render immediately
+      try {
+        if (typeof getBookings === 'function' && typeof saveBookings === 'function') {
+          const allB = getBookings();
+          const svcList = services.map(s => s.name).join(', ');
+          const walkInBooking = res.booking || {
+            id: (res.invoice && res.invoice.booking_id) || (res.invoice && res.invoice.id) || ('wb-' + Date.now()),
+            invoice_id: res.invoice ? res.invoice.id : null,
+            invoice_ref: res.invoice ? res.invoice.invoice_number : null,
+            invoice_number: res.invoice ? res.invoice.invoice_number : null,
+            name: name,
+            phone: phone,
+            vehicleType: vType,
+            vehicleModel: vType,
+            reg: reg,
+            service: svcList || 'Walk-In Wash & Detail',
+            price: Number(totals.grandTotal || 0),
+            total_amount: Number(totals.grandTotal || 0),
+            date: new Date().toISOString().split('T')[0],
+            booking_date: new Date().toISOString().split('T')[0],
+            created_at: new Date().toISOString(),
+            status: 'COMPLETED',
+            payStatus: (payStatus || 'UNPAID').toUpperCase(),
+            payMethod: payMethod || 'Cash',
+            source: 'WALK_IN',
+            acknowledged: true
+          };
+
+          const existIdx = allB.findIndex(b => (b.id && b.id === walkInBooking.id) || (walkInBooking.invoice_number && b.invoice_number === walkInBooking.invoice_number));
+          if (existIdx >= 0) {
+            allB[existIdx] = { ...allB[existIdx], ...walkInBooking };
+          } else {
+            allB.unshift(walkInBooking);
+          }
+          saveBookings(allB);
+        }
+      } catch (bkErr) {
+        console.error("Error updating bookings with walk-in bill:", bkErr);
+      }
       
       // Save customer to local Customers Database
       try {
