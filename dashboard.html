@@ -1225,6 +1225,7 @@
     @media (max-width: 1024px) {
       .dashboard-layout { flex-direction: column; }
       .sidebar { width: 100%; height: auto; position: static; }
+      .walkin-grid-layout { grid-template-columns: 1fr !important; }
     }
 
     /* Completed Jobs Monthly Calendar Filter */
@@ -1986,111 +1987,214 @@
     </div>
   </div>
 
-  <div class="panel" style="max-width:800px;">
-    <div class="panel-header">
-      <div class="panel-title" style="font-size:1.2rem; font-weight:700;">MAKE BILL</div>
-    </div>
-    <form class="form-body" id="make-bill-form" onsubmit="event.preventDefault(); makeBill();">
+  <div class="walkin-grid-layout" style="display:grid; grid-template-columns: minmax(0, 1.8fr) minmax(320px, 1fr); gap: 1.5rem; align-items: start;">
+    
+    <!-- LEFT COLUMN: BILL FORM -->
+    <div class="panel" style="margin-bottom:0;">
+      <div class="panel-header" style="border-bottom:1px solid var(--line); padding-bottom:0.75rem; margin-bottom:1.25rem;">
+        <div class="panel-title" style="font-size:1.15rem; font-weight:700; letter-spacing:0.04em;">MAKE BILL</div>
+      </div>
       
-      <!-- 1. CUSTOMER & VEHICLE DETAILS -->
-      <div style="margin-bottom:1.5rem;">
-        <div class="form-label" style="margin-bottom:0.8rem; color:var(--white); font-weight:600;">1. CUSTOMER & VEHICLE DETAILS</div>
-        <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
-          <div class="form-group">
-            <label class="form-label">Customer Name *</label>
-            <input type="text" id="mb-name" class="form-input" placeholder="e.g. John Doe" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Phone Number *</label>
-            <input type="tel" id="mb-phone" class="form-input" placeholder="e.g. 9840123456" pattern="[0-9]{10}" maxlength="10" title="Phone number must be exactly 10 digits" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.key === 'Backspace' || event.key === 'Delete'" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Vehicle Number *</label>
-            <input type="text" id="mb-reg" class="form-input" placeholder="TN 01 AB 1234" maxlength="13" autocomplete="off" spellcheck="false" style="text-transform:uppercase;" required>
-          </div>
-          <div class="form-group">
-            <label class="form-label">Vehicle Type *</label>
-            <select class="form-select" id="mb-vtype" onchange="mbUpdateAllPrices()">
-              <option value="Hatchback">Hatchback</option>
-              <option value="Sedan" selected>Sedan</option>
-              <option value="SUV / 4x4">SUV</option>
-              <option value="Bike">Bike</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
-      <!-- 2. SELECT SERVICES -->
-      <div style="margin-bottom:1.5rem; background:var(--bg-panel-2); padding:1.2rem; border-radius:8px; border:1px solid var(--line);">
-        <div class="form-label" style="margin-bottom:0.8rem; color:var(--white); font-weight:600;">2. SERVICES</div>
-        <div id="mb-services-container">
-          <!-- Populated by JS -->
-        </div>
-        <button type="button" class="btn btn-outline" style="padding:0.5rem 1rem; margin-top:0.5rem;" onclick="mbAddServiceRow()">+ ADD SERVICE</button>
-      </div>
-
-      <!-- 3. TOTALS & DISCOUNT -->
-      <div style="margin-bottom:1.5rem; display:flex; justify-content:flex-end;">
-        <div style="width:300px; background:rgba(255,255,255,0.02); padding:1rem; border-radius:8px; border:1px solid var(--line);">
-          <div style="display:flex; justify-content:space-between; margin-bottom:0.8rem; align-items:center;">
-            <span style="color:var(--text-muted);">Subtotal:</span>
-            <span id="mb-subtotal" style="font-family:'IBM Plex Mono'; font-weight:700;">₹0</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; margin-bottom:0.8rem; align-items:center;">
-            <span style="color:var(--text-muted);">Discount:</span>
-            <div style="display:flex; align-items:center; gap:0.5rem;">
-              <span>₹</span>
-              <input type="number" id="mb-discount" class="form-input" style="width:80px; text-align:right; padding:0.4rem;" value="0" min="0" oninput="mbCalcTotals()">
+      <form class="form-body" id="make-bill-form" onsubmit="event.preventDefault(); makeBill();">
+        
+        <!-- 1. CUSTOMER & VEHICLE DETAILS -->
+        <div style="margin-bottom:1.5rem;">
+          <div class="form-label" style="margin-bottom:0.8rem; color:var(--white); font-weight:600; letter-spacing:0.05em; font-size:0.82rem;">1. CUSTOMER &amp; VEHICLE DETAILS</div>
+          <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap:1rem;">
+            <div class="form-group">
+              <label class="form-label" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.04em;">Customer Name *</label>
+              <input type="text" id="mb-name" class="form-input" placeholder="e.g. Ramesh Kumar" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.04em;">Phone Number *</label>
+              <input type="tel" id="mb-phone" class="form-input" placeholder="+91 90333 44556" pattern="[0-9]{10}" maxlength="10" title="Phone number must be exactly 10 digits" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.key === 'Backspace' || event.key === 'Delete'" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.04em;">Vehicle Number *</label>
+              <input type="text" id="mb-reg" class="form-input" placeholder="TN 12 AB 3456" maxlength="13" autocomplete="off" spellcheck="false" style="text-transform:uppercase;" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.04em;">Vehicle Type *</label>
+              <select class="form-select" id="mb-vtype" onchange="mbUpdateAllPrices()">
+                <option value="Hatchback">Hatchback</option>
+                <option value="Sedan">Sedan</option>
+                <option value="SUV / 4x4" selected>SUV</option>
+                <option value="Bike">Bike</option>
+              </select>
             </div>
           </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--line); padding-top:0.8rem; margin-top:0.5rem;">
-            <span style="font-weight:700; color:var(--green);">Grand Total:</span>
-            <span id="mb-grandtotal" style="font-family:'IBM Plex Mono'; font-weight:700; font-size:1.2rem; color:var(--green);">₹0</span>
+        </div>
+
+        <!-- 2. SERVICES -->
+        <div style="margin-bottom:1.5rem; background:var(--bg-panel-2); padding:1.2rem; border-radius:8px; border:1px solid var(--line);">
+          <div class="form-label" style="margin-bottom:0.8rem; color:var(--white); font-weight:600; letter-spacing:0.05em; font-size:0.82rem;">2. SERVICES</div>
+          <div id="mb-services-container">
+            <!-- Populated by JS -->
+          </div>
+          
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-top:0.75rem; flex-wrap:wrap; gap:1rem;">
+            <button type="button" class="btn btn-outline" style="padding:0.45rem 0.9rem; font-size:0.82rem;" onclick="mbAddServiceRow()">+ ADD SERVICE</button>
+            <div style="text-align:right; font-size:0.82rem; font-family:'IBM Plex Mono'; line-height:1.6;">
+              <div style="color:var(--text-muted);">Services Subtotal: <strong id="mb-svc-subtotal-disp" style="color:var(--white); margin-left:0.5rem;">₹0</strong></div>
+              <div style="color:var(--text-muted);">Discount: <strong id="mb-svc-discount-disp" style="color:var(--muted); margin-left:0.5rem;">₹0</strong></div>
+              <div style="color:var(--green); font-weight:700; margin-top:2px;">Service Total: <strong id="mb-svc-total-disp" style="color:var(--green); margin-left:0.5rem;">₹0</strong></div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- 4. PAYMENT -->
-      <div style="margin-bottom:1.5rem;">
-        <div class="form-label" style="margin-bottom:0.8rem; color:var(--white); font-weight:600;">3. PAYMENT</div>
-        <div class="form-grid" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
-          <div class="form-group">
-            <label class="form-label">Payment Status</label>
-            <select class="form-select" id="mb-pay-status" onchange="mbHandlePaymentChange()">
-              <option value="PAID">Fully Paid</option>
-              <option value="PARTIAL">Partial</option>
-              <option value="UNPAID" selected>Unpaid</option>
-            </select>
+        <!-- 4. UPSELL / ADD-ON PRODUCTS -->
+        <div style="margin-bottom:1.5rem; background:var(--bg-panel-2); padding:1.2rem; border-radius:8px; border:1px solid var(--line);">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem;">
+            <div>
+              <div style="display:flex; align-items:center; gap:0.5rem; color:var(--white); font-weight:600; letter-spacing:0.04em; font-size:0.85rem;">
+                <span style="font-size:1.1rem; color:#a855f7;">📦</span>
+                <span>UPSELL / ADD-ON PRODUCTS</span>
+              </div>
+              <div style="font-size:0.75rem; color:#a1a1aa; margin-top:2px; margin-left:1.6rem;">Add extra products and accessories</div>
+            </div>
+            <button type="button" class="btn btn-outline" style="padding:0.35rem 0.85rem; font-size:0.78rem; border-color:rgba(168,85,247,0.4); color:#c084fc;" onclick="mbAddProductRow()">+ Add Product</button>
           </div>
-          <div class="form-group">
-            <label class="form-label">Payment Method</label>
-            <select class="form-select" id="mb-pay-method">
-              <option value="CASH" selected>Cash</option>
-              <option value="UPI">UPI / QR</option>
-              <option value="CARD">Credit/Debit Card</option>
-              <option value="BANK_TRANSFER">Bank Transfer</option>
-            </select>
+
+          <!-- Table Header -->
+          <div style="display:grid; grid-template-columns: minmax(140px, 2fr) 90px 110px 100px 42px; gap:0.5rem; padding:0.4rem 0.5rem; font-size:0.72rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em; border-bottom:1px solid var(--line); margin-bottom:0.6rem;">
+            <span>PRODUCT NAME</span>
+            <span>QUANTITY</span>
+            <span>UNIT PRICE (₹)</span>
+            <span style="text-align:right;">TOTAL (₹)</span>
+            <span style="text-align:center;">ACTION</span>
           </div>
-          <div class="form-group">
-            <label class="form-label">Amount Paid</label>
-            <input type="number" id="mb-pay-amount" class="form-input" value="0" min="0" oninput="mbCalcTotals()">
+
+          <!-- Product Rows Container -->
+          <div id="mb-products-container">
+            <!-- Populated by JS -->
           </div>
-          <div class="form-group">
-            <label class="form-label">Balance Due</label>
-            <input type="text" id="mb-balance-due" class="form-input" value="₹0" readonly style="background:rgba(255,255,255,0.05); font-weight:700;">
+
+          <!-- Add-on Subtotal Pill -->
+          <div style="margin-top:0.85rem; background:rgba(168,85,247,0.08); border:1px solid rgba(168,85,247,0.25); border-radius:6px; padding:0.65rem 1rem; display:flex; align-items:center; gap:0.6rem; color:#c084fc; font-weight:600; font-size:0.85rem;">
+            <span>📦</span>
+            <span>Add-on Subtotal: <strong id="mb-addon-subtotal-disp" style="font-family:'IBM Plex Mono'; color:#d8b4fe; margin-left:4px;">₹0</strong></span>
           </div>
         </div>
+
+        <!-- 3. PAYMENT -->
+        <div style="margin-bottom:1.5rem;">
+          <div class="form-label" style="margin-bottom:0.8rem; color:var(--white); font-weight:600; letter-spacing:0.05em; font-size:0.82rem;">3. PAYMENT</div>
+          <div class="form-grid" style="grid-template-columns: 1fr 1fr 1fr 1fr; gap:0.75rem;">
+            <div class="form-group">
+              <label class="form-label" style="font-size:0.72rem; text-transform:uppercase;">Payment Status</label>
+              <select class="form-select" id="mb-pay-status" onchange="mbHandlePaymentChange()">
+                <option value="PAID" selected>Paid</option>
+                <option value="PARTIAL">Partial</option>
+                <option value="UNPAID">Unpaid</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-size:0.72rem; text-transform:uppercase;">Payment Method</label>
+              <select class="form-select" id="mb-pay-method" onchange="mbCalcTotals()">
+                <option value="UPI" selected>UPI / QR</option>
+                <option value="CASH">Cash</option>
+                <option value="CARD">Credit/Debit Card</option>
+                <option value="BANK_TRANSFER">Bank Transfer</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-size:0.72rem; text-transform:uppercase;">Amount Paid</label>
+              <input type="number" id="mb-pay-amount" class="form-input" value="0" min="0" oninput="mbCalcTotals()">
+            </div>
+            <div class="form-group">
+              <label class="form-label" style="font-size:0.72rem; text-transform:uppercase;">Balance Due</label>
+              <input type="text" id="mb-balance-due" class="form-input" value="₹0" readonly style="background:rgba(255,255,255,0.05); font-weight:700; font-family:'IBM Plex Mono';">
+            </div>
+          </div>
+        </div>
+
+        <span id="mb-error" style="color:var(--red); font-weight:600; display:none; margin-bottom:1rem;"></span>
+
+      </form>
+    </div>
+
+    <!-- RIGHT COLUMN: BILL SUMMARY STICKY CARD -->
+    <div class="panel" style="position:sticky; top:1.5rem; margin-bottom:0; background:var(--bg-panel-2); border:1px solid var(--line); border-radius:10px; padding:1.25rem;">
+      <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:1.25rem; padding-bottom:0.75rem; border-bottom:1px solid var(--line);">
+        <span style="font-size:1.2rem; background:rgba(99,102,241,0.15); border-radius:6px; padding:4px 6px;">🧾</span>
+        <span style="font-weight:700; font-size:0.95rem; letter-spacing:0.04em; color:var(--white);">BILL SUMMARY</span>
       </div>
 
-      <!-- 5. SUBMIT -->
-      <div style="display:flex; justify-content:flex-end; align-items:center; gap:1rem; border-top:1px solid var(--line); padding-top:1.5rem;">
-        <span id="mb-error" style="color:var(--red); font-weight:600; display:none;"></span>
-        <button type="submit" class="btn btn-green" id="mb-submit-btn" style="padding:1rem 2.5rem; font-size:1.2rem; font-weight:700; width:100%;">
-          GENERATE BILL
+      <div style="display:flex; flex-direction:column; gap:0.75rem; font-size:0.85rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="color:var(--text-muted);">Services Subtotal</span>
+          <span id="mb-summary-services" style="font-family:'IBM Plex Mono'; font-weight:600; color:var(--white);">₹0</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="color:var(--text-muted);">Add-on Subtotal</span>
+          <span id="mb-summary-addon" style="font-family:'IBM Plex Mono'; font-weight:600; color:var(--white);">₹0</span>
+        </div>
+
+        <div style="border-top:1px solid var(--line); padding-top:0.75rem; display:flex; justify-content:space-between; align-items:center;">
+          <span style="color:var(--text-muted);">Subtotal</span>
+          <span id="mb-subtotal" style="font-family:'IBM Plex Mono'; font-weight:700; color:var(--white);">₹0</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <span style="color:var(--text-muted);">Discount</span>
+          <div style="display:flex; align-items:center; gap:0.35rem;">
+            <span style="color:var(--text-muted); font-size:0.85rem;">₹</span>
+            <input type="number" id="mb-discount" class="form-input" style="width:85px; text-align:right; padding:0.35rem 0.5rem; font-size:0.85rem;" value="0" min="0" oninput="mbCalcTotals()">
+          </div>
+        </div>
+
+        <!-- Grand Total Banner -->
+        <div style="background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.3); border-radius:8px; padding:0.85rem 1rem; display:flex; justify-content:space-between; align-items:center; margin:0.35rem 0;">
+          <span style="font-weight:700; color:var(--green); font-size:0.95rem;">Grand Total</span>
+          <span id="mb-grandtotal" style="font-family:'IBM Plex Mono'; font-weight:700; font-size:1.25rem; color:var(--green);">₹0</span>
+        </div>
+
+        <!-- Payment Meta -->
+        <div style="display:flex; flex-direction:column; gap:0.6rem; padding-top:0.35rem; font-size:0.82rem; border-top:1px dashed var(--line);">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="color:var(--text-muted);">Payment Status</span>
+            <span id="mb-summary-paystatus" class="pay-badge pay-paid" style="font-size:0.72rem; padding:2px 8px;">PAID</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="color:var(--text-muted);">Payment Method</span>
+            <span id="mb-summary-paymethod" style="font-family:'IBM Plex Mono'; font-weight:600;">UPI / QR</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="color:var(--text-muted);">Amount Paid</span>
+            <span id="mb-summary-paidamt" style="font-family:'IBM Plex Mono'; font-weight:600;">₹0</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="color:var(--text-muted);">Balance Due</span>
+            <span id="mb-summary-balance" style="font-family:'IBM Plex Mono'; font-weight:700; color:var(--white);">₹0</span>
+          </div>
+        </div>
+
+        <!-- Additional Info -->
+        <div style="margin-top:0.6rem; padding-top:0.75rem; border-top:1px solid var(--line); font-size:0.78rem;">
+          <div style="font-size:0.72rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:0.5rem; display:flex; align-items:center; gap:0.35rem;">
+            <span>⚙</span> ADDITIONAL INFO
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+            <span style="color:var(--text-muted);">Booking Source</span>
+            <span class="source-badge source-walkin" style="font-size:0.7rem; padding:2px 8px;">WALK-IN</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
+            <span style="color:var(--text-muted);">Invoice No.</span>
+            <span id="mb-summary-invno" style="font-family:'IBM Plex Mono'; font-weight:600; color:var(--pink);">TR-2026-000001</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <span style="color:var(--text-muted);">Date &amp; Time</span>
+            <span id="mb-summary-datetime" style="font-family:'IBM Plex Mono'; color:var(--white); font-size:0.72rem;">Today</span>
+          </div>
+        </div>
+
+        <!-- Action Button -->
+        <button type="button" class="btn" id="mb-submit-btn" onclick="document.getElementById('make-bill-form').requestSubmit();" style="margin-top:0.75rem; background:linear-gradient(135deg, #e91e63, #ec4899); color:#fff; border:none; padding:0.9rem; font-weight:700; font-size:0.95rem; letter-spacing:0.04em; border-radius:8px; width:100%; display:flex; align-items:center; justify-content:center; gap:0.5rem; cursor:pointer; box-shadow:0 4px 14px rgba(233,30,99,0.35); transition:transform 0.15s, opacity 0.15s;">
+          <span>🧾</span> GENERATE BILL
         </button>
-      </div>
 
-    </form>
+      </div>
+    </div>
+
   </div>
 </section>
 <section class="content-section" id="invoices-sec" style="display:none;">
@@ -2187,7 +2291,7 @@
     <table style="width:100%; border-collapse:collapse; margin-bottom:10mm; font-size:14px;">
       <thead>
         <tr style="background:#000; color:#fff;">
-          <th style="padding:10px; text-align:left;">Service Description</th>
+          <th style="padding:10px; text-align:left;">Item / Description</th>
           <th style="padding:10px; text-align:center; width:15%;">Qty</th>
           <th style="padding:10px; text-align:right; width:20%;">Rate (₹)</th>
           <th style="padding:10px; text-align:right; width:20%;">Amount (₹)</th>
@@ -2201,6 +2305,14 @@
     <!-- Totals -->
     <div style="display:flex; justify-content:flex-end; margin-bottom:10mm;">
       <div style="width:40%;">
+        <div id="inv-services-subtotal-row" style="display:none; justify-content:space-between; padding:4px 0; font-size:13px; color:#555;">
+          <span>Services Subtotal</span>
+          <span id="inv-services-subtotal" style="font-weight:600;">₹0</span>
+        </div>
+        <div id="inv-addon-subtotal-row" style="display:none; justify-content:space-between; padding:4px 0; font-size:13px; color:#555;">
+          <span>Add-on Products Subtotal</span>
+          <span id="inv-addon-subtotal" style="font-weight:600;">₹0</span>
+        </div>
         <div style="display:flex; justify-content:space-between; padding:5px 0;">
           <span style="color:#555;">Subtotal</span>
           <span id="inv-subtotal" style="font-weight:600;">₹0</span>
@@ -5342,6 +5454,78 @@
       const displayMethod = isPaid ? (rawMethod ? formatPaymentMethod(rawMethod) : 'Cash') : (rawMethod && rawMethod.toUpperCase() !== 'PENDING' ? formatPaymentMethod(rawMethod) : 'Pending');
       const payColor = isPaid ? 'var(--green)' : 'var(--red)';
 
+      // Check for itemized breakdown in local invoices or booking data
+      const localInvs = JSON.parse(localStorage.getItem('trieye_invoices') || '[]');
+      const assocInv = (window._invoicesCache || []).find(i => i.id === b.invoice_id || i.invoice_number === b.invoice_ref || i.invoice_number === b.invoice_number) ||
+        localInvs.find(i => i.id === b.invoice_id || i.invoice_number === b.invoice_ref || i.invoice_number === b.invoice_number);
+
+      const invItems = (assocInv && assocInv.invoice_items) ? assocInv.invoice_items : [];
+      let rcptServices = [];
+      let rcptProducts = [];
+
+      if (invItems.length > 0) {
+        invItems.forEach(it => {
+          const isProd = it.item_type === 'PRODUCT' || it.is_product || 
+            ['Chain Loop', 'Perfume', 'Fabric Cloth'].includes(it.service_name) ||
+            (!it.service_id && !['Foam Wash', 'Ceramic Coating', 'Interior Deep Cleaning', 'Full Detail Combo', 'PPF', 'Paint Protection Film', 'Underbody Anti-Rust Coating', 'Bike Detailing'].some(s => (it.service_name||'').toLowerCase().includes(s.toLowerCase())));
+          if (isProd) rcptProducts.push(it);
+          else rcptServices.push(it);
+        });
+      } else if (Array.isArray(b.services) || Array.isArray(b.products)) {
+        rcptServices = (b.services || []).map(s => ({ service_name: s.name, quantity: s.quantity || 1, total_price: (s.quantity || 1) * (s.unit_price || 0) }));
+        rcptProducts = (b.products || []).map(p => ({ service_name: p.name, quantity: p.quantity || 1, total_price: (p.quantity || 1) * (p.unit_price || 0) }));
+      }
+
+      let breakdownHtml = '';
+      if (rcptProducts.length > 0) {
+        breakdownHtml = `
+          <div style="border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:0.75rem 0; display:flex; flex-direction:column; gap:0.6rem;">
+            ${rcptServices.length > 0 ? `
+              <div>
+                <div style="font-size:0.72rem; font-family:'IBM Plex Mono'; color:var(--white); font-weight:700; text-transform:uppercase; margin-bottom:4px;">
+                  🚗 Detailing Services
+                </div>
+                ${rcptServices.map(s => `
+                  <div style="display:flex; justify-content:space-between; font-size:0.85rem; padding:2px 0 2px 8px;">
+                    <span style="color:var(--text-muted);">${escapeHtml(s.service_name)} (x${s.quantity})</span>
+                    <strong style="font-family:'IBM Plex Mono'; color:var(--white);">₹${Number(s.total_price).toLocaleString()}</strong>
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
+
+            <div>
+              <div style="font-size:0.72rem; font-family:'IBM Plex Mono'; color:#c084fc; font-weight:700; text-transform:uppercase; margin-bottom:4px; margin-top:2px;">
+                📦 Add-on Products &amp; Accessories
+              </div>
+              ${rcptProducts.map(p => `
+                <div style="display:flex; justify-content:space-between; font-size:0.85rem; padding:2px 0 2px 8px;">
+                  <span style="color:var(--text-muted);">${escapeHtml(p.service_name)} (x${p.quantity})</span>
+                  <strong style="font-family:'IBM Plex Mono'; color:#c084fc;">₹${Number(p.total_price).toLocaleString()}</strong>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      } else {
+        breakdownHtml = `
+          <!-- Service & Pricing Breakdown -->
+          <div style="border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:0.75rem 0;">
+            <div style="display:flex; justify-content:space-between; font-size:0.75rem; font-family:'IBM Plex Mono'; color:var(--muted); text-transform:uppercase; margin-bottom:6px;">
+              <span>Service Description</span>
+              <span>Amount</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; font-size:0.9rem; align-items:center;">
+              <div>
+                <strong>${escapeHtml(b.service || 'Foam Wash')}</strong>
+                <div style="font-size:0.72rem; color:var(--muted);">${escapeHtml(b.bay || 'Detailing Bay 01')}</div>
+              </div>
+              <strong style="font-family:'IBM Plex Mono'; font-size:1rem; color:var(--white);">₹${bookingPrice.toLocaleString()}</strong>
+            </div>
+          </div>
+        `;
+      }
+
       const body = document.getElementById('receipt-modal-body');
       body.innerHTML = `
         <div class="invoice-box" style="padding:1.25rem; border-radius:8px; background:var(--bg-panel-2); border:1px solid var(--line); display:flex; flex-direction:column; gap:1rem;">
@@ -5386,20 +5570,7 @@
             </div>
           </div>
 
-          <!-- Service & Pricing Breakdown -->
-          <div style="border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:0.75rem 0;">
-            <div style="display:flex; justify-content:space-between; font-size:0.75rem; font-family:'IBM Plex Mono'; color:var(--muted); text-transform:uppercase; margin-bottom:6px;">
-              <span>Service Description</span>
-              <span>Amount</span>
-            </div>
-            <div style="display:flex; justify-content:space-between; font-size:0.9rem; align-items:center;">
-              <div>
-                <strong>${escapeHtml(b.service || 'Foam Wash')}</strong>
-                <div style="font-size:0.72rem; color:var(--muted);">${escapeHtml(b.bay || 'Detailing Bay 01')}</div>
-              </div>
-              <strong style="font-family:'IBM Plex Mono'; font-size:1rem; color:var(--white);">₹${bookingPrice.toLocaleString()}</strong>
-            </div>
-          </div>
+          ${breakdownHtml}
 
           <!-- Payment Info & Final Total -->
           <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -6853,55 +7024,223 @@ function mbUpdateAllPrices() {
   });
 }
 
+// Suggested Add-on Products
+const mbSuggestedProducts = [
+  { name: 'Chain Loop', price: 50 },
+  { name: 'Perfume', price: 200 },
+  { name: 'Fabric Cloth', price: 150 }
+];
+
+let mbProductRowCounter = 0;
+
+function mbAddProductRow(defaultName = '', defaultPrice = null) {
+  const container = document.getElementById('mb-products-container');
+  if (!container) return;
+  mbProductRowCounter++;
+  const rowId = `mb-prod-row-${mbProductRowCounter}`;
+
+  const rowDiv = document.createElement('div');
+  rowDiv.id = rowId;
+  rowDiv.className = 'mb-prod-row';
+  rowDiv.style.cssText = "display:grid; grid-template-columns: minmax(140px, 2fr) 90px 110px 100px 42px; gap:0.5rem; align-items:center; margin-bottom:0.6rem;";
+
+  const isCustom = defaultName && !mbSuggestedProducts.some(p => p.name === defaultName);
+  const selectedName = defaultName || (mbSuggestedProducts[0] ? mbSuggestedProducts[0].name : 'CUSTOM');
+  const initialPrice = defaultPrice !== null ? defaultPrice : (mbSuggestedProducts.find(p => p.name === selectedName)?.price || 0);
+
+  rowDiv.innerHTML = `
+    <div>
+      <select class="form-select mb-prod-select" onchange="mbProductSelected('${rowId}')" style="padding:0.4rem 0.5rem; font-size:0.82rem;">
+        ${mbSuggestedProducts.map(p => `
+          <option value="${escapeHtml(p.name)}" data-price="${p.price}" ${p.name === selectedName && !isCustom ? 'selected' : ''}>
+            ${escapeHtml(p.name)}
+          </option>
+        `).join('')}
+        <option value="CUSTOM" ${isCustom ? 'selected' : ''}>+ Custom Product...</option>
+      </select>
+      <input type="text" class="form-input mb-prod-custom-name" placeholder="Enter product name" value="${isCustom ? escapeHtml(defaultName) : ''}" style="display:${isCustom ? 'block' : 'none'}; margin-top:0.35rem; padding:0.35rem 0.5rem; font-size:0.8rem;" oninput="mbCalcTotals()">
+    </div>
+    <div>
+      <input type="number" class="form-input mb-prod-qty" value="1" min="1" step="1" oninput="if(this.value < 1 && this.value !== '') this.value = 1; mbCalcTotals()" style="padding:0.4rem; text-align:center; font-size:0.85rem;">
+    </div>
+    <div>
+      <input type="number" class="form-input mb-prod-price" value="${initialPrice}" min="0" step="1" oninput="if(this.value < 0) this.value = 0; mbCalcTotals()" style="padding:0.4rem; font-size:0.85rem;">
+    </div>
+    <div style="font-family:'IBM Plex Mono'; font-weight:700; text-align:right; font-size:0.9rem;" class="mb-prod-total">₹${initialPrice}</div>
+    <div style="text-align:center;">
+      <button type="button" class="btn btn-outline" style="padding:0.35rem 0.5rem; color:var(--red); border-color:rgba(239,68,68,0.4); border-radius:6px; font-size:0.85rem;" onclick="document.getElementById('${rowId}').remove(); mbCalcTotals();" title="Remove Product">✕</button>
+    </div>
+  `;
+  container.appendChild(rowDiv);
+  mbCalcTotals();
+}
+
+function mbProductSelected(rowId) {
+  const rowDiv = document.getElementById(rowId);
+  if (!rowDiv) return;
+  const select = rowDiv.querySelector('.mb-prod-select');
+  const customNameInput = rowDiv.querySelector('.mb-prod-custom-name');
+  const priceInput = rowDiv.querySelector('.mb-prod-price');
+
+  if (select.value === 'CUSTOM') {
+    customNameInput.style.display = 'block';
+    customNameInput.focus();
+  } else {
+    customNameInput.style.display = 'none';
+    const opt = select.options[select.selectedIndex];
+    const defaultPrice = opt.getAttribute('data-price');
+    if (defaultPrice !== null && defaultPrice !== undefined) {
+      priceInput.value = defaultPrice;
+    }
+  }
+  mbCalcTotals();
+}
+
 function mbCalcTotals() {
-  const container = document.getElementById('mb-services-container');
-  const rows = container.querySelectorAll('div[id^="mb-row-"]');
-  let subtotal = 0;
-  
-  rows.forEach(row => {
-    const qty = parseInt(row.querySelector('.mb-svc-qty').value) || 1;
-    const price = parseFloat(row.querySelector('.mb-svc-price').value) || 0;
+  // 1. Services Subtotal
+  const svcContainer = document.getElementById('mb-services-container');
+  const svcRows = svcContainer ? svcContainer.querySelectorAll('div[id^="mb-row-"]') : [];
+  let servicesSubtotal = 0;
+
+  svcRows.forEach(row => {
+    const qtyInput = row.querySelector('.mb-svc-qty');
+    const priceInput = row.querySelector('.mb-svc-price');
+    let qty = parseInt(qtyInput ? qtyInput.value : 1, 10);
+    if (isNaN(qty) || qty < 1) qty = 1;
+    let price = parseFloat(priceInput ? priceInput.value : 0);
+    if (isNaN(price) || price < 0) price = 0;
     const rowTotal = qty * price;
-    row.querySelector('.mb-svc-total').innerText = '₹' + rowTotal;
-    subtotal += rowTotal;
+    const totalEl = row.querySelector('.mb-svc-total');
+    if (totalEl) totalEl.innerText = '₹' + rowTotal.toLocaleString();
+    servicesSubtotal += rowTotal;
   });
-  
-  document.getElementById('mb-subtotal').innerText = '₹' + subtotal;
-  
+
+  // 2. Add-on Products Subtotal
+  const prodContainer = document.getElementById('mb-products-container');
+  const prodRows = prodContainer ? prodContainer.querySelectorAll('.mb-prod-row') : [];
+  let addonSubtotal = 0;
+
+  prodRows.forEach(row => {
+    const qtyInput = row.querySelector('.mb-prod-qty');
+    const priceInput = row.querySelector('.mb-prod-price');
+    let qty = parseInt(qtyInput ? qtyInput.value : 1, 10);
+    if (isNaN(qty) || qty < 1) qty = 1;
+    let price = parseFloat(priceInput ? priceInput.value : 0);
+    if (isNaN(price) || price < 0) price = 0;
+    const rowTotal = qty * price;
+    const totalEl = row.querySelector('.mb-prod-total');
+    if (totalEl) totalEl.innerText = '₹' + rowTotal.toLocaleString();
+    addonSubtotal += rowTotal;
+  });
+
+  // 3. Subtotal
+  const subtotal = servicesSubtotal + addonSubtotal;
+
+  // 4. Discount
   const discountInput = document.getElementById('mb-discount');
-  let discount = parseFloat(discountInput.value) || 0;
+  let discount = parseFloat(discountInput ? discountInput.value : 0);
+  if (isNaN(discount) || discount < 0) {
+    discount = 0;
+  }
   if (discount > subtotal) {
     discount = subtotal;
-    discountInput.value = discount;
+    if (discountInput) discountInput.value = discount;
   }
-  
-  const grandTotal = subtotal - discount;
-  document.getElementById('mb-grandtotal').innerText = '₹' + grandTotal;
-  
-  // Payment calculations
-  const payStatus = document.getElementById('mb-pay-status').value;
+
+  // 5. Grand Total
+  const grandTotal = Math.max(0, subtotal - discount);
+
+  // 6. Payment Status & Amount Paid
+  const payStatusSelect = document.getElementById('mb-pay-status');
+  const payStatus = payStatusSelect ? payStatusSelect.value : 'PAID';
   const payAmtInput = document.getElementById('mb-pay-amount');
-  
+
   if (payStatus === 'PAID') {
-    payAmtInput.value = grandTotal;
-    payAmtInput.disabled = true;
-  } else if (payStatus === 'UNPAID') {
-    payAmtInput.value = 0;
-    payAmtInput.disabled = true;
-  } else {
-    payAmtInput.disabled = false; // Partial
-  }
-  
-  let payAmt = parseFloat(payAmtInput.value) || 0;
-  if (payAmt > grandTotal && payStatus !== 'PARTIAL') {
-      payAmt = grandTotal;
+    if (payAmtInput) {
       payAmtInput.value = grandTotal;
+      payAmtInput.disabled = true;
+    }
+  } else if (payStatus === 'UNPAID') {
+    if (payAmtInput) {
+      payAmtInput.value = 0;
+      payAmtInput.disabled = true;
+    }
+  } else {
+    if (payAmtInput) {
+      payAmtInput.disabled = false;
+    }
   }
-  
-  const balanceDue = grandTotal - payAmt;
-  document.getElementById('mb-balance-due').value = '₹' + Math.max(0, balanceDue);
-  
-  return { subtotal, discount, grandTotal, balanceDue, payAmt };
+
+  let payAmt = parseFloat(payAmtInput ? payAmtInput.value : 0);
+  if (isNaN(payAmt) || payAmt < 0) payAmt = 0;
+  if (payStatus !== 'PARTIAL' && payAmt > grandTotal) {
+    payAmt = grandTotal;
+    if (payAmtInput) payAmtInput.value = grandTotal;
+  }
+
+  // 7. Balance Due
+  const balanceDue = Math.max(0, grandTotal - payAmt);
+  const balanceDueEl = document.getElementById('mb-balance-due');
+  if (balanceDueEl) balanceDueEl.value = '₹' + balanceDue.toLocaleString();
+
+  // Update Section Inlines
+  const svcSubDisp = document.getElementById('mb-svc-subtotal-disp');
+  if (svcSubDisp) svcSubDisp.innerText = '₹' + servicesSubtotal.toLocaleString();
+  const svcDiscDisp = document.getElementById('mb-svc-discount-disp');
+  if (svcDiscDisp) svcDiscDisp.innerText = '₹' + discount.toLocaleString();
+  const svcTotDisp = document.getElementById('mb-svc-total-disp');
+  if (svcTotDisp) svcTotDisp.innerText = '₹' + Math.max(0, servicesSubtotal - discount).toLocaleString();
+
+  const addonSubDisp = document.getElementById('mb-addon-subtotal-disp');
+  if (addonSubDisp) addonSubDisp.innerText = '₹' + addonSubtotal.toLocaleString();
+
+  // Update Bill Summary Sticky Card
+  const sumSvc = document.getElementById('mb-summary-services');
+  if (sumSvc) sumSvc.innerText = '₹' + servicesSubtotal.toLocaleString();
+  const sumAddon = document.getElementById('mb-summary-addon');
+  if (sumAddon) sumAddon.innerText = '₹' + addonSubtotal.toLocaleString();
+  const sumSub = document.getElementById('mb-subtotal');
+  if (sumSub) sumSub.innerText = '₹' + subtotal.toLocaleString();
+  const sumGrand = document.getElementById('mb-grandtotal');
+  if (sumGrand) sumGrand.innerText = '₹' + grandTotal.toLocaleString();
+
+  const sumPayStatus = document.getElementById('mb-summary-paystatus');
+  if (sumPayStatus) {
+    sumPayStatus.innerText = payStatus;
+    sumPayStatus.className = 'pay-badge pay-' + payStatus.toLowerCase();
+  }
+
+  const payMethodSelect = document.getElementById('mb-pay-method');
+  const sumPayMethod = document.getElementById('mb-summary-paymethod');
+  if (sumPayMethod && payMethodSelect) {
+    const rawMethod = payMethodSelect.value;
+    sumPayMethod.innerText = rawMethod === 'UPI' ? 'UPI / QR' : (rawMethod === 'CARD' ? 'Credit/Debit Card' : (rawMethod === 'BANK_TRANSFER' ? 'Bank Transfer' : 'Cash'));
+  }
+
+  const sumPaidAmt = document.getElementById('mb-summary-paidamt');
+  if (sumPaidAmt) sumPaidAmt.innerText = '₹' + payAmt.toLocaleString();
+  const sumBalance = document.getElementById('mb-summary-balance');
+  if (sumBalance) sumBalance.innerText = '₹' + balanceDue.toLocaleString();
+
+  mbUpdateAdditionalInfo();
+
+  return { servicesSubtotal, addonSubtotal, subtotal, discount, grandTotal, balanceDue, payAmt };
+}
+
+function mbUpdateAdditionalInfo() {
+  const dtEl = document.getElementById('mb-summary-datetime');
+  if (dtEl) {
+    const now = new Date();
+    dtEl.innerText = now.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) + ', ' +
+      now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+  }
+
+  const invNoEl = document.getElementById('mb-summary-invno');
+  if (invNoEl) {
+    const currentYear = new Date().getFullYear();
+    const nextSeq = parseInt(localStorage.getItem('trieye_new_inv_seq') || '1', 10);
+    invNoEl.innerText = `TR-${currentYear}-${String(nextSeq).padStart(6, '0')}`;
+  }
 }
 
 function mbHandlePaymentChange() {
@@ -6929,7 +7268,7 @@ async function makeBill() {
   
   if (!name || !phone || !rawReg) {
     errorMsg.innerText = "Please fill in Customer Name, Phone, and Vehicle Number.";
-    errorMsg.style.display = 'inline';
+    errorMsg.style.display = 'block';
     return;
   }
 
@@ -6944,7 +7283,7 @@ async function makeBill() {
 
   if (!isValidReg) {
     errorMsg.innerText = "Enter vehicle number in TN 01 AB 1234 format";
-    errorMsg.style.display = 'inline';
+    errorMsg.style.display = 'block';
     document.getElementById('mb-reg').focus();
     return;
   }
@@ -6952,30 +7291,59 @@ async function makeBill() {
   phone = phone.replace(/\D/g, '').slice(-10);
   if (phone.length < 10) {
     errorMsg.innerText = "Please enter a valid 10-digit phone number.";
-    errorMsg.style.display = 'inline';
+    errorMsg.style.display = 'block';
     return;
   }
   
-  const container = document.getElementById('mb-services-container');
-  const rows = container.querySelectorAll('div[id^="mb-row-"]');
+  // Collect Detailing Services
+  const svcContainer = document.getElementById('mb-services-container');
+  const svcRows = svcContainer ? svcContainer.querySelectorAll('div[id^="mb-row-"]') : [];
   const services = [];
   
-  rows.forEach(row => {
+  svcRows.forEach(row => {
     const sel = row.querySelector('.mb-svc-select');
     const opt = sel.options[sel.selectedIndex];
-    if (opt.dataset.name) {
+    if (opt && opt.dataset.name) {
       services.push({
         id: opt.value || 'undefined',
         name: opt.dataset.name,
-        quantity: parseInt(row.querySelector('.mb-svc-qty').value) || 1,
+        quantity: parseInt(row.querySelector('.mb-svc-qty').value, 10) || 1,
         unit_price: parseFloat(row.querySelector('.mb-svc-price').value) || 0
       });
     }
   });
+
+  // Collect Add-on Products
+  const prodContainer = document.getElementById('mb-products-container');
+  const prodRows = prodContainer ? prodContainer.querySelectorAll('.mb-prod-row') : [];
+  const products = [];
+
+  prodRows.forEach(row => {
+    const sel = row.querySelector('.mb-prod-select');
+    const customInput = row.querySelector('.mb-prod-custom-name');
+    let prodName = '';
+    if (sel.value === 'CUSTOM') {
+      prodName = (customInput ? customInput.value : '').trim();
+    } else {
+      prodName = sel.value;
+    }
+    const qty = parseInt(row.querySelector('.mb-prod-qty').value, 10) || 1;
+    const price = parseFloat(row.querySelector('.mb-prod-price').value) || 0;
+
+    if (prodName) {
+      products.push({
+        name: prodName,
+        quantity: qty,
+        unit_price: price,
+        total_price: qty * price,
+        is_product: true
+      });
+    }
+  });
   
-  if (services.length === 0) {
-    errorMsg.innerText = "Please add at least one valid service.";
-    errorMsg.style.display = 'inline';
+  if (services.length === 0 && products.length === 0) {
+    errorMsg.innerText = "Please add at least one service or add-on product.";
+    errorMsg.style.display = 'block';
     return;
   }
   
@@ -6985,13 +7353,13 @@ async function makeBill() {
   
   if (totals.payAmt > totals.grandTotal) {
       errorMsg.innerText = "Amount Paid cannot be greater than Grand Total.";
-      errorMsg.style.display = 'inline';
+      errorMsg.style.display = 'block';
       return;
   }
   
   const btn = document.getElementById('mb-submit-btn');
-  const oldText = btn.innerText;
-  btn.innerText = 'GENERATING...';
+  const oldText = btn.innerHTML;
+  btn.innerHTML = '<span>⏳</span> GENERATING...';
   btn.disabled = true;
   
   try {
@@ -6999,6 +7367,7 @@ async function makeBill() {
       customer: { name, phone },
       vehicle: { vehicle_type: vType, reg_number: reg },
       services: services,
+      products: products,
       totals: totals,
       payment: {
         amount: totals.payAmt,
@@ -7014,17 +7383,26 @@ async function makeBill() {
     const res = await window.TrieyeDB.createInvoice(payload);
     
     if (res && res.success) {
-      // Show Invoice
+      // Show Invoice Modal
       await openInvoiceModal(res.invoice.id);
       
-      // Reset Form
+      // Reset Form Fields
       document.getElementById('mb-name').value = '';
       document.getElementById('mb-phone').value = '';
       document.getElementById('mb-reg').value = '';
       document.getElementById('mb-discount').value = '0';
-      document.getElementById('mb-pay-status').value = 'UNPAID';
-      container.innerHTML = '';
+      document.getElementById('mb-pay-status').value = 'PAID';
+      
+      // Reset services container to 1 default row
+      svcContainer.innerHTML = '';
       mbAddServiceRow();
+
+      // Reset products container with default suggestions
+      prodContainer.innerHTML = '';
+      mbSuggestedProducts.forEach(p => {
+        mbAddProductRow(p.name, p.price);
+      });
+
       mbCalcTotals();
       
       // Refresh list if applicable
@@ -7034,7 +7412,14 @@ async function makeBill() {
       try {
         if (typeof getBookings === 'function' && typeof saveBookings === 'function') {
           const allB = getBookings();
-          const svcList = services.map(s => s.name).join(', ');
+          const svcNames = services.map(s => s.name).join(', ');
+          const prodNames = products.map(p => `${p.name} (x${p.quantity || 1})`).join(', ');
+          const combinedDesc = svcNames && prodNames ? `${svcNames} + ${prodNames}` : (svcNames || prodNames || 'Walk-In Wash & Detail');
+
+          const todayDateIso = (window.TrieyeDB && typeof window.TrieyeDB.getLocalDateIso === 'function')
+            ? window.TrieyeDB.getLocalDateIso(new Date())
+            : (typeof getKolkataTodayAndTomorrow === 'function' ? getKolkataTodayAndTomorrow().todayStr : new Date().toISOString().split('T')[0]);
+
           const walkInBooking = res.booking || {
             id: (res.invoice && res.invoice.booking_id) || (res.invoice && res.invoice.id) || ('wb-' + Date.now()),
             invoice_id: res.invoice ? res.invoice.id : null,
@@ -7045,16 +7430,18 @@ async function makeBill() {
             vehicleType: vType,
             vehicleModel: vType,
             reg: reg,
-            service: svcList || 'Walk-In Wash & Detail',
+            service: combinedDesc,
+            services: services,
+            products: products,
             price: Number(totals.grandTotal || 0),
             total_amount: Number(totals.grandTotal || 0),
-            date: new Date().toISOString().split('T')[0],
-            booking_date: new Date().toISOString().split('T')[0],
+            date: todayDateIso,
+            booking_date: todayDateIso,
             created_at: new Date().toISOString(),
             status: 'COMPLETED',
-            payStatus: (payStatus || 'UNPAID').toUpperCase(),
-            payMethod: payMethod || 'Cash',
-            source: 'WALK_IN',
+            payStatus: (payStatus || 'PAID').toUpperCase(),
+            payMethod: payMethod || 'UPI',
+            source: 'OFFLINE / WALK-IN',
             acknowledged: true
           };
 
@@ -7065,6 +7452,9 @@ async function makeBill() {
             allB.unshift(walkInBooking);
           }
           saveBookings(allB);
+          if (typeof renderOnlineBookingsTable === 'function') renderOnlineBookingsTable();
+          if (typeof renderPaymentsTable === 'function') renderPaymentsTable();
+          if (typeof renderCompletedJobsTable === 'function') renderCompletedJobsTable();
         }
       } catch (bkErr) {
         console.error("Error updating bookings with walk-in bill:", bkErr);
@@ -7105,22 +7495,28 @@ async function makeBill() {
         console.error("Error saving customer:", e);
       }
     } else {
-      errorMsg.innerText = "Failed: " + (res.error.message || res.error || "Unknown error");
-      errorMsg.style.display = 'inline';
+      errorMsg.innerText = "Failed: " + (res.error ? (res.error.message || res.error) : "Unknown error");
+      errorMsg.style.display = 'block';
     }
   } catch (err) {
     errorMsg.innerText = "Error: " + (err.message || err);
-    errorMsg.style.display = 'inline';
+    errorMsg.style.display = 'block';
     console.error("Make Bill Error:", err);
   } finally {
-    btn.innerText = oldText;
+    btn.innerHTML = oldText;
     btn.disabled = false;
   }
 }
 
-// Automatically add one row and setup vehicle input listeners on load
+// Automatically add initial services & suggested add-on products on load
 document.addEventListener('DOMContentLoaded', () => {
     mbAddServiceRow();
+    
+    // Pre-populate suggested products: Chain Loop ₹50, Perfume ₹200, Fabric Cloth ₹150
+    mbSuggestedProducts.forEach(p => {
+      mbAddProductRow(p.name, p.price);
+    });
+
     const mbRegInput = document.getElementById('mb-reg');
     const mbError = document.getElementById('mb-error');
     if (mbRegInput) {
@@ -7137,6 +7533,8 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
     }
+
+    mbCalcTotals();
 });
 // ==========================================
 
@@ -7228,28 +7626,97 @@ async function openInvoiceModal(invoiceId) {
   document.getElementById('inv-veh-reg').innerText = veh.reg_number || 'N/A';
   document.getElementById('inv-veh-model').innerText = veh.vehicle_type || 'Car';
   
-  const tbody = document.getElementById('inv-items-tbody');
-  tbody.innerHTML = '';
-  items.forEach(item => {
-    tbody.innerHTML += `
-      <tr style="border-bottom:1px solid #eee;">
-        <td style="padding:10px;">${item.service_name}</td>
-        <td style="padding:10px; text-align:center;">${item.quantity}</td>
-        <td style="padding:10px; text-align:right;">${item.unit_price}</td>
-        <td style="padding:10px; text-align:right; font-weight:600;">${item.total_price}</td>
-      </tr>
-    `;
+  // Separate services and add-on products
+  const serviceItems = [];
+  const productItems = [];
+
+  items.forEach(it => {
+    const isProd = it.item_type === 'PRODUCT' || it.is_product || 
+      ['Chain Loop', 'Perfume', 'Fabric Cloth'].includes(it.service_name) ||
+      (!it.service_id && !['Foam Wash', 'Ceramic Coating', 'Interior Deep Cleaning', 'Full Detail Combo', 'PPF', 'Paint Protection Film', 'Underbody Anti-Rust Coating', 'Bike Detailing'].some(s => (it.service_name||'').toLowerCase().includes(s.toLowerCase())));
+    if (isProd) {
+      productItems.push(it);
+    } else {
+      serviceItems.push(it);
+    }
   });
 
-  document.getElementById('inv-subtotal').innerText = '₹' + inv.subtotal;
-  document.getElementById('inv-discount').innerText = '- ₹' + inv.discount;
-  document.getElementById('inv-grandtotal').innerText = '₹' + inv.grand_total;
+  const tbody = document.getElementById('inv-items-tbody');
+  tbody.innerHTML = '';
+
+  if (serviceItems.length > 0) {
+    if (productItems.length > 0) {
+      tbody.innerHTML += `
+        <tr style="background:#f1f5f9; font-weight:700; border-bottom:1px solid #cbd5e1;">
+          <td colspan="4" style="padding:6px 10px; color:#1e293b; font-size:11px; letter-spacing:0.5px; text-transform:uppercase;">
+            🚗 Detailing Services
+          </td>
+        </tr>
+      `;
+    }
+    serviceItems.forEach(item => {
+      tbody.innerHTML += `
+        <tr style="border-bottom:1px solid #eee;">
+          <td style="padding:10px;">${escapeHtml(item.service_name)}</td>
+          <td style="padding:10px; text-align:center;">${item.quantity}</td>
+          <td style="padding:10px; text-align:right;">₹${Number(item.unit_price).toLocaleString()}</td>
+          <td style="padding:10px; text-align:right; font-weight:600;">₹${Number(item.total_price).toLocaleString()}</td>
+        </tr>
+      `;
+    });
+  }
+
+  if (productItems.length > 0) {
+    tbody.innerHTML += `
+      <tr style="background:#f5f3ff; font-weight:700; border-bottom:1px solid #ddd6fe; ${serviceItems.length > 0 ? 'border-top:1px solid #e2e8f0;' : ''}">
+        <td colspan="4" style="padding:6px 10px; color:#6d28d9; font-size:11px; letter-spacing:0.5px; text-transform:uppercase;">
+          📦 Upsell / Add-on Products &amp; Accessories
+        </td>
+      </tr>
+    `;
+    productItems.forEach(item => {
+      tbody.innerHTML += `
+        <tr style="border-bottom:1px solid #eee;">
+          <td style="padding:10px;">${escapeHtml(item.service_name)}</td>
+          <td style="padding:10px; text-align:center;">${item.quantity}</td>
+          <td style="padding:10px; text-align:right;">₹${Number(item.unit_price).toLocaleString()}</td>
+          <td style="padding:10px; text-align:right; font-weight:600;">₹${Number(item.total_price).toLocaleString()}</td>
+        </tr>
+      `;
+    });
+  }
+
+  if (serviceItems.length === 0 && productItems.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="4" style="padding:15px; text-align:center; color:#999;">No line items found</td></tr>`;
+  }
+
+  // Calculate separate subtotals for printable breakdown
+  const svcTotal = serviceItems.reduce((acc, i) => acc + (Number(i.total_price) || 0), 0);
+  const prodTotal = productItems.reduce((acc, i) => acc + (Number(i.total_price) || 0), 0);
+
+  const svcSbtRow = document.getElementById('inv-services-subtotal-row');
+  const prodSbtRow = document.getElementById('inv-addon-subtotal-row');
+  if (svcSbtRow && prodSbtRow) {
+    if (productItems.length > 0) {
+      svcSbtRow.style.display = 'flex';
+      document.getElementById('inv-services-subtotal').innerText = '₹' + svcTotal.toLocaleString();
+      prodSbtRow.style.display = 'flex';
+      document.getElementById('inv-addon-subtotal').innerText = '₹' + prodTotal.toLocaleString();
+    } else {
+      svcSbtRow.style.display = 'none';
+      prodSbtRow.style.display = 'none';
+    }
+  }
+
+  document.getElementById('inv-subtotal').innerText = '₹' + Number(inv.subtotal).toLocaleString();
+  document.getElementById('inv-discount').innerText = '- ₹' + Number(inv.discount).toLocaleString();
+  document.getElementById('inv-grandtotal').innerText = '₹' + Number(inv.grand_total).toLocaleString();
   
-  const amtPaid = pay.amount || 0;
-  const balanceDue = Math.max(0, inv.grand_total - amtPaid);
+  const amtPaid = Number(pay.amount || 0);
+  const balanceDue = Math.max(0, Number(inv.grand_total) - amtPaid);
   
-  document.getElementById('inv-amt-paid').innerText = '₹' + amtPaid;
-  document.getElementById('inv-balance').innerText = '₹' + balanceDue;
+  document.getElementById('inv-amt-paid').innerText = '₹' + amtPaid.toLocaleString();
+  document.getElementById('inv-balance').innerText = '₹' + balanceDue.toLocaleString();
   document.getElementById('inv-pay-status').innerText = pay.status || 'UNPAID';
   document.getElementById('inv-pay-method').innerText = pay.method || 'Pending';
 
@@ -7291,8 +7758,45 @@ function shareInvoiceWhatsApp() {
     alert("No customer phone number available.");
     return;
   }
-  const text = `Hello ${cust.name || 'Customer'},\n\nThank you for choosing TRIEYE. Your invoice ${currentPrintInvoice.invoice_number} for ₹${currentPrintInvoice.grand_total} has been generated.\n\nDetail • Precision • Protection`;
-  const url = `https://wa.me/91${cust.phone}?text=${encodeURIComponent(text)}`;
+  const veh = currentPrintInvoice.vehicles || {};
+  const items = currentPrintInvoice.invoice_items || [];
+  
+  const serviceItems = [];
+  const productItems = [];
+  items.forEach(it => {
+    const isProd = it.item_type === 'PRODUCT' || it.is_product || 
+      ['Chain Loop', 'Perfume', 'Fabric Cloth'].includes(it.service_name) ||
+      (!it.service_id && !['Foam Wash', 'Ceramic Coating', 'Interior Deep Cleaning', 'Full Detail Combo', 'PPF', 'Paint Protection Film', 'Underbody Anti-Rust Coating', 'Bike Detailing'].some(s => (it.service_name||'').toLowerCase().includes(s.toLowerCase())));
+    if (isProd) productItems.push(it);
+    else serviceItems.push(it);
+  });
+
+  let itemsText = '';
+  if (serviceItems.length > 0) {
+    itemsText += '\n*Detailing Services:*\n' + serviceItems.map(s => `• ${s.service_name} (x${s.quantity}) - ₹${Number(s.total_price).toLocaleString()}`).join('\n') + '\n';
+  }
+  if (productItems.length > 0) {
+    itemsText += '\n*Add-on Products & Accessories:*\n' + productItems.map(p => `• ${p.service_name} (x${p.quantity}) - ₹${Number(p.total_price).toLocaleString()}`).join('\n') + '\n';
+  }
+
+  const pays = (currentPrintInvoice.bookings && currentPrintInvoice.bookings.payments) ? currentPrintInvoice.bookings.payments : (currentPrintInvoice.payments || []);
+  const pay = pays[0] || {};
+  const amtPaid = Number(pay.amount || 0);
+  const balance = Math.max(0, Number(currentPrintInvoice.grand_total) - amtPaid);
+
+  const text = `*TRIEYE STUDIO — TAX INVOICE*\n` +
+    `Invoice: *${currentPrintInvoice.invoice_number}*\n` +
+    `Customer: ${cust.name || 'Valued Customer'}\n` +
+    `Vehicle: ${veh.reg_number || 'N/A'} (${veh.vehicle_type || 'Car'})\n` +
+    itemsText +
+    `\n*Subtotal:* ₹${Number(currentPrintInvoice.subtotal).toLocaleString()}\n` +
+    (Number(currentPrintInvoice.discount) > 0 ? `*Discount:* -₹${Number(currentPrintInvoice.discount).toLocaleString()}\n` : '') +
+    `*Grand Total:* ₹${Number(currentPrintInvoice.grand_total).toLocaleString()}\n` +
+    `*Payment Status:* ${pay.status || 'PAID'} (Paid: ₹${amtPaid.toLocaleString()}${balance > 0 ? `, Due: ₹${balance.toLocaleString()}` : ''})\n\n` +
+    `Thank you for choosing TRIEYE!\n_Detail • Precision • Protection_`;
+
+  const cleanPhone = cust.phone.replace(/\D/g, '').slice(-10);
+  const url = `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(text)}`;
   window.open(url, '_blank');
 }
 

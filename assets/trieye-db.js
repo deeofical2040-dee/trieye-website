@@ -1167,7 +1167,7 @@ const TrieyeDB = {
       }
 
       const cleanCustPhone = String(payload.customer.phone || '').replace(/\D/g, '').slice(-10);
-      const todayIso = new Date().toISOString().split('T')[0];
+      const todayIso = this.getLocalDateIso(new Date());
       const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
       const finalGrandTotal = Number(payload.totals.grand_total !== undefined ? payload.totals.grand_total : (payload.totals.grandTotal || 0));
 
@@ -1359,13 +1359,16 @@ const TrieyeDB = {
 
       const invoiceId = invData.id;
 
-      // 5. Create Invoice Items
-      const itemsPayload = (payload.services || []).map(s => {
+      // 5. Create Invoice Items (Services + Upsell / Add-on Products)
+      const itemsPayload = [];
+      const localItemsPayload = [];
+
+      (payload.services || []).forEach(s => {
         let sid = s.id || null;
         if (!sid || !uuidRegex.test(String(sid))) sid = null;
         const qty = parseInt(s.quantity, 10) || 1;
         const price = Number(s.unit_price || 0);
-        return {
+        const itemObj = {
           invoice_id: invoiceId,
           service_id: sid,
           service_name: s.name || 'Detailing Service',
@@ -1373,6 +1376,30 @@ const TrieyeDB = {
           unit_price: price,
           total_price: qty * price
         };
+        itemsPayload.push(itemObj);
+        localItemsPayload.push({
+          ...itemObj,
+          item_type: 'SERVICE'
+        });
+      });
+
+      (payload.products || []).forEach(p => {
+        const qty = parseInt(p.quantity, 10) || 1;
+        const price = Number(p.unit_price || 0);
+        const prodName = (p.name || '').trim() || 'Add-on Product';
+        const itemObj = {
+          invoice_id: invoiceId,
+          service_id: null,
+          service_name: prodName,
+          quantity: qty,
+          unit_price: price,
+          total_price: qty * price
+        };
+        itemsPayload.push(itemObj);
+        localItemsPayload.push({
+          ...itemObj,
+          item_type: 'PRODUCT'
+        });
       });
 
       if (sb && !String(invoiceId).startsWith('inv-') && itemsPayload.length > 0) {
@@ -1403,7 +1430,17 @@ const TrieyeDB = {
       }
 
       // 7. Assemble Complete Booking Record for Immediate Dashboard Display
-      const svcNames = (payload.services || []).map(s => s.name).join(', ') || 'Walk-In Wash & Detailing';
+      const svcNames = (payload.services || []).map(s => s.name).join(', ');
+      const prodNames = (payload.products || []).map(p => `${p.name} (x${p.quantity || 1})`).join(', ');
+      let combinedDesc = svcNames;
+      if (svcNames && prodNames) {
+        combinedDesc = `${svcNames} + ${prodNames}`;
+      } else if (!svcNames && prodNames) {
+        combinedDesc = prodNames;
+      } else if (!combinedDesc) {
+        combinedDesc = 'Walk-In Wash & Detailing';
+      }
+
       const createdBookingRecord = {
         id: bookingId,
         share_token: bookingShareToken,
@@ -1418,13 +1455,16 @@ const TrieyeDB = {
         total_amount: finalGrandTotal,
         price: finalGrandTotal,
         status: 'COMPLETED',
-        source: 'WALK_IN',
+        source: 'OFFLINE / WALK-IN',
         name: payload.customer.name || 'Walk-In Customer',
         phone: cleanCustPhone,
         vehicleType: payload.vehicle.vehicle_type || 'Car',
         vehicleModel: payload.vehicle.vehicle_type || 'Car',
         reg: payload.vehicle.reg_number,
-        service: svcNames,
+        service: combinedDesc,
+        services: payload.services || [],
+        products: payload.products || [],
+        totals: payload.totals || {},
         payStatus: (payload.payment && payload.payment.status) || 'UNPAID',
         payMethod: (payload.payment && payload.payment.method) || 'Cash',
         created_at: invData.created_at || new Date().toISOString(),
@@ -1452,12 +1492,14 @@ const TrieyeDB = {
           booking_id: bookingId,
           created_at: invData.created_at,
           subtotal: Number(payload.totals.subtotal || 0),
+          services_subtotal: Number(payload.totals.servicesSubtotal || payload.totals.subtotal || 0),
+          addon_subtotal: Number(payload.totals.addonSubtotal || 0),
           discount: Number(payload.totals.discount || 0),
           grand_total: finalGrandTotal,
           status: 'ISSUED',
           customers: { name: payload.customer.name, phone: cleanCustPhone },
           vehicles: { vehicle_type: payload.vehicle.vehicle_type, reg_number: payload.vehicle.reg_number },
-          invoice_items: itemsPayload,
+          invoice_items: localItemsPayload,
           payments: payload.payment ? [{ amount: payload.payment.amount, method: payload.payment.method, status: payload.payment.status }] : []
         };
         localInvoices.unshift(invFull);
