@@ -1798,11 +1798,6 @@
             <div class="kpi-value" id="kpi-pending-payments" style="color:var(--red);">₹0</div>
             <div class="kpi-subtext">Unsettled active job balance</div>
           </div>
-          <div class="kpi-card blue">
-            <div class="kpi-label">Total Customers <span>👥</span></div>
-            <div class="kpi-value" id="kpi-total-customers">0</div>
-            <div class="kpi-subtext">Registered in studio CRM</div>
-          </div>
         </div>
 
 
@@ -4067,7 +4062,6 @@
       setText('kpi-today-walkin', walkinToday);
       setText('kpi-today-completed', completedToday);
       setText('kpi-pending-payments', '₹' + pendingPay.toLocaleString());
-      setText('kpi-total-customers', totalCustCount);
       setText('kpi-bay-occupancy', bayRatio + '%');
       setText('kpi-bay-fraction', `${occupiedBays}/${bays.length} Bays Active`);
 
