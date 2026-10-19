@@ -6,10 +6,13 @@
   "scripts": {
     "dev": "node server.js",
     "start": "node server.js",
-    "serve": "npx serve ."
+    "serve": "npx serve .",
+    "test": "node test_overflow.js && node test_small_viewport.js"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.117.2",
+    "@supabase/supabase-js": "^2.117.2"
+  },
+  "devDependencies": {
     "puppeteer": "^25.12.0"
   }
 }

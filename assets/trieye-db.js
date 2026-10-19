@@ -824,9 +824,19 @@ const TrieyeDB = {
 
     // 1. Persist to REST Backend API if running
     try {
+      const apiHeaders = { 'Content-Type': 'application/json' };
+      const sbSession = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
+      if (sbSession && sbSession.auth) {
+        try {
+          const { data: sessionData } = await sbSession.auth.getSession();
+          if (sessionData && sessionData.session && sessionData.session.access_token) {
+            apiHeaders['Authorization'] = `Bearer ${sessionData.session.access_token}`;
+          }
+        } catch (authErr) {}
+      }
       await fetch('/api/services', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: apiHeaders,
         body: JSON.stringify(normalized || servicesMap)
       });
     } catch (e) {}
