@@ -7,7 +7,7 @@
     "dev": "node server.js",
     "start": "node server.js",
     "serve": "npx serve .",
-    "build": "echo 'Build successful'",
+    "build": "mkdir -p public && cp -r assets public/ && cp robots.txt sitemap.xml public/ 2>/dev/null || true",
     "test": "node test_overflow.js && node test_small_viewport.js"
   },
   "dependencies": {

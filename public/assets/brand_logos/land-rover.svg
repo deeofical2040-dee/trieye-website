@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 250" width="500" height="250">
+  <ellipse cx="250" cy="125" rx="240" ry="115" fill="#005A2B" stroke="#FFFFFF" stroke-width="6"/>
+  <ellipse cx="250" cy="125" rx="230" ry="105" fill="none" stroke="#FFFFFF" stroke-width="2"/>
+  <text x="250" y="110" font-family="'Arial Black', 'Helvetica Neue', sans-serif" font-size="48" font-weight="900" fill="#FFFFFF" text-anchor="middle" letter-spacing="3">LAND</text>
+  <text x="250" y="162" font-family="'Arial Black', 'Helvetica Neue', sans-serif" font-size="48" font-weight="900" fill="#FFFFFF" text-anchor="middle" letter-spacing="3">ROVER</text>
+  <path d="M 40 125 L 85 125 M 415 125 L 460 125" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+</svg>

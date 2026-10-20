@@ -1,0 +1,24 @@
+# TRIEYE Detailing Studio Robots Specification
+# Website: https://trieyedetailing.com
+
+User-agent: *
+Allow: /
+Allow: /assets/
+Allow: /*.css$
+Allow: /*.js$
+Allow: /*.jpg$
+Allow: /*.png$
+Allow: /*.webp$
+Allow: /*.svg$
+
+# Disallow Private & Admin Operational Interfaces
+Disallow: /dashboard
+Disallow: /dashboard.html
+Disallow: /invoice
+Disallow: /invoice.html
+Disallow: /craftsmanship-demos
+Disallow: /craftsmanship-demos.html
+Disallow: /api/
+
+# XML Sitemap Index Location
+Sitemap: https://trieyedetailing.com/sitemap.xml
