@@ -2375,8 +2375,8 @@
           <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path><circle cx="19" cy="5" r="1" fill="currentColor" stroke="none"></circle><circle cx="16" cy="3" r="0.75" fill="currentColor" stroke="none"></circle></svg>
         </div>
       </button>
-      <button class="btn btn-primary" onclick="showSection('walkin-sec'); document.getElementById('walkin-phone').focus();" title="Walk-In Entry">
-        <span class="topbar-btn-text">+ Walk-In Entry</span>
+      <button class="btn btn-primary" onclick="window.location.href='/walkin'" title="Walk-In Billing">
+        <span class="topbar-btn-text">+ Walk-In Billing</span>
         <span class="topbar-btn-icon">+ Bill</span>
       </button>
       <button class="btn" onclick="lockAdminConsole()" title="Lock Admin Session">
@@ -2411,8 +2411,11 @@
           <li class="nav-item" id="nav-online" onclick="showSection('online-sec')">
             <a><span>🌐 Online Bookings</span><span class="nav-counter" id="badge-online-count">0</span></a>
           </li>
-          <li class="nav-item" id="nav-walkin" onclick="showSection('walkin-sec')">
-            <a><span>⚡ Walk-In Billing</span></a>
+          <li class="nav-item" id="nav-walkin" onclick="window.location.href='/walkin'">
+            <a href="/walkin" style="display:flex; align-items:center; justify-content:space-between; width:100%;">
+              <span>⚡ Walk-In Billing</span>
+              <span style="font-size:0.75rem; opacity:0.8;">↗</span>
+            </a>
           </li>
         </ul>
       </div>
@@ -2464,7 +2467,7 @@
                <div style="width: 1px; height: 14px; background: var(--line);"></div>
                <span id="overview-date-count" style="font-family: 'IBM Plex Mono', monospace; font-size: 0.7rem; font-weight: 600; color: var(--green);">0 Bookings</span>
             </div>
-            <button class="btn btn-green" onclick="showSection('walkin-sec')">+ Quick Walk-In</button>
+            <button class="btn btn-green" onclick="window.location.href='/walkin'">+ Quick Walk-In</button>
           </div>
         </div>
 
@@ -2552,7 +2555,7 @@
               <option value="IN PROGRESS">In Progress</option>
               <option value="QUALITY CHECK">Quality Check</option>
             </select>
-            <button class="btn btn-primary" onclick="showSection('walkin-sec')">+ Add Vehicle</button>
+            <button class="btn btn-primary" onclick="window.location.href='/walkin'">+ Add Vehicle</button>
           </div>
         </div>
 
@@ -2672,227 +2675,6 @@
         </div>
       </section>
 
-      <!-- 4. EXPRESS WALKIN ENTRY SECTION -->
-      <!-- NEW WALK-IN POS SECTION -->
-<!-- NEW WALK-IN POS SECTION -->
-<section class="content-section" id="walkin-sec">
-  <div class="section-header">
-    <div>
-      <div class="section-title"><span>⚡</span> Make Bill</div>
-      <div class="section-subtitle">Simplified Walk-In Billing Workflow</div>
-    </div>
-  </div>
-
-  <div class="walkin-grid-layout" style="display:grid; grid-template-columns: minmax(0, 1.8fr) minmax(280px, 1fr); gap: 1.5rem; align-items: start;">
-    
-    <!-- LEFT COLUMN: BILL FORM -->
-    <div class="panel" style="margin-bottom:0;">
-      <div class="panel-header" style="border-bottom:1px solid var(--line); padding-bottom:0.75rem; margin-bottom:1.25rem;">
-        <div class="panel-title" style="font-size:1.15rem; font-weight:700; letter-spacing:0.04em;">MAKE BILL</div>
-      </div>
-      
-      <form class="form-body" id="make-bill-form" onsubmit="event.preventDefault(); makeBill();">
-        
-        <!-- 1. CUSTOMER & VEHICLE DETAILS -->
-        <div style="margin-bottom:1.5rem;">
-          <div class="form-label" style="margin-bottom:0.8rem; color:var(--white); font-weight:600; letter-spacing:0.05em; font-size:0.82rem;">1. CUSTOMER &amp; VEHICLE DETAILS</div>
-          <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap:1rem;">
-            <div class="form-group">
-              <label class="form-label" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.04em;">Customer Name *</label>
-              <input type="text" id="mb-name" class="form-input" placeholder="e.g. Ramesh Kumar" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.04em;">Phone Number *</label>
-              <input type="tel" id="mb-phone" class="form-input" placeholder="+91 90333 44556" pattern="[0-9]{10}" maxlength="10" title="Phone number must be exactly 10 digits" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 10)" onkeypress="return (event.charCode >= 48 && event.charCode <= 57) || event.key === 'Backspace' || event.key === 'Delete'" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.04em;">Vehicle Number *</label>
-              <input type="text" id="mb-reg" class="form-input" placeholder="TN 12 AB 3456" maxlength="13" autocomplete="off" spellcheck="false" style="text-transform:uppercase;" required>
-            </div>
-            <div class="form-group">
-              <label class="form-label" style="font-size:0.75rem; text-transform:uppercase; letter-spacing:0.04em;">Vehicle Type *</label>
-              <select class="form-select" id="mb-vtype" onchange="mbUpdateAllPrices()">
-                <option value="Hatchback">Hatchback</option>
-                <option value="Sedan">Sedan</option>
-                <option value="SUV / 4x4" selected>SUV</option>
-                <option value="Bike">Bike</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <!-- 2. SERVICES -->
-        <div style="margin-bottom:1.5rem; background:var(--bg-panel-2); padding:1.2rem; border-radius:8px; border:1px solid var(--line);">
-          <div class="form-label" style="margin-bottom:0.8rem; color:var(--white); font-weight:600; letter-spacing:0.05em; font-size:0.82rem;">2. SERVICES</div>
-          <div id="mb-services-container">
-            <!-- Populated by JS -->
-          </div>
-          
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-top:0.75rem; flex-wrap:wrap; gap:1rem;">
-            <button type="button" class="btn btn-outline" style="padding:0.45rem 0.9rem; font-size:0.82rem;" onclick="mbAddServiceRow()">+ ADD SERVICE</button>
-            <div style="text-align:right; font-size:0.82rem; font-family:'IBM Plex Mono'; line-height:1.6;">
-              <div style="color:var(--text-muted);">Services Subtotal: <strong id="mb-svc-subtotal-disp" style="color:var(--white); margin-left:0.5rem;">₹0</strong></div>
-              <div style="color:var(--text-muted);">Discount: <strong id="mb-svc-discount-disp" style="color:var(--muted); margin-left:0.5rem;">₹0</strong></div>
-              <div style="color:var(--green); font-weight:700; margin-top:2px;">Service Total: <strong id="mb-svc-total-disp" style="color:var(--green); margin-left:0.5rem;">₹0</strong></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 4. UPSELL / ADD-ON PRODUCTS -->
-        <div style="margin-bottom:1.5rem; background:var(--bg-panel-2); padding:1.2rem; border-radius:8px; border:1px solid var(--line);">
-          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:1rem;">
-            <div>
-              <div style="display:flex; align-items:center; gap:0.5rem; color:var(--white); font-weight:600; letter-spacing:0.04em; font-size:0.85rem;">
-                <span style="font-size:1.1rem; color:#a855f7;">📦</span>
-                <span>UPSELL / ADD-ON PRODUCTS</span>
-              </div>
-              <div style="font-size:0.75rem; color:#a1a1aa; margin-top:2px; margin-left:1.6rem;">Add extra products and accessories</div>
-            </div>
-            <button type="button" class="btn btn-outline" style="padding:0.35rem 0.85rem; font-size:0.78rem; border-color:rgba(168,85,247,0.4); color:#c084fc;" onclick="mbAddProductRow()">+ Add Product</button>
-          </div>
-
-          <!-- Table Header -->
-          <div class="mb-prod-header" style="display:none;">
-            <span>PRODUCT NAME</span>
-            <span>QUANTITY</span>
-            <span>UNIT PRICE (₹)</span>
-            <span style="text-align:right;">TOTAL (₹)</span>
-            <span style="text-align:center;">ACTION</span>
-          </div>
-
-          <!-- Product Rows Container -->
-          <div id="mb-products-container">
-            <!-- Populated by JS -->
-          </div>
-
-          <!-- Add-on Subtotal Pill -->
-          <div style="margin-top:0.85rem; background:rgba(168,85,247,0.08); border:1px solid rgba(168,85,247,0.25); border-radius:6px; padding:0.65rem 1rem; display:flex; align-items:center; gap:0.6rem; color:#c084fc; font-weight:600; font-size:0.85rem;">
-            <span>📦</span>
-            <span>Add-on Subtotal: <strong id="mb-addon-subtotal-disp" style="font-family:'IBM Plex Mono'; color:#d8b4fe; margin-left:4px;">₹0</strong></span>
-          </div>
-        </div>
-
-        <!-- 3. PAYMENT -->
-        <div style="margin-bottom:1.5rem;">
-          <div class="form-label" style="margin-bottom:0.8rem; color:var(--white); font-weight:600; letter-spacing:0.05em; font-size:0.82rem;">3. PAYMENT</div>
-          <div class="form-grid mb-payment-grid">
-            <div class="form-group">
-              <label class="form-label" style="font-size:0.72rem; text-transform:uppercase;">Payment Status</label>
-              <select class="form-select" id="mb-pay-status" onchange="mbHandlePaymentChange()">
-                <option value="PAID" selected>Paid</option>
-                <option value="PARTIAL">Partial</option>
-                <option value="UNPAID">Unpaid</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label" style="font-size:0.72rem; text-transform:uppercase;">Payment Method</label>
-              <select class="form-select" id="mb-pay-method" onchange="mbCalcTotals()">
-                <option value="UPI" selected>UPI / QR</option>
-                <option value="CASH">Cash</option>
-                <option value="CARD">Credit/Debit Card</option>
-                <option value="BANK_TRANSFER">Bank Transfer</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label class="form-label" style="font-size:0.72rem; text-transform:uppercase;">Amount Paid</label>
-              <input type="number" id="mb-pay-amount" class="form-input" value="0" min="0" oninput="mbCalcTotals()">
-            </div>
-            <div class="form-group">
-              <label class="form-label" style="font-size:0.72rem; text-transform:uppercase;">Balance Due</label>
-              <input type="text" id="mb-balance-due" class="form-input" value="₹0" readonly style="background:rgba(255,255,255,0.05); font-weight:700; font-family:'IBM Plex Mono';">
-            </div>
-          </div>
-        </div>
-
-        <span id="mb-error" style="color:var(--red); font-weight:600; display:none; margin-bottom:1rem;"></span>
-
-      </form>
-    </div>
-
-    <!-- RIGHT COLUMN: BILL SUMMARY STICKY CARD -->
-    <div class="panel" style="position:sticky; top:1.5rem; margin-bottom:0; background:var(--bg-panel-2); border:1px solid var(--line); border-radius:10px; padding:1.25rem;">
-      <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:1.25rem; padding-bottom:0.75rem; border-bottom:1px solid var(--line);">
-        <span style="font-size:1.2rem; background:rgba(99,102,241,0.15); border-radius:6px; padding:4px 6px;">🧾</span>
-        <span style="font-weight:700; font-size:0.95rem; letter-spacing:0.04em; color:var(--white);">BILL SUMMARY</span>
-      </div>
-
-      <div style="display:flex; flex-direction:column; gap:0.75rem; font-size:0.85rem;">
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span style="color:var(--text-muted);">Services Subtotal</span>
-          <span id="mb-summary-services" style="font-family:'IBM Plex Mono'; font-weight:600; color:var(--white);">₹0</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span style="color:var(--text-muted);">Add-on Subtotal</span>
-          <span id="mb-summary-addon" style="font-family:'IBM Plex Mono'; font-weight:600; color:var(--white);">₹0</span>
-        </div>
-
-        <div style="border-top:1px solid var(--line); padding-top:0.75rem; display:flex; justify-content:space-between; align-items:center;">
-          <span style="color:var(--text-muted);">Subtotal</span>
-          <span id="mb-subtotal" style="font-family:'IBM Plex Mono'; font-weight:700; color:var(--white);">₹0</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; align-items:center;">
-          <span style="color:var(--text-muted);">Discount</span>
-          <div style="display:flex; align-items:center; gap:0.35rem;">
-            <span style="color:var(--text-muted); font-size:0.85rem;">₹</span>
-            <input type="number" id="mb-discount" class="form-input" style="width:85px; text-align:right; padding:0.35rem 0.5rem; font-size:0.85rem;" value="0" min="0" oninput="mbCalcTotals()">
-          </div>
-        </div>
-
-        <!-- Grand Total Banner -->
-        <div style="background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.3); border-radius:8px; padding:0.85rem 1rem; display:flex; justify-content:space-between; align-items:center; margin:0.35rem 0;">
-          <span style="font-weight:700; color:var(--green); font-size:0.95rem;">Grand Total</span>
-          <span id="mb-grandtotal" style="font-family:'IBM Plex Mono'; font-weight:700; font-size:1.25rem; color:var(--green);">₹0</span>
-        </div>
-
-        <!-- Payment Meta -->
-        <div style="display:flex; flex-direction:column; gap:0.6rem; padding-top:0.35rem; font-size:0.82rem; border-top:1px dashed var(--line);">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="color:var(--text-muted);">Payment Status</span>
-            <span id="mb-summary-paystatus" class="pay-badge pay-paid" style="font-size:0.72rem; padding:2px 8px;">PAID</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="color:var(--text-muted);">Payment Method</span>
-            <span id="mb-summary-paymethod" style="font-family:'IBM Plex Mono'; font-weight:600;">UPI / QR</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="color:var(--text-muted);">Amount Paid</span>
-            <span id="mb-summary-paidamt" style="font-family:'IBM Plex Mono'; font-weight:600;">₹0</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="color:var(--text-muted);">Balance Due</span>
-            <span id="mb-summary-balance" style="font-family:'IBM Plex Mono'; font-weight:700; color:var(--white);">₹0</span>
-          </div>
-        </div>
-
-        <!-- Additional Info -->
-        <div style="margin-top:0.6rem; padding-top:0.75rem; border-top:1px solid var(--line); font-size:0.78rem;">
-          <div style="font-size:0.72rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.04em; margin-bottom:0.5rem; display:flex; align-items:center; gap:0.35rem;">
-            <span>⚙</span> ADDITIONAL INFO
-          </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
-            <span style="color:var(--text-muted);">Booking Source</span>
-            <span class="source-badge source-walkin" style="font-size:0.7rem; padding:2px 8px;">WALK-IN</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.4rem;">
-            <span style="color:var(--text-muted);">Invoice No.</span>
-            <span id="mb-summary-invno" style="font-family:'IBM Plex Mono'; font-weight:600; color:var(--pink);">TR-2026-000001</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="color:var(--text-muted);">Date &amp; Time</span>
-            <span id="mb-summary-datetime" style="font-family:'IBM Plex Mono'; color:var(--white); font-size:0.72rem;">Today</span>
-          </div>
-        </div>
-
-        <!-- Action Button -->
-        <button type="button" class="btn" id="mb-submit-btn" onclick="document.getElementById('make-bill-form').requestSubmit();" style="margin-top:0.75rem; background:linear-gradient(135deg, #e91e63, #ec4899); color:#fff; border:none; padding:0.9rem; font-weight:700; font-size:0.95rem; letter-spacing:0.04em; border-radius:8px; width:100%; display:flex; align-items:center; justify-content:center; gap:0.5rem; cursor:pointer; box-shadow:0 4px 14px rgba(233,30,99,0.35); transition:transform 0.15s, opacity 0.15s;">
-          <span>🧾</span> GENERATE BILL
-        </button>
-
-      </div>
-    </div>
-
-  </div>
-</section>
 <section class="content-section" id="invoices-sec" style="display:none;">
   <div class="section-header">
     <div>
@@ -2900,7 +2682,7 @@
       <div class="section-subtitle">Manage offline billing history and generated invoices</div>
     </div>
     <div style="display:flex; gap:0.5rem;">
-      <button class="btn btn-primary" onclick="showSection('walkin-sec')">+ New Bill</button>
+      <button class="btn btn-primary" onclick="window.location.href='/walkin'">+ New Bill</button>
     </div>
   </div>
 
@@ -4553,6 +4335,10 @@
     function showSection(secId) {
       // Close mobile drawer on navigation
       closeMobileDrawer();
+      if (secId === 'walkin-sec') {
+        window.location.href = '/walkin';
+        return;
+      }
 
       document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
@@ -7790,6 +7576,7 @@ function mbGetServices() {
 
 function mbAddServiceRow() {
   const container = document.getElementById('mb-services-container');
+  if (!container) return;
   const rowId = `mb-row-${Date.now()}`;
   
   const services = mbGetServices();
@@ -8347,7 +8134,7 @@ async function makeBill() {
 
 // Automatically add initial service on load (add-on products start empty until explicitly added)
 document.addEventListener('DOMContentLoaded', () => {
-    mbAddServiceRow();
+    if (typeof mbAddServiceRow === 'function' && document.getElementById('mb-services-container')) mbAddServiceRow();
     
     // Add-on products container starts empty by default
     const prodContainer = document.getElementById('mb-products-container');
