@@ -1,0 +1,2557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>TRIEYE — 10 Premium Splash Screen Animation Demos</title>
+  <meta name="description" content="Explore 10 unique, cinematic splash screen animation demos for TRIEYE Detailing Studio. High polish automotive visual identity, smooth transitions, and interactive controls.">
+  <link rel="icon" type="image/png" href="/assets/trieye-logo-clean.png">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700;800&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* -------------------------------------------------------------
+       ROOT TOKENS & RESET
+       ------------------------------------------------------------- */
+    :root {
+      --bg-main: #07090c;
+      --bg-card: #0d1117;
+      --bg-card-hover: #131922;
+      --bg-panel: #0a0e14;
+      --bg-overlay: rgba(7, 9, 12, 0.96);
+      
+      --lime: #a6d331;
+      --lime-glow: rgba(166, 211, 49, 0.4);
+      --lime-dim: rgba(166, 211, 49, 0.12);
+      
+      --pink: #ee2f76;
+      --pink-glow: rgba(238, 47, 118, 0.4);
+      
+      --cyan: #38bdf8;
+      --white: #ffffff;
+      --text-muted: #8b949e;
+      --text-sub: #cbd5e1;
+      --line: rgba(255, 255, 255, 0.08);
+      --line-bright: rgba(255, 255, 255, 0.15);
+      
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      
+      --font-heading: 'Oswald', 'Inter', -apple-system, sans-serif;
+      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+      
+      --transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      background-color: var(--bg-main);
+      color: var(--white);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      line-height: 1.5;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Subtle background grid pattern */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(166, 211, 49, 0.04) 0%, transparent 60%),
+        linear-gradient(to right, rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.015) 1px, transparent 1px);
+      background-size: 100% 100%, 48px 48px, 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* -------------------------------------------------------------
+       TOP NAVIGATION BAR
+       ------------------------------------------------------------- */
+    .demos-nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(7, 9, 12, 0.85);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--line);
+      height: 72px;
+      display: flex;
+      align-items: center;
+      padding: 0 2rem;
+    }
+
+    .nav-inner {
+      width: 100%;
+      max-width: 1440px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .nav-brand-logo {
+      height: 28px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .nav-center-tabs {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .nav-tab-active {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--white);
+      position: relative;
+      padding: 0.5rem 0;
+      text-decoration: none;
+    }
+
+    .nav-tab-active::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--lime);
+      box-shadow: 0 0 10px var(--lime-glow);
+      border-radius: 2px;
+    }
+
+    .nav-back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      text-decoration: none;
+      padding: 0.45rem 0.9rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      transition: var(--transition);
+    }
+
+    .nav-back-btn:hover {
+      color: var(--white);
+      background: rgba(255, 255, 255, 0.05);
+      border-color: var(--line-bright);
+    }
+
+    /* -------------------------------------------------------------
+       HERO HEADER SECTION
+       ------------------------------------------------------------- */
+    .demos-hero {
+      position: relative;
+      z-index: 1;
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 2.75rem 2rem 1.75rem;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-content {
+      max-width: 680px;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--lime);
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
+    }
+
+    .hero-title {
+      font-family: var(--font-heading);
+      font-size: clamp(2rem, 4.5vw, 3.25rem);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      line-height: 1.05;
+      text-transform: uppercase;
+      color: var(--white);
+      margin-bottom: 0.75rem;
+    }
+
+    .hero-title span {
+      color: var(--lime);
+      text-shadow: 0 0 30px var(--lime-glow);
+    }
+
+    .hero-desc {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      line-height: 1.6;
+      max-width: 580px;
+    }
+
+    .hero-badges {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .feature-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: rgba(13, 17, 23, 0.8);
+      border: 1px solid var(--line);
+      padding: 0.65rem 1rem;
+      border-radius: var(--radius-md);
+      backdrop-filter: blur(8px);
+    }
+
+    .badge-icon-box {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--lime-dim);
+      border: 1px solid rgba(166, 211, 49, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--lime);
+      font-size: 0.85rem;
+    }
+
+    .badge-texts {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .badge-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--white);
+      line-height: 1.2;
+    }
+
+    .badge-subtitle {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+
+    /* -------------------------------------------------------------
+       DEMO CARDS GRID
+       ------------------------------------------------------------- */
+    .demos-grid-section {
+      position: relative;
+      z-index: 1;
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 0 2rem 4rem;
+    }
+
+    .demos-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 1120px) {
+      .demos-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 680px) {
+      .demos-grid {
+        grid-template-columns: 1fr;
+      }
+      .demos-nav, .demos-hero, .demos-grid-section {
+        padding-left: 1.2rem;
+        padding-right: 1.2rem;
+      }
+    }
+
+    /* Card Component */
+    .demo-card {
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      transition: var(--transition);
+      position: relative;
+      outline: none;
+    }
+
+    .demo-card:hover, .demo-card:focus-visible {
+      transform: translateY(-4px);
+      border-color: rgba(166, 211, 49, 0.4);
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.6), 0 0 24px rgba(166, 211, 49, 0.15);
+      background: var(--bg-card-hover);
+    }
+
+    .demo-thumbnail-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #000;
+      overflow: hidden;
+    }
+
+    .demo-thumb-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s ease;
+      filter: brightness(0.92);
+    }
+
+    .demo-card:hover .demo-thumb-img {
+      transform: scale(1.05);
+      filter: brightness(1.05);
+    }
+
+    /* Watermark / Logo Overlay on Thumbnail */
+    .thumb-logo-overlay {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.6) 100%);
+    }
+
+    .thumb-trieye-logo {
+      width: 44%;
+      max-width: 180px;
+      height: auto;
+      filter: drop-shadow(0 4px 16px rgba(0,0,0,0.8));
+    }
+
+    /* Play overlay button on thumbnail hover */
+    .thumb-play-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(7, 9, 12, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      backdrop-filter: blur(2px);
+    }
+
+    .demo-card:hover .thumb-play-overlay {
+      opacity: 1;
+    }
+
+    .thumb-play-badge {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: var(--lime);
+      color: #07090c;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 28px var(--lime-glow);
+      transform: scale(0.85);
+      transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .demo-card:hover .thumb-play-badge {
+      transform: scale(1);
+    }
+
+    /* Card Details Footer */
+    .demo-card-body {
+      padding: 1.25rem 1.4rem 1.35rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      flex: 1;
+    }
+
+    .card-top-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+    }
+
+    .card-number-title {
+      display: flex;
+      align-items: baseline;
+      gap: 0.65rem;
+    }
+
+    .card-number {
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--lime);
+      letter-spacing: 0.05em;
+    }
+
+    .card-title {
+      font-family: var(--font-body);
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: var(--white);
+      letter-spacing: -0.01em;
+    }
+
+    .card-meta-right {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card-duration-pill {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.07);
+      color: var(--text-muted);
+      border: 1px solid var(--line);
+    }
+
+    .card-play-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--line);
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.65rem;
+      transition: var(--transition);
+      cursor: pointer;
+    }
+
+    .demo-card:hover .card-play-btn {
+      background: var(--lime);
+      color: #07090c;
+      border-color: var(--lime);
+    }
+
+    .card-description {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* -------------------------------------------------------------
+       FULLSCREEN / OVERLAY PREVIEW STAGE
+       ------------------------------------------------------------- */
+    .player-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: #000;
+      display: none;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .player-overlay.active {
+      display: flex;
+    }
+
+    /* Top Floating Control Bar */
+    .player-topbar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.25rem 2rem;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, transparent 100%);
+      pointer-events: none;
+    }
+
+    .player-topbar > * {
+      pointer-events: auto;
+    }
+
+    .player-info-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: rgba(13, 17, 23, 0.8);
+      border: 1px solid var(--line-bright);
+      padding: 0.45rem 1rem;
+      border-radius: 999px;
+      backdrop-filter: blur(12px);
+    }
+
+    .player-num {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--lime);
+      letter-spacing: 0.08em;
+    }
+
+    .player-name {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--white);
+    }
+
+    .player-top-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .player-btn {
+      background: rgba(13, 17, 23, 0.8);
+      border: 1px solid var(--line-bright);
+      color: var(--white);
+      padding: 0.45rem 0.85rem;
+      border-radius: 999px;
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      transition: var(--transition);
+    }
+
+    .player-btn:hover {
+      background: rgba(255, 255, 255, 0.12);
+      border-color: var(--white);
+    }
+
+    .player-btn.active-lime {
+      background: var(--lime);
+      color: #07090c;
+      border-color: var(--lime);
+    }
+
+    .player-close-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: rgba(13, 17, 23, 0.8);
+      border: 1px solid var(--line-bright);
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      transition: var(--transition);
+    }
+
+    .player-close-btn:hover {
+      background: var(--pink);
+      border-color: var(--pink);
+      color: #fff;
+    }
+
+    /* Bottom Control Dock */
+    .player-bottombar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 1.25rem 2rem 2rem;
+      background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%);
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      pointer-events: none;
+    }
+
+    .player-bottombar > * {
+      pointer-events: auto;
+    }
+
+    /* Timeline progress */
+    .player-timeline-wrap {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .player-timeline-track {
+      flex: 1;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 2px;
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .player-timeline-fill {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 0%;
+      background: linear-gradient(90deg, var(--lime), #fff);
+      box-shadow: 0 0 10px var(--lime-glow);
+      transition: width 0.08s linear;
+    }
+
+    .player-time-disp {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      min-width: 80px;
+      text-align: right;
+    }
+
+    /* Dock buttons row */
+    .player-dock-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .dock-left, .dock-center, .dock-right {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .dock-btn-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(13, 17, 23, 0.85);
+      border: 1px solid var(--line-bright);
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      transition: var(--transition);
+    }
+
+    .dock-btn-icon:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: var(--white);
+    }
+
+    .dock-btn-primary {
+      background: var(--lime);
+      color: #07090c;
+      border: none;
+      padding: 0.55rem 1.25rem;
+      border-radius: 999px;
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-size: 0.82rem;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      box-shadow: 0 0 20px var(--lime-glow);
+      transition: var(--transition);
+    }
+
+    .dock-btn-primary:hover {
+      transform: scale(1.04);
+      background: #bbf03f;
+    }
+
+    /* -------------------------------------------------------------
+       ANIMATION CANVAS & STAGE
+       ------------------------------------------------------------- */
+    .animation-stage {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #000;
+    }
+
+    .stage-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .stage-dom-layer {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      perspective: 1200px;
+    }
+
+    /* -------------------------------------------------------------
+       SIMULATED WEBSITE PREVIEW (REVEAL TARGET)
+       ------------------------------------------------------------- */
+    .mock-site-reveal {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      background: #07090c;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+      transform: scale(0.97);
+      display: flex;
+      flex-direction: column;
+      z-index: 50;
+      overflow-y: auto;
+    }
+
+    .mock-site-reveal.revealed {
+      opacity: 1;
+      pointer-events: auto;
+      transform: scale(1);
+    }
+
+    /* Mock Site Content Header */
+    .mock-nav {
+      height: 70px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 3rem;
+      background: rgba(7, 9, 12, 0.9);
+      backdrop-filter: blur(12px);
+    }
+
+    .mock-hero {
+      position: relative;
+      flex: 1;
+      min-height: 520px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 4rem 2rem;
+      background: radial-gradient(circle at 50% 30%, rgba(166, 211, 49, 0.08) 0%, transparent 60%);
+    }
+
+    .mock-hero-pill {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--lime);
+      letter-spacing: 0.16em;
+      border: 1px solid rgba(166, 211, 49, 0.3);
+      padding: 4px 12px;
+      border-radius: 999px;
+      background: rgba(166, 211, 49, 0.08);
+      margin-bottom: 1.25rem;
+    }
+
+    .mock-hero-h1 {
+      font-family: var(--font-heading);
+      font-size: clamp(2.4rem, 5vw, 4.2rem);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      line-height: 1.05;
+      margin-bottom: 1.25rem;
+    }
+
+    .mock-hero-h1 span {
+      color: var(--lime);
+    }
+
+    .mock-hero-sub {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      max-width: 620px;
+      margin-bottom: 2rem;
+    }
+
+    .mock-hero-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .mock-revealed-bar {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(13, 17, 23, 0.95);
+      border: 1px solid var(--lime);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.8), 0 0 25px var(--lime-glow);
+      padding: 0.75rem 1.5rem;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      z-index: 1000;
+      backdrop-filter: blur(16px);
+      animation: floatBadge 3s ease-in-out infinite;
+    }
+
+    @keyframes floatBadge {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-6px); }
+    }
+
+    /* Accessibility reduced-motion */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       TOP NAVIGATION
+       ============================================================ -->
+  <header class="demos-nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-brand" title="TRIEYE Detailing Studio">
+        <img src="/assets/trieye-logo-clean.png" alt="TRIEYE Studio" class="nav-brand-logo" onerror="this.onerror=null; this.src='/assets/trieye-logo.png';">
+      </a>
+
+      <nav class="nav-center-tabs">
+        <span class="nav-tab-active">SPLASH DEMOS</span>
+      </nav>
+
+      <a href="/" class="nav-back-btn" title="Return to Live Website">
+        <span>&larr;</span>
+        <span>Back to Website</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       HERO INTRO SECTION
+       ============================================================ -->
+  <section class="demos-hero">
+    <div class="hero-content">
+      <div class="hero-eyebrow">10 EXCLUSIVE</div>
+      <h1 class="hero-title">SPLASH SCREEN <span>DEMOS</span></h1>
+      <p class="hero-desc">
+        Explore 10 unique splash screen animations inspired by automotive excellence.
+        Click on any demo to preview and experience the TRIEYE brand in motion.
+      </p>
+    </div>
+
+    <div class="hero-badges">
+      <div class="feature-badge">
+        <div class="badge-icon-box">&#9658;</div>
+        <div class="badge-texts">
+          <div class="badge-title">Play / Replay</div>
+          <div class="badge-subtitle">Control the animation</div>
+        </div>
+      </div>
+
+      <div class="feature-badge">
+        <div class="badge-icon-box">&#x26F6;</div>
+        <div class="badge-texts">
+          <div class="badge-title">Fullscreen</div>
+          <div class="badge-subtitle">Best experience</div>
+        </div>
+      </div>
+
+      <div class="feature-badge">
+        <div class="badge-icon-box">&#x1F4F1;</div>
+        <div class="badge-texts">
+          <div class="badge-title">Responsive</div>
+          <div class="badge-subtitle">Works on all devices</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       10 DEMO CARDS GRID
+       ============================================================ -->
+  <main class="demos-grid-section">
+    <div class="demos-grid" id="demosGrid">
+      
+      <!-- 01: Cinematic Luxury Reveal -->
+      <article class="demo-card" data-demo="1" tabindex="0" onclick="launchDemo(1)" onkeydown="if(event.key==='Enter'||event.key===' ') launchDemo(1)">
+        <div class="demo-thumbnail-wrap">
+          <img src="/assets/splash-demos/thumb-01.jpg" alt="Cinematic Luxury Reveal" class="demo-thumb-img" loading="lazy">
+          <div class="thumb-logo-overlay">
+            <img src="/assets/trieye-logo-clean.png" alt="TRIEYE" class="thumb-trieye-logo">
+          </div>
+          <div class="thumb-play-overlay">
+            <div class="thumb-play-badge">&#9658;</div>
+          </div>
+        </div>
+        <div class="demo-card-body">
+          <div class="card-top-row">
+            <div class="card-number-title">
+              <span class="card-number">01</span>
+              <h2 class="card-title">Cinematic Luxury Reveal</h2>
+            </div>
+            <div class="card-meta-right">
+              <span class="card-duration-pill">6s</span>
+              <button class="card-play-btn" aria-label="Play Demo 01">&#9658;</button>
+            </div>
+          </div>
+          <p class="card-description">A dramatic reveal with cinematic lighting, car silhouette and premium atmosphere.</p>
+        </div>
+      </article>
+
+      <!-- 02: Logo Assembly -->
+      <article class="demo-card" data-demo="2" tabindex="0" onclick="launchDemo(2)" onkeydown="if(event.key==='Enter'||event.key===' ') launchDemo(2)">
+        <div class="demo-thumbnail-wrap">
+          <img src="/assets/splash-demos/thumb-02.jpg" alt="Logo Assembly" class="demo-thumb-img" loading="lazy">
+          <div class="thumb-logo-overlay">
+            <img src="/assets/trieye-logo-clean.png" alt="TRIEYE" class="thumb-trieye-logo">
+          </div>
+          <div class="thumb-play-overlay">
+            <div class="thumb-play-badge">&#9658;</div>
+          </div>
+        </div>
+        <div class="demo-card-body">
+          <div class="card-top-row">
+            <div class="card-number-title">
+              <span class="card-number">02</span>
+              <h2 class="card-title">Logo Assembly</h2>
+            </div>
+            <div class="card-meta-right">
+              <span class="card-duration-pill">5s</span>
+              <button class="card-play-btn" aria-label="Play Demo 02">&#9658;</button>
+            </div>
+          </div>
+          <p class="card-description">Watch the TRIEYE logo come together piece by piece with smooth motion.</p>
+        </div>
+      </article>
+
+      <!-- 03: Neon Automotive -->
+      <article class="demo-card" data-demo="3" tabindex="0" onclick="launchDemo(3)" onkeydown="if(event.key==='Enter'||event.key===' ') launchDemo(3)">
+        <div class="demo-thumbnail-wrap">
+          <img src="/assets/splash-demos/thumb-03.jpg" alt="Neon Automotive" class="demo-thumb-img" loading="lazy">
+          <div class="thumb-logo-overlay">
+            <img src="/assets/trieye-logo-clean.png" alt="TRIEYE" class="thumb-trieye-logo">
+          </div>
+          <div class="thumb-play-overlay">
+            <div class="thumb-play-badge">&#9658;</div>
+          </div>
+        </div>
+        <div class="demo-card-body">
+          <div class="card-top-row">
+            <div class="card-number-title">
+              <span class="card-number">03</span>
+              <h2 class="card-title">Neon Automotive</h2>
+            </div>
+            <div class="card-meta-right">
+              <span class="card-duration-pill">5s</span>
+              <button class="card-play-btn" aria-label="Play Demo 03">&#9658;</button>
+            </div>
+          </div>
+          <p class="card-description">Electric light trails, futuristic visuals and a bold brand reveal.</p>
+        </div>
+      </article>
+
+      <!-- 04: Premium Detailing Reveal -->
+      <article class="demo-card" data-demo="4" tabindex="0" onclick="launchDemo(4)" onkeydown="if(event.key==='Enter'||event.key===' ') launchDemo(4)">
+        <div class="demo-thumbnail-wrap">
+          <img src="/assets/splash-demos/thumb-04.jpg" alt="Premium Detailing Reveal" class="demo-thumb-img" loading="lazy">
+          <div class="thumb-logo-overlay">
+            <img src="/assets/trieye-logo-clean.png" alt="TRIEYE" class="thumb-trieye-logo">
+          </div>
+          <div class="thumb-play-overlay">
+            <div class="thumb-play-badge">&#9658;</div>
+          </div>
+        </div>
+        <div class="demo-card-body">
+          <div class="card-top-row">
+            <div class="card-number-title">
+              <span class="card-number">04</span>
+              <h2 class="card-title">Premium Detailing Reveal</h2>
+            </div>
+            <div class="card-meta-right">
+              <span class="card-duration-pill">6s</span>
+              <button class="card-play-btn" aria-label="Play Demo 04">&#9658;</button>
+            </div>
+          </div>
+          <p class="card-description">Water droplets, foam textures and polished surfaces transition to the brand.</p>
+        </div>
+      </article>
+
+      <!-- 05: Horizontal Slide Reveal -->
+      <article class="demo-card" data-demo="5" tabindex="0" onclick="launchDemo(5)" onkeydown="if(event.key==='Enter'||event.key===' ') launchDemo(5)">
+        <div class="demo-thumbnail-wrap">
+          <img src="/assets/splash-demos/thumb-05.jpg" alt="Horizontal Slide Reveal" class="demo-thumb-img" loading="lazy">
+          <div class="thumb-logo-overlay">
+            <img src="/assets/trieye-logo-clean.png" alt="TRIEYE" class="thumb-trieye-logo">
+          </div>
+          <div class="thumb-play-overlay">
+            <div class="thumb-play-badge">&#9658;</div>
+          </div>
+        </div>
+        <div class="demo-card-body">
+          <div class="card-top-row">
+            <div class="card-number-title">
+              <span class="card-number">05</span>
+              <h2 class="card-title">Horizontal Slide Reveal</h2>
+            </div>
+            <div class="card-meta-right">
+              <span class="card-duration-pill">5s</span>
+              <button class="card-play-btn" aria-label="Play Demo 05">&#9658;</button>
+            </div>
+          </div>
+          <p class="card-description">Smooth panels slide from right to left to reveal the brand and website.</p>
+        </div>
+      </article>
+
+      <!-- 06: 3D Metallic Logo -->
+      <article class="demo-card" data-demo="6" tabindex="0" onclick="launchDemo(6)" onkeydown="if(event.key==='Enter'||event.key===' ') launchDemo(6)">
+        <div class="demo-thumbnail-wrap">
+          <img src="/assets/splash-demos/thumb-06.jpg" alt="3D Metallic Logo" class="demo-thumb-img" loading="lazy">
+          <div class="thumb-logo-overlay">
+            <img src="/assets/trieye-logo-clean.png" alt="TRIEYE" class="thumb-trieye-logo">
+          </div>
+          <div class="thumb-play-overlay">
+            <div class="thumb-play-badge">&#9658;</div>
+          </div>
+        </div>
+        <div class="demo-card-body">
+          <div class="card-top-row">
+            <div class="card-number-title">
+              <span class="card-number">06</span>
+              <h2 class="card-title">3D Metallic Logo</h2>
+            </div>
+            <div class="card-meta-right">
+              <span class="card-duration-pill">6s</span>
+              <button class="card-play-btn" aria-label="Play Demo 06">&#9658;</button>
+            </div>
+          </div>
+          <p class="card-description">A 3D metallic logo reveal with real reflections, depth and cinematic lighting.</p>
+        </div>
+      </article>
+
+      <!-- 07: Minimal Luxury -->
+      <article class="demo-card" data-demo="7" tabindex="0" onclick="launchDemo(7)" onkeydown="if(event.key==='Enter'||event.key===' ') launchDemo(7)">
+        <div class="demo-thumbnail-wrap">
+          <img src="/assets/splash-demos/thumb-07.jpg" alt="Minimal Luxury" class="demo-thumb-img" loading="lazy">
+          <div class="thumb-logo-overlay">
+            <img src="/assets/trieye-logo-clean.png" alt="TRIEYE" class="thumb-trieye-logo">
+          </div>
+          <div class="thumb-play-overlay">
+            <div class="thumb-play-badge">&#9658;</div>
+          </div>
+        </div>
+        <div class="demo-card-body">
+          <div class="card-top-row">
+            <div class="card-number-title">
+              <span class="card-number">07</span>
+              <h2 class="card-title">Minimal Luxury</h2>
+            </div>
+            <div class="card-meta-right">
+              <span class="card-duration-pill">5s</span>
+              <button class="card-play-btn" aria-label="Play Demo 07">&#9658;</button>
+            </div>
+          </div>
+          <p class="card-description">Clean, elegant and minimal motion for a premium feel.</p>
+        </div>
+      </article>
+
+      <!-- 08: Speed & Precision -->
+      <article class="demo-card" data-demo="8" tabindex="0" onclick="launchDemo(8)" onkeydown="if(event.key==='Enter'||event.key===' ') launchDemo(8)">
+        <div class="demo-thumbnail-wrap">
+          <img src="/assets/splash-demos/thumb-08.jpg" alt="Speed &amp; Precision" class="demo-thumb-img" loading="lazy">
+          <div class="thumb-logo-overlay">
+            <img src="/assets/trieye-logo-clean.png" alt="TRIEYE" class="thumb-trieye-logo">
+          </div>
+          <div class="thumb-play-overlay">
+            <div class="thumb-play-badge">&#9658;</div>
+          </div>
+        </div>
+        <div class="demo-card-body">
+          <div class="card-top-row">
+            <div class="card-number-title">
+              <span class="card-number">08</span>
+              <h2 class="card-title">Speed &amp; Precision</h2>
+            </div>
+            <div class="card-meta-right">
+              <span class="card-duration-pill">6s</span>
+              <button class="card-play-btn" aria-label="Play Demo 08">&#9658;</button>
+            </div>
+          </div>
+          <p class="card-description">Fast motion trails and precision lines showcasing performance and expertise.</p>
+        </div>
+      </article>
+
+      <!-- 09: Liquid Chrome -->
+      <article class="demo-card" data-demo="9" tabindex="0" onclick="launchDemo(9)" onkeydown="if(event.key==='Enter'||event.key===' ') launchDemo(9)">
+        <div class="demo-thumbnail-wrap">
+          <img src="/assets/splash-demos/thumb-09.jpg" alt="Liquid Chrome" class="demo-thumb-img" loading="lazy">
+          <div class="thumb-logo-overlay">
+            <img src="/assets/trieye-logo-clean.png" alt="TRIEYE" class="thumb-trieye-logo">
+          </div>
+          <div class="thumb-play-overlay">
+            <div class="thumb-play-badge">&#9658;</div>
+          </div>
+        </div>
+        <div class="demo-card-body">
+          <div class="card-top-row">
+            <div class="card-number-title">
+              <span class="card-number">09</span>
+              <h2 class="card-title">Liquid Chrome</h2>
+            </div>
+            <div class="card-meta-right">
+              <span class="card-duration-pill">5s</span>
+              <button class="card-play-btn" aria-label="Play Demo 09">&#9658;</button>
+            </div>
+          </div>
+          <p class="card-description">Liquid metal transitions into the TRIEYE brand identity.</p>
+        </div>
+      </article>
+
+      <!-- 10: Interactive Experience -->
+      <article class="demo-card" data-demo="10" tabindex="0" onclick="launchDemo(10)" onkeydown="if(event.key==='Enter'||event.key===' ') launchDemo(10)">
+        <div class="demo-thumbnail-wrap">
+          <img src="/assets/splash-demos/thumb-10.jpg" alt="Interactive Experience" class="demo-thumb-img" loading="lazy">
+          <div class="thumb-logo-overlay">
+            <img src="/assets/trieye-logo-clean.png" alt="TRIEYE" class="thumb-trieye-logo">
+          </div>
+          <div class="thumb-play-overlay">
+            <div class="thumb-play-badge">&#9658;</div>
+          </div>
+        </div>
+        <div class="demo-card-body">
+          <div class="card-top-row">
+            <div class="card-number-title">
+              <span class="card-number">10</span>
+              <h2 class="card-title">Interactive Experience</h2>
+            </div>
+            <div class="card-meta-right">
+              <span class="card-duration-pill">5s</span>
+              <button class="card-play-btn" aria-label="Play Demo 10">&#9658;</button>
+            </div>
+          </div>
+          <p class="card-description">Click or tap to trigger the reveal and enter the TRIEYE experience.</p>
+        </div>
+      </article>
+
+    </div>
+  </main>
+
+  <!-- ============================================================
+       INTERACTIVE FULLSCREEN PREVIEW OVERLAY
+       ============================================================ -->
+  <div class="player-overlay" id="playerOverlay" role="dialog" aria-modal="true" aria-label="Splash Screen Demo Player">
+    
+    <!-- Top Bar Controls -->
+    <div class="player-topbar">
+      <div class="player-info-badge">
+        <span class="player-num" id="playerNum">01</span>
+        <span style="color:var(--line-bright);">/</span>
+        <span class="player-name" id="playerName">Cinematic Luxury Reveal</span>
+      </div>
+
+      <div class="player-top-actions">
+        <button class="player-btn" id="soundToggleBtn" onclick="toggleSound()" title="Toggle Cinematic Sound (Optional)">
+          <span id="soundIcon">&#x1F507;</span>
+          <span id="soundText">Sound Off</span>
+        </button>
+
+        <button class="player-btn" id="reducedMotionBtn" onclick="toggleReducedMotion()" title="Reduced Motion Mode">
+          <span>&#x2699;</span>
+          <span id="motionText">Normal Motion</span>
+        </button>
+
+        <button class="player-btn" id="fullscreenToggleBtn" onclick="toggleFullscreen()" title="Toggle Fullscreen View">
+          <span>&#x26F6;</span>
+          <span>Fullscreen</span>
+        </button>
+
+        <button class="player-close-btn" onclick="closePlayer()" title="Exit Preview (Esc)" aria-label="Close Preview">
+          &#x2715;
+        </button>
+      </div>
+    </div>
+
+    <!-- Animation Stage (Canvas + DOM Layer) -->
+    <div class="animation-stage" id="animationStage">
+      <canvas class="stage-canvas" id="stageCanvas"></canvas>
+      <div class="stage-dom-layer" id="stageDomLayer"></div>
+    </div>
+
+    <!-- Bottom Dock Controls -->
+    <div class="player-bottombar" id="playerBottombar">
+      
+      <!-- Timeline Progress Bar -->
+      <div class="player-timeline-wrap">
+        <div class="player-timeline-track" id="timelineTrack" onclick="scrubTimeline(event)" title="Scrub Animation Timeline">
+          <div class="player-timeline-fill" id="timelineFill"></div>
+        </div>
+        <div class="player-time-disp" id="timeDisplay">0.0s / 6.0s</div>
+      </div>
+
+      <!-- Dock Row -->
+      <div class="player-dock-row">
+        
+        <!-- Left: Prev / Next -->
+        <div class="dock-left">
+          <button class="dock-btn-icon" onclick="navigateDemo(-1)" title="Previous Demo (Left Arrow)">&#8592;</button>
+          <button class="dock-btn-icon" onclick="navigateDemo(1)" title="Next Demo (Right Arrow)">&#8594;</button>
+          <span style="font-size:0.75rem; color:var(--text-muted); margin-left:0.35rem;">Demo <strong id="dockDemoIdx">01</strong> of 10</span>
+        </div>
+
+        <!-- Center: Play / Pause / Replay -->
+        <div class="dock-center">
+          <button class="dock-btn-icon" id="playPauseBtn" onclick="togglePlayPause()" title="Play / Pause (Spacebar)">
+            <span id="playPauseIcon">&#10074;&#10074;</span>
+          </button>
+          <button class="dock-btn-primary" onclick="replayActiveDemo()" title="Replay Animation">
+            <span>&#8635;</span>
+            <span>Replay Demo</span>
+          </button>
+        </div>
+
+        <!-- Right: Skip to Website Reveal -->
+        <div class="dock-right">
+          <button class="player-btn" onclick="skipToWebsiteReveal()" title="Preview how this transitions into live website">
+            <span>Skip Intro &rarr;</span>
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ============================================================
+         SIMULATED WEBSITE PREVIEW (REVEAL TARGET)
+         ============================================================ -->
+    <div class="mock-site-reveal" id="mockSiteReveal">
+      <div class="mock-nav">
+        <img src="/assets/trieye-logo-clean.png" alt="TRIEYE Studio" style="height:28px;">
+        <div style="display:flex; gap:1.5rem; font-size:0.82rem; color:var(--text-muted);">
+          <span>SERVICES</span>
+          <span>CERAMIC COATING</span>
+          <span>PPF</span>
+          <span>STUDIO</span>
+        </div>
+        <button style="background:var(--lime); color:#07090c; border:none; padding:0.45rem 1rem; border-radius:999px; font-weight:700; font-size:0.8rem; cursor:pointer;">
+          BOOK SESSION
+        </button>
+      </div>
+
+      <div class="mock-hero">
+        <div class="mock-hero-pill">&#x2726; TRIEYE BESPOKE DETAILING</div>
+        <h2 class="mock-hero-h1">SURFACE PERFECTION <span>REDEFINED</span></h2>
+        <p class="mock-hero-sub">
+          Chennai's premier automotive atelier specializing in self-healing PPF, 9H ceramic coatings, and concourse level detailing.
+        </p>
+        <div class="mock-hero-actions">
+          <button class="dock-btn-primary" onclick="replayActiveDemo()">
+            <span>&#8635;</span> Replay Splash Animation
+          </button>
+          <button class="player-btn" onclick="closePlayer()">
+            <span>&larr;</span> Back to Demo Gallery
+          </button>
+        </div>
+      </div>
+
+      <!-- Floating Bar on Simulated Site -->
+      <div class="mock-revealed-bar">
+        <span style="font-size:0.82rem; color:var(--white);">
+          Transition Complete: <strong>Demo <span id="revealedDemoNum">01</span></strong>
+        </span>
+        <button class="dock-btn-primary" style="padding:0.35rem 0.9rem; font-size:0.75rem;" onclick="replayActiveDemo()">
+          &#8635; Replay
+        </button>
+        <button class="player-btn" style="padding:0.35rem 0.9rem; font-size:0.75rem;" onclick="navigateDemo(1)">
+          Next Demo &rarr;
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============================================================
+       SPLASH DEMOS JAVASCRIPT ENGINE
+       ============================================================ -->
+  <script>
+    /* -------------------------------------------------------------
+       CONFIG & DEMO DEFINITIONS
+       ------------------------------------------------------------- */
+    const DEMOS = [
+      {
+        id: 1,
+        title: "Cinematic Luxury Reveal",
+        duration: 6.0,
+        desc: "A dramatic reveal with cinematic lighting, car silhouette and premium atmosphere.",
+        type: "cinematic"
+      },
+      {
+        id: 2,
+        title: "Logo Assembly",
+        duration: 5.0,
+        desc: "Watch the TRIEYE logo come together piece by piece with smooth motion.",
+        type: "assembly"
+      },
+      {
+        id: 3,
+        title: "Neon Automotive",
+        duration: 5.0,
+        desc: "Electric light trails, futuristic visuals and a bold brand reveal.",
+        type: "neon"
+      },
+      {
+        id: 4,
+        title: "Premium Detailing Reveal",
+        duration: 6.0,
+        desc: "Water droplets, foam textures and polished surfaces transition to the brand.",
+        type: "detailing"
+      },
+      {
+        id: 5,
+        title: "Horizontal Slide Reveal",
+        duration: 5.0,
+        desc: "Smooth panels slide from right to left to reveal the brand and website.",
+        type: "slide"
+      },
+      {
+        id: 6,
+        title: "3D Metallic Logo",
+        duration: 6.0,
+        desc: "A 3D metallic logo reveal with real reflections, depth and cinematic lighting.",
+        type: "metallic"
+      },
+      {
+        id: 7,
+        title: "Minimal Luxury",
+        duration: 5.0,
+        desc: "Clean, elegant and minimal motion for a premium feel.",
+        type: "minimal"
+      },
+      {
+        id: 8,
+        title: "Speed & Precision",
+        duration: 6.0,
+        desc: "Fast motion trails and precision lines showcasing performance and expertise.",
+        type: "speed"
+      },
+      {
+        id: 9,
+        title: "Liquid Chrome",
+        duration: 5.0,
+        desc: "Liquid metal transitions into the TRIEYE brand identity.",
+        type: "liquid"
+      },
+      {
+        id: 10,
+        title: "Interactive Experience",
+        duration: 5.0,
+        desc: "Click or tap to trigger the reveal and enter the TRIEYE experience.",
+        type: "interactive"
+      }
+    ];
+
+    let currentDemoIndex = 0; // 0-indexed (0..9)
+    let isPlaying = false;
+    let animStartTime = 0;
+    let animPausedTime = 0;
+    let animElapsed = 0;
+    let animRafId = null;
+    let soundEnabled = false;
+    let reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    // Canvas elements & sizing
+    const overlay = document.getElementById('playerOverlay');
+    const canvas = document.getElementById('stageCanvas');
+    const ctx = canvas.getContext('2d');
+    const domLayer = document.getElementById('stageDomLayer');
+    const timelineFill = document.getElementById('timelineFill');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const mockSiteReveal = document.getElementById('mockSiteReveal');
+    const playPauseIcon = document.getElementById('playPauseIcon');
+
+    let canvasWidth = window.innerWidth;
+    let canvasHeight = window.innerHeight;
+
+    function resizeCanvas() {
+      const dpr = window.devicePixelRatio || 1;
+      canvasWidth = overlay.clientWidth || window.innerWidth;
+      canvasHeight = overlay.clientHeight || window.innerHeight;
+      canvas.width = canvasWidth * dpr;
+      canvas.height = canvasHeight * dpr;
+      ctx.resetTransform?.();
+      ctx.scale(dpr, dpr);
+    }
+    window.addEventListener('resize', () => {
+      if (overlay.classList.contains('active')) {
+        resizeCanvas();
+      }
+    });
+
+    /* -------------------------------------------------------------
+       WEB AUDIO API SYNTHESIZER (SYNTHESIZED SOUNDSCAPES)
+       ------------------------------------------------------------- */
+    let audioCtx = null;
+
+    function initAudioContext() {
+      if (!audioCtx) {
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        if (AudioContext) {
+          audioCtx = new AudioContext();
+        }
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playCinematicSound(type) {
+      if (!soundEnabled || !audioCtx) return;
+      try {
+        const now = audioCtx.currentTime;
+
+        if (type === 'rumble') {
+          // Low automotive engine/exhaust sub-bass rumble
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          const filter = audioCtx.createBiquadFilter();
+
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(45, now);
+          osc.frequency.exponentialRampToValueAtTime(110, now + 1.2);
+          osc.frequency.exponentialRampToValueAtTime(60, now + 2.5);
+
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(160, now);
+          filter.frequency.exponentialRampToValueAtTime(420, now + 1.2);
+          filter.frequency.exponentialRampToValueAtTime(120, now + 2.5);
+
+          gain.gain.setValueAtTime(0.01, now);
+          gain.gain.linearRampToValueAtTime(0.25, now + 0.3);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 2.8);
+
+          osc.connect(filter);
+          filter.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          osc.start(now);
+          osc.stop(now + 3.0);
+        } else if (type === 'laser') {
+          // Futuristic neon sweep / whoosh
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(1200, now);
+          osc.frequency.exponentialRampToValueAtTime(180, now + 0.6);
+
+          gain.gain.setValueAtTime(0.2, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.65);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.7);
+        } else if (type === 'shimmer') {
+          // Metallic crystal shimmer / chime
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(880, now);
+          osc.frequency.exponentialRampToValueAtTime(1760, now + 0.4);
+
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 1.2);
+        } else if (type === 'snap') {
+          // Mechanical precision snap
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'square';
+          osc.frequency.setValueAtTime(320, now);
+          osc.frequency.exponentialRampToValueAtTime(60, now + 0.12);
+
+          gain.gain.setValueAtTime(0.18, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.15);
+        } else if (type === 'water') {
+          // Hydrophobic spray / water mist
+          const bufferSize = audioCtx.sampleRate * 0.8;
+          const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+          }
+          const noise = audioCtx.createBufferSource();
+          noise.buffer = buffer;
+
+          const filter = audioCtx.createBiquadFilter();
+          filter.type = 'bandpass';
+          filter.frequency.setValueAtTime(2400, now);
+          filter.Q.setValueAtTime(3, now);
+
+          const gain = audioCtx.createGain();
+          gain.gain.setValueAtTime(0.01, now);
+          gain.gain.linearRampToValueAtTime(0.15, now + 0.2);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
+
+          noise.connect(filter);
+          filter.connect(gain);
+          gain.connect(audioCtx.destination);
+          noise.start(now);
+          noise.stop(now + 0.8);
+        }
+      } catch (e) {
+        console.warn("Audio synth:", e);
+      }
+    }
+
+    function toggleSound() {
+      initAudioContext();
+      soundEnabled = !soundEnabled;
+      const btn = document.getElementById('soundToggleBtn');
+      const icon = document.getElementById('soundIcon');
+      const txt = document.getElementById('soundText');
+
+      if (soundEnabled) {
+        btn.classList.add('active-lime');
+        icon.innerHTML = '&#x1F50A;';
+        txt.textContent = 'Sound On';
+        playCinematicSound('laser');
+      } else {
+        btn.classList.remove('active-lime');
+        icon.innerHTML = '&#x1F507;';
+        txt.textContent = 'Sound Off';
+      }
+    }
+
+    function toggleReducedMotion() {
+      reducedMotion = !reducedMotion;
+      const btn = document.getElementById('reducedMotionBtn');
+      const txt = document.getElementById('motionText');
+      if (reducedMotion) {
+        btn.classList.add('active-lime');
+        txt.textContent = 'Reduced Motion';
+      } else {
+        btn.classList.remove('active-lime');
+        txt.textContent = 'Normal Motion';
+      }
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        overlay.requestFullscreen?.().catch(() => {});
+      } else {
+        document.exitFullscreen?.().catch(() => {});
+      }
+    }
+
+    /* -------------------------------------------------------------
+       PLAYER NAVIGATION & STATE MANAGEMENT
+       ------------------------------------------------------------- */
+    function launchDemo(demoNumber) {
+      currentDemoIndex = demoNumber - 1;
+      overlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      resizeCanvas();
+      startDemo(currentDemoIndex);
+    }
+
+    function closePlayer() {
+      stopAnimation();
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+      if (document.fullscreenElement) {
+        document.exitFullscreen?.().catch(() => {});
+      }
+    }
+
+    function navigateDemo(delta) {
+      stopAnimation();
+      currentDemoIndex = (currentDemoIndex + delta + DEMOS.length) % DEMOS.length;
+      startDemo(currentDemoIndex);
+    }
+
+    function updatePlayerHeader(demo) {
+      const numStr = String(demo.id).padStart(2, '0');
+      document.getElementById('playerNum').textContent = numStr;
+      document.getElementById('playerName').textContent = demo.title;
+      document.getElementById('dockDemoIdx').textContent = numStr;
+      document.getElementById('revealedDemoNum').textContent = numStr;
+    }
+
+    function togglePlayPause() {
+      if (isPlaying) {
+        pauseAnimation();
+      } else {
+        resumeAnimation();
+      }
+    }
+
+    function pauseAnimation() {
+      isPlaying = false;
+      playPauseIcon.textContent = '▶';
+      cancelAnimationFrame(animRafId);
+    }
+
+    function resumeAnimation() {
+      if (isPlaying) return;
+      isPlaying = true;
+      playPauseIcon.textContent = '❚❚';
+      animStartTime = performance.now() - (animElapsed * 1000);
+      animLoop();
+    }
+
+    function replayActiveDemo() {
+      startDemo(currentDemoIndex);
+    }
+
+    function scrubTimeline(e) {
+      const track = document.getElementById('timelineTrack');
+      const rect = track.getBoundingClientRect();
+      const clickRatio = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+      const demo = DEMOS[currentDemoIndex];
+      const targetSec = clickRatio * demo.duration;
+
+      animElapsed = targetSec;
+      animStartTime = performance.now() - (animElapsed * 1000);
+      mockSiteReveal.classList.remove('revealed');
+      
+      if (!isPlaying) {
+        renderDemoFrame(currentDemoIndex, animElapsed);
+        updateTimelineUI(animElapsed, demo.duration);
+      }
+    }
+
+    function skipToWebsiteReveal() {
+      const demo = DEMOS[currentDemoIndex];
+      animElapsed = demo.duration;
+      updateTimelineUI(demo.duration, demo.duration);
+      pauseAnimation();
+      mockSiteReveal.classList.add('revealed');
+      playCinematicSound('shimmer');
+    }
+
+    function startDemo(index) {
+      stopAnimation();
+      const demo = DEMOS[index];
+      updatePlayerHeader(demo);
+
+      // Reset layer & site preview
+      mockSiteReveal.classList.remove('revealed');
+      domLayer.innerHTML = '';
+      ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+
+      // Setup specific DOM elements if needed for this demo
+      setupDemoDOM(demo);
+
+      animElapsed = 0;
+      animStartTime = performance.now();
+      isPlaying = true;
+      playPauseIcon.textContent = '❚❚';
+
+      // Play introductory sound cue based on concept
+      if (demo.id === 1) playCinematicSound('rumble');
+      else if (demo.id === 2) playCinematicSound('snap');
+      else if (demo.id === 3) playCinematicSound('laser');
+      else if (demo.id === 4) playCinematicSound('water');
+      else if (demo.id === 6) playCinematicSound('shimmer');
+      else if (demo.id === 8) playCinematicSound('laser');
+
+      animLoop();
+    }
+
+    function stopAnimation() {
+      isPlaying = false;
+      cancelAnimationFrame(animRafId);
+      domLayer.innerHTML = '';
+    }
+
+    function animLoop() {
+      if (!isPlaying) return;
+      const now = performance.now();
+      animElapsed = (now - animStartTime) / 1000;
+      const demo = DEMOS[currentDemoIndex];
+
+      if (animElapsed >= demo.duration) {
+        animElapsed = demo.duration;
+        updateTimelineUI(animElapsed, demo.duration);
+        renderDemoFrame(currentDemoIndex, animElapsed);
+        // Reveal website transition
+        skipToWebsiteReveal();
+        return;
+      }
+
+      updateTimelineUI(animElapsed, demo.duration);
+      renderDemoFrame(currentDemoIndex, animElapsed);
+
+      animRafId = requestAnimationFrame(animLoop);
+    }
+
+    function updateTimelineUI(elapsed, duration) {
+      const pct = Math.min(100, (elapsed / duration) * 100);
+      timelineFill.style.width = pct + '%';
+      timeDisplay.textContent = `${elapsed.toFixed(1)}s / ${duration.toFixed(1)}s`;
+    }
+
+    /* -------------------------------------------------------------
+       DEMO-SPECIFIC DOM ELEMENT INITIALIZATION
+       ------------------------------------------------------------- */
+    function setupDemoDOM(demo) {
+      domLayer.innerHTML = '';
+
+      if (demo.id === 5) {
+        // Horizontal Slide Panels
+        const wrap = document.createElement('div');
+        wrap.id = 'slidePanelsWrap';
+        wrap.style.cssText = 'position:absolute; inset:0; display:flex; flex-direction:column; width:100%; height:100%; pointer-events:none; z-index:10;';
+        
+        const count = 6;
+        for (let i = 0; i < count; i++) {
+          const slat = document.createElement('div');
+          slat.className = 'slide-slat';
+          slat.style.cssText = `
+            flex: 1;
+            background: linear-gradient(180deg, #161b22, #0d1117);
+            border-bottom: 1px solid rgba(166, 211, 49, 0.25);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.8);
+            transform: translateX(0%);
+            transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+          `;
+          wrap.appendChild(slat);
+        }
+        domLayer.appendChild(wrap);
+      } else if (demo.id === 10) {
+        // Interactive Touch Ring
+        const ringBox = document.createElement('div');
+        ringBox.id = 'interactiveTouchBox';
+        ringBox.style.cssText = `
+          pointer-events: auto;
+          cursor: pointer;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 1.25rem;
+          transition: transform 0.2s ease, opacity 0.4s ease;
+        `;
+        ringBox.innerHTML = `
+          <div style="
+            width: 140px; height: 140px; border-radius: 50%;
+            border: 2px solid var(--lime);
+            box-shadow: 0 0 35px var(--lime-glow), inset 0 0 25px var(--lime-glow);
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(166, 211, 49, 0.08);
+            position: relative;
+            animation: ringPulse 2s infinite ease-in-out;
+          ">
+            <div style="font-size: 2.2rem; filter: drop-shadow(0 0 10px var(--lime));">&#x1F446;</div>
+            <div style="
+              position: absolute; inset: -10px; border-radius: 50%;
+              border: 1px dashed rgba(166,211,49,0.5);
+              animation: spinRing 8s linear infinite;
+            "></div>
+          </div>
+          <div style="
+            font-family: var(--font-mono); font-size: 0.85rem; font-weight: 700;
+            color: var(--lime); letter-spacing: 0.2em; text-transform: uppercase;
+            text-shadow: 0 0 12px var(--lime-glow);
+          ">TAP TO IGNITE</div>
+        `;
+        ringBox.addEventListener('click', () => {
+          triggerInteractiveIgnition();
+        });
+        domLayer.appendChild(ringBox);
+      }
+    }
+
+    let interactiveTriggered = false;
+    function triggerInteractiveIgnition() {
+      interactiveTriggered = true;
+      playCinematicSound('laser');
+      playCinematicSound('rumble');
+      const box = document.getElementById('interactiveTouchBox');
+      if (box) {
+        box.style.transform = 'scale(1.4)';
+        box.style.opacity = '0';
+      }
+    }
+
+    /* -------------------------------------------------------------
+       THE 10 CANVAS ANIMATION RENDERING ENGINES
+       ------------------------------------------------------------- */
+    function renderDemoFrame(demoIdx, t) {
+      const demo = DEMOS[demoIdx];
+      if (!demo) return;
+      const w = canvasWidth;
+      const h = canvasHeight;
+      const cx = w / 2;
+      const cy = h / 2;
+
+      ctx.clearRect(0, 0, w, h);
+
+      switch (demo.id) {
+        case 1: renderDemo01_Cinematic(t, w, h, cx, cy); break;
+        case 2: renderDemo02_Assembly(t, w, h, cx, cy); break;
+        case 3: renderDemo03_Neon(t, w, h, cx, cy); break;
+        case 4: renderDemo04_Detailing(t, w, h, cx, cy); break;
+        case 5: renderDemo05_Slide(t, w, h, cx, cy); break;
+        case 6: renderDemo06_Metallic(t, w, h, cx, cy); break;
+        case 7: renderDemo07_Minimal(t, w, h, cx, cy); break;
+        case 8: renderDemo08_Speed(t, w, h, cx, cy); break;
+        case 9: renderDemo09_Liquid(t, w, h, cx, cy); break;
+        case 10: renderDemo10_Interactive(t, w, h, cx, cy); break;
+      }
+    }
+
+    // Helper: Draw standard TRIEYE Vector Logo on canvas
+    function drawTrieyeLogo(ctx, cx, cy, scale = 1, alpha = 1, glowColor = null) {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.scale(scale, scale);
+      ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
+
+      if (glowColor) {
+        ctx.shadowColor = glowColor;
+        ctx.shadowBlur = 24;
+      }
+
+      // TRI (Crisp White/Silver with pink accent)
+      ctx.font = "900 68px 'Inter', sans-serif";
+      ctx.textAlign = "right";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText("TRI", -12, 0);
+
+      // EYE (Electric Lime Green)
+      ctx.fillStyle = "#a6d331";
+      ctx.textAlign = "left";
+      ctx.fillText("EYE", 12, 0);
+
+      // Horizontal detail bars across EYE
+      ctx.fillStyle = "#a6d331";
+      ctx.fillRect(152, -22, 28, 5);
+      ctx.fillRect(152, -2, 28, 5);
+      ctx.fillRect(152, 18, 28, 5);
+
+      // Tagline: DETAILING STUDIO
+      ctx.shadowBlur = 0;
+      ctx.font = "600 13px 'IBM Plex Mono', monospace";
+      ctx.textAlign = "center";
+      ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+      ctx.letterSpacing = "0.4em";
+      ctx.fillText("D E T A I L I N G   S T U D I O", 10, 48);
+
+      ctx.restore();
+    }
+
+    /* -------------------------------------------------------------
+       DEMO 01: CINEMATIC LUXURY REVEAL (6s)
+       ------------------------------------------------------------- */
+    function renderDemo01_Cinematic(t, w, h, cx, cy) {
+      // 1. Deep Vignette Background
+      const bgGrad = ctx.createRadialGradient(cx, cy, 50, cx, cy, Math.max(w, h));
+      bgGrad.addColorStop(0, '#0a0d13');
+      bgGrad.addColorStop(1, '#020305');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, w, h);
+
+      // 2. Car Silhouette Outline (0.5s - 5.5s)
+      const carAlpha = Math.min(1, Math.max(0, (t - 0.5) / 1.5));
+      ctx.save();
+      ctx.globalAlpha = carAlpha * 0.35;
+      ctx.strokeStyle = '#a6d331';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      // Aerodynamic roofline & hood contours
+      ctx.moveTo(cx - 360, cy + 120);
+      ctx.quadraticCurveTo(cx - 240, cy + 30, cx - 140, cy - 20);
+      ctx.quadraticCurveTo(cx, cy - 70, cx + 140, cy - 20);
+      ctx.quadraticCurveTo(cx + 240, cy + 30, cx + 360, cy + 120);
+      ctx.stroke();
+
+      // Windshield & roof curve
+      ctx.beginPath();
+      ctx.moveTo(cx - 180, cy + 10);
+      ctx.quadraticCurveTo(cx, cy - 65, cx + 180, cy + 10);
+      ctx.stroke();
+      ctx.restore();
+
+      // 3. Dual Projector Headlights Ignition (t: 0.8s - 6s)
+      const lightProg = Math.min(1, Math.max(0, (t - 0.8) / 1.2));
+      const headlightY = cy + 50;
+      const leftHL = cx - 210;
+      const rightHL = cx + 210;
+
+      if (lightProg > 0) {
+        [leftHL, rightHL].forEach(x => {
+          // Beam flare
+          const beamGrad = ctx.createRadialGradient(x, headlightY, 4, x, headlightY, 160 * lightProg);
+          beamGrad.addColorStop(0, 'rgba(255, 255, 255, 0.95)');
+          beamGrad.addColorStop(0.2, 'rgba(56, 189, 248, 0.5)');
+          beamGrad.addColorStop(0.6, 'rgba(166, 211, 49, 0.15)');
+          beamGrad.addColorStop(1, 'transparent');
+
+          ctx.fillStyle = beamGrad;
+          ctx.beginPath();
+          ctx.arc(x, headlightY, 160 * lightProg, 0, Math.PI * 2);
+          ctx.fill();
+
+          // High intensity bulb core
+          ctx.fillStyle = '#ffffff';
+          ctx.shadowColor = '#38bdf8';
+          ctx.shadowBlur = 20;
+          ctx.fillRect(x - 18, headlightY - 6, 36, 12);
+          ctx.shadowBlur = 0;
+        });
+
+        // Floor light reflections
+        const floorGrad = ctx.createRadialGradient(cx, cy + 140, 10, cx, cy + 140, 320);
+        floorGrad.addColorStop(0, `rgba(166, 211, 49, ${0.15 * lightProg})`);
+        floorGrad.addColorStop(1, 'transparent');
+        ctx.fillStyle = floorGrad;
+        ctx.fillRect(cx - 360, cy + 80, 720, 140);
+      }
+
+      // 4. Logo Emerge through volumetric light (t: 2.2s - 5.5s)
+      const logoProg = Math.min(1, Math.max(0, (t - 2.0) / 1.5));
+      if (logoProg > 0) {
+        const logoY = cy - 60 + (1 - logoProg) * 20;
+        drawTrieyeLogo(ctx, cx, logoY, 0.9 + logoProg * 0.1, logoProg, 'rgba(166, 211, 49, 0.5)');
+      }
+
+      // 5. Final high-beam flash at end (t: 5.2s - 6s)
+      if (t > 5.2) {
+        const flashAlpha = Math.min(1, (t - 5.2) / 0.8);
+        ctx.fillStyle = `rgba(255, 255, 255, ${flashAlpha * 0.6})`;
+        ctx.fillRect(0, 0, w, h);
+      }
+    }
+
+    /* -------------------------------------------------------------
+       DEMO 02: LOGO ASSEMBLY (5s)
+       ------------------------------------------------------------- */
+    function renderDemo02_Assembly(t, w, h, cx, cy) {
+      // 1. Technical Blueprint Grid Background
+      ctx.fillStyle = '#060a0f';
+      ctx.fillRect(0, 0, w, h);
+
+      ctx.save();
+      ctx.strokeStyle = 'rgba(56, 189, 248, 0.08)';
+      ctx.lineWidth = 1;
+      const gridSize = 40;
+      for (let x = 0; x < w; x += gridSize) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+      }
+      for (let y = 0; y < h; y += gridSize) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+      }
+
+      // Laser coordinate crosshairs
+      const crossAlpha = Math.min(1, t / 0.8);
+      ctx.strokeStyle = `rgba(166, 211, 49, ${0.4 * crossAlpha})`;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(cx - 240, cy); ctx.lineTo(cx + 240, cy);
+      ctx.moveTo(cx, cy - 140); ctx.lineTo(cx, cy + 140);
+      ctx.stroke();
+
+      // Precision technical text
+      ctx.font = "10px 'IBM Plex Mono'";
+      ctx.fillStyle = "rgba(166, 211, 49, 0.6)";
+      ctx.fillText(`AXIS: [${cx.toFixed(0)}, ${cy.toFixed(0)}]  |  TOLERANCE: 0.01mm  |  CALIBRATION: OK`, cx - 180, cy - 90);
+      ctx.restore();
+
+      // 2. Letters Assembly from Trajectories (0.5s - 3.2s)
+      const letters = [
+        { char: "T", targetX: cx - 130, startX: cx - 350, startY: cy - 200, startTime: 0.5, color: "#ffffff" },
+        { char: "R", targetX: cx - 75,  startX: cx - 180, startY: cy + 220, startTime: 0.9, color: "#ffffff" },
+        { char: "I", targetX: cx - 25,  startX: cx - 25,  startY: cy - 250, startTime: 1.3, color: "#ffffff" },
+        { char: "E", targetX: cx + 35,  startX: cx + 180, startY: cy - 220, startTime: 1.7, color: "#a6d331" },
+        { char: "Y", targetX: cx + 90,  startX: cx + 280, startY: cy + 240, startTime: 2.1, color: "#a6d331" },
+        { char: "E", targetX: cx + 145, startX: cx + 360, startY: cy - 180, startTime: 2.5, color: "#a6d331" }
+      ];
+
+      ctx.save();
+      ctx.font = "900 68px 'Inter', sans-serif";
+      ctx.textBaseline = "middle";
+      ctx.textAlign = "center";
+
+      letters.forEach(item => {
+        if (t < item.startTime) return;
+        const prog = Math.min(1, (t - item.startTime) / 0.6);
+        // Magnetic snap cubic easing
+        const ease = 1 - Math.pow(1 - prog, 4);
+
+        const curX = item.startX + (item.targetX - item.startX) * ease;
+        const curY = item.startY + (cy - item.startY) * ease;
+
+        // Assembly guide line
+        ctx.strokeStyle = `rgba(166, 211, 49, ${(1 - ease) * 0.5})`;
+        ctx.beginPath();
+        ctx.moveTo(item.startX, item.startY);
+        ctx.lineTo(curX, curY);
+        ctx.stroke();
+
+        ctx.fillStyle = item.color;
+        if (prog < 1) {
+          ctx.shadowColor = item.color;
+          ctx.shadowBlur = 18;
+        } else {
+          ctx.shadowBlur = 0;
+        }
+        ctx.fillText(item.char, curX, curY);
+      });
+      ctx.restore();
+
+      // 3. Laser Scan Line passing across after assembly (3.2s - 4.2s)
+      if (t > 3.2 && t < 4.4) {
+        const scanX = cx - 220 + ((t - 3.2) / 1.0) * 440;
+        ctx.save();
+        ctx.strokeStyle = '#a6d331';
+        ctx.lineWidth = 3;
+        ctx.shadowColor = '#a6d331';
+        ctx.shadowBlur = 18;
+        ctx.beginPath();
+        ctx.moveTo(scanX, cy - 50);
+        ctx.lineTo(scanX, cy + 50);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // 4. Tagline Typewriter Reveal (3.5s - 5s)
+      if (t > 3.4) {
+        const fullText = "DETAILING STUDIO";
+        const charsToShow = Math.floor(Math.min(fullText.length, ((t - 3.4) / 1.0) * fullText.length));
+        ctx.font = "600 13px 'IBM Plex Mono', monospace";
+        ctx.textAlign = "center";
+        ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
+        ctx.fillText(fullText.slice(0, charsToShow), cx + 5, cy + 48);
+      }
+    }
+
+    /* -------------------------------------------------------------
+       DEMO 03: NEON AUTOMOTIVE (5s)
+       ------------------------------------------------------------- */
+    function renderDemo03_Neon(t, w, h, cx, cy) {
+      // 1. Dark Velocity Canvas
+      ctx.fillStyle = '#05070a';
+      ctx.fillRect(0, 0, w, h);
+
+      // 2. High-Speed Light Trails sweeping across in 3D perspective
+      const numTrails = 16;
+      ctx.save();
+      for (let i = 0; i < numTrails; i++) {
+        const offset = (i / numTrails) * Math.PI * 2;
+        const speed = 1.2 + (i % 3) * 0.4;
+        const trailProgress = (t * speed + offset) % 2.5;
+
+        const startX = -200 + trailProgress * (w + 400);
+        const yBase = cy + Math.sin(trailProgress * 3 + offset) * 90;
+        const trailLen = 220 + (i % 4) * 60;
+
+        const isLime = i % 2 === 0;
+        const grad = ctx.createLinearGradient(startX - trailLen, yBase, startX, yBase);
+        grad.addColorStop(0, 'transparent');
+        grad.addColorStop(0.8, isLime ? 'rgba(166, 211, 49, 0.7)' : 'rgba(255, 255, 255, 0.8)');
+        grad.addColorStop(1, '#ffffff');
+
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 2 + (i % 3) * 1.5;
+        ctx.beginPath();
+        ctx.moveTo(startX - trailLen, yBase);
+        ctx.lineTo(startX, yBase);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // 3. Center Shockwave Expansion (t: 1.8s - 3.2s)
+      if (t > 1.8) {
+        const waveT = (t - 1.8) / 1.4;
+        const radius = waveT * (Math.min(w, h) * 0.6);
+        ctx.save();
+        ctx.strokeStyle = `rgba(166, 211, 49, ${Math.max(0, 1 - waveT) * 0.8})`;
+        ctx.lineWidth = 4 * (1 - waveT);
+        ctx.shadowColor = '#a6d331';
+        ctx.shadowBlur = 30;
+        ctx.beginPath();
+        ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // 4. Glowing Neon Logo Reveal with breathing pulse (t: 2.0s - 5s)
+      if (t > 2.0) {
+        const logoProg = Math.min(1, (t - 2.0) / 0.8);
+        const pulse = 1 + Math.sin(t * 5) * 0.03;
+        drawTrieyeLogo(ctx, cx, cy, (0.95 + logoProg * 0.05) * pulse, logoProg, '#a6d331');
+      }
+    }
+
+    /* -------------------------------------------------------------
+       DEMO 04: PREMIUM DETAILING REVEAL (6s)
+       ------------------------------------------------------------- */
+    function renderDemo04_Detailing(t, w, h, cx, cy) {
+      // 1. Ultra Gloss Deep Black Paint
+      ctx.fillStyle = '#08090c';
+      ctx.fillRect(0, 0, w, h);
+
+      // 2. Microscopic Water Droplets on Surface (t: 0s - 3.5s)
+      const wipeProg = Math.min(1, Math.max(0, (t - 1.2) / 2.2));
+      const wipeX = w * wipeProg;
+
+      // Draw random crystal beads ahead of the wipe
+      ctx.save();
+      const seedCount = 60;
+      for (let i = 0; i < seedCount; i++) {
+        const dx = (Math.sin(i * 99) * 0.5 + 0.5) * w;
+        const dy = (Math.cos(i * 33) * 0.5 + 0.5) * h;
+        if (dx < wipeX) continue; // Wiped clean!
+
+        const radius = 3 + (i % 7) * 2;
+        // Droplet specular
+        const dropGrad = ctx.createRadialGradient(dx - radius*0.3, dy - radius*0.3, 1, dx, dy, radius);
+        dropGrad.addColorStop(0, '#ffffff');
+        dropGrad.addColorStop(0.3, 'rgba(255, 255, 255, 0.7)');
+        dropGrad.addColorStop(0.8, 'rgba(56, 189, 248, 0.4)');
+        dropGrad.addColorStop(1, 'rgba(0, 0, 0, 0.8)');
+
+        ctx.fillStyle = dropGrad;
+        ctx.beginPath();
+        ctx.arc(dx, dy, radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        // White specular glint
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(dx - radius*0.35, dy - radius*0.35, radius*0.25, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+
+      // 3. Rotary Polish / Buffing Sweep Head (t: 1.2s - 3.6s)
+      if (t > 1.2 && t < 3.8) {
+        ctx.save();
+        ctx.strokeStyle = 'rgba(166, 211, 49, 0.8)';
+        ctx.lineWidth = 3;
+        ctx.shadowColor = '#a6d331';
+        ctx.shadowBlur = 25;
+        ctx.beginPath();
+        ctx.moveTo(wipeX, 0);
+        ctx.lineTo(wipeX - 40, h);
+        ctx.stroke();
+
+        // Foam wave crest
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.fillRect(wipeX - 15, 0, 18, h);
+        ctx.restore();
+      }
+
+      // 4. Pristine Ceramic Mirror Reflection revealing TRIEYE Logo (t: 2.2s - 6s)
+      if (t > 2.0) {
+        const logoProg = Math.min(1, (t - 2.0) / 1.5);
+        // Gloss coat reflection bloom
+        const reflGrad = ctx.createRadialGradient(cx, cy, 20, cx, cy, 280);
+        reflGrad.addColorStop(0, `rgba(166, 211, 49, ${0.18 * logoProg})`);
+        reflGrad.addColorStop(1, 'transparent');
+        ctx.fillStyle = reflGrad;
+        ctx.fillRect(0, 0, w, h);
+
+        drawTrieyeLogo(ctx, cx, cy, 0.9 + logoProg * 0.1, logoProg, 'rgba(255, 255, 255, 0.4)');
+
+        // Specular glint across logo
+        if (t > 3.8) {
+          const glintX = cx - 200 + ((t - 3.8) / 1.5) * 400;
+          ctx.save();
+          ctx.fillStyle = '#ffffff';
+          ctx.shadowColor = '#ffffff';
+          ctx.shadowBlur = 20;
+          ctx.beginPath();
+          ctx.arc(glintX, cy - 8, 4, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.restore();
+        }
+      }
+    }
+
+    /* -------------------------------------------------------------
+       DEMO 05: HORIZONTAL SLIDE REVEAL (5s)
+       ------------------------------------------------------------- */
+    function renderDemo05_Slide(t, w, h, cx, cy) {
+      ctx.fillStyle = '#07090d';
+      ctx.fillRect(0, 0, w, h);
+
+      // Drive DOM horizontal shutter panels
+      const slats = document.querySelectorAll('.slide-slat');
+      slats.forEach((slat, idx) => {
+        const delay = 0.4 + idx * 0.18;
+        if (t > delay) {
+          const prog = Math.min(1, (t - delay) / 0.9);
+          const ease = Math.pow(prog, 3); // accelerate away
+          slat.style.transform = `translateX(-${ease * 110}%)`;
+        }
+      });
+
+      // Background Studio Lights turn on one by one
+      if (t > 1.2) {
+        const lightCount = 5;
+        for (let i = 0; i < lightCount; i++) {
+          const lightTime = 1.2 + i * 0.25;
+          if (t > lightTime) {
+            const lx = cx - 240 + i * 120;
+            const grad = ctx.createLinearGradient(lx, 0, lx, cy);
+            grad.addColorStop(0, 'rgba(255, 255, 255, 0.45)');
+            grad.addColorStop(1, 'transparent');
+            ctx.fillStyle = grad;
+            ctx.fillRect(lx - 25, 0, 50, cy + 40);
+          }
+        }
+      }
+
+      // TRIEYE Logo emerges in the center of the opening bay
+      if (t > 1.4) {
+        const logoProg = Math.min(1, (t - 1.4) / 1.2);
+        drawTrieyeLogo(ctx, cx, cy, 0.95 + logoProg * 0.05, logoProg, 'rgba(166, 211, 49, 0.6)');
+      }
+    }
+
+    /* -------------------------------------------------------------
+       DEMO 06: 3D METALLIC LOGO (6s)
+       ------------------------------------------------------------- */
+    function renderDemo06_Metallic(t, w, h, cx, cy) {
+      ctx.fillStyle = '#050608';
+      ctx.fillRect(0, 0, w, h);
+
+      // Studio spotlight beam
+      const spotGrad = ctx.createRadialGradient(cx, 0, 20, cx, cy, h * 0.85);
+      spotGrad.addColorStop(0, 'rgba(255, 255, 255, 0.18)');
+      spotGrad.addColorStop(1, 'transparent');
+      ctx.fillStyle = spotGrad;
+      ctx.fillRect(0, 0, w, h);
+
+      // Turntable rotation progress (starts angled 22deg, rotates to 0)
+      const rotProg = Math.min(1, t / 3.5);
+      const angle = (1 - Math.pow(1 - rotProg, 3)) * 0; // Settles to front
+      const currentAngle = (1 - rotProg) * 0.35; // 20deg to 0
+
+      // Polished Floor Reflection
+      ctx.save();
+      ctx.translate(cx, cy + 70);
+      ctx.scale(1, -0.4);
+      ctx.globalAlpha = 0.22 * rotProg;
+      drawTrieyeLogo(ctx, 0, 0, 1, 1, null);
+      ctx.restore();
+
+      // Draw 3D Beveled Layers
+      const layers = 8;
+      for (let i = layers; i >= 0; i--) {
+        const offset = i * 2.2;
+        const layerAlpha = i === 0 ? 1 : 0.4 + (i / layers) * 0.4;
+        const colorShade = i === 0 ? '#ffffff' : `rgb(${50 + i * 8}, ${50 + i * 8}, ${60 + i * 8})`;
+
+        ctx.save();
+        ctx.translate(cx + currentAngle * 100 - i * 1.5, cy + i * 1.2);
+        ctx.scale(1, 1);
+        ctx.globalAlpha = layerAlpha;
+
+        if (i === 0) {
+          // Top chrome polished face
+          drawTrieyeLogo(ctx, 0, 0, 1.05, 1, 'rgba(255, 255, 255, 0.4)');
+        } else {
+          // Extrusion shadow depth
+          ctx.font = "900 70px 'Inter', sans-serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillStyle = colorShade;
+          ctx.fillText("TRIEYE", 0, 0);
+        }
+        ctx.restore();
+      }
+
+      // Specular highlight gleam moving across the metal bevels
+      if (t > 2.5) {
+        const gleamX = cx - 220 + ((t - 2.5) / 2.0) * 440;
+        ctx.save();
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = '#ffffff';
+        ctx.shadowBlur = 25;
+        ctx.beginPath();
+        ctx.arc(gleamX, cy - 12, 6, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    /* -------------------------------------------------------------
+       DEMO 07: MINIMAL LUXURY (5s)
+       ------------------------------------------------------------- */
+    function renderDemo07_Minimal(t, w, h, cx, cy) {
+      // Pure deepest obsidian black
+      ctx.fillStyle = '#040507';
+      ctx.fillRect(0, 0, w, h);
+
+      // Soft ambient mist along bottom third
+      ctx.save();
+      const mistAlpha = Math.min(1, t / 2.0);
+      const mistGrad = ctx.createLinearGradient(0, h * 0.6, 0, h);
+      mistGrad.addColorStop(0, 'transparent');
+      mistGrad.addColorStop(1, `rgba(255, 255, 255, ${0.06 * mistAlpha})`);
+      ctx.fillStyle = mistGrad;
+      ctx.fillRect(0, h * 0.6, w, h * 0.4);
+      ctx.restore();
+
+      // Precision hairline expanding from center
+      const lineProg = Math.min(1, Math.max(0, (t - 0.4) / 1.6));
+      const lineEase = 1 - Math.pow(1 - lineProg, 3);
+      const lineW = 260 * lineEase;
+
+      ctx.strokeStyle = `rgba(255, 255, 255, ${0.25 * lineEase})`;
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(cx - lineW, cy + 28);
+      ctx.lineTo(cx + lineW, cy + 28);
+      ctx.stroke();
+
+      // Minimal Logo with slow tracking expansion (0.8s - 4.5s)
+      if (t > 0.8) {
+        const logoProg = Math.min(1, (t - 0.8) / 1.8);
+        const trackingScale = 0.96 + logoProg * 0.04;
+        drawTrieyeLogo(ctx, cx, cy - 8, trackingScale, logoProg, 'rgba(255, 255, 255, 0.2)');
+      }
+    }
+
+    /* -------------------------------------------------------------
+       DEMO 08: SPEED & PRECISION (6s)
+       ------------------------------------------------------------- */
+    function renderDemo08_Speed(t, w, h, cx, cy) {
+      ctx.fillStyle = '#06080d';
+      ctx.fillRect(0, 0, w, h);
+
+      // Aerodynamic Wind Tunnel Speed Streaks
+      ctx.save();
+      const streakCount = 40;
+      const speed = t < 3.2 ? 2.5 : 0.3; // sudden slow-motion freeze
+
+      for (let i = 0; i < streakCount; i++) {
+        const angle = (i / streakCount) * Math.PI * 2;
+        const dist = ((t * speed * 250 + i * 35) % (Math.max(w, h) * 0.7));
+        const px = cx + Math.cos(angle) * dist;
+        const py = cy + Math.sin(angle) * dist * 0.6;
+        const length = 40 + (i % 5) * 20;
+
+        ctx.strokeStyle = i % 2 === 0 ? 'rgba(166, 211, 49, 0.6)' : 'rgba(255, 255, 255, 0.5)';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(px, py);
+        ctx.lineTo(px + Math.cos(angle) * length, py + Math.sin(angle) * length);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // Precision HUD gauges
+      ctx.save();
+      ctx.font = "11px 'IBM Plex Mono'";
+      ctx.fillStyle = "rgba(166, 211, 49, 0.75)";
+      const velocity = Math.min(320, Math.floor(t * 70));
+      ctx.fillText(`VELOCITY: ${velocity} KM/H  |  DRAG: 0.28 Cd  |  DOWNFORCE: 420 KG`, cx - 180, cy - 120);
+
+      // Precision target reticle
+      ctx.strokeStyle = 'rgba(166, 211, 49, 0.3)';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(cx - 200, cy - 70, 400, 140);
+      ctx.restore();
+
+      // Shockwave burst & Logo Lock (t: 2.8s - 6s)
+      if (t > 2.8) {
+        const logoProg = Math.min(1, (t - 2.8) / 0.8);
+        drawTrieyeLogo(ctx, cx, cy, 0.95 + logoProg * 0.05, logoProg, '#a6d331');
+      }
+    }
+
+    /* -------------------------------------------------------------
+       DEMO 09: LIQUID CHROME (5s)
+       ------------------------------------------------------------- */
+    function renderDemo09_Liquid(t, w, h, cx, cy) {
+      ctx.fillStyle = '#06070a';
+      ctx.fillRect(0, 0, w, h);
+
+      // Liquid Molten Mercury Ripples
+      ctx.save();
+      const numRings = 7;
+      for (let i = 0; i < numRings; i++) {
+        const ringProg = ((t * 0.5 + i / numRings) % 1);
+        const r = ringProg * 280;
+        const alpha = (1 - ringProg) * 0.5;
+
+        const grad = ctx.createRadialGradient(cx, cy, r * 0.8, cx, cy, r);
+        grad.addColorStop(0, 'transparent');
+        grad.addColorStop(0.5, `rgba(255, 255, 255, ${alpha})`);
+        grad.addColorStop(1, 'transparent');
+
+        ctx.strokeStyle = grad;
+        ctx.lineWidth = 6 + (i % 3) * 4;
+        ctx.beginPath();
+        ctx.arc(cx, cy, r, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // Fluid coalescence into solid Logo (t: 1.8s - 5s)
+      if (t > 1.8) {
+        const solidProg = Math.min(1, (t - 1.8) / 1.4);
+        drawTrieyeLogo(ctx, cx, cy, 0.9 + solidProg * 0.1, solidProg, 'rgba(255, 255, 255, 0.6)');
+      }
+    }
+
+    /* -------------------------------------------------------------
+       DEMO 10: INTERACTIVE EXPERIENCE (5s / Tap trigger)
+       ------------------------------------------------------------- */
+    function renderDemo10_Interactive(t, w, h, cx, cy) {
+      ctx.fillStyle = '#05070a';
+      ctx.fillRect(0, 0, w, h);
+
+      // Auto-trigger if user didn't tap after 2.8s
+      if (t > 2.8 && !interactiveTriggered) {
+        triggerInteractiveIgnition();
+      }
+
+      if (interactiveTriggered) {
+        // High-energy ignition expansion
+        const waveT = Math.min(1, (t - 2.8) / 1.5);
+        ctx.save();
+        const shockRadius = waveT * (Math.max(w, h) * 0.6);
+        ctx.strokeStyle = `rgba(166, 211, 49, ${Math.max(0, 1 - waveT)})`;
+        ctx.lineWidth = 6 * (1 - waveT);
+        ctx.shadowColor = '#a6d331';
+        ctx.shadowBlur = 35;
+        ctx.beginPath();
+        ctx.arc(cx, cy, shockRadius, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+
+        // Logo Burst
+        drawTrieyeLogo(ctx, cx, cy, 1 + waveT * 0.1, 1, '#a6d331');
+      } else {
+        // Ambient idle glow behind touch ring
+        const idlePulse = 1 + Math.sin(t * 4) * 0.08;
+        const idleGrad = ctx.createRadialGradient(cx, cy, 10, cx, cy, 180 * idlePulse);
+        idleGrad.addColorStop(0, 'rgba(166, 211, 49, 0.2)');
+        idleGrad.addColorStop(1, 'transparent');
+        ctx.fillStyle = idleGrad;
+        ctx.beginPath();
+        ctx.arc(cx, cy, 180 * idlePulse, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    }
+
+    /* -------------------------------------------------------------
+       KEYBOARD SHORTCUTS
+       ------------------------------------------------------------- */
+    document.addEventListener('keydown', (e) => {
+      if (!overlay.classList.contains('active')) return;
+
+      if (e.key === 'Escape') {
+        closePlayer();
+      } else if (e.key === ' ' || e.code === 'Space') {
+        e.preventDefault();
+        togglePlayPause();
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        navigateDemo(1);
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        navigateDemo(-1);
+      } else if (e.key === 'r' || e.key === 'R') {
+        replayActiveDemo();
+      }
+    });
+
+    // Expose helpers on window
+    window.DEMOS = DEMOS;
+    window.launchDemo = launchDemo;
+    window.startDemo = startDemo;
+    window.closePlayer = closePlayer;
+    window.renderDemoFrame = renderDemoFrame;
+    window.replayActiveDemo = replayActiveDemo;
+    window.navigateDemo = navigateDemo;
+    Object.defineProperty(window, 'currentDemoIndex', {
+      get: () => currentDemoIndex,
+      set: (v) => { currentDemoIndex = v; }
+    });
+
+  </script>
+</body>
+</html>
