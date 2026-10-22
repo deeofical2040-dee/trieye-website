@@ -1874,15 +1874,18 @@ const TrieyeDB = {
   }
 };
 
-window.TrieyeDB = TrieyeDB;
-
 if (typeof window !== 'undefined') {
+  window.TrieyeDB = TrieyeDB;
   window.formatVehicleNumber = TrieyeDB.formatVehicleNumber.bind(TrieyeDB);
   window.validateVehicleNumber = TrieyeDB.validateVehicleNumber.bind(TrieyeDB);
   window.normalizeVehicleNumber = TrieyeDB.normalizeVehicleNumber.bind(TrieyeDB);
   window.formatVehicleReg = TrieyeDB.formatVehicleReg.bind(TrieyeDB);
   window.validateVehicleReg = TrieyeDB.validateVehicleReg.bind(TrieyeDB);
   window.normalizeVehicleReg = TrieyeDB.normalizeVehicleReg.bind(TrieyeDB);
+}
+
+if (typeof globalThis !== 'undefined') {
+  globalThis.TrieyeDB = TrieyeDB;
 }
 
 

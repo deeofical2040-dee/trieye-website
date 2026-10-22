@@ -42,6 +42,13 @@ Also list the modified production files.
 
 ---
 
+## Vercel Deployment Safety Rules
+- **NEVER** manually deploy, click Deploy, trigger production deployments, or modify Vercel configuration/settings without explicit user approval.
+- **Pre-Push Warning**: Before pushing to `origin/main` on GitHub, always notify and warn the user that pushing to `main` may automatically trigger a live production build/deployment on the connected Vercel project (`trieye-website.vercel.app`).
+- Keep all verification focused strictly on local testing and GitHub sync unless explicit Vercel deployment authorization is granted.
+
+---
+
 ## Safety & Security Rules
 - **NEVER** use `git push --force`, `git push --force-with-lease`, or `git reset --hard` without explicit user confirmation.
 - **NEVER** push secrets, API secret keys, service_role keys, passwords, or personal access tokens.

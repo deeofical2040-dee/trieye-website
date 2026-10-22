@@ -9,8 +9,15 @@
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <!-- Supabase JS Client & Trieye DB Adapter -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="/assets/supabase-config.js"></script>
-  <script src="/assets/trieye-db.js"></script>
+  <script>
+    (function() {
+      var isFile = window.location.protocol === 'file:' || !window.location.host;
+      var prefix = isFile ? 'assets/' : '/assets/';
+      window.__TRIEYE_ASSET_PREFIX__ = prefix;
+      document.write('<script src="' + prefix + 'supabase-config.js"><\/script>');
+      document.write('<script src="' + prefix + 'trieye-db.js"><\/script>');
+    })();
+  </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script>
     (function() {
@@ -102,6 +109,77 @@
       display: flex;
       align-items: center;
       gap: 0.85rem;
+    }
+    .mobile-menu-btn {
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+      min-height: 40px;
+      border-radius: 8px;
+      background: var(--bg-panel-2);
+      border: 1px solid var(--line);
+      color: var(--white);
+      cursor: pointer;
+      padding: 0;
+      flex-shrink: 0;
+      transition: all 0.15s ease;
+      touch-action: manipulation;
+    }
+    .mobile-menu-btn:hover {
+      background: var(--bg-panel-3);
+      border-color: var(--pink);
+      color: var(--pink);
+    }
+    .mobile-menu-btn:active {
+      transform: scale(0.95);
+    }
+    .mobile-menu-btn svg {
+      width: 22px;
+      height: 22px;
+      stroke: currentColor;
+    }
+    .topbar-btn-icon {
+      display: none;
+    }
+    .brand-title-short {
+      display: none;
+    }
+    .sidebar-backdrop {
+      display: none;
+    }
+    .sidebar-mobile-header {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.25rem 0.25rem 0.85rem;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 0.75rem;
+    }
+    .sidebar-close-btn {
+      background: var(--bg-panel-2);
+      border: 1px solid var(--line);
+      color: var(--white);
+      width: 36px;
+      height: 36px;
+      min-width: 36px;
+      min-height: 36px;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.1rem;
+      font-weight: 700;
+      transition: all 0.15s ease;
+      border: 1px solid var(--line);
+    }
+    .sidebar-close-btn:hover {
+      background: var(--pink-dim);
+      border-color: var(--pink);
+      color: var(--pink);
     }
     .brand-logo {
       height: 32px;
@@ -574,11 +652,14 @@
     /* Tables */
     .table-container {
       overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
       width: 100%;
+      max-width: 100%;
       border-radius: 8px;
     }
-    table.data-table {
+    table.data-table, table.trieye-table {
       width: 100%;
+      min-width: 620px;
       border-collapse: collapse;
       text-align: left;
       font-size: 0.84rem;
@@ -757,6 +838,7 @@
       transition: border-color 0.2s;
       outline: none;
       width: 100%;
+      min-width: 0;
     }
     .form-input:focus, .form-select:focus, .form-textarea:focus {
       border-color: var(--pink);
@@ -1218,14 +1300,601 @@
     .auth-logo {
       height: 38px;
       width: auto;
+      max-width: 180px;
       object-fit: contain;
       margin: 0 auto;
     }
+    .password-input-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
+    }
+    .password-toggle-btn {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      transition: color 0.15s ease, background 0.15s ease;
+      touch-action: manipulation;
+      z-index: 2;
+    }
+    .password-toggle-btn:hover {
+      color: var(--pink);
+      background: var(--pink-dim);
+    }
+    .password-toggle-btn:focus-visible {
+      outline: 2px solid var(--pink);
+      outline-offset: 1px;
+    }
+    .password-toggle-btn .eye-icon {
+      width: 18px;
+      height: 18px;
+      stroke: currentColor;
+    }
 
+    /* Walk-In Form Responsive Elements */
+    .mb-svc-row {
+      display: grid;
+      grid-template-columns: minmax(180px, 2fr) 1fr;
+      gap: 0.5rem;
+      align-items: center;
+      margin-bottom: 0.8rem;
+    }
+    .mb-svc-row-top {
+      width: 100%;
+    }
+    .mb-svc-row-bottom {
+      display: grid;
+      grid-template-columns: 80px 105px 95px 38px;
+      gap: 0.5rem;
+      align-items: center;
+    }
+    .mb-prod-header {
+      display: grid;
+      grid-template-columns: minmax(140px, 2fr) 90px 110px 100px 42px;
+      gap: 0.5rem;
+      padding: 0.4rem 0.5rem;
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      border-bottom: 1px solid var(--line);
+      margin-bottom: 0.6rem;
+    }
+    .mb-prod-row {
+      display: grid;
+      grid-template-columns: minmax(140px, 2fr) 90px 110px 100px 42px;
+      gap: 0.5rem;
+      padding: 0.2rem 0.5rem;
+      align-items: center;
+      margin-bottom: 0.6rem;
+    }
+    .mb-prod-row-top {
+      width: 100%;
+    }
+    .mb-prod-row-bottom {
+      display: contents;
+    }
+    .mb-prod-mobile-lbl {
+      display: none;
+    }
+    .mb-payment-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+    }
+
+    /* Responsive Invoice Preview Modal */
+    #invoiceModal {
+      position: fixed;
+      top: 5%;
+      left: 50%;
+      transform: translate(-50%, 0);
+      width: 210mm;
+      max-width: 95vw;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: #ffffff;
+      color: #000000;
+      padding: 0;
+      border-radius: 8px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+    }
+    .invoice-modal-header {
+      padding: 10px 20px;
+      background: #111111;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: #ffffff;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .invoice-modal-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    #printable-invoice {
+      padding: 15mm;
+      background: #ffffff;
+      font-family: 'Inter', sans-serif;
+      color: #000000;
+    }
+
+    /* RESPONSIVE BREAKPOINTS */
     @media (max-width: 1024px) {
-      .dashboard-layout { flex-direction: column; }
-      .sidebar { width: 100%; height: auto; position: static; }
-      .walkin-grid-layout { grid-template-columns: 1fr !important; }
+      .dashboard-layout {
+        position: relative;
+        min-height: calc(100vh - 60px);
+      }
+      .mobile-menu-btn {
+        display: inline-flex;
+      }
+      .sidebar {
+        position: fixed !important;
+        top: 0 !important;
+        left: 0 !important;
+        bottom: 0 !important;
+        width: 290px !important;
+        max-width: 84vw !important;
+        height: 100vh !important;
+        height: 100dvh !important;
+        z-index: 99999 !important;
+        transform: translateX(-100%);
+        transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.28s ease;
+        box-shadow: none;
+        overflow-y: auto;
+        background: var(--bg-panel);
+        border-right: 1px solid var(--line);
+        padding: 1rem 0.85rem 2rem;
+        display: flex !important;
+        flex-direction: column !important;
+      }
+      .sidebar.drawer-open {
+        transform: translateX(0) !important;
+        box-shadow: 14px 0 40px rgba(0, 0, 0, 0.65) !important;
+      }
+      .sidebar-backdrop {
+        display: block;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        z-index: 99998;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.25s ease;
+      }
+      .sidebar-backdrop.active {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .sidebar-mobile-header {
+        display: flex;
+      }
+      body.drawer-open {
+        overflow: hidden !important;
+      }
+
+      .walkin-grid-layout {
+        grid-template-columns: 1fr !important;
+      }
+      .walkin-grid-layout > .panel:nth-child(2) {
+        position: static !important;
+      }
+      .main-content {
+        padding: 1.25rem 1rem;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .topbar {
+        padding: 0.6rem 0.85rem;
+      }
+      .brand-title {
+        font-size: 1.15rem;
+      }
+      .brand-badge {
+        font-size: 0.6rem;
+        padding: 0.1rem 0.35rem;
+      }
+      .top-actions {
+        gap: 0.45rem;
+      }
+      .top-actions .btn {
+        padding: 0.4rem 0.65rem;
+        font-size: 0.74rem;
+      }
+      .section-header {
+        gap: 0.75rem;
+      }
+      .section-title {
+        font-size: 1.35rem;
+      }
+      .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.75rem;
+      }
+      .kpi-card {
+        padding: 0.85rem 0.95rem;
+      }
+      .kpi-value {
+        font-size: 1.5rem;
+      }
+      .mb-payment-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+      }
+      #invoiceModal {
+        top: 2% !important;
+        left: 3% !important;
+        width: 94% !important;
+        max-width: 94% !important;
+        transform: none !important;
+        max-height: 96vh !important;
+      }
+      .invoice-modal-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+        padding: 10px 12px;
+      }
+      .invoice-modal-actions {
+        justify-content: flex-start;
+      }
+      #printable-invoice {
+        padding: 14px !important;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .main-content {
+        padding: 0.75rem 0.65rem;
+        gap: 1rem;
+      }
+      .section-header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .section-header > div:last-child {
+        width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      .section-header > div:last-child > * {
+        flex: 1 1 auto;
+      }
+
+      /* Services Row Stacked on Mobile */
+      .mb-svc-row {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+        background: var(--bg-panel-2);
+        border: 1px solid var(--line);
+        padding: 0.75rem;
+        border-radius: 8px;
+      }
+      .mb-svc-row-top {
+        width: 100%;
+      }
+      .mb-svc-row-bottom {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr auto;
+        gap: 0.45rem;
+        align-items: center;
+        width: 100%;
+      }
+
+      /* Add-On Products Stacked on Mobile */
+      .mb-prod-header {
+        display: none !important;
+      }
+      .mb-prod-row {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0.5rem !important;
+        background: var(--bg-panel-2);
+        border: 1px solid var(--line);
+        padding: 0.75rem;
+        border-radius: 8px;
+        margin-bottom: 0.75rem !important;
+      }
+      .mb-prod-row-top {
+        width: 100%;
+      }
+      .mb-prod-row-bottom {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr auto;
+        gap: 0.45rem;
+        align-items: center;
+        width: 100%;
+      }
+      .mb-prod-mobile-lbl {
+        display: inline !important;
+      }
+
+      /* Walk-In Form Details */
+      #make-bill-form .form-grid {
+        grid-template-columns: 1fr !important;
+      }
+
+      /* Printable Invoice Customer Cards Stack */
+      .inv-cust-veh-grid {
+        flex-direction: column !important;
+        gap: 0.5rem;
+      }
+      .inv-cust-veh-grid > div {
+        width: 100% !important;
+      }
+      .inv-totals-box {
+        width: 100% !important;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .topbar {
+        padding: 0.45rem 0.55rem;
+      }
+      .brand-group {
+        gap: 0.4rem;
+      }
+      .mobile-menu-btn {
+        width: 36px;
+        height: 36px;
+        min-width: 36px;
+        min-height: 36px;
+      }
+      .brand-logo {
+        height: 22px;
+      }
+      .brand-title {
+        font-size: 0.95rem;
+        gap: 0.25rem;
+      }
+      .brand-badge {
+        display: none;
+      }
+      .top-actions {
+        gap: 0.25rem;
+      }
+      #syncStatusText {
+        display: none;
+      }
+      .sync-status-badge {
+        padding: 0.3rem 0.45rem;
+      }
+      .theme-toggle-btn {
+        width: 42px;
+        height: 24px;
+      }
+      .theme-toggle-thumb {
+        width: 18px;
+        height: 18px;
+      }
+      [data-theme="dark"] .theme-toggle-thumb {
+        transform: translateX(18px);
+      }
+      .topbar-btn-text {
+        display: none;
+      }
+      .topbar-btn-icon {
+        display: inline !important;
+      }
+      .top-actions .btn {
+        padding: 0.35rem 0.45rem;
+        font-size: 0.72rem;
+      }
+      .kpi-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+      }
+      .kpi-card {
+        padding: 0.7rem 0.75rem;
+      }
+      .kpi-value {
+        font-size: 1.3rem;
+      }
+      .kpi-label {
+        font-size: 0.65rem;
+      }
+      .kpi-subtext {
+        font-size: 0.65rem;
+      }
+      .filter-bar {
+        padding: 0.5rem;
+        gap: 0.35rem;
+      }
+      .filter-pill {
+        padding: 0.3rem 0.55rem;
+        font-size: 0.7rem;
+      }
+      .source-pill {
+        padding: 0.28rem 0.65rem;
+        font-size: 0.7rem;
+      }
+      .mb-payment-grid {
+        grid-template-columns: 1fr 1fr !important;
+        gap: 0.5rem;
+      }
+      .mb-payment-grid .form-label {
+        font-size: 0.65rem;
+      }
+      .dash-modal-backdrop {
+        padding: 0.5rem;
+      }
+      .dash-modal {
+        max-height: 94vh;
+      }
+      .dash-modal-body {
+        padding: 0.85rem;
+      }
+      .dash-modal-body .form-grid {
+        grid-template-columns: 1fr !important;
+      }
+      #invoiceModal {
+        top: 2% !important;
+        left: 2% !important;
+        right: 2% !important;
+        transform: none !important;
+        width: auto !important;
+        max-width: 96vw !important;
+        max-height: 96vh !important;
+        border-radius: 8px !important;
+      }
+      .invoice-modal-header {
+        padding: 8px 10px !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 8px !important;
+      }
+      .invoice-modal-actions {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)) !important;
+        gap: 5px !important;
+      }
+      .invoice-modal-actions .btn {
+        padding: 0.35rem 0.45rem !important;
+        font-size: 0.7rem !important;
+        text-align: center !important;
+        justify-content: center !important;
+      }
+      #printable-invoice {
+        padding: 10px 8px !important;
+      }
+    }
+
+    @media (max-width: 375px) {
+      .topbar {
+        padding: 0.35rem 0.4rem;
+      }
+      .brand-group {
+        gap: 0.3rem;
+      }
+      .mobile-menu-btn {
+        width: 34px;
+        height: 34px;
+        min-width: 34px;
+        min-height: 34px;
+      }
+      .brand-title-full {
+        display: none;
+      }
+      .brand-title-short {
+        display: inline;
+      }
+      .brand-title {
+        font-size: 0.88rem;
+      }
+      .top-actions {
+        gap: 0.2rem;
+      }
+      .theme-toggle-btn {
+        width: 38px;
+        height: 22px;
+      }
+      .theme-toggle-thumb {
+        width: 16px;
+        height: 16px;
+      }
+      [data-theme="dark"] .theme-toggle-thumb {
+        transform: translateX(16px);
+      }
+      .sync-status-badge {
+        padding: 0.25rem 0.35rem;
+      }
+      .top-actions .btn {
+        padding: 0.3rem 0.38rem;
+        font-size: 0.68rem;
+      }
+      .main-content {
+        padding: 0.85rem 0.5rem;
+      }
+      .form-body {
+        padding: 0.85rem;
+      }
+      .panel-header {
+        padding: 0.75rem 0.85rem;
+      }
+      .mb-svc-row,
+      .mb-prod-row {
+        padding: 0.55rem;
+      }
+      .mb-svc-row-bottom,
+      .mb-prod-row-bottom {
+        gap: 0.3rem;
+      }
+      .mb-svc-row-bottom input,
+      .mb-svc-row-bottom button,
+      .mb-prod-row-bottom input,
+      .mb-prod-row-bottom button {
+        padding: 0.35rem 0.25rem !important;
+        font-size: 0.72rem !important;
+      }
+    }
+
+    @media (max-width: 330px) {
+      .topbar {
+        padding: 0.3rem 0.3rem;
+      }
+      .brand-group {
+        gap: 0.2rem;
+      }
+      .mobile-menu-btn {
+        width: 30px;
+        height: 30px;
+        min-width: 30px;
+        min-height: 30px;
+      }
+      .mobile-menu-btn svg {
+        width: 18px;
+        height: 18px;
+      }
+      .brand-title {
+        font-size: 0.8rem;
+      }
+      .theme-toggle-btn {
+        width: 34px;
+        height: 20px;
+      }
+      .theme-toggle-thumb {
+        width: 14px;
+        height: 14px;
+      }
+      [data-theme="dark"] .theme-toggle-thumb {
+        transform: translateX(14px);
+      }
+      .top-actions .btn {
+        padding: 0.25rem 0.3rem;
+        font-size: 0.62rem;
+      }
+      .main-content {
+        padding: 0.75rem 0.35rem;
+      }
+      .form-body {
+        padding: 0.65rem;
+      }
+      .kpi-grid {
+        grid-template-columns: 1fr;
+      }
+      .mb-payment-grid {
+        grid-template-columns: 1fr !important;
+      }
     }
 
     /* Completed Jobs Monthly Calendar Filter */
@@ -1519,8 +2188,8 @@
     }
     .customer-profile-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 0.75rem;
     }
     .customer-profile-stat {
       background: var(--bg-panel-2);
@@ -1619,50 +2288,56 @@
       }
     }
   </style>
-
-  <style>
-    @media print {
-      body * {
-        visibility: hidden;
-      }
-      #invoiceModal, #invoiceModal * {
-        visibility: visible;
-      }
-      #invoiceModal {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        margin: 0;
-        padding: 0;
-        box-shadow: none;
-        transform: none;
-      }
-      #invoiceModal > div:first-child {
-        display: none !important; /* Hide header buttons during print */
-      }
-    }
-  </style>
 </head>
 <body>
 
   <!-- ADMIN AUTHENTICATION GATEWAY -->
   <div class="auth-overlay" id="adminAuthOverlay" style="display:none;">
     <div class="auth-card">
-      <img src="/assets/trieye-logo-dark.png" alt="Trieye" class="auth-logo logo-dark">
-      <img src="/assets/trieye-logo-light.png" alt="Trieye" class="auth-logo logo-light">
+      <div class="auth-logo-container" style="display:flex; justify-content:center; align-items:center; min-height:44px;">
+        <img src="/assets/trieye-logo-dark.png" 
+             onerror="this.onerror=null; this.src='assets/trieye-logo-dark.png';" 
+             alt="TRIEYE Detailing Studio" 
+             class="auth-logo logo-dark" 
+             width="180" 
+             height="41" 
+             loading="eager" 
+             decoding="async">
+        <img src="/assets/trieye-logo-light.png" 
+             onerror="this.onerror=null; this.src='assets/trieye-logo-light.png';" 
+             alt="TRIEYE Detailing Studio" 
+             class="auth-logo logo-light" 
+             width="180" 
+             height="41" 
+             loading="eager" 
+             decoding="async">
+      </div>
       <div>
         <h2 style="font-family:'Oswald'; font-size:1.5rem; letter-spacing:0.04em;">ADMIN CONSOLE LOGIN</h2>
         <p style="font-size:0.8rem; color:var(--muted); margin-top:4px;">Sign in with your verified Supabase Admin credentials</p>
       </div>
       <form id="adminLoginForm" onsubmit="handleAdminLogin(event)" style="display:flex; flex-direction:column; gap:0.85rem; text-align:left;">
         <div class="form-group" style="margin-bottom:0;">
-          <label class="form-label" style="font-size:0.75rem;">Admin Email</label>
+          <label class="form-label" for="adminAuthEmail" style="font-size:0.75rem;">Admin Email</label>
           <input type="email" id="adminAuthEmail" class="form-input" placeholder="admin@trieyestudio.com" required autocomplete="email" style="font-size:0.9rem;">
         </div>
         <div class="form-group" style="margin-bottom:0;">
-          <label class="form-label" style="font-size:0.75rem;">Password</label>
-          <input type="password" id="adminAuthPass" class="form-input" placeholder="••••••••" required autocomplete="current-password" style="font-size:0.9rem;">
+          <label class="form-label" for="adminAuthPass" style="font-size:0.75rem;">Password</label>
+          <div class="password-input-wrapper">
+            <input type="password" id="adminAuthPass" class="form-input" placeholder="••••••••" required autocomplete="current-password" style="font-size:0.9rem; padding-right:2.8rem;">
+            <button type="button" id="adminPasswordToggle" class="password-toggle-btn" aria-label="Show password" aria-pressed="false" onclick="toggleAdminPasswordVisibility(event)" tabindex="0">
+              <!-- Eye Open (show) icon -->
+              <svg class="eye-icon eye-icon-show" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+              <!-- Eye Off (hide) icon -->
+              <svg class="eye-icon eye-icon-hide" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="display:none;">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                <line x1="1" y1="1" x2="23" y2="23"></line>
+              </svg>
+            </button>
+          </div>
         </div>
         <button type="submit" id="adminLoginBtn" class="btn btn-primary" style="justify-content:center; padding:0.7rem; margin-top:0.35rem; font-size:0.85rem;">Sign In to Dashboard →</button>
         <div id="authErrorMsg" style="font-size:0.78rem; color:var(--red); display:none; text-align:center; padding:0.4rem; background:var(--red-dim); border:1px solid var(--red); border-radius:6px;"></div>
@@ -1673,10 +2348,19 @@
   <!-- STICKY TOP HEADER -->
   <header class="topbar">
     <div class="brand-group">
+      <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open Navigation Menu" aria-expanded="false" onclick="toggleMobileDrawer()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
       <img src="/assets/trieye-logo-dark.png" alt="Trieye Studio" class="brand-logo logo-dark" onerror="this.style.display='none'">
       <img src="/assets/trieye-logo-light.png" alt="Trieye Studio" class="brand-logo logo-light" onerror="this.style.display='none'">
       <div class="brand-title">
-        Trieye Studio <span class="brand-badge">PRO ADMIN</span>
+        <span class="brand-title-full">Trieye Studio</span>
+        <span class="brand-title-short">Trieye</span>
+        <span class="brand-badge">PRO ADMIN</span>
       </div>
     </div>
 
@@ -1691,18 +2375,30 @@
           <svg class="icon-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path><circle cx="19" cy="5" r="1" fill="currentColor" stroke="none"></circle><circle cx="16" cy="3" r="0.75" fill="currentColor" stroke="none"></circle></svg>
         </div>
       </button>
-      <button class="btn btn-primary" onclick="showSection('walkin-sec'); document.getElementById('walkin-phone').focus();">
-        + Walk-In Entry
+      <button class="btn btn-primary" onclick="showSection('walkin-sec'); document.getElementById('walkin-phone').focus();" title="Walk-In Entry">
+        <span class="topbar-btn-text">+ Walk-In Entry</span>
+        <span class="topbar-btn-icon">+ Bill</span>
       </button>
       <button class="btn" onclick="lockAdminConsole()" title="Lock Admin Session">
-        🔒 Logout
+        <span class="topbar-btn-text">🔒 Logout</span>
+        <span class="topbar-btn-icon">🔒</span>
       </button>
     </div>
   </header>
 
   <div class="dashboard-layout">
-    <!-- LEFT SIDEBAR WITH ALL 12 REQUIRED SECTIONS -->
-    <aside class="sidebar">
+    <!-- MOBILE SIDEBAR BACKDROP -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeMobileDrawer()"></div>
+
+    <!-- LEFT SIDEBAR WITH ALL REQUIRED SECTIONS -->
+    <aside class="sidebar" id="dashboardSidebar">
+      <div class="sidebar-mobile-header">
+        <div class="brand-title" style="font-size:1.15rem; margin:0;">
+          Trieye Studio <span class="brand-badge">PRO</span>
+        </div>
+        <button class="sidebar-close-btn" id="sidebarCloseBtn" onclick="closeMobileDrawer()" aria-label="Close menu">✕</button>
+      </div>
+
       <div>
         <div class="sidebar-section-title">Core Operations</div>
         <ul class="nav-list">
@@ -1987,7 +2683,7 @@
     </div>
   </div>
 
-  <div class="walkin-grid-layout" style="display:grid; grid-template-columns: minmax(0, 1.8fr) minmax(320px, 1fr); gap: 1.5rem; align-items: start;">
+  <div class="walkin-grid-layout" style="display:grid; grid-template-columns: minmax(0, 1.8fr) minmax(280px, 1fr); gap: 1.5rem; align-items: start;">
     
     <!-- LEFT COLUMN: BILL FORM -->
     <div class="panel" style="margin-bottom:0;">
@@ -2056,7 +2752,7 @@
           </div>
 
           <!-- Table Header -->
-          <div style="display:grid; grid-template-columns: minmax(140px, 2fr) 90px 110px 100px 42px; gap:0.5rem; padding:0.4rem 0.5rem; font-size:0.72rem; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em; border-bottom:1px solid var(--line); margin-bottom:0.6rem;">
+          <div class="mb-prod-header" style="display:none;">
             <span>PRODUCT NAME</span>
             <span>QUANTITY</span>
             <span>UNIT PRICE (₹)</span>
@@ -2079,7 +2775,7 @@
         <!-- 3. PAYMENT -->
         <div style="margin-bottom:1.5rem;">
           <div class="form-label" style="margin-bottom:0.8rem; color:var(--white); font-weight:600; letter-spacing:0.05em; font-size:0.82rem;">3. PAYMENT</div>
-          <div class="form-grid" style="grid-template-columns: 1fr 1fr 1fr 1fr; gap:0.75rem;">
+          <div class="form-grid mb-payment-grid">
             <div class="form-group">
               <label class="form-label" style="font-size:0.72rem; text-transform:uppercase;">Payment Status</label>
               <select class="form-select" id="mb-pay-status" onchange="mbHandlePaymentChange()">
@@ -2237,11 +2933,11 @@
 </section>
 
 <!-- PRINTABLE A4 INVOICE MODAL -->
-<div class="modal-backdrop" id="invoiceModalBackdrop" style="display:none; z-index:999998; position:fixed; inset:0; background:rgba(0,0,0,0.8);"></div>
-<div class="modal" id="invoiceModal" style="display:none; z-index:999999; position:fixed; top:5%; left:50%; transform:translate(-50%, 0); width:210mm; max-height:90vh; overflow-y:auto; background:white; color:black; padding:0; border-radius:8px;">
-  <div style="padding:10px 20px; background:#111; display:flex; justify-content:space-between; align-items:center; color:white; border-top-left-radius:8px; border-top-right-radius:8px; position:sticky; top:0;">
-    <h3 style="margin:0;">Invoice Preview</h3>
-    <div style="display:flex; gap:10px;">
+<div class="modal-backdrop" id="invoiceModalBackdrop" style="display:none; z-index:999998; position:fixed; inset:0; background:rgba(0,0,0,0.8);" onclick="closeInvoiceModal()"></div>
+<div class="modal" id="invoiceModal" style="display:none;">
+  <div class="invoice-modal-header">
+    <h3 style="margin:0; font-family:'Oswald',sans-serif; letter-spacing:0.04em; font-size:1.15rem;">Invoice Preview</h3>
+    <div class="invoice-modal-actions">
       <button class="btn btn-primary" onclick="printInvoice()">🖨️ PRINT</button>
       <button class="btn btn-primary" onclick="downloadInvoice()">⬇️ DOWNLOAD PDF</button>
       <button class="btn btn-outline" style="border-color:#25D366; color:#25D366;" onclick="shareInvoiceWhatsApp()">💬 WHATSAPP</button>
@@ -2251,14 +2947,14 @@
   </div>
   
   <!-- A4 PRINTABLE CONTENT (Strict styling to match trieye branding) -->
-  <div id="printable-invoice" style="padding: 15mm; background: white; font-family: 'Inter', sans-serif; color: #000;">
+  <div id="printable-invoice">
     <!-- Header -->
-    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10mm; border-bottom:2px solid #000; padding-bottom:5mm;">
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10mm; border-bottom:2px solid #000; padding-bottom:5mm; flex-wrap:wrap; gap:10px;">
       <div>
         <!-- Use logo-dark because invoice background is white -->
         <img src="/assets/trieye-logo-dark.png" alt="Trieye" style="height:40px; margin-bottom:5px;">
         <div style="font-family:'Oswald', sans-serif; font-size:12px; letter-spacing:1px; color:#555;">DETAIL • PRECISION • PROTECTION</div>
-        <div style="margin-top:10px; font-size:12px; color:#333;">
+        <div style="margin-top:10px; font-size:12px; color:#333; line-height:1.4;">
           1st, 19, 6th Street, Main Rd<br>
           Baba Nagar, Villivakkam<br>
           Chennai, Tamil Nadu 600049<br>
@@ -2267,14 +2963,14 @@
         </div>
       </div>
       <div style="text-align:right;">
-        <h1 style="margin:0; font-family:'Oswald', sans-serif; font-size:32px; letter-spacing:2px; color:#000;">TAX INVOICE</h1>
+        <h1 style="margin:0; font-family:'Oswald', sans-serif; font-size:30px; letter-spacing:2px; color:#000;">TAX INVOICE</h1>
         <div style="margin-top:5px; font-size:14px; font-weight:600;" id="inv-num">TR-2026-000000</div>
         <div style="font-size:13px; color:#555;" id="inv-date">Date: 2026-01-01 10:00 AM</div>
       </div>
     </div>
     
     <!-- Customer & Vehicle -->
-    <div style="display:flex; justify-content:space-between; margin-bottom:10mm;">
+    <div class="inv-cust-veh-grid" style="display:flex; justify-content:space-between; margin-bottom:10mm;">
       <div style="width:48%; background:#f9f9f9; padding:10px; border-left:4px solid #000;">
         <div style="font-size:11px; color:#777; font-weight:600; text-transform:uppercase; margin-bottom:5px;">Billed To</div>
         <div style="font-size:16px; font-weight:700; margin-bottom:2px;" id="inv-cust-name">Customer Name</div>
@@ -2288,23 +2984,25 @@
     </div>
     
     <!-- Items Table -->
-    <table style="width:100%; border-collapse:collapse; margin-bottom:10mm; font-size:14px;">
-      <thead>
-        <tr style="background:#000; color:#fff;">
-          <th style="padding:10px; text-align:left;">Item / Description</th>
-          <th style="padding:10px; text-align:center; width:15%;">Qty</th>
-          <th style="padding:10px; text-align:right; width:20%;">Rate (₹)</th>
-          <th style="padding:10px; text-align:right; width:20%;">Amount (₹)</th>
-        </tr>
-      </thead>
-      <tbody id="inv-items-tbody">
-        <!-- JS fills this -->
-      </tbody>
-    </table>
+    <div style="width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; margin-bottom:10mm;">
+      <table style="width:100%; min-width:440px; border-collapse:collapse; font-size:14px;">
+        <thead>
+          <tr style="background:#000; color:#fff;">
+            <th style="padding:10px; text-align:left;">Item / Description</th>
+            <th style="padding:10px; text-align:center; width:15%;">Qty</th>
+            <th style="padding:10px; text-align:right; width:20%;">Rate (₹)</th>
+            <th style="padding:10px; text-align:right; width:20%;">Amount (₹)</th>
+          </tr>
+        </thead>
+        <tbody id="inv-items-tbody">
+          <!-- JS fills this -->
+        </tbody>
+      </table>
+    </div>
     
     <!-- Totals -->
     <div style="display:flex; justify-content:flex-end; margin-bottom:10mm;">
-      <div style="width:40%;">
+      <div class="inv-totals-box" style="width:45%; min-width:260px;">
         <div id="inv-services-subtotal-row" style="display:none; justify-content:space-between; padding:4px 0; font-size:13px; color:#555;">
           <span>Services Subtotal</span>
           <span id="inv-services-subtotal" style="font-weight:600;">₹0</span>
@@ -2708,7 +3406,7 @@
           </div>
         </div>
 
-        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:1.25rem;">
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:1.25rem;">
           <div class="panel">
             <div class="panel-header"><div class="panel-title"><span>🏷️</span> Popular Service Packages</div></div>
             <div style="padding:1.25rem;" id="rep-popular-services">
@@ -2734,7 +3432,7 @@
           </div>
         </div>
 
-        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap:1.25rem;">
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:1.25rem;">
           <!-- Business Profile Form -->
           <div class="panel">
             <div class="panel-header"><div class="panel-title"><span>🏢</span> Business Information</div></div>
@@ -3786,10 +4484,59 @@
       });
     }
 
+    // Mobile Drawer Navigation Controls
+    function openMobileDrawer() {
+      const sidebar = document.getElementById('dashboardSidebar');
+      const backdrop = document.getElementById('sidebarBackdrop');
+      const btn = document.getElementById('mobileMenuBtn');
+      if (sidebar) sidebar.classList.add('drawer-open');
+      if (backdrop) backdrop.classList.add('active');
+      if (btn) btn.setAttribute('aria-expanded', 'true');
+      document.body.classList.add('drawer-open');
+    }
+
+    function closeMobileDrawer() {
+      const sidebar = document.getElementById('dashboardSidebar');
+      const backdrop = document.getElementById('sidebarBackdrop');
+      const btn = document.getElementById('mobileMenuBtn');
+      if (sidebar) sidebar.classList.remove('drawer-open');
+      if (backdrop) backdrop.classList.remove('active');
+      if (btn) btn.setAttribute('aria-expanded', 'false');
+      document.body.classList.remove('drawer-open');
+    }
+
+    function toggleMobileDrawer() {
+      const sidebar = document.getElementById('dashboardSidebar');
+      if (sidebar && sidebar.classList.contains('drawer-open')) {
+        closeMobileDrawer();
+      } else {
+        openMobileDrawer();
+      }
+    }
+
+    // Auto-close mobile drawer on window resize above tablet
+    window.addEventListener('resize', () => {
+      if (window.innerWidth > 1024) {
+        closeMobileDrawer();
+      }
+    });
+
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && activeModals.length > 0) {
-        const topModal = activeModals[activeModals.length - 1];
-        closeModal(topModal);
+      if (e.key === 'Escape') {
+        const invModal = document.getElementById('invoiceModal');
+        if (invModal && invModal.style.display !== 'none') {
+          closeInvoiceModal();
+          return;
+        }
+        const sidebar = document.getElementById('dashboardSidebar');
+        if (sidebar && sidebar.classList.contains('drawer-open')) {
+          closeMobileDrawer();
+          return;
+        }
+        if (activeModals.length > 0) {
+          const topModal = activeModals[activeModals.length - 1];
+          closeModal(topModal);
+        }
       }
     });
 
@@ -3804,6 +4551,9 @@
 
     // Tab Navigation
     function showSection(secId) {
+      // Close mobile drawer on navigation
+      closeMobileDrawer();
+
       document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
 
@@ -6631,48 +7381,126 @@ TRIEYE WATERWASH & DETAILING`;
       }
     }
 
+    function toggleAdminPasswordVisibility(e) {
+      if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      const passInput = document.getElementById('adminAuthPass');
+      const toggleBtn = document.getElementById('adminPasswordToggle');
+      if (!passInput || !toggleBtn) return;
+
+      const isPassword = passInput.type === 'password';
+      passInput.type = isPassword ? 'text' : 'password';
+
+      toggleBtn.setAttribute('aria-pressed', isPassword ? 'true' : 'false');
+      toggleBtn.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+
+      const showIcon = toggleBtn.querySelector('.eye-icon-show');
+      const hideIcon = toggleBtn.querySelector('.eye-icon-hide');
+      if (showIcon && hideIcon) {
+        showIcon.style.display = isPassword ? 'none' : 'block';
+        hideIcon.style.display = isPassword ? 'block' : 'none';
+      }
+
+      // Preserve input focus and caret position
+      try {
+        passInput.focus({ preventScroll: true });
+        const len = passInput.value.length;
+        passInput.setSelectionRange(len, len);
+      } catch (err) {}
+    }
+
+    let isAdminLoginInProgress = false;
+
+    async function ensureTrieyeDBReady(timeoutMs = 1500) {
+      if (window.TrieyeDB && typeof window.TrieyeDB.signInAdmin === 'function') {
+        return window.TrieyeDB;
+      }
+      const startTime = Date.now();
+      while (Date.now() - startTime < timeoutMs) {
+        await new Promise(res => setTimeout(res, 80));
+        if (window.TrieyeDB && typeof window.TrieyeDB.signInAdmin === 'function') {
+          return window.TrieyeDB;
+        }
+      }
+      return (window.TrieyeDB && typeof window.TrieyeDB.signInAdmin === 'function') ? window.TrieyeDB : null;
+    }
+
     async function handleAdminLogin(e) {
-      e.preventDefault();
-      const email = document.getElementById('adminAuthEmail').value.trim();
-      const pass = document.getElementById('adminAuthPass').value;
+      if (e) {
+        e.preventDefault();
+      }
+
+      // Prevent accidental duplicate submissions
+      if (isAdminLoginInProgress) return;
+
+      const emailEl = document.getElementById('adminAuthEmail');
+      const passEl = document.getElementById('adminAuthPass');
       const btn = document.getElementById('adminLoginBtn');
       const errEl = document.getElementById('authErrorMsg');
 
+      const email = emailEl ? emailEl.value.trim() : '';
+      const pass = passEl ? passEl.value : '';
+
       if (!email || !pass) {
         if (errEl) {
-          errEl.innerText = 'Please enter both email and password.';
+          errEl.innerText = 'Please enter both your admin email and password.';
           errEl.style.display = 'block';
         }
         return;
       }
 
       if (errEl) errEl.style.display = 'none';
+
+      isAdminLoginInProgress = true;
       if (btn) {
         btn.disabled = true;
         btn.innerText = 'Verifying Admin Credentials...';
       }
 
       try {
-        const result = await window.TrieyeDB.signInAdmin(email, pass);
-
-        if (!result.success) {
+        // Ensure TrieyeDB and authentication adapter are ready
+        const db = await ensureTrieyeDBReady();
+        if (!db || typeof db.signInAdmin !== 'function') {
+          console.error('🚨 [Trieye Admin Auth Diagnostic] Database adapter unavailable:', {
+            hasSupabaseClient: typeof window.getTrieyeSupabase === 'function' && window.getTrieyeSupabase() !== null,
+            hasTrieyeDB: typeof window.TrieyeDB !== 'undefined'
+          });
           if (errEl) {
-            errEl.innerText = result.error || 'Authentication failed.';
+            errEl.innerText = 'Authentication service is initializing or unavailable. Please check your internet connection and refresh.';
             errEl.style.display = 'block';
           }
           return;
         }
 
+        const result = await db.signInAdmin(email, pass);
+
+        if (!result || !result.success) {
+          if (errEl) {
+            errEl.innerText = (result && result.error) ? result.error : 'Invalid administrator credentials. Please check your email and password.';
+            errEl.style.display = 'block';
+          }
+          return;
+        }
+
+        // Authentication & Role Verified
         document.getElementById('adminAuthOverlay').style.display = 'none';
+        if (passEl) passEl.value = '';
         showToast('Welcome back, Studio Admin!');
         await onAdminAuthenticated();
       } catch (err) {
-        console.error('🚨 [Trieye Dashboard Login Error]:', err);
+        // Diagnostic log without credentials or tokens
+        console.error('🚨 [Trieye Dashboard Login Error]:', err && err.message ? err.message : 'Unknown authentication error');
         if (errEl) {
-          errEl.innerText = err.message || 'Login failed. Please check your credentials.';
+          const safeMessage = (err && typeof err.message === 'string' && !err.message.includes('undefined') && !err.message.includes('null'))
+            ? err.message
+            : 'Authentication failed. Please verify your credentials and network connection.';
+          errEl.innerText = safeMessage;
           errEl.style.display = 'block';
         }
       } finally {
+        isAdminLoginInProgress = false;
         if (btn) {
           btn.disabled = false;
           btn.innerText = 'Sign In to Dashboard →';
@@ -6972,21 +7800,25 @@ function mbAddServiceRow() {
 
   const rowDiv = document.createElement('div');
   rowDiv.id = rowId;
-  rowDiv.style.cssText = "display:grid; grid-template-columns: 2fr 1fr 1fr 1fr 40px; gap:0.5rem; align-items:center; margin-bottom:0.8rem;";
+  rowDiv.className = 'mb-svc-row';
   rowDiv.innerHTML = `
-    <select class="form-select mb-svc-select" onchange="mbServiceSelected('${rowId}')">
-      ${optionsHtml}
-    </select>
-    <div style="display:flex; align-items:center; gap:0.5rem;">
-      <span style="color:var(--text-muted); font-size:0.8rem;">Qty</span>
-      <input type="number" class="form-input mb-svc-qty" value="1" min="1" oninput="mbCalcTotals()" style="padding:0.4rem;">
+    <div class="mb-svc-row-top">
+      <select class="form-select mb-svc-select" onchange="mbServiceSelected('${rowId}')">
+        ${optionsHtml}
+      </select>
     </div>
-    <div style="display:flex; align-items:center; gap:0.5rem;">
-      <span style="color:var(--text-muted); font-size:0.8rem;">₹</span>
-      <input type="number" class="form-input mb-svc-price" value="0" min="0" oninput="mbCalcTotals()" style="padding:0.4rem;">
+    <div class="mb-svc-row-bottom">
+      <div style="display:flex; align-items:center; gap:0.35rem;">
+        <span style="color:var(--text-muted); font-size:0.75rem;">Qty</span>
+        <input type="number" class="form-input mb-svc-qty" value="1" min="1" oninput="mbCalcTotals()" style="padding:0.4rem; font-size:0.82rem;">
+      </div>
+      <div style="display:flex; align-items:center; gap:0.35rem;">
+        <span style="color:var(--text-muted); font-size:0.75rem;">₹</span>
+        <input type="number" class="form-input mb-svc-price" value="0" min="0" oninput="mbCalcTotals()" style="padding:0.4rem; font-size:0.82rem;">
+      </div>
+      <div style="font-family:'IBM Plex Mono'; font-weight:700; text-align:right; font-size:0.88rem;" class="mb-svc-total">₹0</div>
+      <button type="button" class="btn btn-outline" style="padding:0.4rem 0.5rem; color:var(--red); border-color:var(--red); font-size:0.82rem;" onclick="document.getElementById('${rowId}').remove(); mbCalcTotals();" title="Remove Service">✕</button>
     </div>
-    <div style="font-family:'IBM Plex Mono'; font-weight:700; text-align:right;" class="mb-svc-total">₹0</div>
-    <button class="btn btn-outline" style="padding:0.4rem; color:var(--red); border-color:var(--red);" onclick="document.getElementById('${rowId}').remove(); mbCalcTotals();">✕</button>
   `;
   container.appendChild(rowDiv);
 }
@@ -7042,15 +7874,14 @@ function mbAddProductRow(defaultName = '', defaultPrice = null) {
   const rowDiv = document.createElement('div');
   rowDiv.id = rowId;
   rowDiv.className = 'mb-prod-row';
-  rowDiv.style.cssText = "display:grid; grid-template-columns: minmax(140px, 2fr) 90px 110px 100px 42px; gap:0.5rem; align-items:center; margin-bottom:0.6rem;";
 
   const isCustom = defaultName && !mbSuggestedProducts.some(p => p.name === defaultName);
   const selectedName = defaultName || (mbSuggestedProducts[0] ? mbSuggestedProducts[0].name : 'CUSTOM');
   const initialPrice = defaultPrice !== null ? defaultPrice : (mbSuggestedProducts.find(p => p.name === selectedName)?.price || 0);
 
   rowDiv.innerHTML = `
-    <div>
-      <select class="form-select mb-prod-select" onchange="mbProductSelected('${rowId}')" style="padding:0.4rem 0.5rem; font-size:0.82rem;">
+    <div class="mb-prod-row-top">
+      <select class="form-select mb-prod-select" onchange="mbProductSelected('${rowId}')" style="padding:0.4rem 0.5rem; font-size:0.82rem; width:100%;">
         ${mbSuggestedProducts.map(p => `
           <option value="${escapeHtml(p.name)}" data-price="${p.price}" ${p.name === selectedName && !isCustom ? 'selected' : ''}>
             ${escapeHtml(p.name)}
@@ -7058,17 +7889,21 @@ function mbAddProductRow(defaultName = '', defaultPrice = null) {
         `).join('')}
         <option value="CUSTOM" ${isCustom ? 'selected' : ''}>+ Custom Product...</option>
       </select>
-      <input type="text" class="form-input mb-prod-custom-name" placeholder="Enter product name" value="${isCustom ? escapeHtml(defaultName) : ''}" style="display:${isCustom ? 'block' : 'none'}; margin-top:0.35rem; padding:0.35rem 0.5rem; font-size:0.8rem;" oninput="mbCalcTotals()">
+      <input type="text" class="form-input mb-prod-custom-name" placeholder="Enter product name" value="${isCustom ? escapeHtml(defaultName) : ''}" style="display:${isCustom ? 'block' : 'none'}; margin-top:0.35rem; padding:0.35rem 0.5rem; font-size:0.8rem; width:100%;" oninput="mbCalcTotals()">
     </div>
-    <div>
-      <input type="number" class="form-input mb-prod-qty" value="1" min="1" step="1" oninput="if(this.value < 1 && this.value !== '') this.value = 1; mbCalcTotals()" style="padding:0.4rem; text-align:center; font-size:0.85rem;">
-    </div>
-    <div>
-      <input type="number" class="form-input mb-prod-price" value="${initialPrice}" min="0" step="1" oninput="if(this.value < 0) this.value = 0; mbCalcTotals()" style="padding:0.4rem; font-size:0.85rem;">
-    </div>
-    <div style="font-family:'IBM Plex Mono'; font-weight:700; text-align:right; font-size:0.9rem;" class="mb-prod-total">₹${initialPrice}</div>
-    <div style="text-align:center;">
-      <button type="button" class="btn btn-outline" style="padding:0.35rem 0.5rem; color:var(--red); border-color:rgba(239,68,68,0.4); border-radius:6px; font-size:0.85rem;" onclick="document.getElementById('${rowId}').remove(); mbCalcTotals();" title="Remove Product">✕</button>
+    <div class="mb-prod-row-bottom">
+      <div style="display:flex; align-items:center; gap:0.3rem;">
+        <span class="mb-prod-mobile-lbl" style="display:none; font-size:0.72rem; color:var(--muted);">Qty:</span>
+        <input type="number" class="form-input mb-prod-qty" value="1" min="1" step="1" oninput="if(this.value < 1 && this.value !== '') this.value = 1; mbCalcTotals()" style="padding:0.4rem; text-align:center; font-size:0.85rem; width:100%;">
+      </div>
+      <div style="display:flex; align-items:center; gap:0.3rem;">
+        <span class="mb-prod-mobile-lbl" style="display:none; font-size:0.72rem; color:var(--muted);">₹:</span>
+        <input type="number" class="form-input mb-prod-price" value="${initialPrice}" min="0" step="1" oninput="if(this.value < 0) this.value = 0; mbCalcTotals()" style="padding:0.4rem; font-size:0.85rem; width:100%;">
+      </div>
+      <div style="font-family:'IBM Plex Mono'; font-weight:700; text-align:right; font-size:0.88rem;" class="mb-prod-total">₹${initialPrice}</div>
+      <div style="text-align:center;">
+        <button type="button" class="btn btn-outline" style="padding:0.35rem 0.5rem; color:var(--red); border-color:rgba(239,68,68,0.4); border-radius:6px; font-size:0.85rem;" onclick="document.getElementById('${rowId}').remove(); mbCalcTotals();" title="Remove Product">✕</button>
+      </div>
     </div>
   `;
   container.appendChild(rowDiv);
@@ -7119,6 +7954,11 @@ function mbCalcTotals() {
   const prodContainer = document.getElementById('mb-products-container');
   const prodRows = prodContainer ? prodContainer.querySelectorAll('.mb-prod-row') : [];
   let addonSubtotal = 0;
+
+  const prodHeaderEl = document.querySelector('.mb-prod-header');
+  if (prodHeaderEl) {
+    prodHeaderEl.style.display = (prodRows.length > 0 && window.innerWidth > 640) ? 'grid' : 'none';
+  }
 
   prodRows.forEach(row => {
     const qtyInput = row.querySelector('.mb-prod-qty');
