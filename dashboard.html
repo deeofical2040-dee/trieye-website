@@ -8237,11 +8237,8 @@ async function makeBill() {
       svcContainer.innerHTML = '';
       mbAddServiceRow();
 
-      // Reset products container with default suggestions
+      // Reset products container (starts empty; add-ons are added on demand)
       prodContainer.innerHTML = '';
-      mbSuggestedProducts.forEach(p => {
-        mbAddProductRow(p.name, p.price);
-      });
 
       mbCalcTotals();
       
@@ -8348,14 +8345,16 @@ async function makeBill() {
   }
 }
 
-// Automatically add initial services & suggested add-on products on load
+// Automatically add initial service on load (add-on products start empty until explicitly added)
 document.addEventListener('DOMContentLoaded', () => {
     mbAddServiceRow();
     
-    // Pre-populate suggested products: Chain Loop ₹50, Perfume ₹200, Fabric Cloth ₹150
-    mbSuggestedProducts.forEach(p => {
-      mbAddProductRow(p.name, p.price);
-    });
+    // Add-on products container starts empty by default
+    const prodContainer = document.getElementById('mb-products-container');
+    if (prodContainer) {
+      prodContainer.innerHTML = '';
+    }
+    mbCalcTotals();
 
     const mbRegInput = document.getElementById('mb-reg');
     const mbError = document.getElementById('mb-error');
