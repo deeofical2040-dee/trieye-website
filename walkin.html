@@ -623,6 +623,31 @@
         padding: 0.5rem 0.4rem;
       }
     }
+
+    @media print {
+      body * {
+        visibility: hidden;
+      }
+      #invoice-print-area, #invoice-print-area * {
+        visibility: visible;
+      }
+      #invoice-print-area {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        margin: 0 !important;
+        padding: 24px !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        border: none !important;
+        box-shadow: none !important;
+      }
+      .admin-audit-card, .invoice-modal-header, .modal-backdrop {
+        display: none !important;
+        visibility: hidden !important;
+      }
+    }
   </style>
 </head>
 <body>
@@ -855,6 +880,12 @@
               <input type="number" id="mb-discount" class="form-input" style="width:85px; text-align:right; padding:0.35rem 0.5rem; font-size:0.85rem;" value="0" min="0" oninput="mbCalcTotals()">
             </div>
           </div>
+          <div id="mb-discount-reason-row" style="display:none; flex-direction:column; gap:0.25rem;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="color:var(--muted); font-size:0.75rem;">Discount Reason (Admin Audit):</span>
+            </div>
+            <input type="text" id="mb-discount-reason" class="form-input" style="font-size:0.8rem; padding:0.35rem 0.5rem;" placeholder="e.g. VIP Offer, Studio Promo, Manager Waiver" maxlength="100" oninput="mbCalcTotals()">
+          </div>
 
           <!-- Grand Total Banner -->
           <div style="background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.3); border-radius:8px; padding:0.85rem 1rem; display:flex; justify-content:space-between; align-items:center; margin:0.35rem 0;">
@@ -877,7 +908,7 @@
               <span id="mb-summary-paidamt" style="font-family:'IBM Plex Mono'; font-weight:600;">₹0</span>
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="color:var(--text-muted);">Balance Due</span>
+              <span style="color:var(--text-muted);">Less Amount</span>
               <span id="mb-summary-balance" style="font-family:'IBM Plex Mono'; font-weight:700; color:var(--white);">₹0</span>
             </div>
           </div>
@@ -912,49 +943,70 @@
 
   <!-- PRINTABLE A4 INVOICE MODAL -->
   <div class="modal-backdrop" id="invoiceModalBackdrop" style="display:none;" onclick="closeInvoiceModal()"></div>
-  <div class="modal" id="invoiceModal" style="display:none;">
+  <div class="modal" id="invoiceModal" style="display:none; max-width:850px;">
     <div class="invoice-modal-header">
-      <h3 style="margin:0; font-family:'Oswald',sans-serif; letter-spacing:0.04em; font-size:1.15rem;">Invoice Preview</h3>
-      <div style="display:flex; gap:10px;">
-        <button class="btn btn-outline" style="color:#fff; border-color:#444;" onclick="printInvoice()">🖨️ Print</button>
-        <button class="btn btn-outline" style="color:#fff; border-color:#444;" onclick="downloadInvoicePDF()">📥 PDF</button>
-        <button class="btn btn-green" style="background:#22c55e; color:#fff;" onclick="shareInvoiceWhatsApp()">💬 WhatsApp</button>
+      <h3 style="margin:0; font-family:'Oswald',sans-serif; letter-spacing:0.04em; font-size:1.15rem;">Invoice &amp; Bill Preview</h3>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn btn-outline" style="color:#fff; border-color:#444;" onclick="printInvoice()">🖨️ Print Receipt</button>
+        <button class="btn btn-outline" style="color:#fff; border-color:#444;" onclick="downloadInvoicePDF()">📥 Download PDF</button>
+        <button class="btn btn-green" style="background:#22c55e; color:#fff;" onclick="shareInvoiceWhatsApp()">💬 WhatsApp Bill</button>
         <button class="btn btn-outline" style="color:#fff; border-color:#444;" onclick="closeInvoiceModal()">✕</button>
       </div>
     </div>
-    <div id="invoice-print-area" style="padding:40px; font-family:'Space Grotesk', sans-serif; color:#111; background:#fff;">
-      <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid #ee2f76; padding-bottom:20px; margin-bottom:20px;">
+
+    <!-- ADMIN AUDIT PANEL (Hidden during Print & Customer Sharing) -->
+    <div class="admin-audit-card" id="walkin-admin-audit-box" style="margin:16px 20px 0; padding:14px 18px; background:#18181b; border:1px solid #3f3f46; border-radius:8px; font-size:12.5px; display:none;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid #27272a; padding-bottom:6px;">
+        <div style="font-family:'Oswald',sans-serif; letter-spacing:0.04em; font-size:13px; color:#a3e635; text-transform:uppercase; font-weight:700;">
+          🔒 Admin Audit — Billing &amp; Adjustment Record (Internal Only)
+        </div>
+        <span style="font-size:11px; color:#a1a1aa; font-family:'IBM Plex Mono';">Confidential</span>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px;">
+        <div><span style="color:#a1a1aa; display:block; font-size:11px;">Original Price:</span> <strong id="audit-orig-price" style="color:#ffffff; font-family:'IBM Plex Mono';">₹0</strong></div>
+        <div><span style="color:#a1a1aa; display:block; font-size:11px;">Discount:</span> <strong id="audit-discount" style="color:#f43f5e; font-family:'IBM Plex Mono';">₹0</strong></div>
+        <div><span style="color:#a1a1aa; display:block; font-size:11px;">Discount Reason:</span> <strong id="audit-reason" style="color:#38bdf8;">None</strong></div>
+        <div><span style="color:#a1a1aa; display:block; font-size:11px;">Final Bill:</span> <strong id="audit-final-bill" style="color:#a3e635; font-family:'IBM Plex Mono';">₹0</strong></div>
+        <div><span style="color:#a1a1aa; display:block; font-size:11px;">Amount Collected:</span> <strong id="audit-collected" style="color:#ffffff; font-family:'IBM Plex Mono';">₹0</strong></div>
+        <div><span style="color:#a1a1aa; display:block; font-size:11px;">Balance Due:</span> <strong id="audit-balance" style="color:#f43f5e; font-family:'IBM Plex Mono';">₹0</strong></div>
+        <div><span style="color:#a1a1aa; display:block; font-size:11px;">Payment Status:</span> <strong id="audit-status" style="color:#a3e635; font-family:'IBM Plex Mono';">PAID</strong></div>
+      </div>
+    </div>
+
+    <!-- CUSTOMER-FACING PRINTABLE BILL / RECEIPT (Clean, concise, no discount details) -->
+    <div id="invoice-print-area" style="padding:36px; font-family:'Space Grotesk', -apple-system, sans-serif; color:#111; background:#fff; margin:16px 20px 20px; border-radius:6px;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid #ee2f76; padding-bottom:18px; margin-bottom:18px;">
         <div>
-          <h1 style="margin:0; color:#ee2f76; font-size:28px; font-weight:800; font-family:'Oswald', sans-serif; letter-spacing:1px;">TRIEYE DETAILING STUDIO</h1>
-          <p style="margin:5px 0 0; color:#555; font-size:13px; line-height:1.4;">Premium Automotive Detailing &amp; Paint Protection<br>Tamil Nadu, India | Contact: +91 90432 02040</p>
+          <h1 style="margin:0; color:#ee2f76; font-size:26px; font-weight:800; font-family:'Oswald', sans-serif; letter-spacing:1px;">TRIEYE DETAILING</h1>
+          <p style="margin:4px 0 0; color:#555; font-size:12.5px; line-height:1.4;">Premium Automotive Detailing &amp; Paint Protection<br>Villivakkam, Chennai | Contact: +91 99401 81934 / +91 93630 68836</p>
         </div>
         <div style="text-align:right;">
-          <h2 style="margin:0; font-size:22px; color:#333; font-family:'Oswald', sans-serif;">TAX INVOICE</h2>
-          <p style="margin:5px 0 0; font-weight:600; font-size:14px; font-family:'IBM Plex Mono';">Invoice #: <span id="inv-modal-number">INV-0000</span></p>
-          <p style="margin:3px 0 0; color:#666; font-size:13px;">Date: <span id="inv-modal-date">01/01/2026</span></p>
+          <h2 style="margin:0; font-size:20px; color:#111; font-family:'Oswald', sans-serif; letter-spacing:0.04em;">TAX INVOICE</h2>
+          <p style="margin:4px 0 0; font-weight:600; font-size:13.5px; font-family:'IBM Plex Mono';">Invoice #: <span id="inv-modal-number">INV-0000</span></p>
+          <p style="margin:2px 0 0; color:#666; font-size:12.5px;">Date: <span id="inv-modal-date">01/01/2026</span></p>
         </div>
       </div>
       
-      <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px; background:#f8fafc; padding:15px; border-radius:6px; font-size:13px;">
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:18px; background:#f8fafc; padding:14px; border-radius:6px; font-size:13px; border:1px solid #e2e8f0;">
         <div>
-          <strong style="color:#555; text-transform:uppercase; font-size:11px; letter-spacing:0.5px;">Billed To:</strong>
-          <div style="font-size:16px; font-weight:700; margin-top:4px;" id="inv-cust-name">Customer Name</div>
-          <div style="color:#666;" id="inv-cust-phone">+91 00000 00000</div>
+          <strong style="color:#64748b; text-transform:uppercase; font-size:11px; letter-spacing:0.5px;">Billed To:</strong>
+          <div style="font-size:15px; font-weight:700; margin-top:3px; color:#0f172a;" id="inv-cust-name">Customer Name</div>
+          <div style="color:#64748b; font-family:'IBM Plex Mono';" id="inv-cust-phone">+91 00000 00000</div>
         </div>
         <div style="text-align:right;">
-          <strong style="color:#555; text-transform:uppercase; font-size:11px; letter-spacing:0.5px;">Vehicle Details:</strong>
-          <div style="font-size:16px; font-weight:700; margin-top:4px;" id="inv-veh-reg">TN 01 AB 1234</div>
-          <div style="color:#666;" id="inv-veh-type">SUV / 4x4</div>
+          <strong style="color:#64748b; text-transform:uppercase; font-size:11px; letter-spacing:0.5px;">Vehicle Details:</strong>
+          <div style="font-size:15px; font-weight:700; margin-top:3px; color:#ee2f76; font-family:'IBM Plex Mono';" id="inv-veh-reg">TN 01 AB 1234</div>
+          <div style="color:#64748b;" id="inv-veh-type">Car</div>
         </div>
       </div>
 
-      <table style="width:100%; border-collapse:collapse; margin-bottom:20px; font-size:13px;">
+      <table style="width:100%; border-collapse:collapse; margin-bottom:18px; font-size:13px;">
         <thead>
           <tr style="background:#0f172a; color:#fff; text-align:left;">
-            <th style="padding:10px; border-top-left-radius:4px;">Item / Description</th>
-            <th style="padding:10px; text-align:center;">Qty</th>
-            <th style="padding:10px; text-align:right;">Unit Price</th>
-            <th style="padding:10px; text-align:right; border-top-right-radius:4px;">Total</th>
+            <th style="padding:9px 12px; border-top-left-radius:4px;">Service Name / Description</th>
+            <th style="padding:9px 12px; text-align:center; width:65px;">Qty</th>
+            <th style="padding:9px 12px; text-align:right; width:110px;">Rate (₹)</th>
+            <th style="padding:9px 12px; text-align:right; border-top-right-radius:4px; width:120px;">Amount (₹)</th>
           </tr>
         </thead>
         <tbody id="inv-items-tbody">
@@ -962,51 +1014,48 @@
         </tbody>
       </table>
 
-      <!-- Subtotal Breakdown -->
-      <div style="display:flex; justify-content:flex-end; margin-bottom:20px;">
-        <div style="width:300px; font-size:13px;">
-          <div id="inv-services-subtotal-row" style="display:flex; justify-content:space-between; padding:4px 0; color:#555;">
+      <!-- Customer-facing Totals (Simplified, No Discount Details) -->
+      <div style="display:flex; justify-content:flex-end; margin-bottom:18px;">
+        <div style="width:320px; font-size:13px;">
+          <div id="inv-services-subtotal-row" style="display:none; justify-content:space-between; padding:3px 0; color:#64748b;">
             <span>Services Subtotal:</span>
             <span id="inv-services-subtotal" style="font-family:'IBM Plex Mono';">₹0</span>
           </div>
-          <div id="inv-addon-subtotal-row" style="display:flex; justify-content:space-between; padding:4px 0; color:#845ef7; font-weight:600;">
+          <div id="inv-addon-subtotal-row" style="display:none; justify-content:space-between; padding:3px 0; color:#7c3aed; font-weight:600;">
             <span>Add-on Products:</span>
             <span id="inv-addon-subtotal" style="font-family:'IBM Plex Mono';">₹0</span>
           </div>
-          <div style="display:flex; justify-content:space-between; padding:4px 0; color:#555; border-top:1px dashed #cbd5e1; margin-top:4px;">
-            <span>Total Subtotal:</span>
-            <span id="inv-subtotal" style="font-family:'IBM Plex Mono';">₹0</span>
+          <div style="display:flex; justify-content:space-between; padding:6px 0; font-size:14px; font-weight:700; color:#0f172a; border-top:1px dashed #cbd5e1; margin-top:4px;">
+            <span>Total Bill:</span>
+            <span id="inv-subtotal" style="font-family:'IBM Plex Mono'; font-weight:700;">₹0</span>
           </div>
-          <div style="display:flex; justify-content:space-between; padding:4px 0; color:#e03131;">
-            <span>Discount:</span>
-            <span id="inv-discount" style="font-family:'IBM Plex Mono';">- ₹0</span>
+          <div style="display:flex; justify-content:space-between; padding:4px 0; color:#334155;">
+            <span>Amount Collected:</span>
+            <span id="inv-amt-paid" style="font-family:'IBM Plex Mono'; font-weight:600; color:#0f172a;">₹0</span>
           </div>
-          <div style="display:flex; justify-content:space-between; padding:8px 0; font-size:16px; font-weight:800; border-top:2px solid #000; border-bottom:2px solid #000; margin-top:4px;">
-            <span>Grand Total:</span>
-            <span id="inv-grandtotal" style="color:#ee2f76; font-family:'IBM Plex Mono';">₹0</span>
+          <div id="inv-balance-row" style="display:none; justify-content:space-between; padding:4px 0; color:#dc2626; font-weight:700;">
+            <span>Less Amount:</span>
+            <span id="inv-balance" style="font-family:'IBM Plex Mono'; color:#dc2626;">₹0</span>
           </div>
-          <div style="display:flex; justify-content:space-between; padding:4px 0; color:#22c55e; font-weight:600; margin-top:4px;">
-            <span>Amount Paid:</span>
-            <span id="inv-amt-paid" style="font-family:'IBM Plex Mono';">₹0</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; padding:4px 0; color:#e03131; font-weight:600;">
-            <span>Balance Due:</span>
-            <span id="inv-balance" style="font-family:'IBM Plex Mono';">₹0</span>
+          <div style="display:flex; justify-content:space-between; padding:8px 0; font-size:18px; font-weight:800; border-top:2px solid #0f172a; border-bottom:2px solid #0f172a; margin-top:6px;">
+            <span id="inv-final-label">Paid Amount:</span>
+            <span id="inv-grandtotal" style="color:#15803d; font-family:'IBM Plex Mono'; font-size:22px;">₹0</span>
           </div>
         </div>
       </div>
 
-      <div style="border-top:1px solid #ddd; padding-top:15px; font-size:12px; color:#555; display:flex; justify-content:space-between;">
+      <div style="border-top:1px solid #e2e8f0; padding-top:14px; font-size:12px; color:#64748b; display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;">
         <div>
-          <p style="margin:0 0 5px;"><strong>Payment Status:</strong> <span id="inv-pay-status" style="font-weight:700;">PAID</span></p>
-          <p style="margin:0;"><strong>Payment Method:</strong> <span id="inv-pay-method">UPI</span></p>
+          <p style="margin:0 0 4px;"><strong>Payment Status:</strong> <span id="inv-pay-status" style="font-weight:700; color:#15803d;">PAID</span></p>
+          <p style="margin:0;"><strong>Payment Method:</strong> <span id="inv-pay-method" style="font-weight:600; color:#0f172a;">UPI</span></p>
         </div>
         <div style="text-align:right;">
-          <p style="margin:0 0 5px; color:#888;">Thank you for your business!</p>
-          <p style="margin:0; font-weight:600; color:#ee2f76;">Detail • Precision • Protection</p>
+          <p style="margin:0 0 4px; color:#64748b;">Thank you for trusting TRIEYE DETAILING!</p>
+          <p style="margin:0; font-weight:600; color:#ee2f76; font-family:'Oswald',sans-serif; letter-spacing:0.04em;">DETAIL • PRECISION • PROTECTION</p>
         </div>
       </div>
     </div>
+  </div>
   </div>
 
   <div id="toastContainer"></div>
@@ -1389,13 +1438,20 @@
       // 3. Subtotal
       const subtotal = servicesSubtotal + addonSubtotal;
 
-      // 4. Discount
+      // 4. Discount & Reason
       const discountInput = document.getElementById('mb-discount');
       let discount = parseFloat(discountInput ? discountInput.value : 0);
       if (isNaN(discount) || discount < 0) discount = 0;
       if (discount > subtotal) {
         discount = subtotal;
         if (discountInput) discountInput.value = discount;
+      }
+
+      const discountReasonRow = document.getElementById('mb-discount-reason-row');
+      const discountReasonInput = document.getElementById('mb-discount-reason');
+      const discountReason = (discountReasonInput ? discountReasonInput.value : '').trim();
+      if (discountReasonRow) {
+        discountReasonRow.style.display = discount > 0 ? 'flex' : 'none';
       }
 
       // 5. Grand Total
@@ -1473,7 +1529,20 @@
 
       mbUpdateAdditionalInfo();
 
-      return { servicesSubtotal, addonSubtotal, subtotal, discount, grandTotal, balanceDue, payAmt };
+      return {
+        servicesSubtotal,
+        addonSubtotal,
+        subtotal,
+        original_price: subtotal,
+        originalPrice: subtotal,
+        discount,
+        discount_reason: discountReason,
+        discountReason: discountReason,
+        grandTotal,
+        grand_total: grandTotal,
+        balanceDue,
+        payAmt
+      };
     }
 
     function mbUpdateAdditionalInfo() {
@@ -1640,6 +1709,10 @@
           document.getElementById('mb-phone').value = '';
           document.getElementById('mb-reg').value = '';
           document.getElementById('mb-discount').value = '0';
+          const discReasonEl = document.getElementById('mb-discount-reason');
+          if (discReasonEl) discReasonEl.value = '';
+          const discReasonRow = document.getElementById('mb-discount-reason-row');
+          if (discReasonRow) discReasonRow.style.display = 'none';
           document.getElementById('mb-pay-status').value = 'PAID';
           
           // Reset services container to 1 default row
@@ -1666,6 +1739,19 @@
 
     // INVOICE PREVIEW & MODAL
     let currentPrintInvoice = null;
+
+    function formatPaymentMethod(m) {
+      if (window.TrieyeDB && typeof window.TrieyeDB.formatPaymentMethod === 'function') {
+        return window.TrieyeDB.formatPaymentMethod(m);
+      }
+      if (!m) return 'Cash';
+      const u = String(m).toUpperCase();
+      if (u === 'UPI') return 'UPI / QR';
+      if (u === 'CARD') return 'Card';
+      if (u === 'CASH') return 'Cash';
+      if (u === 'BANK_TRANSFER') return 'Bank Transfer';
+      return m;
+    }
 
     async function openInvoiceModal(invoiceId) {
       currentPrintInvoice = null;
@@ -1762,17 +1848,105 @@
         }
       }
 
-      document.getElementById('inv-subtotal').innerText = '₹' + Number(inv.subtotal).toLocaleString();
-      document.getElementById('inv-discount').innerText = '- ₹' + Number(inv.discount).toLocaleString();
-      document.getElementById('inv-grandtotal').innerText = '₹' + Number(inv.grand_total).toLocaleString();
+      const metrics = (window.TrieyeDB && typeof window.TrieyeDB.calculateBillMetrics === 'function')
+        ? window.TrieyeDB.calculateBillMetrics(inv)
+        : {
+            serviceName: (serviceItems[0] && serviceItems[0].service_name) || 'Detailing Service',
+            serviceDescription: '',
+            originalBillAmount: Number(inv.subtotal || inv.grand_total || 0),
+            discountAmount: Number(inv.discount || 0),
+            discountReason: inv.discount_reason || '',
+            finalBillAmount: Number(inv.grand_total || 0),
+            amountCollected: Number(pay.amount || 0),
+            balanceDue: Math.max(0, Number(inv.grand_total || 0) - Number(pay.amount || 0)),
+            paymentStatus: pay.status || 'UNPAID',
+            paymentMethod: pay.method || 'Pending',
+            isPaid: (pay.status || '').toUpperCase() === 'PAID',
+            isPartial: (pay.status || '').toUpperCase() === 'PARTIAL',
+            isUnpaid: (pay.status || '').toUpperCase() === 'UNPAID'
+          };
+
+      // Customer-Facing Printable Receipt:
+      // Show Total Bill (original price), Amount Collected, Paid Amount (when fully paid)
+      // or Balance Due (when partially paid). Never leak discount details.
+      const subtotalEl = document.getElementById('inv-subtotal');
+      if (subtotalEl) subtotalEl.innerText = '₹' + metrics.originalBillAmount.toLocaleString('en-IN');
       
-      const amtPaid = Number(pay.amount || 0);
-      const balanceDue = Math.max(0, Number(inv.grand_total) - amtPaid);
+      const amtPaidEl = document.getElementById('inv-amt-paid');
+      if (amtPaidEl) amtPaidEl.innerText = '₹' + metrics.amountCollected.toLocaleString('en-IN');
       
-      document.getElementById('inv-amt-paid').innerText = '₹' + amtPaid.toLocaleString();
-      document.getElementById('inv-balance').innerText = '₹' + balanceDue.toLocaleString();
-      document.getElementById('inv-pay-status').innerText = pay.status || 'UNPAID';
-      document.getElementById('inv-pay-method').innerText = pay.method || 'Pending';
+      const grandtotalEl = document.getElementById('inv-grandtotal');
+      const finalLabelEl = document.getElementById('inv-final-label');
+      const balanceRowEl = document.getElementById('inv-balance-row');
+      const balanceEl = document.getElementById('inv-balance');
+      const payStatusEl = document.getElementById('inv-pay-status');
+      const payMethodEl = document.getElementById('inv-pay-method');
+
+      if (metrics.isPaid) {
+        if (finalLabelEl) finalLabelEl.innerText = 'Paid Amount:';
+        if (grandtotalEl) {
+          grandtotalEl.innerText = '₹' + metrics.amountCollected.toLocaleString('en-IN');
+          grandtotalEl.style.color = '#15803d';
+        }
+        if (balanceRowEl) balanceRowEl.style.display = 'none';
+        if (payStatusEl) {
+          payStatusEl.innerText = 'PAID';
+          payStatusEl.style.color = '#15803d';
+        }
+      } else if (metrics.isPartial) {
+        if (finalLabelEl) finalLabelEl.innerText = 'Final Payable:';
+        if (grandtotalEl) {
+          grandtotalEl.innerText = '₹' + metrics.finalBillAmount.toLocaleString('en-IN');
+          grandtotalEl.style.color = '#d97706';
+        }
+        if (balanceRowEl) {
+          balanceRowEl.style.display = 'flex';
+          if (balanceEl) balanceEl.innerText = '₹' + metrics.balanceDue.toLocaleString('en-IN');
+        }
+        if (payStatusEl) {
+          payStatusEl.innerText = 'PARTIALLY PAID';
+          payStatusEl.style.color = '#d97706';
+        }
+      } else {
+        if (finalLabelEl) finalLabelEl.innerText = 'Amount Payable:';
+        if (grandtotalEl) {
+          grandtotalEl.innerText = '₹' + metrics.finalBillAmount.toLocaleString('en-IN');
+          grandtotalEl.style.color = '#dc2626';
+        }
+        if (balanceRowEl) {
+          balanceRowEl.style.display = 'flex';
+          if (balanceEl) balanceEl.innerText = '₹' + metrics.balanceDue.toLocaleString('en-IN');
+        }
+        if (payStatusEl) {
+          payStatusEl.innerText = 'UNPAID';
+          payStatusEl.style.color = '#dc2626';
+        }
+      }
+      if (payMethodEl) payMethodEl.innerText = formatPaymentMethod(metrics.paymentMethod);
+
+      // Admin Dashboard Audit Box (Internal Audit Trail)
+      const auditBox = document.getElementById('walkin-admin-audit-box');
+      if (auditBox) {
+        auditBox.style.display = 'block';
+        const aOrig = document.getElementById('audit-orig-price');
+        const aDisc = document.getElementById('audit-discount');
+        const aReas = document.getElementById('audit-reason');
+        const aFin = document.getElementById('audit-final-bill');
+        const aCol = document.getElementById('audit-collected');
+        const aBal = document.getElementById('audit-balance');
+        const aStat = document.getElementById('audit-status');
+
+        if (aOrig) aOrig.innerText = '₹' + metrics.originalBillAmount.toLocaleString('en-IN');
+        if (aDisc) aDisc.innerText = metrics.discountAmount > 0 ? ('- ₹' + metrics.discountAmount.toLocaleString('en-IN')) : '₹0';
+        if (aReas) aReas.innerText = metrics.discountReason || (metrics.discountAmount > 0 ? 'Not specified' : 'None');
+        if (aFin) aFin.innerText = '₹' + metrics.finalBillAmount.toLocaleString('en-IN');
+        if (aCol) aCol.innerText = '₹' + metrics.amountCollected.toLocaleString('en-IN');
+        if (aBal) aBal.innerText = '₹' + metrics.balanceDue.toLocaleString('en-IN');
+        if (aStat) {
+          aStat.innerText = metrics.paymentStatus;
+          aStat.style.color = metrics.isPaid ? '#a3e635' : (metrics.isPartial ? '#fbbf24' : '#f87171');
+        }
+      }
 
       document.getElementById('invoiceModalBackdrop').style.display = 'block';
       document.getElementById('invoiceModal').style.display = 'block';
@@ -1791,7 +1965,7 @@
       const element = document.getElementById('invoice-print-area');
       const invNum = (currentPrintInvoice && currentPrintInvoice.invoice_number) ? currentPrintInvoice.invoice_number : 'Invoice';
       const opt = {
-        margin: [10, 10, 10, 10],
+        margin: [8, 8, 8, 8],
         filename: `${invNum}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2 },
@@ -1805,47 +1979,86 @@
     }
 
     function shareInvoiceWhatsApp() {
-      if (!currentPrintInvoice) return;
-      const cust = currentPrintInvoice.customers || {};
+      const inv = currentPrintInvoice || window.currentPrintInvoice;
+      if (!inv) return;
+      const cust = inv.customers || {
+        name: inv.customer_name || inv.name,
+        phone: inv.customer_phone || inv.phone
+      };
       if (!cust.phone) {
         alert("No customer phone number available.");
         return;
       }
-      const veh = currentPrintInvoice.vehicles || {};
-      const items = currentPrintInvoice.invoice_items || [];
-      
-      const serviceItems = [];
-      const productItems = [];
-      items.forEach(it => {
-        const isProd = it.item_type === 'PRODUCT' || it.is_product || 
-          ['Chain Loop', 'Perfume', 'Fabric Cloth'].includes(it.service_name);
-        if (isProd) productItems.push(it);
-        else serviceItems.push(it);
-      });
+      const veh = inv.vehicles || {
+        vehicle_type: inv.vehicle_type || inv.vehicleType,
+        reg_number: inv.reg_number || inv.reg
+      };
+      const metrics = (window.TrieyeDB && typeof window.TrieyeDB.calculateBillMetrics === 'function')
+        ? window.TrieyeDB.calculateBillMetrics(inv)
+        : {
+            serviceName: 'Detailing Service',
+            originalBillAmount: Number(inv.subtotal || inv.grand_total || 0),
+            amountCollected: Number((inv.payments && inv.payments[0]?.amount) || inv.grand_total || 0),
+            finalBillAmount: Number(inv.grand_total || 0),
+            balanceDue: 0,
+            paymentStatus: 'PAID',
+            paymentMethod: 'CASH',
+            isPaid: true
+          };
 
-      let itemsText = '';
-      if (serviceItems.length > 0) {
-        itemsText += '\n*Detailing Services:*\n' + serviceItems.map(s => `• ${s.service_name} (x${s.quantity}) - ₹${Number(s.total_price).toLocaleString()}`).join('\n') + '\n';
+      const shareToken = inv.share_token || (inv.bookings && inv.bookings.share_token) || '';
+      const isLocalHost = !window.location.origin || 
+                          window.location.hostname === 'localhost' || 
+                          window.location.hostname === '127.0.0.1' || 
+                          window.location.hostname.startsWith('192.168.') ||
+                          window.location.protocol === 'file:';
+      const baseOrigin = isLocalHost ? 'https://trieye-website.vercel.app' : window.location.origin;
+      const invoiceUrl = shareToken ? `${baseOrigin}/invoice?token=${encodeURIComponent(shareToken)}` : '';
+
+      let paymentDetailsText = '';
+      if (metrics.isPaid) {
+        if (metrics.discountAmount > 0) {
+          paymentDetailsText = 
+`*Total Bill:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
+*Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
+*Paid Amount:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
+*Payment Status:* ✅ PAID (${formatPaymentMethod(metrics.paymentMethod)})`;
+        } else {
+          paymentDetailsText = `*Total Bill:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}`;
+        }
+      } else if (metrics.isPartial) {
+        paymentDetailsText = 
+`*Total Bill:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
+*Final Payable:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
+*Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
+*Less Amount:* ₹${metrics.balanceDue.toLocaleString('en-IN')}
+*Payment Status:* ⚠️ PARTIAL PAYMENT (${formatPaymentMethod(metrics.paymentMethod)})`;
+      } else {
+        paymentDetailsText = 
+`*Total Bill:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
+*Amount Payable:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
+*Amount Collected:* ₹0
+*Less Amount:* ₹${metrics.balanceDue.toLocaleString('en-IN')}
+*Payment Status:* ❌ UNPAID`;
       }
-      if (productItems.length > 0) {
-        itemsText += '\n*Add-on Products & Accessories:*\n' + productItems.map(p => `• ${p.service_name} (x${p.quantity}) - ₹${Number(p.total_price).toLocaleString()}`).join('\n') + '\n';
-      }
 
-      const pays = (currentPrintInvoice.bookings && currentPrintInvoice.bookings.payments) ? currentPrintInvoice.bookings.payments : (currentPrintInvoice.payments || []);
-      const pay = pays[0] || {};
-      const amtPaid = Number(pay.amount || 0);
-      const balance = Math.max(0, Number(currentPrintInvoice.grand_total) - amtPaid);
+      const text = 
+`*TRIEYE STUDIO — INVOICE*
 
-      const text = `*TRIEYE STUDIO — TAX INVOICE*\n` +
-        `Invoice: *${currentPrintInvoice.invoice_number}*\n` +
-        `Customer: ${cust.name || 'Valued Customer'}\n` +
-        `Vehicle: ${veh.reg_number || 'N/A'} (${veh.vehicle_type || 'Car'})\n` +
-        itemsText +
-        `\n*Subtotal:* ₹${Number(currentPrintInvoice.subtotal).toLocaleString()}\n` +
-        (Number(currentPrintInvoice.discount) > 0 ? `*Discount:* -₹${Number(currentPrintInvoice.discount).toLocaleString()}\n` : '') +
-        `*Grand Total:* ₹${Number(currentPrintInvoice.grand_total).toLocaleString()}\n` +
-        `*Payment Status:* ${pay.status || 'PAID'} (Paid: ₹${amtPaid.toLocaleString()}${balance > 0 ? `, Due: ₹${balance.toLocaleString()}` : ''})\n\n` +
-        `Thank you for choosing TRIEYE!\n_Detail • Precision • Protection_`;
+Hi ${cust.name || 'Valued Customer'},
+
+Thank you for choosing TRIEYE DETAILING.
+Your invoice is ready.
+
+*Invoice:* ${inv.invoice_number || 'TRI-INVOICE'}
+*Vehicle:* ${veh.reg_number || 'N/A'} (${veh.vehicle_type || 'Car'})
+*Service:* ${metrics.serviceName}
+
+${paymentDetailsText}
+
+${invoiceUrl ? `*View Digital Invoice:*\n${invoiceUrl}\n\n` : ''}Thank you,
+TRIEYE DETAILING
+*Detail • Precision • Protection*`;
 
       const cleanPhone = cust.phone.replace(/\D/g, '').slice(-10);
       const url = `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(text)}`;

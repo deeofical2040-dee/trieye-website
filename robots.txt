@@ -1,6 +1,22 @@
 # TRIEYE Detailing Studio Robots Specification
 # Website: https://trieyedetailing.com
 
+# Allow WhatsApp & Social Media preview crawlers
+User-agent: facebookexternalhit
+Allow: /invoice
+Allow: /invoice.html
+Allow: /assets/
+
+User-agent: WhatsApp
+Allow: /invoice
+Allow: /invoice.html
+Allow: /assets/
+
+User-agent: Twitterbot
+Allow: /invoice
+Allow: /invoice.html
+Allow: /assets/
+
 User-agent: *
 Allow: /
 Allow: /assets/

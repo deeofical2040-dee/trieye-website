@@ -56,7 +56,7 @@ BEGIN
         'name', 'Trieye Detailing',
         'tagline', 'Premium Car Spa, Ceramic Coating & Paint Protection Studio',
         'address', '1st, 19, 6th Street, Main Rd, Baba Nagar, Villivakkam, Chennai, Tamil Nadu 600049',
-        'phone', '+91 98765 43210',
+        'phone', '+91 99401 81934 / +91 93630 68836',
         'email', 'care@trieyestudio.com',
         'gstin', '33CKMPB5885L1ZO'
       )

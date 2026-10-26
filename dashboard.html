@@ -2262,6 +2262,10 @@
         border: 1px solid #000000 !important;
         background: #f9f9f9 !important;
       }
+      .admin-audit-card, #inv-modal-admin-audit, #walkin-admin-audit-box {
+        display: none !important;
+        visibility: hidden !important;
+      }
     }
   </style>
 
@@ -2283,8 +2287,12 @@
         box-shadow: none;
         transform: none;
       }
-      #invoiceModal > div:first-child {
-        display: none !important; /* Hide header buttons during print */
+      #invoiceModal > div:first-child,
+      .invoice-modal-header,
+      .admin-audit-card,
+      #inv-modal-admin-audit {
+        display: none !important;
+        visibility: hidden !important;
       }
     }
   </style>
@@ -2701,7 +2709,10 @@
             <th>Date</th>
             <th>Customer</th>
             <th>Vehicle</th>
-            <th>Amount</th>
+            <th>Original Bill</th>
+            <th>Discount &amp; Reason</th>
+            <th>Final Bill</th>
+            <th>Collected / Due</th>
             <th>Payment</th>
             <th>Action</th>
           </tr>
@@ -2728,6 +2739,11 @@
     </div>
   </div>
   
+  <!-- ADMIN ONLY AUDIT BOX (HIDDEN ON PRINT/PDF) -->
+  <div id="inv-modal-admin-audit" class="admin-audit-card" style="display:none; margin:1rem 1.5rem; background:#0f172a; border:1px solid #334155; border-radius:8px; padding:0.85rem;">
+    <!-- Populated via JS for admin inspection -->
+  </div>
+
   <!-- A4 PRINTABLE CONTENT (Strict styling to match trieye branding) -->
   <div id="printable-invoice">
     <!-- Header -->
@@ -2740,7 +2756,7 @@
           1st, 19, 6th Street, Main Rd<br>
           Baba Nagar, Villivakkam<br>
           Chennai, Tamil Nadu 600049<br>
-          +91 98765 43210 | care@trieyestudio.com<br>
+          +91 99401 81934 / +91 93630 68836 | care@trieyestudio.com<br>
           GSTIN: 33CKMPB5885L1ZO
         </div>
       </div>
@@ -2794,29 +2810,25 @@
           <span id="inv-addon-subtotal" style="font-weight:600;">₹0</span>
         </div>
         <div style="display:flex; justify-content:space-between; padding:5px 0;">
-          <span style="color:#555;">Subtotal</span>
+          <span style="color:#555;">Total Bill</span>
           <span id="inv-subtotal" style="font-weight:600;">₹0</span>
         </div>
-        <div style="display:flex; justify-content:space-between; padding:5px 0;">
-          <span style="color:#555;">Discount</span>
-          <span id="inv-discount" style="font-weight:600; color:#e11d48;">- ₹0</span>
+        <div style="display:flex; justify-content:space-between; padding:5px 0;" id="inv-amt-collected-row">
+          <span style="color:#555;">Amount Collected</span>
+          <span id="inv-amt-collected" style="font-weight:600;">₹0</span>
+        </div>
+        <div style="display:none; justify-content:space-between; padding:5px 0; color:#e11d48;" id="inv-balance-row">
+          <span style="font-weight:600;">Less Amount</span>
+          <span id="inv-balance" style="font-weight:700; color:#e11d48;">₹0</span>
         </div>
         <div style="display:flex; justify-content:space-between; padding:10px 0; border-top:2px solid #000; border-bottom:2px solid #000; margin-top:5px; font-size:18px; font-weight:700;">
-          <span>Grand Total</span>
+          <span id="inv-final-payable-label">Paid Amount</span>
           <span id="inv-grandtotal">₹0</span>
         </div>
         
         <!-- Payment Info -->
         <div style="margin-top:10px; padding:10px; background:#f0fdf4; border:1px solid #a3e635; font-size:13px;">
           <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
-            <span style="color:#555;">Amount Paid:</span>
-            <span id="inv-amt-paid" style="font-weight:600;">₹0</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; margin-bottom:5px; border-bottom:1px solid #ddd; padding-bottom:5px;">
-            <span style="color:#555;">Balance Due:</span>
-            <span id="inv-balance" style="font-weight:600; color:#e11d48;">₹0</span>
-          </div>
-          <div style="display:flex; justify-content:space-between; margin-bottom:3px; padding-top:2px;">
             <span>Payment Status:</span>
             <span id="inv-pay-status" style="font-weight:700; color:#15803d;">PAID</span>
           </div>
@@ -2830,7 +2842,7 @@
     
     <!-- Footer -->
     <div style="text-align:center; border-top:1px solid #eee; padding-top:10mm; font-size:13px; color:#555;">
-      <div style="font-weight:600; font-size:16px; color:#000; margin-bottom:5px;">Thank you for choosing TRIEYE</div>
+      <div style="font-weight:600; font-size:16px; color:#000; margin-bottom:5px;">Thank you for choosing TRIEYE DETAILING</div>
       <div>Follow us on Instagram @trieye_studio</div>
     </div>
   </div>
@@ -4210,9 +4222,14 @@
       return null;
     }
     function getPublicInvoiceUrl(shareToken) {
-      const origin = window.location.origin;
-      const path = window.location.pathname.substring(0, window.location.pathname.lastIndexOf('/') + 1);
-      return `${origin}${path || '/'}invoice.html?token=${encodeURIComponent(shareToken)}`;
+      if (!shareToken) return '';
+      const isLocalHost = !window.location.origin || 
+                          window.location.hostname === 'localhost' || 
+                          window.location.hostname === '127.0.0.1' || 
+                          window.location.hostname.startsWith('192.168.') ||
+                          window.location.protocol === 'file:';
+      const baseOrigin = isLocalHost ? 'https://trieye-website.vercel.app' : window.location.origin;
+      return `${baseOrigin}/invoice?token=${encodeURIComponent(shareToken)}`;
     }
     function showToast(msg) {
       const container = document.getElementById('toastContainer');
@@ -5757,12 +5774,27 @@
 
       sortedBookings.forEach((b, idx) => {
         const tr = document.createElement('tr');
-        const isPaid = (b.payStatus || '').toUpperCase() === 'PAID';
-        const payStatus = isPaid ? 'PAID' : 'UNPAID';
-        const rawMethod = b.payMethod;
-        const displayMethod = isPaid ? (rawMethod ? formatPaymentMethod(rawMethod) : 'Cash') : (rawMethod && rawMethod.toUpperCase() !== 'PENDING' ? formatPaymentMethod(rawMethod) : 'Pending');
+        const metrics = window.TrieyeDB && typeof window.TrieyeDB.calculateBillMetrics === 'function'
+          ? window.TrieyeDB.calculateBillMetrics(b)
+          : {
+              originalBillAmount: Number(b.price !== undefined && b.price !== null ? b.price : (b.total_amount || 0)),
+              discountAmount: Number(b.discount || 0),
+              discountReason: b.discount_reason || '',
+              finalBillAmount: Number(b.total_amount || b.price || 0),
+              amountCollected: Number((b.payStatus || '').toUpperCase() === 'PAID' ? (b.total_amount || b.price || 0) : (b.paid_amount || 0)),
+              balanceDue: 0,
+              paymentStatus: (b.payStatus || 'UNPAID').toUpperCase(),
+              paymentMethod: b.payMethod || 'Cash',
+              isFullyPaid: (b.payStatus || '').toUpperCase() === 'PAID',
+              isPartial: (b.payStatus || '').toUpperCase() === 'PARTIAL' || (b.payStatus || '').toUpperCase() === 'PARTIALLY PAID',
+              isUnpaid: (b.payStatus || '').toUpperCase() === 'UNPAID'
+            };
+
+        const isPaid = metrics.isFullyPaid;
+        const payStatus = metrics.paymentStatus;
+        const displayMethod = formatPaymentMethod(metrics.paymentMethod);
         const jobStatus = (b.status || 'CONFIRMED').toUpperCase();
-        const payBadgeClass = 'pay-' + payStatus.toLowerCase();
+        const payBadgeClass = isPaid ? 'pay-paid' : (metrics.isPartial ? 'pay-partial' : 'pay-unpaid');
         
         let statusBadgeClass = 'status-confirmed';
         if (jobStatus === 'COMPLETED') statusBadgeClass = 'status-done';
@@ -5777,9 +5809,20 @@
         } else if (!displayRef.startsWith('TRI-')) {
           displayRef = `TRI-${displayRef.toUpperCase()}`;
         }
-        const bookingPrice = Number(b.price !== undefined && b.price !== null ? b.price : (b.total_amount || 0));
 
         if (b.id) window._historyBookingsMap[b.id] = b;
+
+        const priceDisplay = metrics.discountAmount > 0
+          ? `
+            <div style="line-height:1.2;">
+              <strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${metrics.finalBillAmount.toLocaleString()}</strong>
+              <div style="font-size:0.7rem; color:var(--muted); font-family:'IBM Plex Mono';">
+                <s style="color:#94a3b8;">₹${metrics.originalBillAmount.toLocaleString()}</s> 
+                <span style="color:#f43f5e;">(-₹${metrics.discountAmount.toLocaleString()})</span>
+              </div>
+            </div>
+          `
+          : `<strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${metrics.finalBillAmount.toLocaleString()}</strong>`;
 
         tr.innerHTML = `
           <td><strong class="booking-id-tag">${escapeHtml(displayRef)}</strong></td>
@@ -5789,7 +5832,7 @@
             <div style="font-family:'IBM Plex Mono'; font-size:0.72rem; color:var(--pink);">${escapeHtml(b.reg || 'NO REG')}</div>
           </td>
           <td><strong>${escapeHtml(b.service || 'Foam Wash')}</strong></td>
-          <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${bookingPrice.toLocaleString()}</strong></td>
+          <td>${priceDisplay}</td>
           <td><span class="pay-badge ${payBadgeClass}" style="cursor:pointer;" onclick="openMarkPaidModal('${b.id}')" title="Click to Record / Update Payment">${escapeHtml(payStatus)}</span></td>
           <td><span style="font-family:'IBM Plex Mono'; font-size:0.75rem;">${escapeHtml(displayMethod)}</span></td>
           <td><span class="status-badge ${statusBadgeClass}">${escapeHtml(jobStatus)}</span></td>
@@ -6062,15 +6105,50 @@
         `;
       }
 
+      // Authoritative Bill Metrics
+      const billSource = assocInv ? Object.assign({}, assocInv, b) : b;
+      const metrics = window.TrieyeDB && typeof window.TrieyeDB.calculateBillMetrics === 'function'
+        ? window.TrieyeDB.calculateBillMetrics(billSource)
+        : {
+            originalBillAmount: Number(b.price !== undefined && b.price !== null ? b.price : (b.total_amount || 0)),
+            discountAmount: Number(b.discount || 0),
+            discountReason: b.discount_reason || '',
+            finalBillAmount: Number(b.total_amount || b.price || 0),
+            amountCollected: Number((b.payStatus || '').toUpperCase() === 'PAID' ? (b.total_amount || b.price || 0) : (b.paid_amount || 0)),
+            balanceDue: 0,
+            paymentStatus: (b.payStatus || 'UNPAID').toUpperCase(),
+            paymentMethod: b.payMethod || 'Cash',
+            isFullyPaid: (b.payStatus || '').toUpperCase() === 'PAID',
+            isPartial: (b.payStatus || '').toUpperCase() === 'PARTIAL' || (b.payStatus || '').toUpperCase() === 'PARTIALLY PAID',
+            isUnpaid: (b.payStatus || '').toUpperCase() === 'UNPAID'
+          };
+
       const body = document.getElementById('receipt-modal-body');
       body.innerHTML = `
+        <!-- ADMIN AUDIT CARD (INTERNAL ONLY - HIDDEN ON PRINT) -->
+        <div class="admin-audit-card" style="background:#0f172a; border:1px solid #334155; border-radius:8px; padding:0.85rem; margin-bottom:1rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+            <span style="font-family:'Oswald',sans-serif; font-size:0.85rem; letter-spacing:0.05em; color:#38bdf8;">🛡️ ADMIN AUDIT DETAILS (INTERNAL ONLY)</span>
+            <span class="status-badge ${metrics.isFullyPaid ? 'conf' : (metrics.isPartial ? 'in-prog' : 'pend')}">${metrics.paymentStatus}</span>
+          </div>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:8px; font-size:0.75rem; font-family:'IBM Plex Mono';">
+            <div><span style="color:var(--muted);">Original Price:</span> <b style="color:#fff;">₹${metrics.originalBillAmount.toLocaleString()}</b></div>
+            <div><span style="color:var(--muted);">Discount Applied:</span> <b style="color:${metrics.discountAmount > 0 ? '#f43f5e' : '#94a3b8'};">${metrics.discountAmount > 0 ? '-₹' + metrics.discountAmount.toLocaleString() : '₹0'}</b></div>
+            <div style="grid-column: span 2;"><span style="color:var(--muted);">Discount Reason:</span> <b style="color:#fde047;">${escapeHtml(metrics.discountReason || 'None')}</b></div>
+            <div><span style="color:var(--muted);">Final Bill:</span> <b style="color:#a3e635;">₹${metrics.finalBillAmount.toLocaleString()}</b></div>
+            <div><span style="color:var(--muted);">Collected:</span> <b style="color:#38bdf8;">₹${metrics.amountCollected.toLocaleString()}</b></div>
+            <div><span style="color:var(--muted);">Balance Due:</span> <b style="color:${metrics.balanceDue > 0 ? '#f43f5e' : '#a3e635'};">₹${metrics.balanceDue.toLocaleString()}</b></div>
+            <div><span style="color:var(--muted);">Payment Method:</span> <b style="color:#fff;">${escapeHtml(metrics.paymentMethod || 'Cash')}</b></div>
+          </div>
+        </div>
+
         <div class="invoice-box" style="padding:1.25rem; border-radius:8px; background:var(--bg-panel-2); border:1px solid var(--line); display:flex; flex-direction:column; gap:1rem;">
           <!-- Studio Branding Header -->
           <div style="text-align:center; padding-bottom:0.75rem; border-bottom:1px dashed var(--line);">
-            <div style="font-family:'Oswald', sans-serif; font-size:1.5rem; letter-spacing:0.04em; color:var(--white);">Trieye Detailing</div>
+            <div style="font-family:'Oswald', sans-serif; font-size:1.5rem; letter-spacing:0.04em; color:var(--white);">TRIEYE DETAILING</div>
             <div style="font-size:0.75rem; color:var(--muted); font-family:'IBM Plex Mono'; margin-top:2px;">
               Premium Car Spa, Ceramic Coating &amp; Paint Protection Studio<br>
-              1st, 19, 6th Street, Main Rd, Baba Nagar, Villivakkam, Chennai, Tamil Nadu 600049 · GSTIN: 33CKMPB5885L1ZO · Ph: +91 98765 43210
+              1st, 19, 6th Street, Main Rd, Baba Nagar, Villivakkam, Chennai, Tamil Nadu 600049 · GSTIN: 33CKMPB5885L1ZO · Ph: +91 99401 81934 / +91 93630 68836
             </div>
           </div>
 
@@ -6108,22 +6186,44 @@
 
           ${breakdownHtml}
 
-          <!-- Payment Info & Final Total -->
+          <!-- Customer-facing Bill Presentation -->
+          <div style="background:var(--bg-panel); border:1px solid var(--line-subtle); border-radius:6px; padding:0.85rem; display:flex; flex-direction:column; gap:0.4rem; font-size:0.82rem; font-family:'IBM Plex Mono';">
+            <div style="display:flex; justify-content:space-between;">
+              <span style="color:var(--muted);">Total Bill</span>
+              <strong style="color:var(--white);">₹${metrics.originalBillAmount.toLocaleString()}</strong>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+              <span style="color:var(--muted);">Amount Collected</span>
+              <strong style="color:var(--white);">₹${metrics.amountCollected.toLocaleString()}</strong>
+            </div>
+            ${metrics.balanceDue > 0 ? `
+              <div style="display:flex; justify-content:space-between; color:#f43f5e; font-weight:600;">
+                <span>Less Amount</span>
+                <strong>₹${metrics.balanceDue.toLocaleString()}</strong>
+              </div>
+            ` : ''}
+          </div>
+
+          <!-- Payment Info & Final Prominent Total -->
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <div>
               <div style="font-size:0.72rem; color:var(--muted); font-family:'IBM Plex Mono';">PAYMENT METHOD</div>
-              <div style="font-size:0.85rem; font-weight:600; font-family:'IBM Plex Mono';">${escapeHtml(displayMethod)}</div>
-              <div style="font-size:0.72rem; color:var(--muted); font-family:'IBM Plex Mono'; margin-top:2px;">STATUS: <b style="color:${payColor};">${escapeHtml(payStatus)}</b></div>
+              <div style="font-size:0.85rem; font-weight:600; font-family:'IBM Plex Mono';">${escapeHtml(formatPaymentMethod(metrics.paymentMethod))}</div>
+              <div style="font-size:0.72rem; color:var(--muted); font-family:'IBM Plex Mono'; margin-top:2px;">STATUS: <b style="color:${metrics.isFullyPaid ? 'var(--green)' : (metrics.isPartial ? '#fbbf24' : 'var(--red)')};">${escapeHtml(metrics.paymentStatus)}</b></div>
             </div>
             <div style="text-align:right;">
-              <div style="font-size:0.75rem; color:var(--muted); font-family:'IBM Plex Mono'; text-transform:uppercase;">Final Total</div>
-              <div style="font-family:'Oswald', sans-serif; font-size:1.6rem; color:var(--green); font-weight:700;">₹${bookingPrice.toLocaleString()}</div>
+              <div style="font-size:0.75rem; color:var(--muted); font-family:'IBM Plex Mono'; text-transform:uppercase;">
+                ${metrics.isFullyPaid ? 'Paid Amount' : (metrics.isPartial ? 'Final Payable' : 'Amount Payable')}
+              </div>
+              <div style="font-family:'Oswald', sans-serif; font-size:1.6rem; color:${metrics.isFullyPaid ? 'var(--green)' : 'var(--white)'}; font-weight:700;">
+                ₹${(metrics.isFullyPaid ? metrics.amountCollected : metrics.finalBillAmount).toLocaleString()}
+              </div>
             </div>
           </div>
 
-          ${!isPaid ? `
+          ${!metrics.isFullyPaid ? `
             <div style="display:flex; justify-content:flex-end; padding-top:0.35rem;">
-              <button class="btn btn-green btn-sm" style="font-size:0.78rem; padding:0.4rem 0.85rem;" onclick="openMarkPaidModal(window.currentInvoiceBooking)">💳 Settle / Mark Paid →</button>
+              <button class="btn btn-green btn-sm" style="font-size:0.78rem; padding:0.4rem 0.85rem;" onclick="openMarkPaidModal(window.currentInvoiceBooking)">💳 Settle / Record Payment →</button>
             </div>
           ` : `
             <div style="display:flex; justify-content:flex-end; padding-top:0.35rem;">
@@ -6133,8 +6233,8 @@
 
           <!-- Footer Note -->
           <div style="text-align:center; font-size:0.72rem; color:var(--muted); font-family:'IBM Plex Mono'; border-top:1px dashed var(--line); padding-top:0.6rem;">
-            Thank you for trusting Trieye Waterwash &amp; Detailing!<br>
-            For queries, call +91 98765 43210 or visit trieyestudio.com
+            Thank you for trusting TRIEYE DETAILING!<br>
+            For queries, call +91 99401 81934 / +91 93630 68836 or visit trieyestudio.com
           </div>
         </div>
       `;
@@ -6177,8 +6277,23 @@
       }
 
       const customerName = b.name || b.customer_name || 'Valued Customer';
-      const totalAmount = (b.price !== undefined && b.price !== null) ? Number(b.price).toLocaleString('en-IN') : Number(b.total_amount || 0).toLocaleString('en-IN');
-      const paymentStatus = (b.payStatus || b.payment_status || 'UNPAID').toUpperCase();
+      const billSource = (window._invoicesCache || []).find(i => i.id === b.invoice_id || i.invoice_number === b.invoice_ref || i.invoice_number === b.invoice_number) || b;
+      const metrics = window.TrieyeDB && typeof window.TrieyeDB.calculateBillMetrics === 'function'
+        ? window.TrieyeDB.calculateBillMetrics(billSource)
+        : {
+            originalBillAmount: Number(b.price !== undefined && b.price !== null ? b.price : (b.total_amount || 0)),
+            finalBillAmount: Number(b.total_amount || b.price || 0),
+            amountCollected: Number((b.payStatus || '').toUpperCase() === 'PAID' ? (b.total_amount || b.price || 0) : (b.paid_amount || 0)),
+            balanceDue: 0,
+            paymentStatus: (b.payStatus || 'UNPAID').toUpperCase(),
+            paymentMethod: b.payMethod || 'Cash',
+            isFullyPaid: (b.payStatus || '').toUpperCase() === 'PAID',
+            isPartial: (b.payStatus || '').toUpperCase() === 'PARTIAL' || (b.payStatus || '').toUpperCase() === 'PARTIALLY PAID'
+          };
+
+      const serviceName = b.service || (Array.isArray(b.services) && b.services[0]?.name) || b.service_name || 'Detailing & Foam Wash';
+      const vehType = b.vehicle_type || b.vehicleType || b.vehicleModel || (b.vehicles && b.vehicles.vehicle_type) || '';
+      const vehDisplay = (b.reg || b.reg_number || 'Vehicle') + (vehType ? ` (${vehType})` : '');
 
       // Retrieve existing secure share token from Supabase
       const token = await getOrFetchShareToken(b);
@@ -6190,24 +6305,52 @@
 
       const secureInvoiceUrl = getPublicInvoiceUrl(token);
 
+      let paymentLines = '';
+      if (metrics.isFullyPaid) {
+        if (metrics.discountAmount > 0) {
+          paymentLines = 
+`*Total Bill:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
+*Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
+*Paid Amount:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
+*Payment Status:* PAID (${formatPaymentMethod(metrics.paymentMethod)})`;
+        } else {
+          paymentLines = `*Total Bill:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}`;
+        }
+      } else if (metrics.isPartial) {
+        paymentLines = 
+`*Total Bill:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
+*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
+*Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
+*Less Amount:* ₹${metrics.balanceDue.toLocaleString('en-IN')}
+*Payment Status:* PARTIALLY PAID (${formatPaymentMethod(metrics.paymentMethod)})`;
+      } else {
+        paymentLines = 
+`*Total Bill:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
+*Amount Collected:* ₹0
+*Less Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
+*Payment Status:* UNPAID`;
+      }
+
       const msg = 
-`🧾 TRIEYE STUDIO — INVOICE
+`*TRIEYE STUDIO — INVOICE*
 
 Hi ${customerName},
 
-Thank you for choosing Trieye Waterwash & Detailing.
-
+Thank you for choosing TRIEYE DETAILING.
 Your invoice is ready.
 
-Invoice: ${bookingRef}
-Amount: ₹${totalAmount}
-Status: ${paymentStatus}
+*Invoice:* ${bookingRef}
+*Vehicle:* ${vehDisplay}
+*Service:* ${serviceName}
 
-View Invoice:
+${paymentLines}
+
+*View Digital Invoice:*
 ${secureInvoiceUrl}
 
 Thank you,
-TRIEYE WATERWASH & DETAILING`;
+TRIEYE DETAILING
+*Detail • Precision • Protection*`;
 
       const encoded = encodeURIComponent(msg);
       window.open(`https://wa.me/${normalizedPhone}?text=${encoded}`, '_blank');
@@ -8167,7 +8310,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function loadInvoices() {
   const tbody = document.getElementById('invoices-tbody');
-  tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Loading invoices...</td></tr>';
+  tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;">Loading invoices...</td></tr>';
   
   const invoices = await window.TrieyeDB.getInvoices();
   allInvoices = invoices;
@@ -8179,29 +8322,57 @@ function renderInvoicesList(invoices) {
   tbody.innerHTML = '';
   
   if (invoices.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">No invoices found.</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;">No invoices found.</td></tr>';
     return;
   }
 
   invoices.forEach(inv => {
     const cust = inv.customers || {};
     const veh = inv.vehicles || {};
-    const pays = (inv.bookings && inv.bookings.payments) ? inv.bookings.payments : (inv.payments || []);
-    const pay = pays[0] || {};
-    const dateStr = new Date(inv.created_at).toLocaleDateString();
+    const metrics = window.TrieyeDB && typeof window.TrieyeDB.calculateBillMetrics === 'function'
+      ? window.TrieyeDB.calculateBillMetrics(inv)
+      : {
+          originalBillAmount: Number(inv.subtotal || inv.grand_total || 0),
+          discountAmount: Number(inv.discount || 0),
+          discountReason: inv.discount_reason || '',
+          finalBillAmount: Number(inv.grand_total || 0),
+          amountCollected: Number(inv.amount_collected || 0),
+          balanceDue: Number(inv.balance_due || 0),
+          paymentStatus: (inv.status || 'UNPAID').toUpperCase(),
+          paymentMethod: inv.payment_method || 'Cash',
+          isFullyPaid: (inv.status || '').toUpperCase() === 'PAID',
+          isPartial: (inv.status || '').toUpperCase() === 'PARTIAL' || (inv.status || '').toUpperCase() === 'PARTIALLY PAID'
+        };
+
+    const dateStr = new Date(inv.created_at || Date.now()).toLocaleDateString();
     
     let statusBadge = '';
-    if (pay.status === 'PAID') statusBadge = '<span class="status-badge conf">PAID</span>';
-    else if (pay.status === 'PARTIAL') statusBadge = '<span class="status-badge in-prog">PARTIAL</span>';
+    if (metrics.isFullyPaid) statusBadge = '<span class="status-badge conf">PAID</span>';
+    else if (metrics.isPartial) statusBadge = '<span class="status-badge in-prog">PARTIAL</span>';
     else statusBadge = '<span class="status-badge pend">UNPAID</span>';
+
+    const discountDisplay = metrics.discountAmount > 0
+      ? `<span style="color:#f43f5e; font-weight:600; font-family:'IBM Plex Mono';">-₹${metrics.discountAmount.toLocaleString()}</span>` +
+        (metrics.discountReason ? `<br><span style="font-size:0.7rem; color:var(--muted); font-family:'IBM Plex Mono'; background:rgba(255,255,255,0.06); padding:2px 6px; border-radius:4px; display:inline-block; margin-top:2px;">${escapeHtml(metrics.discountReason)}</span>` : '')
+      : `<span style="color:var(--muted); font-size:0.8rem;">—</span>`;
+
+    const collectedDueDisplay = `
+      <div style="font-family:'IBM Plex Mono'; font-size:0.8rem; line-height:1.3;">
+        <span style="color:var(--green); font-weight:600;">₹${metrics.amountCollected.toLocaleString()}</span>
+        ${metrics.balanceDue > 0 ? `<br><span style="color:#f43f5e; font-size:0.72rem; font-weight:600;">Due: ₹${metrics.balanceDue.toLocaleString()}</span>` : ''}
+      </div>
+    `;
 
     tbody.innerHTML += `
       <tr>
-        <td style="font-family:'IBM Plex Mono'; font-weight:600;">${inv.invoice_number}</td>
+        <td style="font-family:'IBM Plex Mono'; font-weight:600;">${escapeHtml(inv.invoice_number)}</td>
         <td>${dateStr}</td>
-        <td>${cust.name || 'N/A'}<br><small>${cust.phone || ''}</small></td>
-        <td>${veh.reg_number || 'N/A'}</td>
-        <td style="font-weight:600;">₹${inv.grand_total}</td>
+        <td>${escapeHtml(cust.name || 'N/A')}<br><small style="color:var(--muted);">${escapeHtml(cust.phone || '')}</small></td>
+        <td>${escapeHtml(veh.reg_number || 'N/A')}</td>
+        <td style="font-weight:600; font-family:'IBM Plex Mono';">₹${metrics.originalBillAmount.toLocaleString()}</td>
+        <td>${discountDisplay}</td>
+        <td style="font-weight:700; font-family:'IBM Plex Mono'; color:var(--white);">₹${metrics.finalBillAmount.toLocaleString()}</td>
+        <td>${collectedDueDisplay}</td>
         <td>${statusBadge}</td>
         <td>
           <button class="btn btn-primary" style="padding:0.3rem 0.6rem; font-size:0.8rem;" onclick="openInvoiceModal('${inv.id}')">View</button>
@@ -8240,9 +8411,44 @@ async function openInvoiceModal(invoiceId) {
   const cust = inv.customers || {};
   const veh = inv.vehicles || {};
   const items = inv.invoice_items || [];
-  const pays = (inv.bookings && inv.bookings.payments) ? inv.bookings.payments : (inv.payments || []);
-  const pay = pays[0] || {};
+  const metrics = window.TrieyeDB && typeof window.TrieyeDB.calculateBillMetrics === 'function'
+    ? window.TrieyeDB.calculateBillMetrics(inv)
+    : {
+        originalBillAmount: Number(inv.subtotal || inv.grand_total || 0),
+        discountAmount: Number(inv.discount || 0),
+        discountReason: inv.discount_reason || '',
+        finalBillAmount: Number(inv.grand_total || 0),
+        amountCollected: Number(inv.amount_collected || 0),
+        balanceDue: Number(inv.balance_due || 0),
+        paymentStatus: (inv.status || 'UNPAID').toUpperCase(),
+        paymentMethod: inv.payment_method || 'Cash',
+        isFullyPaid: (inv.status || '').toUpperCase() === 'PAID',
+        isPartial: (inv.status || '').toUpperCase() === 'PARTIAL' || (inv.status || '').toUpperCase() === 'PARTIALLY PAID',
+        isUnpaid: (inv.status || '').toUpperCase() === 'UNPAID'
+      };
 
+  // 1. Populate Admin Audit Box (Screen Only, Hidden on Print)
+  const auditBox = document.getElementById('inv-modal-admin-audit');
+  if (auditBox) {
+    auditBox.style.display = 'block';
+    auditBox.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <span style="font-family:'Oswald',sans-serif; font-size:0.88rem; letter-spacing:0.05em; color:#38bdf8;">🛡️ ADMIN AUDIT DETAILS (INTERNAL ONLY)</span>
+        <span class="status-badge ${metrics.isFullyPaid ? 'conf' : (metrics.isPartial ? 'in-prog' : 'pend')}">${metrics.paymentStatus}</span>
+      </div>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px; font-size:0.75rem; font-family:'IBM Plex Mono';">
+        <div><span style="color:var(--muted);">Original Price:</span> <b style="color:#fff;">₹${metrics.originalBillAmount.toLocaleString()}</b></div>
+        <div><span style="color:var(--muted);">Discount Applied:</span> <b style="color:${metrics.discountAmount > 0 ? '#f43f5e' : '#94a3b8'};">${metrics.discountAmount > 0 ? '-₹' + metrics.discountAmount.toLocaleString() : '₹0'}</b></div>
+        <div style="grid-column: span 2;"><span style="color:var(--muted);">Discount Reason:</span> <b style="color:#fde047;">${escapeHtml(metrics.discountReason || 'None')}</b></div>
+        <div><span style="color:var(--muted);">Final Bill:</span> <b style="color:#a3e635;">₹${metrics.finalBillAmount.toLocaleString()}</b></div>
+        <div><span style="color:var(--muted);">Collected:</span> <b style="color:#38bdf8;">₹${metrics.amountCollected.toLocaleString()}</b></div>
+        <div><span style="color:var(--muted);">Balance Due:</span> <b style="color:${metrics.balanceDue > 0 ? '#f43f5e' : '#a3e635'};">₹${metrics.balanceDue.toLocaleString()}</b></div>
+        <div><span style="color:var(--muted);">Payment Method:</span> <b style="color:#fff;">${escapeHtml(formatPaymentMethod(metrics.paymentMethod))}</b></div>
+      </div>
+    `;
+  }
+
+  // 2. Populate Customer-Facing Printable Receipt
   document.getElementById('inv-num').innerText = inv.invoice_number;
   document.getElementById('inv-date').innerText = 'Date: ' + new Date(inv.created_at).toLocaleString();
   
@@ -8334,17 +8540,39 @@ async function openInvoiceModal(invoiceId) {
     }
   }
 
-  document.getElementById('inv-subtotal').innerText = '₹' + Number(inv.subtotal).toLocaleString();
-  document.getElementById('inv-discount').innerText = '- ₹' + Number(inv.discount).toLocaleString();
-  document.getElementById('inv-grandtotal').innerText = '₹' + Number(inv.grand_total).toLocaleString();
+  // Customer-facing Totals
+  document.getElementById('inv-subtotal').innerText = '₹' + metrics.originalBillAmount.toLocaleString();
+  const amtCollEl = document.getElementById('inv-amt-collected');
+  if (amtCollEl) amtCollEl.innerText = '₹' + metrics.amountCollected.toLocaleString();
+
+  const balanceRow = document.getElementById('inv-balance-row');
+  const balanceEl = document.getElementById('inv-balance');
+  const finalLabelEl = document.getElementById('inv-final-payable-label');
+  const grandTotalEl = document.getElementById('inv-grandtotal');
+
+  if (metrics.isFullyPaid) {
+    if (finalLabelEl) finalLabelEl.innerText = 'Paid Amount';
+    grandTotalEl.innerText = '₹' + metrics.amountCollected.toLocaleString();
+    if (balanceRow) balanceRow.style.display = 'none';
+  } else if (metrics.isPartial) {
+    if (finalLabelEl) finalLabelEl.innerText = 'Final Payable';
+    grandTotalEl.innerText = '₹' + metrics.finalBillAmount.toLocaleString();
+    if (balanceRow) balanceRow.style.display = 'flex';
+    if (balanceEl) balanceEl.innerText = '₹' + metrics.balanceDue.toLocaleString();
+  } else {
+    if (finalLabelEl) finalLabelEl.innerText = 'Amount Payable';
+    grandTotalEl.innerText = '₹' + metrics.finalBillAmount.toLocaleString();
+    if (balanceRow) balanceRow.style.display = 'flex';
+    if (balanceEl) balanceEl.innerText = '₹' + metrics.finalBillAmount.toLocaleString();
+  }
   
-  const amtPaid = Number(pay.amount || 0);
-  const balanceDue = Math.max(0, Number(inv.grand_total) - amtPaid);
-  
-  document.getElementById('inv-amt-paid').innerText = '₹' + amtPaid.toLocaleString();
-  document.getElementById('inv-balance').innerText = '₹' + balanceDue.toLocaleString();
-  document.getElementById('inv-pay-status').innerText = pay.status || 'UNPAID';
-  document.getElementById('inv-pay-method').innerText = pay.method || 'Pending';
+  const payStatusEl = document.getElementById('inv-pay-status');
+  if (payStatusEl) {
+    payStatusEl.innerText = metrics.paymentStatus;
+    payStatusEl.style.color = metrics.isFullyPaid ? '#15803d' : (metrics.isPartial ? '#d97706' : '#e11d48');
+  }
+  const payMethodEl = document.getElementById('inv-pay-method');
+  if (payMethodEl) payMethodEl.innerText = formatPaymentMethod(metrics.paymentMethod);
 
   document.getElementById('invoiceModalBackdrop').style.display = 'block';
   document.getElementById('invoiceModal').style.display = 'block';
@@ -8405,21 +8633,54 @@ function shareInvoiceWhatsApp() {
     itemsText += '\n*Add-on Products & Accessories:*\n' + productItems.map(p => `• ${p.service_name} (x${p.quantity}) - ₹${Number(p.total_price).toLocaleString()}`).join('\n') + '\n';
   }
 
-  const pays = (currentPrintInvoice.bookings && currentPrintInvoice.bookings.payments) ? currentPrintInvoice.bookings.payments : (currentPrintInvoice.payments || []);
-  const pay = pays[0] || {};
-  const amtPaid = Number(pay.amount || 0);
-  const balance = Math.max(0, Number(currentPrintInvoice.grand_total) - amtPaid);
+  const metrics = window.TrieyeDB && typeof window.TrieyeDB.calculateBillMetrics === 'function'
+    ? window.TrieyeDB.calculateBillMetrics(currentPrintInvoice)
+    : {
+        originalBillAmount: Number(currentPrintInvoice.subtotal || currentPrintInvoice.grand_total || 0),
+        finalBillAmount: Number(currentPrintInvoice.grand_total || 0),
+        amountCollected: Number(currentPrintInvoice.amount_collected || 0),
+        balanceDue: Number(currentPrintInvoice.balance_due || 0),
+        paymentStatus: (currentPrintInvoice.status || 'UNPAID').toUpperCase(),
+        paymentMethod: currentPrintInvoice.payment_method || 'Cash',
+        isFullyPaid: (currentPrintInvoice.status || '').toUpperCase() === 'PAID',
+        isPartial: (currentPrintInvoice.status || '').toUpperCase() === 'PARTIAL' || (currentPrintInvoice.status || '').toUpperCase() === 'PARTIALLY PAID'
+      };
 
-  const text = `*TRIEYE STUDIO — TAX INVOICE*\n` +
-    `Invoice: *${currentPrintInvoice.invoice_number}*\n` +
-    `Customer: ${cust.name || 'Valued Customer'}\n` +
-    `Vehicle: ${veh.reg_number || 'N/A'} (${veh.vehicle_type || 'Car'})\n` +
-    itemsText +
-    `\n*Subtotal:* ₹${Number(currentPrintInvoice.subtotal).toLocaleString()}\n` +
-    (Number(currentPrintInvoice.discount) > 0 ? `*Discount:* -₹${Number(currentPrintInvoice.discount).toLocaleString()}\n` : '') +
-    `*Grand Total:* ₹${Number(currentPrintInvoice.grand_total).toLocaleString()}\n` +
-    `*Payment Status:* ${pay.status || 'PAID'} (Paid: ₹${amtPaid.toLocaleString()}${balance > 0 ? `, Due: ₹${balance.toLocaleString()}` : ''})\n\n` +
-    `Thank you for choosing TRIEYE!\n_Detail • Precision • Protection_`;
+  let paymentLines = '';
+  if (metrics.isFullyPaid) {
+    paymentLines = 
+`*Total Bill:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
+*Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
+*Paid Amount:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
+*Payment Status:* PAID (${formatPaymentMethod(metrics.paymentMethod)})`;
+  } else if (metrics.isPartial) {
+    paymentLines = 
+`*Total Bill:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
+*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
+*Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
+*Less Amount:* ₹${metrics.balanceDue.toLocaleString('en-IN')}
+*Payment Status:* PARTIALLY PAID (${formatPaymentMethod(metrics.paymentMethod)})`;
+  } else {
+    paymentLines = 
+`*Total Bill:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
+*Amount Collected:* ₹0
+*Less Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
+*Payment Status:* UNPAID`;
+  }
+
+  const shareToken = currentPrintInvoice.share_token || (currentPrintInvoice.bookings && currentPrintInvoice.bookings.share_token) || '';
+  const secureInvoiceUrl = shareToken ? getPublicInvoiceUrl(shareToken) : '';
+  const invoiceLinkLine = secureInvoiceUrl ? `\n*View Digital Invoice:*\n${secureInvoiceUrl}\n` : '';
+
+  const text = `*TRIEYE STUDIO — INVOICE*\n\n` +
+    `Hi ${cust.name || 'Valued Customer'},\n\n` +
+    `Thank you for choosing TRIEYE DETAILING.\nYour invoice is ready.\n\n` +
+    `*Invoice:* ${currentPrintInvoice.invoice_number}\n` +
+    `*Vehicle:* ${veh.reg_number || 'N/A'} (${veh.vehicle_type || 'Car'})\n` +
+    itemsText + '\n' +
+    paymentLines + '\n' +
+    invoiceLinkLine + '\n' +
+    `Thank you,\nTRIEYE DETAILING\n*Detail • Precision • Protection*`;
 
   const cleanPhone = cust.phone.replace(/\D/g, '').slice(-10);
   const url = `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(text)}`;
