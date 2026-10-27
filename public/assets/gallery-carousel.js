@@ -75,6 +75,14 @@
 
     if (cards.length === 0) return;
 
+    // Preload all gallery images in background to eliminate slide transition delays
+    galleryItemsData.forEach(function(item) {
+      if (item && item.src) {
+        var img = new Image();
+        img.src = item.src;
+      }
+    });
+
     var currentIndex = 0;
     var totalCards = cards.length;
     var autoPlayTimer = null;
