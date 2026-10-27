@@ -607,8 +607,16 @@
 
         <div class="totals-box">
           <div class="total-row">
-            <span>Total Bill</span>
+            <span>Original Service Price</span>
             <span class="mono" id="subtotal-amount" style="font-weight:600; color:var(--text);">₹0</span>
+          </div>
+          <div class="total-row" id="row-less-amount" style="display:none; color:var(--text-muted);">
+            <span>Less Amount</span>
+            <span class="mono" id="less-amount" style="font-weight:600; color:#38bdf8;">-₹0</span>
+          </div>
+          <div class="total-row" id="row-final-bill" style="border-top:1px dashed var(--line-subtle); padding-top:4px;">
+            <span style="font-weight:600;">Final Bill Amount</span>
+            <span class="mono" id="final-bill-amount" style="font-weight:700; color:var(--text);">₹0</span>
           </div>
           <div class="total-row">
             <span>GST / Taxes</span>
@@ -619,7 +627,7 @@
             <span class="mono" id="amount-collected" style="font-weight:600; color:var(--text);">₹0</span>
           </div>
           <div class="total-row" id="row-balance-due" style="display:none; color:var(--red);">
-            <span style="font-weight:600;">Less Amount</span>
+            <span style="font-weight:600;">Balance Due</span>
             <span class="mono" id="balance-due" style="font-weight:700; color:var(--red);">₹0</span>
           </div>
           <div class="total-row grand-total" id="row-final-paid">
@@ -745,13 +753,29 @@
         }
 
         // Customer-facing Bill Presentation
-        // 1. Total Bill / Original Bill Amount
+        // 1. Original Service Price
         document.getElementById('subtotal-amount').innerText = '₹' + metrics.originalBillAmount.toLocaleString('en-IN');
         
-        // 2. Amount Collected
+        // 2. Less Amount (Authorized Adjustment)
+        const rowLessAmount = document.getElementById('row-less-amount');
+        const lessAmountEl = document.getElementById('less-amount');
+        if (metrics.lessAmount > 0) {
+          rowLessAmount.style.display = 'flex';
+          lessAmountEl.innerText = '-₹' + metrics.lessAmount.toLocaleString('en-IN');
+        } else {
+          rowLessAmount.style.display = 'none';
+        }
+
+        // 3. Final Bill Amount
+        const finalBillEl = document.getElementById('final-bill-amount');
+        if (finalBillEl) {
+          finalBillEl.innerText = '₹' + metrics.finalBillAmount.toLocaleString('en-IN');
+        }
+
+        // 4. Amount Collected
         document.getElementById('amount-collected').innerText = '₹' + metrics.amountCollected.toLocaleString('en-IN');
 
-        // 3. Balance Due and Paid Amount / Final Payable
+        // 5. Balance Due and Paid Amount / Final Payable
         const rowBalanceDue = document.getElementById('row-balance-due');
         const balanceDueEl = document.getElementById('balance-due');
         const finalLabelEl = document.getElementById('final-amount-label');
@@ -767,11 +791,11 @@
           payStatusEl.className = 'badge-status status-paid';
         } else if (metrics.isPartial) {
           // When partially paid: Clearly show Amount Collected and Balance Due. Never show false PAID.
-          finalLabelEl.innerText = 'Final Payable';
-          grandTotalEl.innerText = '₹' + metrics.finalBillAmount.toLocaleString('en-IN');
+          finalLabelEl.innerText = 'Balance Due';
+          grandTotalEl.innerText = '₹' + metrics.balanceDue.toLocaleString('en-IN');
           rowBalanceDue.style.display = 'flex';
           balanceDueEl.innerText = '₹' + metrics.balanceDue.toLocaleString('en-IN');
-          payStatusEl.innerText = 'PARTIALLY PAID';
+          payStatusEl.innerText = 'PARTIAL';
           payStatusEl.className = 'badge-status status-partial';
         } else {
           // Unpaid

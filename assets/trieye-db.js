@@ -91,46 +91,105 @@ const TrieyeDB = {
       itemsSubtotal = items.reduce((sum, item) => sum + (Number(item.total_price !== undefined ? item.total_price : (item.unit_price * (item.quantity || 1))) || 0), 0);
     }
 
-    const recordedDiscount = Number(invOrBooking.discount !== undefined ? invOrBooking.discount : ((invOrBooking.totals && invOrBooking.totals.discount) || 0));
-    const recordedDiscountReason = invOrBooking.discount_reason || (invOrBooking.totals && (invOrBooking.totals.discount_reason || invOrBooking.totals.discountReason)) || invOrBooking.discountReason || '';
-
+    // 1. Authoritative Original Service Price / Subtotal
     let originalBillAmount = Number(invOrBooking.subtotal !== undefined && invOrBooking.subtotal !== null ? invOrBooking.subtotal : (invOrBooking.original_price || invOrBooking.originalPrice || 0));
     if (originalBillAmount <= 0) {
       if (itemsSubtotal > 0) {
         originalBillAmount = itemsSubtotal;
       } else {
-        const gt = Number(invOrBooking.grand_total !== undefined ? invOrBooking.grand_total : (invOrBooking.total_amount !== undefined ? invOrBooking.total_amount : (invOrBooking.price || 0)));
-        originalBillAmount = gt + (recordedDiscount > 0 ? recordedDiscount : 0);
+        const rawBase = Number(invOrBooking.price !== undefined ? invOrBooking.price : (invOrBooking.total_amount !== undefined ? invOrBooking.total_amount : (invOrBooking.grand_total || 0)));
+        originalBillAmount = rawBase;
       }
     }
 
-    const discountAmount = Math.max(0, recordedDiscount);
+    // 2. Authoritative Authorized Reduction / Less Amount (Discount, waiver, or authorized price adjustment)
+    let authorizedAdjustment = 0;
+    const recordedDiscountReason = invOrBooking.discount_reason || (invOrBooking.totals && (invOrBooking.totals.discount_reason || invOrBooking.totals.discountReason)) || invOrBooking.discountReason || '';
 
-    let finalBillAmount = Number(invOrBooking.grand_total !== undefined && invOrBooking.grand_total !== null ? invOrBooking.grand_total : (invOrBooking.total_amount !== undefined && invOrBooking.total_amount !== null ? invOrBooking.total_amount : (invOrBooking.price !== undefined ? invOrBooking.price : 0)));
-    if (finalBillAmount <= 0 && originalBillAmount > 0) {
-      finalBillAmount = Math.max(0, originalBillAmount - discountAmount);
+    if (invOrBooking.discount !== undefined && invOrBooking.discount !== null) {
+      authorizedAdjustment = Number(invOrBooking.discount || 0);
+    } else if (invOrBooking.totals && invOrBooking.totals.discount !== undefined) {
+      authorizedAdjustment = Number(invOrBooking.totals.discount || 0);
+    } else if (invOrBooking.discount_amount !== undefined && invOrBooking.discount_amount !== null) {
+      authorizedAdjustment = Number(invOrBooking.discount_amount || 0);
+    } else if (invOrBooking.adjustment !== undefined && invOrBooking.adjustment !== null) {
+      authorizedAdjustment = Number(invOrBooking.adjustment || 0);
     }
 
-    const pays = (invOrBooking.bookings && invOrBooking.bookings.payments) ? invOrBooking.bookings.payments : (invOrBooking.payments || []);
-    const payRecord = Array.isArray(pays) ? (pays[0] || {}) : (pays || {});
+    // 3. Authoritative Final Bill Amount
+    // Final Bill Amount = Original Service Price - Authorized Adjustment
+    let finalBillAmount = 0;
+    if (invOrBooking.grand_total !== undefined && invOrBooking.grand_total !== null) {
+      finalBillAmount = Number(invOrBooking.grand_total);
+    } else if (invOrBooking.final_bill_amount !== undefined && invOrBooking.final_bill_amount !== null) {
+      finalBillAmount = Number(invOrBooking.final_bill_amount);
+    } else if (invOrBooking.total_amount !== undefined && invOrBooking.total_amount !== null) {
+      finalBillAmount = Number(invOrBooking.total_amount);
+    } else if (originalBillAmount > 0) {
+      finalBillAmount = Math.max(0, originalBillAmount - authorizedAdjustment);
+    }
 
+    // Check if original price was not explicit but grand_total & discount were given
+    if (originalBillAmount <= finalBillAmount && authorizedAdjustment > 0) {
+      originalBillAmount = finalBillAmount + authorizedAdjustment;
+    } else if (authorizedAdjustment > 0 && finalBillAmount === 0 && originalBillAmount > 0) {
+      finalBillAmount = Math.max(0, originalBillAmount - authorizedAdjustment);
+    } else if (authorizedAdjustment === 0 && originalBillAmount > finalBillAmount && finalBillAmount > 0) {
+      // If original bill was greater than final bill and no explicit discount was set, the difference is an authorized adjustment
+      authorizedAdjustment = originalBillAmount - finalBillAmount;
+    }
+
+    // 4. Authoritative Amount Collected (sum all valid payment transactions without double counting)
+    const pays = (invOrBooking.bookings && invOrBooking.bookings.payments) ? invOrBooking.bookings.payments : (invOrBooking.payments || []);
     let amountCollected = 0;
-    if (payRecord && payRecord.amount !== undefined && payRecord.amount !== null) {
-      amountCollected = Number(payRecord.amount || 0);
+    let paymentMethods = [];
+
+    if (Array.isArray(pays) && pays.length > 0) {
+      amountCollected = pays.reduce((sum, p) => {
+        const pStatus = String(p.status || 'COMPLETED').toUpperCase();
+        if (['VOID', 'REFUNDED', 'FAILED', 'CANCELLED'].includes(pStatus)) return sum;
+        if (p.method) paymentMethods.push(String(p.method).toUpperCase());
+        return sum + (Number(p.amount) || 0);
+      }, 0);
     } else if (invOrBooking.amount_collected !== undefined && invOrBooking.amount_collected !== null) {
       amountCollected = Number(invOrBooking.amount_collected || 0);
     } else if (invOrBooking.amount_paid !== undefined && invOrBooking.amount_paid !== null) {
       amountCollected = Number(invOrBooking.amount_paid || 0);
+    } else if (invOrBooking.paid_amount !== undefined && invOrBooking.paid_amount !== null) {
+      amountCollected = Number(invOrBooking.paid_amount || 0);
+    } else if (invOrBooking.balance_due !== undefined && invOrBooking.balance_due !== null) {
+      amountCollected = Math.max(0, finalBillAmount - Number(invOrBooking.balance_due || 0));
     } else if ((invOrBooking.payStatus || invOrBooking.payment_status || '').toUpperCase() === 'PAID') {
       amountCollected = finalBillAmount;
     } else {
       amountCollected = 0;
     }
 
+    // 5. Historical Data Migration & Disambiguation for "Less Amount":
+    // If a legacy record had a field named `less_amount` and no explicit `balance_due`:
+    // - If less_amount equals (finalBillAmount - amountCollected), it was historically logged as the unpaid balance!
+    // - We preserve it as Balance Due and do not silently reinterpret it as a discount.
+    if (invOrBooking.balance_due === undefined && invOrBooking.less_amount !== undefined && invOrBooking.less_amount !== null) {
+      const legacyLess = Number(invOrBooking.less_amount || 0);
+      if (legacyLess > 0 && Math.abs(legacyLess - (finalBillAmount - amountCollected)) < 0.01) {
+        // Was used as balance due
+        amountCollected = Math.max(0, finalBillAmount - legacyLess);
+      } else if (legacyLess > 0 && authorizedAdjustment === 0 && (originalBillAmount - legacyLess === finalBillAmount)) {
+        // Was used as authorized adjustment
+        authorizedAdjustment = legacyLess;
+      }
+    }
+
+    // 6. Balance Due = max(0, Final Bill Amount - Valid Payments Collected)
     const balanceDue = Math.max(0, finalBillAmount - amountCollected);
 
+    // 7. Authoritative Payment Status (reflect actual balance and void/refund rules)
+    const rawStatus = String(invOrBooking.status || invOrBooking.payment_status || invOrBooking.payStatus || '').toUpperCase();
     let paymentStatus = 'UNPAID';
-    if (finalBillAmount > 0 && amountCollected >= finalBillAmount && balanceDue === 0) {
+
+    if (rawStatus === 'REFUNDED' || rawStatus === 'VOID') {
+      paymentStatus = rawStatus;
+    } else if (finalBillAmount > 0 && amountCollected >= finalBillAmount && balanceDue === 0) {
       paymentStatus = 'PAID';
     } else if (amountCollected > 0 && balanceDue > 0) {
       paymentStatus = 'PARTIAL';
@@ -140,7 +199,11 @@ const TrieyeDB = {
       paymentStatus = 'UNPAID';
     }
 
-    const rawMethod = payRecord.method || invOrBooking.payMethod || invOrBooking.payment_method || 'CASH';
+    // 8. Payment Method
+    const payRecord = Array.isArray(pays) ? (pays[0] || {}) : (pays || {});
+    let rawMethod = paymentMethods.length > 0 
+      ? Array.from(new Set(paymentMethods)).join(', ')
+      : (payRecord.method || invOrBooking.payMethod || invOrBooking.payment_method || 'CASH');
 
     const serviceName = invOrBooking.service || invOrBooking.service_name || (items[0] && items[0].service_name) || 'Detailing Service';
     const serviceDescription = invOrBooking.service_description || (items[0] && items[0].service_description) || '';
@@ -149,7 +212,9 @@ const TrieyeDB = {
       serviceName,
       serviceDescription,
       originalBillAmount,
-      discountAmount,
+      originalServicePrice: originalBillAmount,
+      lessAmount: authorizedAdjustment,
+      discountAmount: authorizedAdjustment,
       discountReason: recordedDiscountReason,
       finalBillAmount,
       amountCollected,
@@ -159,8 +224,14 @@ const TrieyeDB = {
       isPaid: paymentStatus === 'PAID',
       isFullyPaid: paymentStatus === 'PAID',
       isPartial: paymentStatus === 'PARTIAL',
-      isUnpaid: paymentStatus === 'UNPAID'
+      isUnpaid: paymentStatus === 'UNPAID',
+      isRefunded: paymentStatus === 'REFUNDED',
+      isVoid: paymentStatus === 'VOID'
     };
+  },
+
+  calculateFinancialMetrics(invOrBooking) {
+    return this.calculateBillMetrics(invOrBooking);
   },
 
   formatPaymentMethod(m) {

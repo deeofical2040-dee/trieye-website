@@ -19,6 +19,7 @@
     })();
   </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="/assets/exceljs.min.js"></script>
   <script>
     (function() {
       try {
@@ -309,6 +310,29 @@
     .btn-green:hover {
       background: #94bd2b;
       box-shadow: 0 0 16px var(--green-glow);
+    }
+    .btn-excel {
+      background: rgba(22, 163, 74, 0.12);
+      border-color: #16a34a;
+      color: #22c55e;
+      font-weight: 600;
+    }
+    .btn-excel:hover {
+      background: #16a34a;
+      border-color: #15803d;
+      color: #ffffff;
+      box-shadow: 0 0 14px rgba(22, 163, 74, 0.35);
+    }
+    [data-theme="dark"] .btn-excel {
+      background: rgba(34, 197, 94, 0.15);
+      border-color: #22c55e;
+      color: #4ade80;
+    }
+    [data-theme="dark"] .btn-excel:hover {
+      background: #22c55e;
+      border-color: #16a34a;
+      color: #0b0e14;
+      box-shadow: 0 0 14px rgba(34, 197, 94, 0.45);
     }
     .btn-icon-sm {
       padding: 0.25rem 0.5rem;
@@ -2597,7 +2621,11 @@
             <div class="section-title"><span>🌐</span> Online Website Bookings</div>
             <div class="section-subtitle">Reservations placed via Trieye customer booking portal</div>
           </div>
-
+          <div style="display:flex; gap:0.5rem; align-items:center;">
+            <button type="button" class="btn btn-excel" id="btn-export-online-excel" onclick="exportOnlineBookingsToExcel()" title="Download genuine Excel (.xlsx) report matching current filter">
+              <span>⬇</span> Download Excel
+            </button>
+          </div>
         </div>
 
         <!-- Monthly Calendar Filter Toolbar -->
@@ -5098,6 +5126,389 @@
       changeJobStatus(id, 'ARRIVED');
     }
 
+    // EXCEL EXPORT FEATURE (GENUINE .XLSX FOR ONLINE BOOKINGS)
+    async function ensureExcelJSLoaded() {
+      if (typeof window.ExcelJS !== 'undefined') return window.ExcelJS;
+      return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = window.__TRIEYE_ASSET_PREFIX__ ? (window.__TRIEYE_ASSET_PREFIX__ + 'exceljs.min.js') : '/assets/exceljs.min.js';
+        script.onload = () => {
+          if (typeof window.ExcelJS !== 'undefined') resolve(window.ExcelJS);
+          else reject(new Error('ExcelJS failed to initialize.'));
+        };
+        script.onerror = () => {
+          // CDN fallback
+          const cdnScript = document.createElement('script');
+          cdnScript.src = 'https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js';
+          cdnScript.onload = () => {
+            if (typeof window.ExcelJS !== 'undefined') resolve(window.ExcelJS);
+            else reject(new Error('ExcelJS CDN fallback failed to initialize.'));
+          };
+          cdnScript.onerror = () => reject(new Error('Unable to load ExcelJS library. Please check network connection.'));
+          document.head.appendChild(cdnScript);
+        };
+        document.head.appendChild(script);
+      });
+    }
+
+    async function exportOnlineBookingsToExcel() {
+      const btn = document.getElementById('btn-export-online-excel');
+      const originalText = btn ? btn.innerHTML : '<span>⬇</span> Download Excel';
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<span>⏳</span> Generating Excel...';
+      }
+
+      try {
+        const ExcelLib = await ensureExcelJSLoaded();
+
+        // 1. Fetch authorized data from authoritative source (Supabase / local fallback)
+        let bookings = getBookings();
+        if (window.TrieyeDB && typeof window.TrieyeDB.getBookings === 'function') {
+          try {
+            const remote = await window.TrieyeDB.getBookings();
+            if (Array.isArray(remote) && !remote._hasError && remote.length > 0) {
+              bookings = remote;
+            }
+          } catch (e) {
+            console.warn('⚠️ [Excel Export] Using cached bookings:', e);
+          }
+        }
+
+        // 2. Fetch invoices to enrich discounts & multi-service line items
+        let invoices = [];
+        if (window.TrieyeDB && typeof window.TrieyeDB.getInvoices === 'function') {
+          try {
+            invoices = await window.TrieyeDB.getInvoices();
+          } catch (e) {}
+        }
+        if (!Array.isArray(invoices) || invoices.length === 0) {
+          try {
+            invoices = JSON.parse(localStorage.getItem('trieye_invoices')) || [];
+          } catch (e) {}
+        }
+        const invoiceMap = new Map();
+        if (Array.isArray(invoices)) {
+          invoices.forEach(inv => {
+            if (inv.booking_id) invoiceMap.set(String(inv.booking_id), inv);
+            if (inv.id) invoiceMap.set(String(inv.id), inv);
+            if (inv.invoice_number) invoiceMap.set(String(inv.invoice_number), inv);
+            if (inv.invoice_ref) invoiceMap.set(String(inv.invoice_ref), inv);
+          });
+        }
+
+        // 3. Filter records matching active filter
+        const { todayStr: localToday, tomStr: localTomorrow } = getKolkataTodayAndTomorrow();
+        const mode = (onlineFilterState || 'TODAY').toUpperCase().trim();
+        const selYearStr = String(currentOnlineYear);
+        const selMonthStr = String(currentOnlineMonth + 1).padStart(2, '0');
+        const selMonthPrefix = `${selYearStr}-${selMonthStr}`;
+
+        const matching = bookings.filter(b => {
+          const normSrc = normalizeSource(b.source);
+          if (onlineSourceFilter === 'ONLINE' && normSrc !== 'ONLINE') return false;
+          if (onlineSourceFilter === 'WALKIN' && normSrc !== 'WALK-IN') return false;
+
+          const bDate = getBookingServiceDate(b);
+          if (!bDate) return false;
+          const s = normalizeStatus(b.status);
+
+          if (mode === 'TODAY') {
+            return bDate === localToday;
+          }
+          if (mode === 'TOMORROW') {
+            return bDate === localTomorrow;
+          }
+          if (mode === 'UPCOMING') {
+            return bDate > localTomorrow && s !== 'CANCELLED';
+          }
+          if (currentOnlineSpecificDate) {
+            if (bDate !== currentOnlineSpecificDate) return false;
+          }
+
+          if (mode === 'PENDING') return s === 'PENDING';
+          if (mode === 'CONFIRMED') return s === 'CONFIRMED';
+          if (mode === 'COMPLETED') return s === 'COMPLETED';
+          if (mode === 'CANCELLED') return s === 'CANCELLED';
+
+          // For 'ALL', if no specific date is selected, respect current active month boundary if viewing a month
+          if (mode === 'ALL' && !currentOnlineSpecificDate) {
+            return bDate.startsWith(selMonthPrefix);
+          }
+
+          return true;
+        });
+
+        if (!matching || matching.length === 0) {
+          showToast('No bookings found matching current filter to export.');
+          return;
+        }
+
+        // 4. Create Workbook with ONLY 1 sheet named "Bookings"
+        const workbook = new ExcelLib.Workbook();
+        workbook.creator = 'TRIEYE Detailing Studio';
+        workbook.lastModifiedBy = 'Studio Administrator';
+        workbook.created = new Date();
+        workbook.modified = new Date();
+
+        const worksheet = workbook.addWorksheet('Bookings', {
+          views: [{ state: 'frozen', xSplit: 0, ySplit: 2 }]
+        });
+
+        // 5. Title Row (Row 1) - Merged A1:P1 (16 Columns)
+        worksheet.mergeCells('A1:P1');
+        const titleRow = worksheet.getRow(1);
+        titleRow.height = 36;
+        const titleCell = worksheet.getCell('A1');
+
+        let filterDesc = 'All Active Records';
+        if (mode === 'TODAY') filterDesc = `Today (${formatHumanDate(localToday)})`;
+        else if (mode === 'TOMORROW') filterDesc = `Tomorrow (${formatHumanDate(localTomorrow)})`;
+        else if (mode === 'UPCOMING') filterDesc = 'Upcoming';
+        else if (currentOnlineSpecificDate) filterDesc = `Date: ${formatHumanDate(currentOnlineSpecificDate)}`;
+        else if (mode === 'ALL') filterDesc = `${MONTH_NAMES[currentOnlineMonth] || ''} ${currentOnlineYear || ''} (All)`;
+        else filterDesc = mode;
+
+        titleCell.value = `TRIEYE DETAILING STUDIO — BOOKINGS REPORT (${filterDesc})`;
+        titleCell.font = { name: 'Arial', size: 13, bold: true, color: { argb: 'FFFFFFFF' } };
+        titleCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0D5C3A' } };
+        titleCell.alignment = { vertical: 'middle', horizontal: 'center' };
+
+        // 6. Header Row (Row 2) - Exactly the 16 columns matching invoice terminology
+        const headers = [
+          'Booking / Bill ID',
+          'Booking Source',
+          'Customer Name',
+          'Phone Number',
+          'Vehicle Type',
+          'Registration Number',
+          'Service / Package',
+          'Original Service Price',
+          'Less Amount',
+          'Discount Reason',
+          'Final Bill Amount',
+          'Amount Collected',
+          'Balance Due',
+          'Payment Method',
+          'Payment Status',
+          'Booking Date & Time'
+        ];
+
+        const headerRow = worksheet.getRow(2);
+        headerRow.height = 28;
+        headers.forEach((h, idx) => {
+          const cell = headerRow.getCell(idx + 1);
+          cell.value = h;
+          cell.font = { name: 'Arial', size: 10, bold: true, color: { argb: 'FFFFFFFF' } };
+          cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF16773F' } }; // Professional green
+          cell.alignment = { vertical: 'middle', horizontal: 'center', wrapText: true };
+          cell.border = {
+            top: { style: 'thin', color: { argb: 'FF0D5C3A' } },
+            left: { style: 'thin', color: { argb: 'FF0D5C3A' } },
+            bottom: { style: 'medium', color: { argb: 'FF0D5C3A' } },
+            right: { style: 'thin', color: { argb: 'FF0D5C3A' } }
+          };
+        });
+
+        // Enable Excel filters on the header row
+        worksheet.autoFilter = { from: 'A2', to: 'P2' };
+
+        // 7. Data Rows (Row 3 onwards - exactly 1 row per booking)
+        matching.forEach((b, i) => {
+          const rowNum = i + 3;
+          const row = worksheet.getRow(rowNum);
+          row.height = 22;
+          const isEven = i % 2 === 1;
+          const bgFill = isEven ? 'FFF9FAFB' : 'FFFFFFFF';
+
+          const linkedInv = invoiceMap.get(String(b.id)) || 
+                            invoiceMap.get(String(b.invoice_number)) || 
+                            invoiceMap.get(String(b.invoice_ref)) || 
+                            (b.invoice_id ? invoiceMap.get(String(b.invoice_id)) : null);
+
+          // Authoritative billSource merging invoice payment record on top of booking
+          const billSource = linkedInv ? Object.assign({}, b, linkedInv) : b;
+
+          // Calculate authoritative financial metrics matching the invoice screen
+          let metrics;
+          if (window.TrieyeDB && typeof window.TrieyeDB.calculateBillMetrics === 'function') {
+            metrics = window.TrieyeDB.calculateBillMetrics(billSource);
+          } else {
+            const origAmt = Number(billSource.subtotal || billSource.original_price || billSource.price || billSource.total_amount || 0);
+            const lessAmt = Number(billSource.discount !== undefined ? billSource.discount : (billSource.less_amount !== undefined ? billSource.less_amount : 0));
+            const fb = Number(billSource.grand_total !== undefined ? billSource.grand_total : (billSource.final_bill_amount !== undefined ? billSource.final_bill_amount : (billSource.total_amount !== undefined ? billSource.total_amount : Math.max(0, origAmt - lessAmt))));
+            let ac = 0;
+            if (billSource.amount_collected !== undefined && billSource.amount_collected !== null) ac = Number(billSource.amount_collected || 0);
+            else if (billSource.amount_paid !== undefined && billSource.amount_paid !== null) ac = Number(billSource.amount_paid || 0);
+            else if (billSource.paid_amount !== undefined && billSource.paid_amount !== null) ac = Number(billSource.paid_amount || 0);
+            else if (billSource.balance_due !== undefined && billSource.balance_due !== null) ac = Math.max(0, fb - Number(billSource.balance_due || 0));
+            else if ((billSource.payStatus || billSource.status || '').toUpperCase() === 'PAID') ac = fb;
+            const bal = Math.max(0, fb - ac);
+            const st = (fb > 0 && ac >= fb && bal === 0) ? 'PAID' : (ac > 0 && bal > 0 ? 'PARTIAL' : (fb === 0 && ac === 0 ? 'PAID' : 'UNPAID'));
+            metrics = {
+              originalBillAmount: origAmt,
+              originalServicePrice: origAmt,
+              lessAmount: lessAmt,
+              discountAmount: lessAmt,
+              discountReason: billSource.discount_reason || billSource.discountReason || '',
+              finalBillAmount: fb,
+              amountCollected: ac,
+              balanceDue: bal,
+              paymentStatus: st,
+              paymentMethod: billSource.payMethod || billSource.payment_method || 'CASH'
+            };
+          }
+
+          // 1. Booking / Bill ID
+          const billId = b.invoice_number || b.invoice_ref || (b.id && b.id.length > 8 ? `TRI-${b.id.slice(0, 8).toUpperCase()}` : (b.id || 'N/A'));
+
+          // 2. Booking Source
+          const isWalkIn = normalizeSource(b.source) === 'WALK-IN';
+          const sourceText = isWalkIn ? 'Walk-in' : 'Online';
+
+          // 3. Customer Name
+          const custName = b.name || (b.customers && b.customers.name) || (linkedInv && linkedInv.customers && linkedInv.customers.name) || 'Valued Customer';
+
+          // 4. Phone Number
+          const phone = b.phone || (b.customers && b.customers.phone) || (linkedInv && linkedInv.customers && linkedInv.customers.phone) || '';
+
+          // 5. Vehicle Type
+          const vehType = b.vehicleType || (b.vehicles && b.vehicles.vehicle_type) || (linkedInv && linkedInv.vehicles && linkedInv.vehicles.vehicle_type) || 'Car';
+
+          // 6. Registration Number
+          const regNum = b.reg || (b.vehicles && b.vehicles.reg_number) || (linkedInv && linkedInv.vehicles && linkedInv.vehicles.reg_number) || 'N/A';
+
+          // 7. Service / Package (represent multiple services clearly without double-counting)
+          let serviceText = b.service || (b.services && b.services.name) || 'Detailing Service';
+          if (linkedInv && Array.isArray(linkedInv.invoice_items) && linkedInv.invoice_items.length > 0) {
+            const names = linkedInv.invoice_items.map(it => it.service_name).filter(Boolean);
+            if (names.length > 0) serviceText = names.join(', ');
+          }
+
+          // 8. Original Service Price
+          const origServicePrice = Number(metrics.originalBillAmount || 0);
+
+          // 9. Less Amount (Authorized Adjustment / Discount)
+          const lessAmount = Number(metrics.lessAmount !== undefined ? metrics.lessAmount : (metrics.discountAmount || 0));
+
+          // 10. Discount Reason (Included in admin export)
+          const discountReason = metrics.discountReason ? metrics.discountReason : (lessAmount > 0 ? 'Authorized Adjustment' : 'None');
+
+          // 11. Final Bill Amount
+          const finalBill = Number(metrics.finalBillAmount || 0);
+
+          // 12. Amount Collected (actual recorded payment, never duplicated from final bill if balance remains)
+          const collected = Number(metrics.amountCollected || 0);
+
+          // 13. Balance Due (authoritative unpaid balance from invoice)
+          const balanceDue = Number(metrics.balanceDue !== undefined ? metrics.balanceDue : Math.max(0, finalBill - collected));
+
+          // 14. Payment Method
+          let method = String(metrics.paymentMethod || billSource.payMethod || billSource.payment_method || 'CASH').toUpperCase();
+          if (method === 'UPI / QR' || method.includes('UPI')) method = 'UPI';
+
+          // 15. Payment Status (PARTIAL when balance remains, never false PAID)
+          const payStatus = String(metrics.paymentStatus || billSource.payStatus || billSource.status || 'UNPAID').toUpperCase();
+
+          // 16. Booking Date & Time
+          const bDate = b.booking_date || b.date || (billSource.created_at ? billSource.created_at.slice(0, 10) : '');
+          const bTime = b.bookingTime || b.booking_time || b.slot || '';
+          const dtText = [bDate, bTime].filter(Boolean).join(' ') || 'Immediate';
+
+          const rowData = [
+            billId,
+            sourceText,
+            custName,
+            phone,
+            vehType,
+            regNum,
+            serviceText,
+            origServicePrice,
+            lessAmount,
+            discountReason,
+            finalBill,
+            collected,
+            balanceDue,
+            method,
+            payStatus,
+            dtText
+          ];
+
+          rowData.forEach((val, cIdx) => {
+            const cell = row.getCell(cIdx + 1);
+            cell.value = val;
+            cell.font = { name: 'Arial', size: 10, color: { argb: 'FF1F2937' } };
+            cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: bgFill } };
+            cell.border = {
+              top: { style: 'thin', color: { argb: 'FFE5E7EB' } },
+              left: { style: 'thin', color: { argb: 'FFE5E7EB' } },
+              bottom: { style: 'thin', color: { argb: 'FFE5E7EB' } },
+              right: { style: 'thin', color: { argb: 'FFE5E7EB' } }
+            };
+
+            // Currency formatting in INR for cols: 8 (Original Service Price), 9 (Less Amount), 11 (Final Bill), 12 (Collected), 13 (Balance Due)
+            if ([8, 9, 11, 12, 13].includes(cIdx + 1)) {
+              cell.numFmt = '"₹"#,##0.00';
+              cell.alignment = { vertical: 'middle', horizontal: 'right' };
+              if ([11, 12].includes(cIdx + 1)) {
+                cell.font = { name: 'Arial', size: 10, bold: true, color: { argb: 'FF111827' } };
+              } else if (cIdx + 1 === 9) {
+                cell.font = {
+                  name: 'Arial',
+                  size: 10,
+                  bold: lessAmount > 0,
+                  color: { argb: lessAmount > 0 ? 'FF2563EB' : 'FF6B7280' }
+                };
+              } else if (cIdx + 1 === 13) {
+                // Highlight Balance Due in rose red if balance remains, or emerald green if settled
+                cell.font = {
+                  name: 'Arial',
+                  size: 10,
+                  bold: true,
+                  color: { argb: balanceDue > 0 ? 'FFE11D48' : 'FF059669' }
+                };
+              }
+            } else if ([1, 2, 4, 5, 6, 14, 15, 16].includes(cIdx + 1)) {
+              cell.alignment = { vertical: 'middle', horizontal: 'center' };
+            } else {
+              cell.alignment = { vertical: 'middle', horizontal: 'left' };
+            }
+          });
+        });
+
+        // Set suitable column widths for all 16 columns
+        const colWidths = [20, 18, 24, 16, 14, 18, 34, 22, 16, 24, 20, 18, 16, 18, 16, 24];
+        colWidths.forEach((w, idx) => {
+          worksheet.getColumn(idx + 1).width = w;
+        });
+
+        // 8. Generate genuine .xlsx buffer and trigger download
+        const exportDateStr = localToday || new Date().toISOString().slice(0, 10);
+        const filename = `TRIEYE_Bookings_${exportDateStr}.xlsx`;
+
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url = URL.createObjectURL(blob);
+        const downloadLink = document.createElement('a');
+        downloadLink.href = url;
+        downloadLink.download = filename;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+        showToast(`Successfully exported ${matching.length} booking${matching.length === 1 ? '' : 's'} to ${filename}!`);
+      } catch (err) {
+        console.error('🚨 [Excel Export Error]:', err);
+        alert('Failed to generate Excel file: ' + (err.message || 'Unknown error'));
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = originalText;
+        }
+      }
+    }
+
     // 4. EXPRESS WALKIN ENTRY FLOW
     function handleCustomerLookup() {
       const phoneInput = document.getElementById('walkin-phone');
@@ -6133,12 +6544,12 @@
           </div>
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:8px; font-size:0.75rem; font-family:'IBM Plex Mono';">
             <div><span style="color:var(--muted);">Original Price:</span> <b style="color:#fff;">₹${metrics.originalBillAmount.toLocaleString()}</b></div>
-            <div><span style="color:var(--muted);">Discount Applied:</span> <b style="color:${metrics.discountAmount > 0 ? '#f43f5e' : '#94a3b8'};">${metrics.discountAmount > 0 ? '-₹' + metrics.discountAmount.toLocaleString() : '₹0'}</b></div>
-            <div style="grid-column: span 2;"><span style="color:var(--muted);">Discount Reason:</span> <b style="color:#fde047;">${escapeHtml(metrics.discountReason || 'None')}</b></div>
+            <div><span style="color:var(--muted);">Less Amount (Adj):</span> <b style="color:${metrics.lessAmount > 0 ? '#38bdf8' : '#94a3b8'};">${metrics.lessAmount > 0 ? '-₹' + metrics.lessAmount.toLocaleString() : '₹0'}</b></div>
+            <div style="grid-column: span 2;"><span style="color:var(--muted);">Adjustment Reason:</span> <b style="color:#fde047;">${escapeHtml(metrics.discountReason || 'None')}</b></div>
             <div><span style="color:var(--muted);">Final Bill:</span> <b style="color:#a3e635;">₹${metrics.finalBillAmount.toLocaleString()}</b></div>
-            <div><span style="color:var(--muted);">Collected:</span> <b style="color:#38bdf8;">₹${metrics.amountCollected.toLocaleString()}</b></div>
+            <div><span style="color:var(--muted);">Amount Collected:</span> <b style="color:#38bdf8;">₹${metrics.amountCollected.toLocaleString()}</b></div>
             <div><span style="color:var(--muted);">Balance Due:</span> <b style="color:${metrics.balanceDue > 0 ? '#f43f5e' : '#a3e635'};">₹${metrics.balanceDue.toLocaleString()}</b></div>
-            <div><span style="color:var(--muted);">Payment Method:</span> <b style="color:#fff;">${escapeHtml(metrics.paymentMethod || 'Cash')}</b></div>
+            <div><span style="color:var(--muted);">Payment Method:</span> <b style="color:#fff;">${escapeHtml(formatPaymentMethod(metrics.paymentMethod))}</b></div>
           </div>
         </div>
 
@@ -6187,21 +6598,29 @@
           ${breakdownHtml}
 
           <!-- Customer-facing Bill Presentation -->
-          <div style="background:var(--bg-panel); border:1px solid var(--line-subtle); border-radius:6px; padding:0.85rem; display:flex; flex-direction:column; gap:0.4rem; font-size:0.82rem; font-family:'IBM Plex Mono';">
+          <div style="background:var(--bg-panel); border:1px solid var(--line-subtle); border-radius:6px; padding:0.85rem; display:flex; flex-direction:column; gap:0.45rem; font-size:0.82rem; font-family:'IBM Plex Mono';">
             <div style="display:flex; justify-content:space-between;">
-              <span style="color:var(--muted);">Total Bill</span>
+              <span style="color:var(--muted);">Original Service Price</span>
               <strong style="color:var(--white);">₹${metrics.originalBillAmount.toLocaleString()}</strong>
+            </div>
+            ${metrics.lessAmount > 0 ? `
+              <div style="display:flex; justify-content:space-between; color:#38bdf8;">
+                <span>Less Amount</span>
+                <strong>-₹${metrics.lessAmount.toLocaleString()}</strong>
+              </div>
+            ` : ''}
+            <div style="display:flex; justify-content:space-between; border-top:1px dashed var(--line-subtle); padding-top:4px;">
+              <span style="color:var(--muted); font-weight:600;">Final Bill Amount</span>
+              <strong style="color:var(--white); font-size:0.88rem;">₹${metrics.finalBillAmount.toLocaleString()}</strong>
             </div>
             <div style="display:flex; justify-content:space-between;">
               <span style="color:var(--muted);">Amount Collected</span>
-              <strong style="color:var(--white);">₹${metrics.amountCollected.toLocaleString()}</strong>
+              <strong style="color:#a3e635;">₹${metrics.amountCollected.toLocaleString()}</strong>
             </div>
-            ${metrics.balanceDue > 0 ? `
-              <div style="display:flex; justify-content:space-between; color:#f43f5e; font-weight:600;">
-                <span>Less Amount</span>
-                <strong>₹${metrics.balanceDue.toLocaleString()}</strong>
-              </div>
-            ` : ''}
+            <div style="display:flex; justify-content:space-between; ${metrics.balanceDue > 0 ? 'color:#f43f5e; font-weight:700;' : 'color:var(--muted);'}">
+              <span>Balance Due</span>
+              <strong>₹${metrics.balanceDue.toLocaleString()}</strong>
+            </div>
           </div>
 
           <!-- Payment Info & Final Prominent Total -->
@@ -6213,10 +6632,10 @@
             </div>
             <div style="text-align:right;">
               <div style="font-size:0.75rem; color:var(--muted); font-family:'IBM Plex Mono'; text-transform:uppercase;">
-                ${metrics.isFullyPaid ? 'Paid Amount' : (metrics.isPartial ? 'Final Payable' : 'Amount Payable')}
+                ${metrics.isFullyPaid ? 'Paid Amount' : (metrics.isPartial ? 'Balance Due' : 'Amount Payable')}
               </div>
-              <div style="font-family:'Oswald', sans-serif; font-size:1.6rem; color:${metrics.isFullyPaid ? 'var(--green)' : 'var(--white)'}; font-weight:700;">
-                ₹${(metrics.isFullyPaid ? metrics.amountCollected : metrics.finalBillAmount).toLocaleString()}
+              <div style="font-family:'Oswald', sans-serif; font-size:1.6rem; color:${metrics.isFullyPaid ? 'var(--green)' : (metrics.isPartial ? '#f43f5e' : 'var(--white)')}; font-weight:700;">
+                ₹${(metrics.isFullyPaid ? metrics.amountCollected : (metrics.isPartial ? metrics.balanceDue : metrics.finalBillAmount)).toLocaleString()}
               </div>
             </div>
           </div>
@@ -6307,27 +6726,34 @@
 
       let paymentLines = '';
       if (metrics.isFullyPaid) {
-        if (metrics.discountAmount > 0) {
+        if (metrics.lessAmount > 0) {
           paymentLines = 
-`*Total Bill:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
+`*Original Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
+*Less Amount:* ₹${metrics.lessAmount.toLocaleString('en-IN')}
+*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
-*Paid Amount:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
+*Balance Due:* ₹0
 *Payment Status:* PAID (${formatPaymentMethod(metrics.paymentMethod)})`;
         } else {
-          paymentLines = `*Total Bill:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}`;
+          paymentLines = 
+`*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
+*Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
+*Balance Due:* ₹0
+*Payment Status:* PAID (${formatPaymentMethod(metrics.paymentMethod)})`;
         }
       } else if (metrics.isPartial) {
         paymentLines = 
-`*Total Bill:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
-*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
+(metrics.lessAmount > 0 ? `*Original Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}\n*Less Amount:* ₹${metrics.lessAmount.toLocaleString('en-IN')}\n` : '') +
+`*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
-*Less Amount:* ₹${metrics.balanceDue.toLocaleString('en-IN')}
-*Payment Status:* PARTIALLY PAID (${formatPaymentMethod(metrics.paymentMethod)})`;
+*Balance Due:* ₹${metrics.balanceDue.toLocaleString('en-IN')}
+*Payment Status:* PARTIAL (${formatPaymentMethod(metrics.paymentMethod)})`;
       } else {
         paymentLines = 
-`*Total Bill:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
+(metrics.lessAmount > 0 ? `*Original Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}\n*Less Amount:* ₹${metrics.lessAmount.toLocaleString('en-IN')}\n` : '') +
+`*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹0
-*Less Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
+*Balance Due:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Payment Status:* UNPAID`;
       }
 
@@ -8648,23 +9074,34 @@ function shareInvoiceWhatsApp() {
 
   let paymentLines = '';
   if (metrics.isFullyPaid) {
-    paymentLines = 
-`*Total Bill:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
-*Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
-*Paid Amount:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
-*Payment Status:* PAID (${formatPaymentMethod(metrics.paymentMethod)})`;
-  } else if (metrics.isPartial) {
-    paymentLines = 
-`*Total Bill:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
+    if (metrics.lessAmount > 0) {
+      paymentLines = 
+`*Original Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
+*Less Amount:* ₹${metrics.lessAmount.toLocaleString('en-IN')}
 *Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
-*Less Amount:* ₹${metrics.balanceDue.toLocaleString('en-IN')}
-*Payment Status:* PARTIALLY PAID (${formatPaymentMethod(metrics.paymentMethod)})`;
+*Balance Due:* ₹0
+*Payment Status:* PAID (${formatPaymentMethod(metrics.paymentMethod)})`;
+    } else {
+      paymentLines = 
+`*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
+*Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
+*Balance Due:* ₹0
+*Payment Status:* PAID (${formatPaymentMethod(metrics.paymentMethod)})`;
+    }
+  } else if (metrics.isPartial) {
+    paymentLines = 
+(metrics.lessAmount > 0 ? `*Original Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}\n*Less Amount:* ₹${metrics.lessAmount.toLocaleString('en-IN')}\n` : '') +
+`*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
+*Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
+*Balance Due:* ₹${metrics.balanceDue.toLocaleString('en-IN')}
+*Payment Status:* PARTIAL (${formatPaymentMethod(metrics.paymentMethod)})`;
   } else {
     paymentLines = 
-`*Total Bill:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
+(metrics.lessAmount > 0 ? `*Original Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}\n*Less Amount:* ₹${metrics.lessAmount.toLocaleString('en-IN')}\n` : '') +
+`*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹0
-*Less Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
+*Balance Due:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Payment Status:* UNPAID`;
   }
 

@@ -908,7 +908,7 @@
               <span id="mb-summary-paidamt" style="font-family:'IBM Plex Mono'; font-weight:600;">₹0</span>
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="color:var(--text-muted);">Less Amount</span>
+              <span style="color:var(--text-muted);">Balance Due</span>
               <span id="mb-summary-balance" style="font-family:'IBM Plex Mono'; font-weight:700; color:var(--white);">₹0</span>
             </div>
           </div>
@@ -1034,7 +1034,7 @@
             <span id="inv-amt-paid" style="font-family:'IBM Plex Mono'; font-weight:600; color:#0f172a;">₹0</span>
           </div>
           <div id="inv-balance-row" style="display:none; justify-content:space-between; padding:4px 0; color:#dc2626; font-weight:700;">
-            <span>Less Amount:</span>
+            <span>Balance Due:</span>
             <span id="inv-balance" style="font-family:'IBM Plex Mono'; color:#dc2626;">₹0</span>
           </div>
           <div style="display:flex; justify-content:space-between; padding:8px 0; font-size:18px; font-weight:800; border-top:2px solid #0f172a; border-bottom:2px solid #0f172a; margin-top:6px;">
@@ -2017,28 +2017,34 @@
 
       let paymentDetailsText = '';
       if (metrics.isPaid) {
-        if (metrics.discountAmount > 0) {
+        if (metrics.lessAmount > 0) {
           paymentDetailsText = 
-`*Total Bill:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
+`*Original Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
+*Less Amount:* ₹${metrics.lessAmount.toLocaleString('en-IN')}
+*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
-*Paid Amount:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
+*Balance Due:* ₹0
 *Payment Status:* ✅ PAID (${formatPaymentMethod(metrics.paymentMethod)})`;
         } else {
-          paymentDetailsText = `*Total Bill:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}`;
+          paymentDetailsText = 
+`*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
+*Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
+*Balance Due:* ₹0
+*Payment Status:* ✅ PAID (${formatPaymentMethod(metrics.paymentMethod)})`;
         }
       } else if (metrics.isPartial) {
         paymentDetailsText = 
-`*Total Bill:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
-*Final Payable:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
+(metrics.lessAmount > 0 ? `*Original Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}\n*Less Amount:* ₹${metrics.lessAmount.toLocaleString('en-IN')}\n` : '') +
+`*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
-*Less Amount:* ₹${metrics.balanceDue.toLocaleString('en-IN')}
-*Payment Status:* ⚠️ PARTIAL PAYMENT (${formatPaymentMethod(metrics.paymentMethod)})`;
+*Balance Due:* ₹${metrics.balanceDue.toLocaleString('en-IN')}
+*Payment Status:* ⚠️ PARTIAL (${formatPaymentMethod(metrics.paymentMethod)})`;
       } else {
         paymentDetailsText = 
-`*Total Bill:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
-*Amount Payable:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
+(metrics.lessAmount > 0 ? `*Original Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}\n*Less Amount:* ₹${metrics.lessAmount.toLocaleString('en-IN')}\n` : '') +
+`*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹0
-*Less Amount:* ₹${metrics.balanceDue.toLocaleString('en-IN')}
+*Balance Due:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Payment Status:* ❌ UNPAID`;
       }
 
