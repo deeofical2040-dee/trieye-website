@@ -91,18 +91,7 @@ const TrieyeDB = {
       itemsSubtotal = items.reduce((sum, item) => sum + (Number(item.total_price !== undefined ? item.total_price : (item.unit_price * (item.quantity || 1))) || 0), 0);
     }
 
-    // 1. Authoritative Original Service Price / Subtotal
-    let originalBillAmount = Number(invOrBooking.subtotal !== undefined && invOrBooking.subtotal !== null ? invOrBooking.subtotal : (invOrBooking.original_price || invOrBooking.originalPrice || 0));
-    if (originalBillAmount <= 0) {
-      if (itemsSubtotal > 0) {
-        originalBillAmount = itemsSubtotal;
-      } else {
-        const rawBase = Number(invOrBooking.price !== undefined ? invOrBooking.price : (invOrBooking.total_amount !== undefined ? invOrBooking.total_amount : (invOrBooking.grand_total || 0)));
-        originalBillAmount = rawBase;
-      }
-    }
-
-    // 2. Authoritative Authorized Reduction / Less Amount (Discount, waiver, or authorized price adjustment)
+    // 1. Authoritative Authorized Reduction / Less Amount (Discount, waiver, or authorized price adjustment)
     let authorizedAdjustment = 0;
     const recordedDiscountReason = invOrBooking.discount_reason || (invOrBooking.totals && (invOrBooking.totals.discount_reason || invOrBooking.totals.discountReason)) || invOrBooking.discountReason || '';
 
@@ -116,27 +105,31 @@ const TrieyeDB = {
       authorizedAdjustment = Number(invOrBooking.adjustment || 0);
     }
 
-    // 3. Authoritative Final Bill Amount
-    // Final Bill Amount = Original Service Price - Authorized Adjustment
+    // 2. Authoritative Original Service Price / Subtotal and Final Bill Amount
+    // Formula: Final Bill Amount = Original Service Price - Less Amount (Authorized Adjustment)
+    let originalBillAmount = Number(invOrBooking.subtotal !== undefined && invOrBooking.subtotal !== null ? invOrBooking.subtotal : (invOrBooking.original_price || invOrBooking.originalPrice || 0));
     let finalBillAmount = 0;
-    if (invOrBooking.grand_total !== undefined && invOrBooking.grand_total !== null) {
+
+    const hasExplicitSubtotal = originalBillAmount > 0;
+    if (hasExplicitSubtotal) {
+      finalBillAmount = Math.max(0, originalBillAmount - authorizedAdjustment);
+    } else if (itemsSubtotal > 0) {
+      originalBillAmount = itemsSubtotal;
+      finalBillAmount = Math.max(0, originalBillAmount - authorizedAdjustment);
+    } else if (invOrBooking.grand_total !== undefined && invOrBooking.grand_total !== null && Number(invOrBooking.grand_total) > 0) {
       finalBillAmount = Number(invOrBooking.grand_total);
-    } else if (invOrBooking.final_bill_amount !== undefined && invOrBooking.final_bill_amount !== null) {
-      finalBillAmount = Number(invOrBooking.final_bill_amount);
-    } else if (invOrBooking.total_amount !== undefined && invOrBooking.total_amount !== null) {
+      originalBillAmount = finalBillAmount + authorizedAdjustment;
+    } else if (invOrBooking.total_amount !== undefined && invOrBooking.total_amount !== null && Number(invOrBooking.total_amount) > 0) {
       finalBillAmount = Number(invOrBooking.total_amount);
-    } else if (originalBillAmount > 0) {
+      originalBillAmount = finalBillAmount + authorizedAdjustment;
+    } else if (invOrBooking.price !== undefined && invOrBooking.price !== null) {
+      originalBillAmount = Number(invOrBooking.price);
       finalBillAmount = Math.max(0, originalBillAmount - authorizedAdjustment);
     }
 
-    // Check if original price was not explicit but grand_total & discount were given
-    if (originalBillAmount <= finalBillAmount && authorizedAdjustment > 0) {
-      originalBillAmount = finalBillAmount + authorizedAdjustment;
-    } else if (authorizedAdjustment > 0 && finalBillAmount === 0 && originalBillAmount > 0) {
+    // Always strictly enforce the formula: Final Bill Amount = Original Bill Amount - Less Amount
+    if (originalBillAmount > 0) {
       finalBillAmount = Math.max(0, originalBillAmount - authorizedAdjustment);
-    } else if (authorizedAdjustment === 0 && originalBillAmount > finalBillAmount && finalBillAmount > 0) {
-      // If original bill was greater than final bill and no explicit discount was set, the difference is an authorized adjustment
-      authorizedAdjustment = originalBillAmount - finalBillAmount;
     }
 
     // 4. Authoritative Amount Collected (sum all valid payment transactions without double counting)
@@ -1327,6 +1320,13 @@ const TrieyeDB = {
     const method = (paymentObj.method || 'CASH').toUpperCase();
     const status = (paymentObj.status || 'PAID').toUpperCase();
 
+    const originalBillAmount = paymentObj.originalBillAmount !== undefined ? Number(paymentObj.originalBillAmount) : null;
+    const lessAmount = paymentObj.lessAmount !== undefined ? Number(paymentObj.lessAmount) : 0;
+    const finalBillAmount = paymentObj.finalBillAmount !== undefined 
+      ? Number(paymentObj.finalBillAmount) 
+      : (originalBillAmount !== null ? Math.max(0, originalBillAmount - lessAmount) : amount);
+    const discountReason = paymentObj.discountReason || (lessAmount > 0 ? 'Authorized Less Amount' : '');
+
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     let targetBookingUuid = null;
     let targetInvoiceUuid = null;
@@ -1354,6 +1354,8 @@ const TrieyeDB = {
     // Helper to sync local storage caches and in-memory caches
     const syncLocalPayment = () => {
       try {
+        const invStatus = (status === 'PAID' ? 'PAID' : (status === 'PARTIAL' ? 'PARTIAL' : 'ISSUED'));
+
         const localBookings = JSON.parse(localStorage.getItem('trieye_bookings')) || [];
         const bIdx = localBookings.findIndex(b => 
           b.id === bookingId || 
@@ -1364,12 +1366,18 @@ const TrieyeDB = {
         );
         if (bIdx >= 0) {
           const b = localBookings[bIdx];
-          const finalAmt = Number(b.grand_total !== undefined ? b.grand_total : (b.total_amount || b.price || 0));
           b.payStatus = status;
           b.payMethod = method;
           b.amount_collected = amount;
           b.amount_paid = amount;
-          b.balance_due = Math.max(0, finalAmt - amount);
+          if (originalBillAmount !== null && originalBillAmount > 0) b.subtotal = originalBillAmount;
+          b.discount = lessAmount;
+          b.discount_amount = lessAmount;
+          if (discountReason) b.discount_reason = discountReason;
+          b.total_amount = finalBillAmount;
+          b.grand_total = finalBillAmount;
+          b.price = finalBillAmount;
+          b.balance_due = Math.max(0, finalBillAmount - amount);
           b.payments = [{ amount, method, status }];
           localBookings[bIdx] = b;
           localStorage.setItem('trieye_bookings', JSON.stringify(localBookings));
@@ -1385,11 +1393,16 @@ const TrieyeDB = {
         );
         if (iIdx >= 0) {
           const inv = localInvs[iIdx];
+          if (originalBillAmount !== null && originalBillAmount > 0) inv.subtotal = originalBillAmount;
+          inv.discount = lessAmount;
+          if (discountReason) inv.discount_reason = discountReason;
+          inv.grand_total = finalBillAmount;
+          inv.total_amount = finalBillAmount;
           inv.payments = [{ amount, method, status }];
           inv.amount_collected = amount;
           inv.amount_paid = amount;
-          inv.balance_due = Math.max(0, Number(inv.grand_total || 0) - amount);
-          inv.status = status;
+          inv.balance_due = Math.max(0, finalBillAmount - amount);
+          inv.status = invStatus;
           localInvs[iIdx] = inv;
           localStorage.setItem('trieye_invoices', JSON.stringify(localInvs));
         }
@@ -1404,11 +1417,16 @@ const TrieyeDB = {
               i.invoice_number === bookingId
             );
             if (inv) {
+              if (originalBillAmount !== null && originalBillAmount > 0) inv.subtotal = originalBillAmount;
+              inv.discount = lessAmount;
+              if (discountReason) inv.discount_reason = discountReason;
+              inv.grand_total = finalBillAmount;
+              inv.total_amount = finalBillAmount;
               inv.payments = [{ amount, method, status }];
               inv.amount_collected = amount;
               inv.amount_paid = amount;
-              inv.balance_due = Math.max(0, Number(inv.grand_total || 0) - amount);
-              inv.status = status;
+              inv.balance_due = Math.max(0, finalBillAmount - amount);
+              inv.status = invStatus;
             }
           }
           if (window.currentInvoiceBooking) {
@@ -1424,10 +1442,41 @@ const TrieyeDB = {
               cur.payMethod = method;
               cur.amount_collected = amount;
               cur.amount_paid = amount;
-              const curFinal = Number(cur.price !== undefined ? cur.price : (cur.total_amount || cur.grand_total || 0));
-              cur.balance_due = Math.max(0, curFinal - amount);
+              if (originalBillAmount !== null && originalBillAmount > 0) cur.subtotal = originalBillAmount;
+              cur.discount = lessAmount;
+              cur.discount_amount = lessAmount;
+              if (discountReason) cur.discount_reason = discountReason;
+              cur.total_amount = finalBillAmount;
+              cur.grand_total = finalBillAmount;
+              cur.price = finalBillAmount;
+              cur.balance_due = Math.max(0, finalBillAmount - amount);
               cur.payments = [{ amount, method, status }];
             }
+          }
+          if (window._historyBookingsMap) {
+            Object.values(window._historyBookingsMap).forEach(cur => {
+              if (
+                cur.id === bookingId || 
+                (targetBookingUuid && cur.id === targetBookingUuid) || 
+                cur.invoice_ref === bookingId || 
+                cur.invoice_number === bookingId ||
+                (targetInvoiceUuid && cur.invoice_id === targetInvoiceUuid)
+              ) {
+                cur.payStatus = status;
+                cur.payMethod = method;
+                cur.amount_collected = amount;
+                cur.amount_paid = amount;
+                if (originalBillAmount !== null && originalBillAmount > 0) cur.subtotal = originalBillAmount;
+                cur.discount = lessAmount;
+                cur.discount_amount = lessAmount;
+                if (discountReason) cur.discount_reason = discountReason;
+                cur.total_amount = finalBillAmount;
+                cur.grand_total = finalBillAmount;
+                cur.price = finalBillAmount;
+                cur.balance_due = Math.max(0, finalBillAmount - amount);
+                cur.payments = [{ amount, method, status }];
+              }
+            });
           }
         }
       } catch (e) {}
@@ -1465,7 +1514,58 @@ const TrieyeDB = {
           }
         }
 
-        // 3. Update existing or insert new record
+        const invStatus = (status === 'PAID' ? 'PAID' : (status === 'PARTIAL' ? 'PARTIAL' : 'ISSUED'));
+
+        // Update invoices table with discount/less amount, subtotal, and grand_total
+        try {
+          const invUpdatePayload = {
+            status: invStatus,
+            discount: lessAmount,
+            grand_total: finalBillAmount
+          };
+          if (originalBillAmount !== null && originalBillAmount > 0) {
+            invUpdatePayload.subtotal = originalBillAmount;
+          }
+          if (discountReason) {
+            invUpdatePayload.discount_reason = discountReason;
+          }
+
+          if (targetInvoiceUuid) {
+            let { error: invErr } = await sb.from('invoices').update(invUpdatePayload).eq('id', targetInvoiceUuid);
+            if (invErr && invErr.message && invErr.message.includes('discount_reason')) {
+              delete invUpdatePayload.discount_reason;
+              await sb.from('invoices').update(invUpdatePayload).eq('id', targetInvoiceUuid);
+            }
+          } else if (targetBookingUuid) {
+            let { error: invErr } = await sb.from('invoices').update(invUpdatePayload).eq('booking_id', targetBookingUuid);
+            if (invErr && invErr.message && invErr.message.includes('discount_reason')) {
+              delete invUpdatePayload.discount_reason;
+              await sb.from('invoices').update(invUpdatePayload).eq('booking_id', targetBookingUuid);
+            }
+          }
+        } catch (e) {
+          console.warn('⚠️ [recordPayment invoice update]:', e);
+        }
+
+        // Update bookings table with total_amount and discount_amount
+        try {
+          if (targetBookingUuid) {
+            const bUpdatePayload = {
+              total_amount: finalBillAmount
+            };
+            if (lessAmount !== undefined) bUpdatePayload.discount_amount = lessAmount;
+            if (discountReason) bUpdatePayload.discount_reason = discountReason;
+
+            let { error: bErr } = await sb.from('bookings').update(bUpdatePayload).eq('id', targetBookingUuid);
+            if (bErr && (bErr.code === '42703' || (bErr.message && (bErr.message.includes('discount_amount') || bErr.message.includes('discount_reason'))))) {
+              await sb.from('bookings').update({ total_amount: finalBillAmount }).eq('id', targetBookingUuid);
+            }
+          }
+        } catch (e) {
+          console.warn('⚠️ [recordPayment booking update]:', e);
+        }
+
+        // 3. Update existing or insert new payment record
         if (existingId) {
           const updatePayload = {
             amount: amount,
@@ -1486,16 +1586,6 @@ const TrieyeDB = {
             TrieyeDB.logError('payments', 'UPDATE', error);
             return { success: false, error: error.message };
           }
-
-          // Also update linked invoice status if invoice exists
-          try {
-            const invStatus = (status === 'PAID' ? 'PAID' : (status === 'PARTIAL' ? 'PARTIAL' : 'ISSUED'));
-            if (targetInvoiceUuid) {
-              await sb.from('invoices').update({ status: invStatus }).eq('id', targetInvoiceUuid);
-            } else if (targetBookingUuid) {
-              await sb.from('invoices').update({ status: invStatus }).eq('booking_id', targetBookingUuid);
-            }
-          } catch (e) {}
 
           syncLocalPayment();
           return { success: true, payment: data ? data[0] : null };
@@ -1518,15 +1608,6 @@ const TrieyeDB = {
             TrieyeDB.logError('payments', 'INSERT', error);
             return { success: false, error: error.message };
           }
-
-          try {
-            const invStatus = (status === 'PAID' ? 'PAID' : (status === 'PARTIAL' ? 'PARTIAL' : 'ISSUED'));
-            if (targetInvoiceUuid) {
-              await sb.from('invoices').update({ status: invStatus }).eq('id', targetInvoiceUuid);
-            } else if (targetBookingUuid) {
-              await sb.from('invoices').update({ status: invStatus }).eq('booking_id', targetBookingUuid);
-            }
-          } catch (e) {}
 
           syncLocalPayment();
           return { success: true, payment: data ? data[0] : null };
