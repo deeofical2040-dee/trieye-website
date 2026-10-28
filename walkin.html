@@ -842,8 +842,8 @@
                 <input type="number" id="mb-pay-amount" class="form-input" value="0" min="0" oninput="mbCalcTotals()">
               </div>
               <div class="form-group">
-                <label class="form-label" for="mb-balance-due">Balance Due</label>
-                <input type="text" id="mb-balance-due" class="form-input" value="₹0" readonly style="background:rgba(255,255,255,0.05); font-weight:700; font-family:'IBM Plex Mono';">
+                <label class="form-label" for="mb-balance-due">Less Amount</label>
+                <input type="text" id="mb-balance-due" class="form-input" value="₹0" readonly style="background:rgba(255,255,255,0.05); font-weight:700; font-family:'IBM Plex Mono'; color:#38bdf8;">
               </div>
             </div>
           </div>
@@ -908,8 +908,8 @@
               <span id="mb-summary-paidamt" style="font-family:'IBM Plex Mono'; font-weight:600;">₹0</span>
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="color:var(--text-muted);">Balance Due</span>
-              <span id="mb-summary-balance" style="font-family:'IBM Plex Mono'; font-weight:700; color:var(--white);">₹0</span>
+              <span style="color:var(--text-muted);">Less Amount</span>
+              <span id="mb-summary-balance" style="font-family:'IBM Plex Mono'; font-weight:700; color:#38bdf8;">₹0</span>
             </div>
           </div>
 
@@ -968,7 +968,7 @@
         <div><span style="color:#a1a1aa; display:block; font-size:11px;">Discount Reason:</span> <strong id="audit-reason" style="color:#38bdf8;">None</strong></div>
         <div><span style="color:#a1a1aa; display:block; font-size:11px;">Final Bill:</span> <strong id="audit-final-bill" style="color:#a3e635; font-family:'IBM Plex Mono';">₹0</strong></div>
         <div><span style="color:#a1a1aa; display:block; font-size:11px;">Amount Collected:</span> <strong id="audit-collected" style="color:#ffffff; font-family:'IBM Plex Mono';">₹0</strong></div>
-        <div><span style="color:#a1a1aa; display:block; font-size:11px;">Balance Due:</span> <strong id="audit-balance" style="color:#f43f5e; font-family:'IBM Plex Mono';">₹0</strong></div>
+        <div><span style="color:#a1a1aa; display:block; font-size:11px;">Less Amount:</span> <strong id="audit-balance" style="color:#38bdf8; font-family:'IBM Plex Mono';">₹0</strong></div>
         <div><span style="color:#a1a1aa; display:block; font-size:11px;">Payment Status:</span> <strong id="audit-status" style="color:#a3e635; font-family:'IBM Plex Mono';">PAID</strong></div>
       </div>
     </div>
@@ -1487,10 +1487,10 @@
         if (payAmtInput) payAmtInput.value = grandTotal;
       }
 
-      // 7. Balance Due
+      // 7. Less Amount & Internal Balance Calculation
       const balanceDue = Math.max(0, grandTotal - payAmt);
       const balanceDueEl = document.getElementById('mb-balance-due');
-      if (balanceDueEl) balanceDueEl.value = '₹' + balanceDue.toLocaleString();
+      if (balanceDueEl) balanceDueEl.value = discount > 0 ? '-₹' + discount.toLocaleString() : '₹0';
 
       // Update Section Inlines
       const svcSubDisp = document.getElementById('mb-svc-subtotal-disp');
@@ -1529,7 +1529,7 @@
       const sumPaidAmt = document.getElementById('mb-summary-paidamt');
       if (sumPaidAmt) sumPaidAmt.innerText = '₹' + payAmt.toLocaleString();
       const sumBalance = document.getElementById('mb-summary-balance');
-      if (sumBalance) sumBalance.innerText = '₹' + balanceDue.toLocaleString();
+      if (sumBalance) sumBalance.innerText = discount > 0 ? '-₹' + discount.toLocaleString() : '₹0';
 
       mbUpdateAdditionalInfo();
 
@@ -1899,18 +1899,18 @@
           payStatusEl.innerText = 'PAID';
           payStatusEl.style.color = '#15803d';
         }
-      } else if (metrics.isPartial) {
-        if (finalLabelEl) finalLabelEl.innerText = 'Remaining Balance:';
+      } else if (metrics.amountCollected > 0) {
+        if (finalLabelEl) finalLabelEl.innerText = 'Amount Collected:';
         if (grandtotalEl) {
-          grandtotalEl.innerText = '₹' + metrics.balanceDue.toLocaleString('en-IN');
-          grandtotalEl.style.color = '#d97706';
+          grandtotalEl.innerText = '₹' + metrics.amountCollected.toLocaleString('en-IN');
+          grandtotalEl.style.color = '#0284c7';
         }
         if (payStatusEl) {
           payStatusEl.innerText = 'PARTIALLY PAID';
           payStatusEl.style.color = '#d97706';
         }
       } else {
-        if (finalLabelEl) finalLabelEl.innerText = 'Amount Payable:';
+        if (finalLabelEl) finalLabelEl.innerText = 'Final Bill Amount:';
         if (grandtotalEl) {
           grandtotalEl.innerText = '₹' + metrics.finalBillAmount.toLocaleString('en-IN');
           grandtotalEl.style.color = '#dc2626';
@@ -1939,7 +1939,7 @@
         if (aReas) aReas.innerText = metrics.discountReason || (metrics.discountAmount > 0 ? 'Not specified' : 'None');
         if (aFin) aFin.innerText = '₹' + metrics.finalBillAmount.toLocaleString('en-IN');
         if (aCol) aCol.innerText = '₹' + metrics.amountCollected.toLocaleString('en-IN');
-        if (aBal) aBal.innerText = '₹' + metrics.balanceDue.toLocaleString('en-IN');
+        if (aBal) aBal.innerText = metrics.lessAmount > 0 ? ('- ₹' + metrics.lessAmount.toLocaleString('en-IN')) : '₹0';
         if (aStat) {
           aStat.innerText = metrics.paymentStatus;
           aStat.style.color = metrics.isPaid ? '#a3e635' : (metrics.isPartial ? '#fbbf24' : '#f87171');

@@ -4307,17 +4307,19 @@
       }
       
       el.classList.add('open');
-      activeModals.push(id);
+      if (!activeModals.includes(id)) {
+        activeModals.push(id);
+      }
       updateModalLayers();
     }
 
     function closeModal(id) {
       const el = document.getElementById(id);
-      if (!el || !el.classList.contains('open')) return;
+      if (!el) return;
 
       el.classList.remove('open');
-      const idx = activeModals.indexOf(id);
-      if (idx > -1) {
+      let idx;
+      while ((idx = activeModals.indexOf(id)) > -1) {
         activeModals.splice(idx, 1);
       }
       updateModalLayers();
@@ -6402,7 +6404,7 @@
       if (typeof bookingOrId === 'object') {
         if (bookingOrId.id) {
           const found = all.find(x => x.id === bookingOrId.id || (bookingOrId.invoice_number && x.invoice_number === bookingOrId.invoice_number));
-          if (found) return { ...bookingOrId, ...found };
+          if (found) return { ...found, ...bookingOrId };
         }
         return bookingOrId;
       }
@@ -6582,11 +6584,10 @@
           </div>
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:8px; font-size:0.75rem; font-family:'IBM Plex Mono';">
             <div><span style="color:var(--muted);">Original Price:</span> <b style="color:#fff;">₹${metrics.originalBillAmount.toLocaleString()}</b></div>
-            <div><span style="color:var(--muted);">Less Amount (Adj):</span> <b style="color:${metrics.lessAmount > 0 ? '#38bdf8' : '#94a3b8'};">${metrics.lessAmount > 0 ? '-₹' + metrics.lessAmount.toLocaleString() : '₹0'}</b></div>
+            <div><span style="color:var(--muted);">Less Amount:</span> <b style="color:${metrics.lessAmount > 0 ? '#38bdf8' : '#94a3b8'};">${metrics.lessAmount > 0 ? '-₹' + metrics.lessAmount.toLocaleString() : '₹0'}</b></div>
             <div style="grid-column: span 2;"><span style="color:var(--muted);">Adjustment Reason:</span> <b style="color:#fde047;">${escapeHtml(metrics.discountReason || 'None')}</b></div>
             <div><span style="color:var(--muted);">Final Bill:</span> <b style="color:#a3e635;">₹${metrics.finalBillAmount.toLocaleString()}</b></div>
             <div><span style="color:var(--muted);">Amount Collected:</span> <b style="color:#38bdf8;">₹${metrics.amountCollected.toLocaleString()}</b></div>
-            <div><span style="color:var(--muted);">Balance Due:</span> <b style="color:${metrics.balanceDue > 0 ? '#f43f5e' : '#a3e635'};">₹${metrics.balanceDue.toLocaleString()}</b></div>
             <div><span style="color:var(--muted);">Payment Method:</span> <b style="color:#fff;">${escapeHtml(formatPaymentMethod(metrics.paymentMethod))}</b></div>
           </div>
         </div>
@@ -6664,10 +6665,10 @@
             </div>
             <div style="text-align:right;">
               <div style="font-size:0.75rem; color:var(--muted); font-family:'IBM Plex Mono'; text-transform:uppercase;">
-                ${metrics.isFullyPaid ? 'Paid Amount' : (metrics.isPartial ? 'Balance Due' : 'Amount Payable')}
+                ${metrics.isFullyPaid ? 'Paid Amount' : (metrics.amountCollected > 0 ? 'Amount Collected' : 'Final Bill Amount')}
               </div>
-              <div style="font-family:'Oswald', sans-serif; font-size:1.6rem; color:${metrics.isFullyPaid ? 'var(--green)' : (metrics.isPartial ? '#f43f5e' : 'var(--white)')}; font-weight:700;">
-                ₹${(metrics.isFullyPaid ? metrics.amountCollected : (metrics.isPartial ? metrics.balanceDue : metrics.finalBillAmount)).toLocaleString()}
+              <div style="font-family:'Oswald', sans-serif; font-size:1.6rem; color:${metrics.isFullyPaid ? 'var(--green)' : (metrics.amountCollected > 0 ? '#38bdf8' : 'var(--white)')}; font-weight:700;">
+                ₹${(metrics.isFullyPaid || metrics.amountCollected > 0 ? metrics.amountCollected : metrics.finalBillAmount).toLocaleString()}
               </div>
             </div>
           </div>
@@ -7286,12 +7287,26 @@ TRIEYE DETAILING
       const select = document.getElementById('pay-modal-job-select');
       if (select) {
         select.innerHTML = '';
+        let hasSelected = false;
+        if (b && !bookings.some(item => item.id === b.id || (b.invoice_number && item.invoice_number === b.invoice_number))) {
+          const opt = document.createElement('option');
+          opt.value = b.id;
+          const shortId = b.id && b.id.length > 8 ? b.id.slice(0, 8) : b.id;
+          opt.innerText = `${shortId} — ${b.name || 'Customer'} (${b.reg || b.vehicleType || 'Vehicle'}) - ₹${b.price || b.total_amount || 0}`;
+          opt.selected = true;
+          select.appendChild(opt);
+          hasSelected = true;
+        }
+
         bookings.forEach(item => {
           const opt = document.createElement('option');
           opt.value = item.id;
           const shortId = item.id && item.id.length > 8 ? item.id.slice(0, 8) : item.id;
           opt.innerText = `${shortId} — ${item.name} (${item.reg || item.vehicleType}) - ₹${item.price || item.total_amount || 0}`;
-          if (item.id === b.id) opt.selected = true;
+          if (!hasSelected && (item.id === b.id || (b.invoice_number && item.invoice_number === b.invoice_number))) {
+            opt.selected = true;
+            hasSelected = true;
+          }
           select.appendChild(opt);
         });
         select.value = b.id;
@@ -9045,11 +9060,10 @@ async function openInvoiceModal(invoiceId) {
       </div>
       <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px; font-size:0.75rem; font-family:'IBM Plex Mono';">
         <div><span style="color:var(--muted);">Original Price:</span> <b style="color:#fff;">₹${metrics.originalBillAmount.toLocaleString()}</b></div>
-        <div><span style="color:var(--muted);">Discount Applied:</span> <b style="color:${metrics.discountAmount > 0 ? '#f43f5e' : '#94a3b8'};">${metrics.discountAmount > 0 ? '-₹' + metrics.discountAmount.toLocaleString() : '₹0'}</b></div>
-        <div style="grid-column: span 2;"><span style="color:var(--muted);">Discount Reason:</span> <b style="color:#fde047;">${escapeHtml(metrics.discountReason || 'None')}</b></div>
+        <div><span style="color:var(--muted);">Less Amount:</span> <b style="color:${metrics.lessAmount > 0 ? '#38bdf8' : '#94a3b8'};">${metrics.lessAmount > 0 ? '-₹' + metrics.lessAmount.toLocaleString() : '₹0'}</b></div>
+        <div style="grid-column: span 2;"><span style="color:var(--muted);">Adjustment Reason:</span> <b style="color:#fde047;">${escapeHtml(metrics.discountReason || 'None')}</b></div>
         <div><span style="color:var(--muted);">Final Bill:</span> <b style="color:#a3e635;">₹${metrics.finalBillAmount.toLocaleString()}</b></div>
         <div><span style="color:var(--muted);">Collected:</span> <b style="color:#38bdf8;">₹${metrics.amountCollected.toLocaleString()}</b></div>
-        <div><span style="color:var(--muted);">Balance Due:</span> <b style="color:${metrics.balanceDue > 0 ? '#f43f5e' : '#a3e635'};">₹${metrics.balanceDue.toLocaleString()}</b></div>
         <div><span style="color:var(--muted);">Payment Method:</span> <b style="color:#fff;">${escapeHtml(formatPaymentMethod(metrics.paymentMethod))}</b></div>
       </div>
     `;
@@ -9166,11 +9180,11 @@ async function openInvoiceModal(invoiceId) {
   if (metrics.isFullyPaid) {
     if (finalLabelEl) finalLabelEl.innerText = 'Paid Amount';
     grandTotalEl.innerText = '₹' + metrics.amountCollected.toLocaleString();
-  } else if (metrics.isPartial) {
-    if (finalLabelEl) finalLabelEl.innerText = 'Remaining Balance';
-    grandTotalEl.innerText = '₹' + metrics.balanceDue.toLocaleString();
+  } else if (metrics.amountCollected > 0) {
+    if (finalLabelEl) finalLabelEl.innerText = 'Amount Collected';
+    grandTotalEl.innerText = '₹' + metrics.amountCollected.toLocaleString();
   } else {
-    if (finalLabelEl) finalLabelEl.innerText = 'Amount Payable';
+    if (finalLabelEl) finalLabelEl.innerText = 'Final Bill Amount';
     grandTotalEl.innerText = '₹' + metrics.finalBillAmount.toLocaleString();
   }
   
@@ -9254,36 +9268,28 @@ function shareInvoiceWhatsApp() {
         isPartial: (currentPrintInvoice.status || '').toUpperCase() === 'PARTIAL' || (currentPrintInvoice.status || '').toUpperCase() === 'PARTIALLY PAID'
       };
 
+  const lessText = metrics.lessAmount > 0 ? `₹${metrics.lessAmount.toLocaleString('en-IN')}` : '₹0';
   let paymentLines = '';
   if (metrics.isFullyPaid) {
-    if (metrics.lessAmount > 0) {
-      paymentLines = 
+    paymentLines = 
 `*Original Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
-*Less Amount:* ₹${metrics.lessAmount.toLocaleString('en-IN')}
+*Less Amount:* ${lessText}
 *Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
-*Balance Due:* ₹0
 *Payment Status:* PAID (${formatPaymentMethod(metrics.paymentMethod)})`;
-    } else {
-      paymentLines = 
-`*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
-*Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
-*Balance Due:* ₹0
-*Payment Status:* PAID (${formatPaymentMethod(metrics.paymentMethod)})`;
-    }
   } else if (metrics.isPartial) {
     paymentLines = 
-(metrics.lessAmount > 0 ? `*Original Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}\n*Less Amount:* ₹${metrics.lessAmount.toLocaleString('en-IN')}\n` : '') +
-`*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
+`*Original Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
+*Less Amount:* ${lessText}
+*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
-*Balance Due:* ₹${metrics.balanceDue.toLocaleString('en-IN')}
 *Payment Status:* PARTIAL (${formatPaymentMethod(metrics.paymentMethod)})`;
   } else {
     paymentLines = 
-(metrics.lessAmount > 0 ? `*Original Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}\n*Less Amount:* ₹${metrics.lessAmount.toLocaleString('en-IN')}\n` : '') +
-`*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
+`*Original Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
+*Less Amount:* ${lessText}
+*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹0
-*Balance Due:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Payment Status:* UNPAID`;
   }
 

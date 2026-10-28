@@ -780,13 +780,13 @@
           grandTotalEl.innerText = '₹' + metrics.amountCollected.toLocaleString('en-IN');
           payStatusEl.innerText = 'PAID';
           payStatusEl.className = 'badge-status status-paid';
-        } else if (metrics.isPartial) {
-          finalLabelEl.innerText = 'Remaining Balance';
-          grandTotalEl.innerText = '₹' + metrics.balanceDue.toLocaleString('en-IN');
+        } else if (metrics.amountCollected > 0) {
+          finalLabelEl.innerText = 'Amount Collected';
+          grandTotalEl.innerText = '₹' + metrics.amountCollected.toLocaleString('en-IN');
           payStatusEl.innerText = 'PARTIAL';
           payStatusEl.className = 'badge-status status-partial';
         } else {
-          finalLabelEl.innerText = 'Amount Payable';
+          finalLabelEl.innerText = 'Final Bill Amount';
           grandTotalEl.innerText = '₹' + metrics.finalBillAmount.toLocaleString('en-IN');
           payStatusEl.innerText = 'UNPAID';
           payStatusEl.className = 'badge-status status-unpaid';
