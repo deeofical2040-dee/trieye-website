@@ -1025,17 +1025,21 @@
             <span>Add-on Products:</span>
             <span id="inv-addon-subtotal" style="font-family:'IBM Plex Mono';">₹0</span>
           </div>
+          <div style="display:flex; justify-content:space-between; padding:4px 0; color:#334155;">
+            <span>Original Service Price:</span>
+            <span id="inv-subtotal" style="font-family:'IBM Plex Mono'; font-weight:600;">₹0</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:4px 0; color:#334155;" id="inv-less-amount-row">
+            <span>Less Amount:</span>
+            <span id="inv-less-amount" style="font-family:'IBM Plex Mono'; font-weight:600; color:#0284c7;">₹0</span>
+          </div>
           <div style="display:flex; justify-content:space-between; padding:6px 0; font-size:14px; font-weight:700; color:#0f172a; border-top:1px dashed #cbd5e1; margin-top:4px;">
-            <span>Total Bill:</span>
-            <span id="inv-subtotal" style="font-family:'IBM Plex Mono'; font-weight:700;">₹0</span>
+            <span>Final Bill Amount:</span>
+            <span id="inv-final-bill" style="font-family:'IBM Plex Mono'; font-weight:700;">₹0</span>
           </div>
           <div style="display:flex; justify-content:space-between; padding:4px 0; color:#334155;">
             <span>Amount Collected:</span>
             <span id="inv-amt-paid" style="font-family:'IBM Plex Mono'; font-weight:600; color:#0f172a;">₹0</span>
-          </div>
-          <div id="inv-balance-row" style="display:none; justify-content:space-between; padding:4px 0; color:#dc2626; font-weight:700;">
-            <span>Balance Due:</span>
-            <span id="inv-balance" style="font-family:'IBM Plex Mono'; color:#dc2626;">₹0</span>
           </div>
           <div style="display:flex; justify-content:space-between; padding:8px 0; font-size:18px; font-weight:800; border-top:2px solid #0f172a; border-bottom:2px solid #0f172a; margin-top:6px;">
             <span id="inv-final-label">Paid Amount:</span>
@@ -1867,18 +1871,21 @@
           };
 
       // Customer-Facing Printable Receipt:
-      // Show Total Bill (original price), Amount Collected, Paid Amount (when fully paid)
-      // or Balance Due (when partially paid). Never leak discount details.
+      // Show Original Service Price, Less Amount, Final Bill Amount, Amount Collected
       const subtotalEl = document.getElementById('inv-subtotal');
       if (subtotalEl) subtotalEl.innerText = '₹' + metrics.originalBillAmount.toLocaleString('en-IN');
       
+      const lessEl = document.getElementById('inv-less-amount');
+      if (lessEl) lessEl.innerText = metrics.lessAmount > 0 ? '-₹' + metrics.lessAmount.toLocaleString('en-IN') : '₹0';
+
+      const finalBillEl = document.getElementById('inv-final-bill');
+      if (finalBillEl) finalBillEl.innerText = '₹' + metrics.finalBillAmount.toLocaleString('en-IN');
+
       const amtPaidEl = document.getElementById('inv-amt-paid');
       if (amtPaidEl) amtPaidEl.innerText = '₹' + metrics.amountCollected.toLocaleString('en-IN');
       
       const grandtotalEl = document.getElementById('inv-grandtotal');
       const finalLabelEl = document.getElementById('inv-final-label');
-      const balanceRowEl = document.getElementById('inv-balance-row');
-      const balanceEl = document.getElementById('inv-balance');
       const payStatusEl = document.getElementById('inv-pay-status');
       const payMethodEl = document.getElementById('inv-pay-method');
 
@@ -1888,20 +1895,15 @@
           grandtotalEl.innerText = '₹' + metrics.amountCollected.toLocaleString('en-IN');
           grandtotalEl.style.color = '#15803d';
         }
-        if (balanceRowEl) balanceRowEl.style.display = 'none';
         if (payStatusEl) {
           payStatusEl.innerText = 'PAID';
           payStatusEl.style.color = '#15803d';
         }
       } else if (metrics.isPartial) {
-        if (finalLabelEl) finalLabelEl.innerText = 'Final Payable:';
+        if (finalLabelEl) finalLabelEl.innerText = 'Remaining Balance:';
         if (grandtotalEl) {
-          grandtotalEl.innerText = '₹' + metrics.finalBillAmount.toLocaleString('en-IN');
+          grandtotalEl.innerText = '₹' + metrics.balanceDue.toLocaleString('en-IN');
           grandtotalEl.style.color = '#d97706';
-        }
-        if (balanceRowEl) {
-          balanceRowEl.style.display = 'flex';
-          if (balanceEl) balanceEl.innerText = '₹' + metrics.balanceDue.toLocaleString('en-IN');
         }
         if (payStatusEl) {
           payStatusEl.innerText = 'PARTIALLY PAID';
@@ -1912,10 +1914,6 @@
         if (grandtotalEl) {
           grandtotalEl.innerText = '₹' + metrics.finalBillAmount.toLocaleString('en-IN');
           grandtotalEl.style.color = '#dc2626';
-        }
-        if (balanceRowEl) {
-          balanceRowEl.style.display = 'flex';
-          if (balanceEl) balanceEl.innerText = '₹' + metrics.balanceDue.toLocaleString('en-IN');
         }
         if (payStatusEl) {
           payStatusEl.innerText = 'UNPAID';
@@ -2015,36 +2013,28 @@
       const baseOrigin = isLocalHost ? 'https://trieye-website.vercel.app' : window.location.origin;
       const invoiceUrl = shareToken ? `${baseOrigin}/invoice?token=${encodeURIComponent(shareToken)}` : '';
 
+      const lessText = metrics.lessAmount > 0 ? `₹${metrics.lessAmount.toLocaleString('en-IN')}` : '₹0';
       let paymentDetailsText = '';
       if (metrics.isPaid) {
-        if (metrics.lessAmount > 0) {
-          paymentDetailsText = 
+        paymentDetailsText = 
 `*Original Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
-*Less Amount:* ₹${metrics.lessAmount.toLocaleString('en-IN')}
+*Less Amount:* ${lessText}
 *Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
-*Balance Due:* ₹0
 *Payment Status:* ✅ PAID (${formatPaymentMethod(metrics.paymentMethod)})`;
-        } else {
-          paymentDetailsText = 
-`*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
-*Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
-*Balance Due:* ₹0
-*Payment Status:* ✅ PAID (${formatPaymentMethod(metrics.paymentMethod)})`;
-        }
       } else if (metrics.isPartial) {
         paymentDetailsText = 
-(metrics.lessAmount > 0 ? `*Original Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}\n*Less Amount:* ₹${metrics.lessAmount.toLocaleString('en-IN')}\n` : '') +
-`*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
+`*Original Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
+*Less Amount:* ${lessText}
+*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
-*Balance Due:* ₹${metrics.balanceDue.toLocaleString('en-IN')}
 *Payment Status:* ⚠️ PARTIAL (${formatPaymentMethod(metrics.paymentMethod)})`;
       } else {
         paymentDetailsText = 
-(metrics.lessAmount > 0 ? `*Original Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}\n*Less Amount:* ₹${metrics.lessAmount.toLocaleString('en-IN')}\n` : '') +
-`*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
+`*Original Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
+*Less Amount:* ${lessText}
+*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹0
-*Balance Due:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Payment Status:* ❌ UNPAID`;
       }
 

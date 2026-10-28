@@ -2838,16 +2838,20 @@
           <span id="inv-addon-subtotal" style="font-weight:600;">₹0</span>
         </div>
         <div style="display:flex; justify-content:space-between; padding:5px 0;">
-          <span style="color:#555;">Total Bill</span>
+          <span style="color:#555;">Original Service Price</span>
           <span id="inv-subtotal" style="font-weight:600;">₹0</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding:5px 0;" id="inv-less-amount-row">
+          <span style="color:#555;">Less Amount</span>
+          <span id="inv-less-amount" style="font-weight:600; color:#0284c7;">₹0</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; padding:5px 0; border-top:1px dashed #cbd5e1; margin-top:2px;" id="inv-final-bill-row">
+          <span style="color:#111; font-weight:600;">Final Bill Amount</span>
+          <span id="inv-final-bill" style="font-weight:700;">₹0</span>
         </div>
         <div style="display:flex; justify-content:space-between; padding:5px 0;" id="inv-amt-collected-row">
           <span style="color:#555;">Amount Collected</span>
           <span id="inv-amt-collected" style="font-weight:600;">₹0</span>
-        </div>
-        <div style="display:none; justify-content:space-between; padding:5px 0; color:#e11d48;" id="inv-balance-row">
-          <span style="font-weight:600;">Less Amount</span>
-          <span id="inv-balance" style="font-weight:700; color:#e11d48;">₹0</span>
         </div>
         <div style="display:flex; justify-content:space-between; padding:10px 0; border-top:2px solid #000; border-bottom:2px solid #000; margin-top:5px; font-size:18px; font-weight:700;">
           <span id="inv-final-payable-label">Paid Amount</span>
@@ -3399,9 +3403,9 @@
 
   <!-- RECORD PAYMENT MODAL -->
   <div class="dash-modal-backdrop" id="modalPayment">
-    <div class="dash-modal">
+    <div class="dash-modal" style="max-width:480px;">
       <div class="dash-modal-header">
-        <div class="dash-modal-title"><span>💳</span> Record / Settle Payment</div>
+        <div class="dash-modal-title"><span>💳</span> Record / Edit Payment</div>
         <button class="dash-modal-close" onclick="closeModal('modalPayment')">&times;</button>
       </div>
       <div class="dash-modal-body">
@@ -3411,10 +3415,33 @@
             <!-- Populated via JS -->
           </select>
         </div>
+
+        <!-- Live Payment Calculation Banner -->
+        <div id="pay-modal-calc-banner" style="background:#0f172a; border:1px solid #334155; border-radius:6px; padding:0.65rem 0.85rem; margin-bottom:1rem; font-family:'IBM Plex Mono',monospace; font-size:0.78rem;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <span style="color:var(--muted);">Final Bill Amount:</span>
+            <strong id="pay-calc-final-bill" style="color:var(--white);">₹0</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+            <span style="color:var(--muted);">Amount to Collect / Paid:</span>
+            <strong id="pay-calc-collected" style="color:#a3e635;">₹0</strong>
+          </div>
+          <div style="display:flex; justify-content:space-between;">
+            <span style="color:var(--muted);">Remaining Balance:</span>
+            <strong id="pay-calc-remaining" style="color:#38bdf8;">₹0</strong>
+          </div>
+        </div>
+
         <div class="form-grid">
           <div class="form-group">
-            <label class="form-label">Amount Collected (₹)</label>
-            <input type="number" id="pay-modal-amount" class="form-input" required>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <label class="form-label" style="margin-bottom:0;">Amount Collected (₹)</label>
+              <div style="display:flex; gap:4px;">
+                <button type="button" class="btn btn-sm" style="font-size:0.65rem; padding:1px 6px; height:auto;" onclick="setPayModalQuickAmount('full')">Full</button>
+                <button type="button" class="btn btn-sm" style="font-size:0.65rem; padding:1px 6px; height:auto;" onclick="setPayModalQuickAmount('zero')">₹0</button>
+              </div>
+            </div>
+            <input type="number" id="pay-modal-amount" class="form-input" min="0" step="1" oninput="onPayModalAmountInput()" required>
           </div>
           <div class="form-group">
             <label class="form-label">Payment Method</label>
@@ -3428,7 +3455,7 @@
         </div>
         <div class="form-group">
           <label class="form-label">Payment Status</label>
-          <select class="form-select" id="pay-modal-status">
+          <select class="form-select" id="pay-modal-status" onchange="onPayModalStatusChange()">
             <option value="PAID">PAID</option>
             <option value="PARTIAL">PARTIAL</option>
             <option value="UNPAID">UNPAID</option>
@@ -3438,7 +3465,7 @@
       </div>
       <div class="dash-modal-footer">
         <button class="btn" onclick="closeModal('modalPayment')">Cancel</button>
-        <button class="btn btn-green" onclick="savePaymentModal()">✓ Save Payment</button>
+        <button class="btn btn-green" id="btn-save-payment-modal" onclick="savePaymentModal()">✓ Save Payment</button>
       </div>
     </div>
   </div>
@@ -6394,6 +6421,9 @@
       if (window._invoicesCache && Array.isArray(window._invoicesCache)) {
         const inv = window._invoicesCache.find(i => i.id === cleanStr || i.invoice_number === cleanStr || (i.booking_id && i.booking_id === cleanStr));
         if (inv) {
+          const pays = (inv.bookings && inv.bookings.payments) ? inv.bookings.payments : (inv.payments || []);
+          const pay = (Array.isArray(pays) ? pays[0] : pays) || {};
+          const coll = Number(inv.amount_collected !== undefined ? inv.amount_collected : (pay.amount !== undefined ? pay.amount : (inv.status === 'PAID' ? (inv.grand_total || inv.total_amount) : 0)));
           return {
             id: inv.booking_id || inv.id,
             invoice_id: inv.id,
@@ -6406,10 +6436,18 @@
             reg: inv.vehicles?.reg_number || inv.reg_number || '',
             service: (inv.invoice_items && inv.invoice_items[0]?.service_name) || (inv.invoice_items && inv.invoice_items[0]?.item_description) || 'Car Detailing & Wash',
             price: Number(inv.grand_total || inv.total_amount || 0),
+            subtotal: Number(inv.subtotal || inv.grand_total || inv.total_amount || 0),
+            discount: Number(inv.discount || 0),
+            discount_reason: inv.discount_reason || '',
             date: inv.created_at ? inv.created_at.split('T')[0] : '',
             booking_date: inv.created_at ? inv.created_at.split('T')[0] : '',
             status: 'COMPLETED',
-            payStatus: (inv.status || 'PAID').toUpperCase(),
+            payStatus: (inv.status || pay.status || 'PAID').toUpperCase(),
+            payMethod: pay.method || 'CASH',
+            amount_collected: coll,
+            amount_paid: coll,
+            balance_due: Math.max(0, Number(inv.grand_total || inv.total_amount || 0) - coll),
+            payments: pays,
             source: 'WALK_IN'
           };
         }
@@ -6603,12 +6641,10 @@
               <span style="color:var(--muted);">Original Service Price</span>
               <strong style="color:var(--white);">₹${metrics.originalBillAmount.toLocaleString()}</strong>
             </div>
-            ${metrics.lessAmount > 0 ? `
-              <div style="display:flex; justify-content:space-between; color:#38bdf8;">
-                <span>Less Amount</span>
-                <strong>-₹${metrics.lessAmount.toLocaleString()}</strong>
-              </div>
-            ` : ''}
+            <div style="display:flex; justify-content:space-between; ${metrics.lessAmount > 0 ? 'color:#38bdf8;' : ''}">
+              <span style="color:var(--muted);">Less Amount</span>
+              <strong style="color:${metrics.lessAmount > 0 ? '#38bdf8' : 'var(--white)'};">${metrics.lessAmount > 0 ? '-₹' + metrics.lessAmount.toLocaleString() : '₹0'}</strong>
+            </div>
             <div style="display:flex; justify-content:space-between; border-top:1px dashed var(--line-subtle); padding-top:4px;">
               <span style="color:var(--muted); font-weight:600;">Final Bill Amount</span>
               <strong style="color:var(--white); font-size:0.88rem;">₹${metrics.finalBillAmount.toLocaleString()}</strong>
@@ -6616,10 +6652,6 @@
             <div style="display:flex; justify-content:space-between;">
               <span style="color:var(--muted);">Amount Collected</span>
               <strong style="color:#a3e635;">₹${metrics.amountCollected.toLocaleString()}</strong>
-            </div>
-            <div style="display:flex; justify-content:space-between; ${metrics.balanceDue > 0 ? 'color:#f43f5e; font-weight:700;' : 'color:var(--muted);'}">
-              <span>Balance Due</span>
-              <strong>₹${metrics.balanceDue.toLocaleString()}</strong>
             </div>
           </div>
 
@@ -6724,36 +6756,28 @@
 
       const secureInvoiceUrl = getPublicInvoiceUrl(token);
 
+      const lessText = metrics.lessAmount > 0 ? `₹${metrics.lessAmount.toLocaleString('en-IN')}` : '₹0';
       let paymentLines = '';
       if (metrics.isFullyPaid) {
-        if (metrics.lessAmount > 0) {
-          paymentLines = 
+        paymentLines = 
 `*Original Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
-*Less Amount:* ₹${metrics.lessAmount.toLocaleString('en-IN')}
+*Less Amount:* ${lessText}
 *Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
-*Balance Due:* ₹0
 *Payment Status:* PAID (${formatPaymentMethod(metrics.paymentMethod)})`;
-        } else {
-          paymentLines = 
-`*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
-*Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
-*Balance Due:* ₹0
-*Payment Status:* PAID (${formatPaymentMethod(metrics.paymentMethod)})`;
-        }
       } else if (metrics.isPartial) {
         paymentLines = 
-(metrics.lessAmount > 0 ? `*Original Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}\n*Less Amount:* ₹${metrics.lessAmount.toLocaleString('en-IN')}\n` : '') +
-`*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
+`*Original Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
+*Less Amount:* ${lessText}
+*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
-*Balance Due:* ₹${metrics.balanceDue.toLocaleString('en-IN')}
 *Payment Status:* PARTIAL (${formatPaymentMethod(metrics.paymentMethod)})`;
       } else {
         paymentLines = 
-(metrics.lessAmount > 0 ? `*Original Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}\n*Less Amount:* ₹${metrics.lessAmount.toLocaleString('en-IN')}\n` : '') +
-`*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
+`*Original Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
+*Less Amount:* ${lessText}
+*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹0
-*Balance Due:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Payment Status:* UNPAID`;
       }
 
@@ -7156,6 +7180,101 @@ TRIEYE DETAILING
       openModal('modalPayment');
     }
 
+    function updatePayModalLiveCalc(fixedFinalBill) {
+      const select = document.getElementById('pay-modal-job-select');
+      const id = select ? select.value : null;
+      const b = resolveOriginalBooking(id);
+      const metrics = (b && window.TrieyeDB && typeof window.TrieyeDB.calculateBillMetrics === 'function')
+        ? window.TrieyeDB.calculateBillMetrics(b)
+        : null;
+
+      const finalBill = fixedFinalBill !== undefined ? fixedFinalBill : (metrics ? metrics.finalBillAmount : Number(b?.price || b?.total_amount || 0));
+      const amtInput = document.getElementById('pay-modal-amount');
+      const val = parseFloat(amtInput ? amtInput.value : 0) || 0;
+      const rem = Math.max(0, finalBill - val);
+
+      const finalBillEl = document.getElementById('pay-calc-final-bill');
+      if (finalBillEl) finalBillEl.innerText = '₹' + finalBill.toLocaleString();
+
+      const collectedEl = document.getElementById('pay-calc-collected');
+      if (collectedEl) collectedEl.innerText = '₹' + val.toLocaleString();
+
+      const remEl = document.getElementById('pay-calc-remaining');
+      if (remEl) {
+        remEl.innerText = '₹' + rem.toLocaleString();
+        remEl.style.color = rem > 0 ? '#f43f5e' : '#a3e635';
+      }
+    }
+
+    function onPayModalAmountInput() {
+      const select = document.getElementById('pay-modal-job-select');
+      const id = select ? select.value : null;
+      const b = resolveOriginalBooking(id);
+      const metrics = (b && window.TrieyeDB && typeof window.TrieyeDB.calculateBillMetrics === 'function')
+        ? window.TrieyeDB.calculateBillMetrics(b)
+        : null;
+      const finalBill = metrics ? metrics.finalBillAmount : Number(b?.price || b?.total_amount || 0);
+
+      const amtInput = document.getElementById('pay-modal-amount');
+      const val = parseFloat(amtInput ? amtInput.value : 0) || 0;
+
+      const statusSelect = document.getElementById('pay-modal-status');
+      if (statusSelect) {
+        if (val >= finalBill && finalBill > 0) {
+          statusSelect.value = 'PAID';
+        } else if (val > 0) {
+          statusSelect.value = 'PARTIAL';
+        } else {
+          statusSelect.value = 'UNPAID';
+        }
+      }
+      updatePayModalLiveCalc(finalBill);
+    }
+
+    function onPayModalStatusChange() {
+      const select = document.getElementById('pay-modal-job-select');
+      const id = select ? select.value : null;
+      const b = resolveOriginalBooking(id);
+      const metrics = (b && window.TrieyeDB && typeof window.TrieyeDB.calculateBillMetrics === 'function')
+        ? window.TrieyeDB.calculateBillMetrics(b)
+        : null;
+      const finalBill = metrics ? metrics.finalBillAmount : Number(b?.price || b?.total_amount || 0);
+
+      const statusSelect = document.getElementById('pay-modal-status');
+      const amtInput = document.getElementById('pay-modal-amount');
+      if (statusSelect && amtInput) {
+        if (statusSelect.value === 'PAID') {
+          if (parseFloat(amtInput.value || 0) < finalBill) {
+            amtInput.value = finalBill;
+          }
+        } else if (statusSelect.value === 'UNPAID') {
+          amtInput.value = 0;
+        }
+      }
+      updatePayModalLiveCalc(finalBill);
+    }
+
+    function setPayModalQuickAmount(type) {
+      const select = document.getElementById('pay-modal-job-select');
+      const id = select ? select.value : null;
+      const b = resolveOriginalBooking(id);
+      const metrics = (b && window.TrieyeDB && typeof window.TrieyeDB.calculateBillMetrics === 'function')
+        ? window.TrieyeDB.calculateBillMetrics(b)
+        : null;
+      const finalBill = metrics ? metrics.finalBillAmount : Number(b?.price || b?.total_amount || 0);
+      const amtInput = document.getElementById('pay-modal-amount');
+      const statusSelect = document.getElementById('pay-modal-status');
+
+      if (type === 'full') {
+        if (amtInput) amtInput.value = finalBill;
+        if (statusSelect) statusSelect.value = 'PAID';
+      } else if (type === 'zero') {
+        if (amtInput) amtInput.value = 0;
+        if (statusSelect) statusSelect.value = 'UNPAID';
+      }
+      updatePayModalLiveCalc(finalBill);
+    }
+
     function openMarkPaidModal(bookingOrId) {
       const b = resolveOriginalBooking(bookingOrId);
       if (!b) {
@@ -7178,13 +7297,30 @@ TRIEYE DETAILING
         select.value = b.id;
       }
 
-      const bookingPrice = Number(b.price !== undefined && b.price !== null ? b.price : (b.total_amount || 0));
+      const metrics = (window.TrieyeDB && typeof window.TrieyeDB.calculateBillMetrics === 'function')
+        ? window.TrieyeDB.calculateBillMetrics(b)
+        : {
+            finalBillAmount: Number(b.price || b.total_amount || 0),
+            amountCollected: Number(b.amount_collected || b.amount_paid || (b.payStatus === 'PAID' ? (b.price || b.total_amount || 0) : 0)),
+            balanceDue: Math.max(0, Number(b.price || b.total_amount || 0) - Number(b.amount_collected || 0)),
+            paymentStatus: (b.payStatus || 'PAID').toUpperCase(),
+            paymentMethod: b.payMethod || 'CASH'
+          };
+
       const amtInput = document.getElementById('pay-modal-amount');
-      if (amtInput) amtInput.value = bookingPrice;
+      if (amtInput) {
+        if (metrics.amountCollected > 0) {
+          amtInput.value = metrics.amountCollected;
+        } else if (metrics.paymentStatus === 'PAID' && metrics.finalBillAmount > 0) {
+          amtInput.value = metrics.finalBillAmount;
+        } else {
+          amtInput.value = metrics.amountCollected || 0;
+        }
+      }
 
       const methodSelect = document.getElementById('pay-modal-method');
       if (methodSelect) {
-        const currMethod = (b.payMethod || 'CASH').toUpperCase();
+        const currMethod = (metrics.paymentMethod || b.payMethod || 'CASH').toUpperCase();
         if (currMethod === 'UPI' || currMethod.includes('UPI') || currMethod.includes('QR')) methodSelect.value = 'UPI';
         else if (currMethod === 'CARD' || currMethod.includes('CARD') || currMethod.includes('POS')) methodSelect.value = 'CARD';
         else if (currMethod.includes('BANK') || currMethod.includes('TRANSFER')) methodSelect.value = 'BANK TRANSFER';
@@ -7192,8 +7328,11 @@ TRIEYE DETAILING
       }
 
       const statusSelect = document.getElementById('pay-modal-status');
-      if (statusSelect) statusSelect.value = 'PAID';
+      if (statusSelect) {
+        statusSelect.value = metrics.paymentStatus;
+      }
 
+      updatePayModalLiveCalc(metrics.finalBillAmount);
       openModal('modalPayment');
     }
 
@@ -7201,76 +7340,118 @@ TRIEYE DETAILING
       const select = document.getElementById('pay-modal-job-select');
       if (!select) return;
       const id = select.value;
-      const b = getBookings().find(x => x.id === id);
+      const b = resolveOriginalBooking(id);
       if (b) {
-        const bookingPrice = Number(b.price !== undefined && b.price !== null ? b.price : (b.total_amount || 0));
+        const metrics = (window.TrieyeDB && typeof window.TrieyeDB.calculateBillMetrics === 'function')
+          ? window.TrieyeDB.calculateBillMetrics(b)
+          : {
+              finalBillAmount: Number(b.price || b.total_amount || 0),
+              amountCollected: Number(b.amount_collected || b.amount_paid || (b.payStatus === 'PAID' ? (b.price || b.total_amount || 0) : 0)),
+              balanceDue: Math.max(0, Number(b.price || b.total_amount || 0) - Number(b.amount_collected || 0)),
+              paymentStatus: (b.payStatus || 'PAID').toUpperCase(),
+              paymentMethod: b.payMethod || 'CASH'
+            };
+
         const amtInput = document.getElementById('pay-modal-amount');
-        if (amtInput) amtInput.value = bookingPrice;
+        if (amtInput) {
+          if (metrics.amountCollected > 0) amtInput.value = metrics.amountCollected;
+          else if (metrics.paymentStatus === 'PAID') amtInput.value = metrics.finalBillAmount;
+          else amtInput.value = metrics.amountCollected || 0;
+        }
 
         const statusSelect = document.getElementById('pay-modal-status');
-        if (statusSelect) statusSelect.value = (b.payStatus || 'PAID').toUpperCase();
+        if (statusSelect) statusSelect.value = metrics.paymentStatus;
 
         const methodSelect = document.getElementById('pay-modal-method');
-        if (methodSelect && b.payMethod) {
-          const currMethod = b.payMethod.toUpperCase();
+        if (methodSelect) {
+          const currMethod = (metrics.paymentMethod || b.payMethod || 'CASH').toUpperCase();
           if (currMethod === 'UPI' || currMethod.includes('UPI') || currMethod.includes('QR')) methodSelect.value = 'UPI';
           else if (currMethod === 'CARD' || currMethod.includes('CARD') || currMethod.includes('POS')) methodSelect.value = 'CARD';
           else if (currMethod.includes('BANK') || currMethod.includes('TRANSFER')) methodSelect.value = 'BANK TRANSFER';
           else methodSelect.value = 'CASH';
         }
+
+        updatePayModalLiveCalc(metrics.finalBillAmount);
       }
     }
 
     async function savePaymentModal() {
       const select = document.getElementById('pay-modal-job-select');
       const id = select ? select.value : null;
-      const amt = Number(document.getElementById('pay-modal-amount').value || 0);
-      const method = document.getElementById('pay-modal-method').value;
-      const status = document.getElementById('pay-modal-status').value;
+      const amtInput = document.getElementById('pay-modal-amount');
+      const amt = parseFloat(amtInput ? amtInput.value : 0);
+      const methodSelect = document.getElementById('pay-modal-method');
+      const method = methodSelect ? methodSelect.value : 'CASH';
+      const statusSelect = document.getElementById('pay-modal-status');
+      const status = statusSelect ? statusSelect.value : 'PAID';
 
       if (!id) {
         showToast('Please select a booking/job');
         return;
       }
 
-      const bookings = getBookings();
-      const target = bookings.find(b => b.id === id);
-      if (target) {
-        target.payStatus = status;
-        target.payMethod = method;
-        saveBookings(bookings);
+      if (isNaN(amt) || amt < 0) {
+        showToast('Please enter a valid payment amount (₹0 or more)');
+        return;
       }
 
-      if (window.TrieyeDB && typeof window.TrieyeDB.recordPayment === 'function') {
-        try {
-          await window.TrieyeDB.recordPayment({
+      const saveBtn = document.getElementById('btn-save-payment-modal');
+      const originalText = saveBtn ? saveBtn.innerHTML : '✓ Save Payment';
+      if (saveBtn) {
+        saveBtn.disabled = true;
+        saveBtn.innerHTML = '<span>⏳</span> Saving...';
+      }
+
+      try {
+        let saveResult = { success: true };
+        if (window.TrieyeDB && typeof window.TrieyeDB.recordPayment === 'function') {
+          saveResult = await window.TrieyeDB.recordPayment({
             bookingId: id,
             amount: amt,
             method: method,
             status: status
           });
-        } catch (e) {
-          console.error('Record payment exception:', e);
         }
-      }
 
-      closeModal('modalPayment');
-      showToast(`Payment of ₹${amt.toLocaleString()} recorded (${formatPaymentMethod(method)})`);
+        if (saveResult && saveResult.success === false) {
+          console.error('Save payment failed in database:', saveResult.error);
+          showToast(`❌ Failed to save payment: ${saveResult.error || 'Database error'}`, true);
+          if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = originalText;
+          }
+          return;
+        }
 
-      // Refresh data from Supabase & re-render dashboard
-      await syncFromSupabase();
-      renderAll();
+        // Close modal and show success toast
+        closeModal('modalPayment');
+        showToast(`✓ Payment of ₹${amt.toLocaleString()} recorded (${formatPaymentMethod(method)})`);
 
-      // Refresh the receipt / bill modal if open
-      const receiptModal = document.getElementById('modalReceipt');
-      if (receiptModal && receiptModal.classList.contains('open') && window.currentInvoiceBooking) {
-        const updatedBooking = getBookings().find(b => b.id === id) || { ...window.currentInvoiceBooking, payStatus: status, payMethod: method };
-        openBillInvoiceModal(updatedBooking);
-      }
+        // Refresh data from Supabase & re-render dashboard
+        await syncFromSupabase();
+        renderAll();
 
-      // Refresh customer history bill data if open
-      if (selectedCustomerPhone) {
-        showCustomerProfile(selectedCustomerPhone);
+        // Refresh the receipt / bill modal if open
+        const receiptModal = document.getElementById('modalReceipt');
+        if (receiptModal && receiptModal.classList.contains('open')) {
+          const updatedBooking = resolveOriginalBooking(id);
+          if (updatedBooking) {
+            openBillInvoiceModal(updatedBooking);
+          }
+        }
+
+        // Refresh customer history bill data if open
+        if (selectedCustomerPhone) {
+          showCustomerProfile(selectedCustomerPhone);
+        }
+      } catch (err) {
+        console.error('Record payment unexpected exception:', err);
+        showToast(`❌ Unexpected error saving payment: ${err.message}`, true);
+      } finally {
+        if (saveBtn) {
+          saveBtn.disabled = false;
+          saveBtn.innerHTML = originalText;
+        }
       }
     }
 
@@ -8968,28 +9149,29 @@ async function openInvoiceModal(invoiceId) {
 
   // Customer-facing Totals
   document.getElementById('inv-subtotal').innerText = '₹' + metrics.originalBillAmount.toLocaleString();
+  const lessEl = document.getElementById('inv-less-amount');
+  if (lessEl) {
+    lessEl.innerText = metrics.lessAmount > 0 ? '-₹' + metrics.lessAmount.toLocaleString() : '₹0';
+  }
+  const finalBillEl = document.getElementById('inv-final-bill');
+  if (finalBillEl) {
+    finalBillEl.innerText = '₹' + metrics.finalBillAmount.toLocaleString();
+  }
   const amtCollEl = document.getElementById('inv-amt-collected');
   if (amtCollEl) amtCollEl.innerText = '₹' + metrics.amountCollected.toLocaleString();
 
-  const balanceRow = document.getElementById('inv-balance-row');
-  const balanceEl = document.getElementById('inv-balance');
   const finalLabelEl = document.getElementById('inv-final-payable-label');
   const grandTotalEl = document.getElementById('inv-grandtotal');
 
   if (metrics.isFullyPaid) {
     if (finalLabelEl) finalLabelEl.innerText = 'Paid Amount';
     grandTotalEl.innerText = '₹' + metrics.amountCollected.toLocaleString();
-    if (balanceRow) balanceRow.style.display = 'none';
   } else if (metrics.isPartial) {
-    if (finalLabelEl) finalLabelEl.innerText = 'Final Payable';
-    grandTotalEl.innerText = '₹' + metrics.finalBillAmount.toLocaleString();
-    if (balanceRow) balanceRow.style.display = 'flex';
-    if (balanceEl) balanceEl.innerText = '₹' + metrics.balanceDue.toLocaleString();
+    if (finalLabelEl) finalLabelEl.innerText = 'Remaining Balance';
+    grandTotalEl.innerText = '₹' + metrics.balanceDue.toLocaleString();
   } else {
     if (finalLabelEl) finalLabelEl.innerText = 'Amount Payable';
     grandTotalEl.innerText = '₹' + metrics.finalBillAmount.toLocaleString();
-    if (balanceRow) balanceRow.style.display = 'flex';
-    if (balanceEl) balanceEl.innerText = '₹' + metrics.finalBillAmount.toLocaleString();
   }
   
   const payStatusEl = document.getElementById('inv-pay-status');
