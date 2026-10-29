@@ -1405,6 +1405,11 @@ const TrieyeDB = {
       }
     } catch (e) {}
 
+    // A booking ID must NEVER be treated as an invoice ID
+    if (targetInvoiceUuid && targetBookingUuid && targetInvoiceUuid === targetBookingUuid) {
+      targetInvoiceUuid = null;
+    }
+
     // Helper to sync local storage caches and in-memory caches
     const syncLocalPayment = () => {
       try {
@@ -1672,19 +1677,31 @@ const TrieyeDB = {
           syncLocalPayment();
           return { success: true, payment: data ? data[0] : null };
         } else {
-          const insertPayload = {
+          let insertPayload = {
             amount: amount,
             method: method,
             status: status
           };
           if (targetBookingUuid) insertPayload.booking_id = targetBookingUuid;
-          if (targetInvoiceUuid) insertPayload.invoice_id = targetInvoiceUuid;
+          if (targetInvoiceUuid && targetInvoiceUuid !== targetBookingUuid) insertPayload.invoice_id = targetInvoiceUuid;
           if (status === 'PAID') insertPayload.paid_at = new Date().toISOString();
 
-          const { data, error } = await sb
+          let { data, error } = await sb
             .from('payments')
             .insert(insertPayload)
             .select();
+
+          // Foreign key retry: If invoice_id violates payments_invoice_id_fkey, retry with booking_id only
+          if (error && (error.code === '23503' || (error.message && error.message.includes('payments_invoice_id_fkey'))) && insertPayload.invoice_id) {
+            console.warn('⚠️ [recordPayment] foreign key violation on payments_invoice_id_fkey. Retrying with booking_id only...');
+            delete insertPayload.invoice_id;
+            const retryRes = await sb
+              .from('payments')
+              .insert(insertPayload)
+              .select();
+            data = retryRes.data;
+            error = retryRes.error;
+          }
 
           if (error) {
             TrieyeDB.logError('payments', 'INSERT', error);

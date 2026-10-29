@@ -7632,7 +7632,7 @@ TRIEYE DETAILING
         if (window.TrieyeDB && typeof window.TrieyeDB.recordPayment === 'function') {
           saveResult = await window.TrieyeDB.recordPayment({
             bookingId: id,
-            invoiceId: b ? (b.invoice_id || b.id) : null,
+            invoiceId: b ? (b.invoice_id || null) : null,
             invoiceNumber: b ? (b.invoice_ref || b.invoice_number) : null,
             originalBillAmount: origBill,
             lessAmount: lessAmt,
