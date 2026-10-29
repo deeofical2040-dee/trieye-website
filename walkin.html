@@ -7,12 +7,32 @@
   <meta name="description" content="TRIEYE Studio Fast Point-of-Sale (POS) Walk-In Billing & Tax Invoicing System.">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%23080b11'/%3E%3Cpath d='M20 30h60M35 50h30M45 70h10' stroke='%23ee2f76' stroke-width='8' stroke-linecap='round'/%3E%3C/svg%3E">
   
+  <!-- Canonical Domain Guard: Avoid preview branch SSO / Deployment Protection restrictions -->
+  <script>
+    (function() {
+      try {
+        var h = window.location.hostname || '';
+        if (h.endsWith('.vercel.app') && h !== 'trieye-website.vercel.app' && !h.startsWith('trieye-website-')) {
+          window.location.replace('https://trieye-website.vercel.app' + window.location.pathname + window.location.search + window.location.hash);
+        }
+      } catch (e) {}
+    })();
+  </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Oswald:wght@500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
   
   <!-- Supabase & PDF Scripts -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/assets/supabase.js"></script>
+  <script>
+    if (typeof supabase === 'undefined') {
+      (function() {
+        var s = document.createElement('script');
+        s.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+        document.head.appendChild(s);
+      })();
+    }
+  </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <!-- Early Theme Init -->
@@ -691,8 +711,16 @@
     <div class="auth-card" id="adminLoginModal">
       <div style="text-align:center; margin-bottom:1.5rem;">
         <div class="brand-logo-wrap" style="justify-content:center; margin-bottom:0.75rem;">
-          <img src="/assets/trieye-logo.png" alt="TRIEYE Detailing Studio" width="180" height="41" class="brand-logo-img logo-light" onerror="this.onerror=null; this.src='/assets/trieye-logo.jpg';">
-          <img src="/assets/trieye-logo-dark.png" alt="TRIEYE Detailing Studio" width="180" height="41" class="brand-logo-img logo-dark" onerror="this.onerror=null; this.src='/assets/trieye-logo.png';">
+          <img src="/assets/trieye-logo.png" alt="TRIEYE Detailing Studio" width="180" height="41" class="brand-logo-img logo-light" onerror="this.style.display='none'; document.getElementById('walkinAuthLogoFallback').style.display='flex';">
+          <img src="/assets/trieye-logo-dark.png" alt="TRIEYE Detailing Studio" width="180" height="41" class="brand-logo-img logo-dark" onerror="this.style.display='none'; document.getElementById('walkinAuthLogoFallback').style.display='flex';">
+          <div id="walkinAuthLogoFallback" style="display:none; flex-direction:column; align-items:center; justify-content:center;">
+            <div style="font-family:'Oswald',sans-serif; font-size:1.75rem; font-weight:700; letter-spacing:0.06em; line-height:1;">
+              <span style="color:#ee2f76;">TRI</span><span style="color:#689f0e;">EYE</span>
+            </div>
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:0.62rem; letter-spacing:0.18em; color:var(--text-muted); text-transform:uppercase; margin-top:3px;">
+              Detailing Studio
+            </div>
+          </div>
         </div>
         <h2 style="font-family:'Oswald',sans-serif; letter-spacing:0.04em; color:var(--white); font-size:1.4rem;">STUDIO TERMINAL AUTHENTICATION</h2>
         <p style="color:var(--text-muted); font-size:0.82rem; margin-top:0.35rem;">Enter administrator credentials to access Walk-In POS Billing.</p>
