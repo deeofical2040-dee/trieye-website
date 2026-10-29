@@ -6985,19 +6985,21 @@ TRIEYE DETAILING
         return;
       }
 
-      // Sync payment to Supabase in background before opening if booking is PAID
+      // Ensure payment is persisted to Supabase and awaited before opening if booking is PAID
       if (b.payStatus === 'PAID' && window.TrieyeDB && typeof window.TrieyeDB.recordPayment === 'function' && isUuid(b.id)) {
-        window.TrieyeDB.recordPayment({
-          bookingId: b.id,
-          invoiceId: b.invoice_id || null,
-          invoiceNumber: b.invoice_ref || b.invoice_number || null,
-          originalBillAmount: b.subtotal || b.total_amount || b.price,
-          lessAmount: b.discount || b.discount_amount || 0,
-          finalBillAmount: b.total_amount || b.price,
-          amount: b.amount_collected !== undefined ? b.amount_collected : (b.total_amount || b.price),
-          method: b.payMethod || 'CASH',
-          status: 'PAID'
-        }).catch(() => {});
+        try {
+          await window.TrieyeDB.recordPayment({
+            bookingId: b.id,
+            invoiceId: b.invoice_id || null,
+            invoiceNumber: b.invoice_ref || b.invoice_number || null,
+            originalBillAmount: b.subtotal || b.total_amount || b.price,
+            lessAmount: b.discount || b.discount_amount || 0,
+            finalBillAmount: b.total_amount || b.price,
+            amount: b.amount_collected !== undefined ? b.amount_collected : (b.total_amount || b.price),
+            method: b.payMethod || 'CASH',
+            status: 'PAID'
+          });
+        } catch (e) {}
       }
 
       const token = await getOrFetchShareToken(b);
@@ -7648,6 +7650,10 @@ TRIEYE DETAILING
     }
 
     async function savePaymentModal() {
+      if (window._isSavingPaymentModal) {
+        return;
+      }
+
       const select = document.getElementById('pay-modal-job-select');
       const id = select ? select.value : null;
       if (!id) {
@@ -7689,6 +7695,7 @@ TRIEYE DETAILING
         status = 'REFUNDED';
       }
 
+      window._isSavingPaymentModal = true;
       const saveBtn = document.getElementById('btn-save-payment-modal');
       const originalText = saveBtn ? saveBtn.innerHTML : '✓ Save Payment';
       if (saveBtn) {
@@ -7753,6 +7760,7 @@ TRIEYE DETAILING
         console.error('Record payment unexpected exception:', err);
         showToast(`❌ Unexpected error saving payment: ${err.message}`, true);
       } finally {
+        window._isSavingPaymentModal = false;
         if (saveBtn) {
           saveBtn.disabled = false;
           saveBtn.innerHTML = originalText;

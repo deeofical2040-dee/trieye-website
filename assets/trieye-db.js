@@ -454,8 +454,21 @@ const TrieyeDB = {
             }
 
             const existingLocal = existingLocalMap.get(String(b.id)) || existingLocalMap.get(shortRef);
-            if (existingLocal && existingLocal.amount_collected > 0 && collectedAmt === 0) {
-              collectedAmt = Number(existingLocal.amount_collected);
+
+            // Calculate authoritative payment metrics
+            let calculatedPayStatus = 'UNPAID';
+            if (collectedAmt >= totalAmt && totalAmt > 0) {
+              calculatedPayStatus = 'PAID';
+            } else if (collectedAmt > 0 && collectedAmt < totalAmt) {
+              calculatedPayStatus = 'PARTIAL';
+            } else if (totalAmt === 0 && collectedAmt === 0 && payStatus === 'PAID') {
+              calculatedPayStatus = 'PAID';
+            } else if (payStatus === 'REFUNDED' || payStatus === 'VOID') {
+              calculatedPayStatus = payStatus;
+            } else if (payStatus === 'PAID') {
+              calculatedPayStatus = 'PAID';
+            } else {
+              calculatedPayStatus = 'UNPAID';
             }
 
             // Resolve Less Amount / discount without letting Supabase omit overwrite local values
@@ -516,8 +529,8 @@ const TrieyeDB = {
               bay: bay.name || null,
               bayId: b.bay_id || null,
               slotId: b.slot_id || null,
-              payStatus: (existingLocal && existingLocal.payStatus && payStatus === 'UNPAID') ? existingLocal.payStatus : payStatus,
-              payMethod: (existingLocal && existingLocal.payMethod && payMethod === 'Pending') ? existingLocal.payMethod : payMethod,
+              payStatus: calculatedPayStatus,
+              payMethod: (paymentsArr.length > 0 && pay.method) ? (pay.method.toUpperCase() === 'PENDING' ? 'Pending' : pay.method) : (existingLocal && existingLocal.payMethod ? existingLocal.payMethod : 'Cash'),
               amount_collected: collectedAmt,
               amount_paid: collectedAmt,
               balance_due: balDue,
@@ -1457,14 +1470,14 @@ const TrieyeDB = {
       const localBookings = JSON.parse(localStorage.getItem('trieye_bookings')) || [];
       const matchB = localBookings.find(b => b.id === bookingId || b.invoice_ref === bookingId || b.invoice_number === bookingId || b.invoice_id === bookingId);
       if (matchB) {
-        if (matchB.id && uuidRegex.test(String(matchB.id).trim())) targetBookingUuid = String(matchB.id).trim();
-        if (matchB.invoice_id && uuidRegex.test(String(matchB.invoice_id).trim())) targetInvoiceUuid = String(matchB.invoice_id).trim();
+        if (!targetBookingUuid && matchB.id && uuidRegex.test(String(matchB.id).trim())) targetBookingUuid = String(matchB.id).trim();
+        if (!targetInvoiceUuid && matchB.invoice_id && uuidRegex.test(String(matchB.invoice_id).trim())) targetInvoiceUuid = String(matchB.invoice_id).trim();
       }
       const localInvs = JSON.parse(localStorage.getItem('trieye_invoices')) || [];
       const matchI = localInvs.find(i => i.id === bookingId || i.invoice_number === bookingId || i.booking_id === bookingId);
       if (matchI) {
-        if (matchI.booking_id && uuidRegex.test(String(matchI.booking_id).trim())) targetBookingUuid = String(matchI.booking_id).trim();
-        if (matchI.id && uuidRegex.test(String(matchI.id).trim())) targetInvoiceUuid = String(matchI.id).trim();
+        if (!targetBookingUuid && matchI.booking_id && uuidRegex.test(String(matchI.booking_id).trim())) targetBookingUuid = String(matchI.booking_id).trim();
+        if (!targetInvoiceUuid && matchI.id && uuidRegex.test(String(matchI.id).trim())) targetInvoiceUuid = String(matchI.id).trim();
       }
     } catch (e) {}
 
@@ -1473,7 +1486,7 @@ const TrieyeDB = {
       targetInvoiceUuid = null;
     }
 
-    // Helper to sync local storage caches and in-memory caches
+    // Helper to sync local storage caches and in-memory caches (only called on confirmed success or offline mode)
     const syncLocalPayment = () => {
       try {
         const invStatus = (status === 'PAID' ? 'PAID' : (status === 'PARTIAL' ? 'PARTIAL' : 'UNPAID'));
@@ -1492,6 +1505,7 @@ const TrieyeDB = {
           b.payMethod = method;
           b.amount_collected = amount;
           b.amount_paid = amount;
+          if (targetInvoiceUuid) b.invoice_id = targetInvoiceUuid;
           if (originalBillAmount !== null && originalBillAmount > 0) b.subtotal = originalBillAmount;
           b.discount = lessAmount;
           b.discount_amount = lessAmount;
@@ -1516,6 +1530,8 @@ const TrieyeDB = {
         );
         if (iIdx >= 0) {
           const inv = localInvs[iIdx];
+          if (targetInvoiceUuid) inv.id = targetInvoiceUuid;
+          if (targetBookingUuid && !inv.booking_id) inv.booking_id = targetBookingUuid;
           if (originalBillAmount !== null && originalBillAmount > 0) inv.subtotal = originalBillAmount;
           inv.discount = lessAmount;
           inv.discount_amount = lessAmount;
@@ -1562,6 +1578,7 @@ const TrieyeDB = {
               i.invoice_number === bookingId
             );
             if (inv) {
+              if (targetInvoiceUuid) inv.id = targetInvoiceUuid;
               if (originalBillAmount !== null && originalBillAmount > 0) inv.subtotal = originalBillAmount;
               inv.discount = lessAmount;
               if (discountReason) inv.discount_reason = discountReason;
@@ -1587,6 +1604,7 @@ const TrieyeDB = {
               cur.payMethod = method;
               cur.amount_collected = amount;
               cur.amount_paid = amount;
+              if (targetInvoiceUuid) cur.invoice_id = targetInvoiceUuid;
               if (originalBillAmount !== null && originalBillAmount > 0) cur.subtotal = originalBillAmount;
               cur.discount = lessAmount;
               cur.discount_amount = lessAmount;
@@ -1611,6 +1629,7 @@ const TrieyeDB = {
                 cur.payMethod = method;
                 cur.amount_collected = amount;
                 cur.amount_paid = amount;
+                if (targetInvoiceUuid) cur.invoice_id = targetInvoiceUuid;
                 if (originalBillAmount !== null && originalBillAmount > 0) cur.subtotal = originalBillAmount;
                 cur.discount = lessAmount;
                 cur.discount_amount = lessAmount;
@@ -1627,74 +1646,226 @@ const TrieyeDB = {
       } catch (e) {}
     };
 
-    if (sb && (targetBookingUuid || targetInvoiceUuid)) {
+    if (sb) {
       try {
-        let existingId = null;
+        const invStatus = (status === 'PAID' ? 'PAID' : (status === 'PARTIAL' ? 'PARTIAL' : 'UNPAID'));
 
-        // 1. Check existing payment by booking_id
-        if (targetBookingUuid) {
-          const { data: bPayments, error: selErr } = await sb
-            .from('payments')
-            .select('id, created_at, booking_id, amount, method, status')
-            .eq('booking_id', targetBookingUuid)
-            .order('created_at', { ascending: false })
-            .limit(1);
+        // Phase 2: Schema validation and verified entity resolution
+        // 1. Verify targetInvoiceUuid if provided: Ensure it references a real invoices.id
+        if (targetInvoiceUuid) {
+          const { data: invCheck, error: invCheckErr } = await sb
+            .from('invoices')
+            .select('id, booking_id, customer_id, vehicle_id')
+            .eq('id', targetInvoiceUuid)
+            .maybeSingle();
 
-          if (!selErr && Array.isArray(bPayments) && bPayments.length > 0) {
-            existingId = bPayments[0].id;
+          if (!invCheckErr && invCheck && invCheck.id) {
+            targetInvoiceUuid = invCheck.id;
+            if (invCheck.booking_id && uuidRegex.test(String(invCheck.booking_id))) {
+              targetBookingUuid = invCheck.booking_id;
+            }
+          } else {
+            // Not a real invoice row in invoices table
+            targetInvoiceUuid = null;
           }
         }
 
-        // 2. Check existing payment by invoice_id if not found by booking_id
-        if (!existingId && targetInvoiceUuid) {
+        // 2. Verify targetBookingUuid if provided: Does it exist in bookings or invoices?
+        let bookingRow = null;
+        if (targetBookingUuid) {
+          const { data: bCheck, error: bCheckErr } = await sb
+            .from('bookings')
+            .select('id, customer_id, vehicle_id, service_id, total_amount, share_token')
+            .eq('id', targetBookingUuid)
+            .maybeSingle();
+
+          if (!bCheckErr && bCheck && bCheck.id) {
+            bookingRow = bCheck;
+          } else {
+            // Check if targetBookingUuid was actually an offline invoice UUID
+            const { data: directInv, error: dInvErr } = await sb
+              .from('invoices')
+              .select('id, booking_id, customer_id, vehicle_id')
+              .eq('id', targetBookingUuid)
+              .maybeSingle();
+
+            if (!dInvErr && directInv && directInv.id) {
+              targetInvoiceUuid = directInv.id;
+              targetBookingUuid = (directInv.booking_id && uuidRegex.test(String(directInv.booking_id))) ? directInv.booking_id : null;
+            } else {
+              targetBookingUuid = null;
+            }
+          }
+        }
+
+        // 3. If targetBookingUuid is confirmed and no invoice UUID yet: Check if an invoice row exists
+        if (targetBookingUuid && !targetInvoiceUuid) {
+          const { data: existInv, error: existInvErr } = await sb
+            .from('invoices')
+            .select('id, invoice_number, booking_id')
+            .eq('booking_id', targetBookingUuid)
+            .maybeSingle();
+
+          if (!existInvErr && existInv && existInv.id) {
+            targetInvoiceUuid = existInv.id;
+          }
+        }
+
+        // 4. Rule: If a legitimate booking has no invoice yet, create its invoice
+        // through the established invoice-creation flow before saving the payment.
+        if (targetBookingUuid && !targetInvoiceUuid && bookingRow) {
+          try {
+            const invInsertObj = {
+              booking_id: targetBookingUuid,
+              customer_id: bookingRow.customer_id,
+              vehicle_id: bookingRow.vehicle_id,
+              subtotal: originalBillAmount !== null && originalBillAmount > 0 ? originalBillAmount : (bookingRow.total_amount || finalBillAmount),
+              discount: lessAmount,
+              grand_total: finalBillAmount,
+              status: invStatus
+            };
+            if (discountReason) invInsertObj.discount_reason = discountReason;
+
+            let { data: newInv, error: newInvErr } = await sb
+              .from('invoices')
+              .insert(invInsertObj)
+              .select('id, invoice_number')
+              .single();
+
+            if (newInvErr && newInvErr.message && newInvErr.message.includes('discount_reason')) {
+              delete invInsertObj.discount_reason;
+              const retryRes = await sb
+                .from('invoices')
+                .insert(invInsertObj)
+                .select('id, invoice_number')
+                .single();
+              newInv = retryRes.data;
+              newInvErr = retryRes.error;
+            }
+
+            if (!newInvErr && newInv && newInv.id) {
+              targetInvoiceUuid = newInv.id;
+              console.log('⚡ [recordPayment] Invoice row created for booking:', targetInvoiceUuid);
+            } else if (newInvErr) {
+              console.warn('⚠️ [recordPayment] Invoice auto-create notice:', newInvErr.message);
+            }
+          } catch (e) {
+            console.warn('⚠️ [recordPayment] Invoice creation exception:', e);
+          }
+        }
+
+        // If targetInvoiceUuid is still not a valid UUID, keep it null so payments_invoice_id_fkey is not violated
+        if (targetInvoiceUuid && !uuidRegex.test(targetInvoiceUuid)) {
+          targetInvoiceUuid = null;
+        }
+
+        // Check if neither reference was resolved
+        if (!targetBookingUuid && !targetInvoiceUuid) {
+          console.error('Save payment failed: Neither a valid booking UUID nor invoice UUID could be resolved for ID:', bookingId);
+          return { success: false, error: 'Invalid booking or invoice reference. Please select a valid record.' };
+        }
+
+        // 5. Look up existing payment record to UPDATE rather than creating duplicates
+        let existingPaymentId = null;
+        if (targetInvoiceUuid) {
           const { data: iPayments } = await sb
             .from('payments')
-            .select('id, created_at, invoice_id, amount, method, status')
+            .select('id, created_at, invoice_id, booking_id, amount, method, status')
             .eq('invoice_id', targetInvoiceUuid)
             .order('created_at', { ascending: false })
             .limit(1);
 
           if (Array.isArray(iPayments) && iPayments.length > 0) {
-            existingId = iPayments[0].id;
+            existingPaymentId = iPayments[0].id;
           }
         }
 
-        const invStatus = (status === 'PAID' ? 'PAID' : (status === 'PARTIAL' ? 'PARTIAL' : 'UNPAID'));
+        if (!existingPaymentId && targetBookingUuid) {
+          const { data: bPayments } = await sb
+            .from('payments')
+            .select('id, created_at, invoice_id, booking_id, amount, method, status')
+            .eq('booking_id', targetBookingUuid)
+            .order('created_at', { ascending: false })
+            .limit(1);
 
-        // Update invoices table with discount/less amount, subtotal, and grand_total
-        try {
-          const invUpdatePayload = {
-            status: invStatus,
-            discount: lessAmount,
-            grand_total: finalBillAmount
+          if (Array.isArray(bPayments) && bPayments.length > 0) {
+            existingPaymentId = bPayments[0].id;
+          }
+        }
+
+        // 6. Update existing or insert new payment record
+        let persistedPayment = null;
+        if (existingPaymentId) {
+          const updatePayload = {
+            amount: amount,
+            method: method,
+            status: status,
+            paid_at: status === 'PAID' ? new Date().toISOString() : null
           };
-          if (originalBillAmount !== null && originalBillAmount > 0) {
-            invUpdatePayload.subtotal = originalBillAmount;
-          }
-          if (discountReason) {
-            invUpdatePayload.discount_reason = discountReason;
-          }
+          if (targetInvoiceUuid) updatePayload.invoice_id = targetInvoiceUuid;
+          if (targetBookingUuid) updatePayload.booking_id = targetBookingUuid;
 
-          if (targetInvoiceUuid) {
+          const { data, error } = await sb
+            .from('payments')
+            .update(updatePayload)
+            .eq('id', existingPaymentId)
+            .select();
+
+          if (error) {
+            TrieyeDB.logError('payments', 'UPDATE', error);
+            return { success: false, error: error.message };
+          }
+          persistedPayment = data ? data[0] : null;
+        } else {
+          const insertPayload = {
+            amount: amount,
+            method: method,
+            status: status,
+            paid_at: status === 'PAID' ? new Date().toISOString() : null
+          };
+          if (targetBookingUuid) insertPayload.booking_id = targetBookingUuid;
+          if (targetInvoiceUuid) insertPayload.invoice_id = targetInvoiceUuid;
+
+          const { data, error } = await sb
+            .from('payments')
+            .insert(insertPayload)
+            .select();
+
+          if (error) {
+            TrieyeDB.logError('payments', 'INSERT', error);
+            return { success: false, error: error.message };
+          }
+          persistedPayment = data ? data[0] : null;
+        }
+
+        // 7. Update invoices table with discount/less amount, subtotal, and grand_total
+        if (targetInvoiceUuid) {
+          try {
+            const invUpdatePayload = {
+              status: invStatus,
+              discount: lessAmount,
+              grand_total: finalBillAmount
+            };
+            if (originalBillAmount !== null && originalBillAmount > 0) {
+              invUpdatePayload.subtotal = originalBillAmount;
+            }
+            if (discountReason) {
+              invUpdatePayload.discount_reason = discountReason;
+            }
+
             let { error: invErr } = await sb.from('invoices').update(invUpdatePayload).eq('id', targetInvoiceUuid);
             if (invErr && invErr.message && invErr.message.includes('discount_reason')) {
               delete invUpdatePayload.discount_reason;
               await sb.from('invoices').update(invUpdatePayload).eq('id', targetInvoiceUuid);
             }
-          } else if (targetBookingUuid) {
-            let { error: invErr } = await sb.from('invoices').update(invUpdatePayload).eq('booking_id', targetBookingUuid);
-            if (invErr && invErr.message && invErr.message.includes('discount_reason')) {
-              delete invUpdatePayload.discount_reason;
-              await sb.from('invoices').update(invUpdatePayload).eq('booking_id', targetBookingUuid);
-            }
+          } catch (e) {
+            console.warn('⚠️ [recordPayment invoice update]:', e);
           }
-        } catch (e) {
-          console.warn('⚠️ [recordPayment invoice update]:', e);
         }
 
-        // Update bookings table with total_amount and discount_amount
-        try {
-          if (targetBookingUuid) {
+        // 8. Update bookings table with total_amount and discount_amount
+        if (targetBookingUuid) {
+          try {
             const bUpdatePayload = {
               total_amount: finalBillAmount
             };
@@ -1705,89 +1876,23 @@ const TrieyeDB = {
             if (bErr && (bErr.code === '42703' || (bErr.message && (bErr.message.includes('discount_amount') || bErr.message.includes('discount_reason'))))) {
               await sb.from('bookings').update({ total_amount: finalBillAmount }).eq('id', targetBookingUuid);
             }
+          } catch (e) {
+            console.warn('⚠️ [recordPayment booking update]:', e);
           }
-        } catch (e) {
-          console.warn('⚠️ [recordPayment booking update]:', e);
         }
 
-        // 3. Update existing or insert new payment record
-        if (existingId) {
-          const updatePayload = {
-            amount: amount,
-            method: method,
-            status: status
-          };
-          if (status === 'PAID') {
-            updatePayload.paid_at = new Date().toISOString();
-          }
-
-          const { data, error } = await sb
-            .from('payments')
-            .update(updatePayload)
-            .eq('id', existingId)
-            .select();
-
-          if (error) {
-            TrieyeDB.logError('payments', 'UPDATE', error);
-            syncLocalPayment();
-            if (error.code === '42501' || (error.message && (error.message.includes('row-level security') || error.message.includes('permission denied')))) {
-              console.warn('⚠️ Supabase RLS restricted write; saved to local cache successfully.');
-              return { success: true, warning: 'Saved to local cache (RLS restricted)', payment: updatePayload };
-            }
-            return { success: false, error: error.message };
-          }
-
-          syncLocalPayment();
-          return { success: true, payment: data ? data[0] : null };
-        } else {
-          let insertPayload = {
-            amount: amount,
-            method: method,
-            status: status
-          };
-          if (targetBookingUuid) insertPayload.booking_id = targetBookingUuid;
-          if (targetInvoiceUuid && targetInvoiceUuid !== targetBookingUuid) insertPayload.invoice_id = targetInvoiceUuid;
-          if (status === 'PAID') insertPayload.paid_at = new Date().toISOString();
-
-          let { data, error } = await sb
-            .from('payments')
-            .insert(insertPayload)
-            .select();
-
-          // Foreign key retry: If invoice_id violates payments_invoice_id_fkey, retry with booking_id only
-          if (error && (error.code === '23503' || (error.message && error.message.includes('payments_invoice_id_fkey'))) && insertPayload.invoice_id) {
-            console.warn('⚠️ [recordPayment] foreign key violation on payments_invoice_id_fkey. Retrying with booking_id only...');
-            delete insertPayload.invoice_id;
-            const retryRes = await sb
-              .from('payments')
-              .insert(insertPayload)
-              .select();
-            data = retryRes.data;
-            error = retryRes.error;
-          }
-
-          if (error) {
-            TrieyeDB.logError('payments', 'INSERT', error);
-            syncLocalPayment();
-            if (error.code === '42501' || (error.message && (error.message.includes('row-level security') || error.message.includes('permission denied')))) {
-              console.warn('⚠️ Supabase RLS restricted write; saved to local cache successfully.');
-              return { success: true, warning: 'Saved to local cache (RLS restricted)', payment: insertPayload };
-            }
-            return { success: false, error: error.message };
-          }
-
-          syncLocalPayment();
-          return { success: true, payment: data ? data[0] : null };
-        }
+        // 9. Persisted write confirmed by database! Now sync local caches & state
+        syncLocalPayment();
+        return { success: true, payment: persistedPayment };
       } catch (err) {
         console.error('🚨 [Supabase Network Error on recordPayment]:', err);
-        syncLocalPayment();
-        return { success: true, warning: 'Saved to local cache (Network fallback)', error: err.message };
+        return { success: false, error: err.message || 'Payment save network exception' };
       }
     }
 
+    // Offline / unconfigured client fallback
     syncLocalPayment();
-    return { success: true, message: 'Saved to local cache' };
+    return { success: true, message: 'Saved to local cache (Supabase client not connected)' };
   },
 
   // 7. REAL-TIME SUBSCRIPTION LISTENER
@@ -2145,14 +2250,15 @@ const TrieyeDB = {
         const payAmt = Number(payload.payment.amount || 0);
         const payStatus = payload.payment.status || payStatusVal;
         const payPayload = {
-          booking_id: bookingId,
           amount: payAmt,
           method: payload.payment.method || 'CASH',
           status: payStatus,
           paid_at: payStatus === 'PAID' ? new Date().toISOString() : null
         };
+        if (bookingId && uuidRegex.test(String(bookingId))) payPayload.booking_id = bookingId;
+        if (invoiceId && uuidRegex.test(String(invoiceId))) payPayload.invoice_id = invoiceId;
 
-        if (sb && !String(bookingId).startsWith('wb-')) {
+        if (sb && (payPayload.booking_id || payPayload.invoice_id)) {
           try {
             const { error: payErr } = await sb.from('payments').insert(payPayload);
             if (payErr) console.warn("Payment insert warning:", payErr);
