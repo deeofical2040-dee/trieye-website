@@ -4631,12 +4631,30 @@
         // explicitly synthesize a display record from the invoice data model without inserting duplicates into Supabase.
         if (remoteInvoices.status === 'fulfilled' && Array.isArray(remoteInvoices.value)) {
           const invList = remoteInvoices.value;
+          window._invoicesCache = invList;
+          try {
+            localStorage.setItem('trieye_invoices', JSON.stringify(invList));
+          } catch (e) {}
+
           invList.forEach(inv => {
-            const linkedBooking = bookingsList.find(b => b.id === inv.booking_id || b.invoice_ref === inv.invoice_number);
+            const linkedBooking = bookingsList.find(b => b.id === inv.booking_id || b.invoice_ref === inv.invoice_number || b.invoice_number === inv.invoice_number);
             if (linkedBooking) {
               linkedBooking.has_invoice = true;
               linkedBooking.invoice_ref = inv.invoice_number || linkedBooking.invoice_ref;
               linkedBooking.invoice_id = inv.id;
+              if (inv.discount !== undefined && inv.discount !== null && Number(inv.discount) > 0) {
+                linkedBooking.discount = Number(inv.discount);
+                linkedBooking.discount_amount = Number(inv.discount);
+              }
+              if (inv.discount_reason) linkedBooking.discount_reason = inv.discount_reason;
+              if (inv.subtotal !== undefined && inv.subtotal !== null && Number(inv.subtotal) > 0) {
+                linkedBooking.subtotal = Number(inv.subtotal);
+                linkedBooking.original_price = Number(inv.subtotal);
+              }
+              if (inv.grand_total !== undefined && inv.grand_total !== null && Number(inv.grand_total) > 0) {
+                linkedBooking.total_amount = Number(inv.grand_total);
+                linkedBooking.price = Number(inv.grand_total);
+              }
             } else if (!linkedBooking && inv.id) {
               const cust = inv.customers || {};
               const veh = inv.vehicles || {};
@@ -4652,6 +4670,11 @@
                 share_token: (inv.bookings && inv.bookings.share_token) || null,
                 booking_date: invDate,
                 date: invDate,
+                subtotal: Number(inv.subtotal || inv.grand_total || 0),
+                original_price: Number(inv.subtotal || inv.grand_total || 0),
+                discount: Number(inv.discount || 0),
+                discount_amount: Number(inv.discount || 0),
+                discount_reason: inv.discount_reason || '',
                 total_amount: Number(inv.grand_total || 0),
                 price: Number(inv.grand_total || 0),
                 status: 'COMPLETED',
@@ -4675,6 +4698,41 @@
             }
           });
         }
+
+        // Merge with existing local bookings to safeguard local discounts and payments from being wiped by partial Supabase returns
+        try {
+          const existingLocalList = JSON.parse(localStorage.getItem(BOOKINGS_KEY) || '[]');
+          if (existingLocalList.length > 0) {
+            const localMap = new Map();
+            existingLocalList.forEach(lb => {
+              if (lb.id) localMap.set(String(lb.id), lb);
+              if (lb.invoice_ref) localMap.set(String(lb.invoice_ref), lb);
+              if (lb.invoice_number) localMap.set(String(lb.invoice_number), lb);
+            });
+            bookingsList.forEach(b => {
+              const lb = localMap.get(String(b.id)) || (b.invoice_ref && localMap.get(String(b.invoice_ref))) || (b.invoice_number && localMap.get(String(b.invoice_number)));
+              if (lb) {
+                if ((b.discount === undefined || b.discount === null || Number(b.discount) === 0) && (lb.discount !== undefined && Number(lb.discount) > 0)) {
+                  b.discount = Number(lb.discount);
+                  b.discount_amount = Number(lb.discount);
+                }
+                if (!b.discount_reason && lb.discount_reason) {
+                  b.discount_reason = lb.discount_reason;
+                }
+                if ((b.subtotal === undefined || b.subtotal === null || Number(b.subtotal) === 0) && (lb.subtotal !== undefined && Number(lb.subtotal) > 0)) {
+                  b.subtotal = Number(lb.subtotal);
+                  b.original_price = Number(lb.subtotal);
+                }
+                if (lb.payStatus && lb.payStatus !== 'UNPAID' && (b.payStatus === 'UNPAID' || !b.payStatus)) {
+                  b.payStatus = lb.payStatus;
+                  b.payMethod = lb.payMethod || b.payMethod;
+                  b.amount_collected = lb.amount_collected;
+                  b.amount_paid = lb.amount_paid;
+                }
+              }
+            });
+          }
+        } catch (e) {}
 
         if (bookingsList.length > 0 || hasUpdates) {
           localStorage.setItem(BOOKINGS_KEY, JSON.stringify(bookingsList));
@@ -6522,8 +6580,8 @@
 
       // Check for itemized breakdown in local invoices or booking data
       const localInvs = JSON.parse(localStorage.getItem('trieye_invoices') || '[]');
-      const assocInv = (window._invoicesCache || []).find(i => i.id === b.invoice_id || i.invoice_number === b.invoice_ref || i.invoice_number === b.invoice_number) ||
-        localInvs.find(i => i.id === b.invoice_id || i.invoice_number === b.invoice_ref || i.invoice_number === b.invoice_number);
+      const assocInv = (window._invoicesCache || []).find(i => i.id === b.invoice_id || i.booking_id === b.id || (b.invoice_ref && i.invoice_number === b.invoice_ref) || (b.invoice_number && i.invoice_number === b.invoice_number) || (b.id && i.id === b.id)) ||
+        localInvs.find(i => i.id === b.invoice_id || i.booking_id === b.id || (b.invoice_ref && i.invoice_number === b.invoice_ref) || (b.invoice_number && i.invoice_number === b.invoice_number) || (b.id && i.id === b.id));
 
       const invItems = (assocInv && assocInv.invoice_items) ? assocInv.invoice_items : [];
       let rcptServices = [];
@@ -6593,7 +6651,17 @@
       }
 
       // Authoritative Bill Metrics
-      const billSource = assocInv ? Object.assign({}, assocInv, b) : b;
+      const billSource = assocInv 
+        ? Object.assign({}, b, assocInv, {
+            discount: (assocInv.discount !== undefined && assocInv.discount !== null && Number(assocInv.discount) > 0) ? Number(assocInv.discount) : (b.discount || b.discount_amount || 0),
+            discount_amount: (assocInv.discount !== undefined && assocInv.discount !== null && Number(assocInv.discount) > 0) ? Number(assocInv.discount) : (b.discount || b.discount_amount || 0),
+            subtotal: (assocInv.subtotal && Number(assocInv.subtotal) > 0) ? Number(assocInv.subtotal) : (b.subtotal || b.original_price || b.price || b.total_amount),
+            grand_total: (assocInv.grand_total && Number(assocInv.grand_total) > 0) ? Number(assocInv.grand_total) : (b.total_amount || b.price),
+            total_amount: (assocInv.grand_total && Number(assocInv.grand_total) > 0) ? Number(assocInv.grand_total) : (b.total_amount || b.price),
+            payStatus: b.payStatus || assocInv.status || 'PAID',
+            payMethod: b.payMethod || (assocInv.payments && assocInv.payments[0] && assocInv.payments[0].method) || 'Cash'
+          }) 
+        : b;
       const metrics = window.TrieyeDB && typeof window.TrieyeDB.calculateBillMetrics === 'function'
         ? window.TrieyeDB.calculateBillMetrics(billSource)
         : {
@@ -7264,10 +7332,18 @@ TRIEYE DETAILING
       return { origBill, lessAmt, finalBill, collectedAmt, balanceDue };
     }
 
+    window._payModalAmountManuallyEdited = false;
+
     function onPayModalLessInput() {
       const calc = updatePayModalLiveCalc();
       const amtInput = document.getElementById('pay-modal-amount');
       const statusSelect = document.getElementById('pay-modal-status');
+
+      // Update Amount Collected automatically to the new final bill only if the user has not manually changed the collected amount
+      if (amtInput && !window._payModalAmountManuallyEdited) {
+        amtInput.value = calc.finalBill;
+      }
+
       const currentAmt = parseFloat(amtInput ? amtInput.value : 0) || 0;
 
       if (statusSelect) {
@@ -7281,6 +7357,7 @@ TRIEYE DETAILING
           statusSelect.value = 'UNPAID';
         }
       }
+      updatePayModalLiveCalc();
     }
 
     function setPayModalQuickLess(type) {
@@ -7297,9 +7374,11 @@ TRIEYE DETAILING
       const statusSelect = document.getElementById('pay-modal-status');
 
       if (type === 'full') {
+        window._payModalAmountManuallyEdited = false;
         if (amtInput) amtInput.value = calc.finalBill;
         if (statusSelect) statusSelect.value = 'PAID';
       } else if (type === 'zero') {
+        window._payModalAmountManuallyEdited = true;
         if (amtInput) amtInput.value = 0;
         if (statusSelect) statusSelect.value = calc.finalBill === 0 ? 'PAID' : 'UNPAID';
       }
@@ -7307,6 +7386,7 @@ TRIEYE DETAILING
     }
 
     function onPayModalAmountInput() {
+      window._payModalAmountManuallyEdited = true;
       const calc = updatePayModalLiveCalc();
       const amtInput = document.getElementById('pay-modal-amount');
       const val = parseFloat(amtInput ? amtInput.value : 0) || 0;
@@ -7431,10 +7511,12 @@ TRIEYE DETAILING
     function onPayModalJobSelect() {
       const select = document.getElementById('pay-modal-job-select');
       if (!select) return;
+      window._payModalAmountManuallyEdited = false;
       const id = select.value;
       const b = resolveOriginalBooking(id);
       if (b) {
-        const metrics = (window.TrieyeDB && typeof window.TrieyeDB.calculateBillMetrics === 'function')
+        window._payModalAmountManuallyEdited = false;
+      const metrics = (window.TrieyeDB && typeof window.TrieyeDB.calculateBillMetrics === 'function')
           ? window.TrieyeDB.calculateBillMetrics(b)
           : {
               originalBillAmount: Number(b.price || b.total_amount || 0),
@@ -7532,6 +7614,8 @@ TRIEYE DETAILING
         if (window.TrieyeDB && typeof window.TrieyeDB.recordPayment === 'function') {
           saveResult = await window.TrieyeDB.recordPayment({
             bookingId: id,
+            invoiceId: b ? (b.invoice_id || b.id) : null,
+            invoiceNumber: b ? (b.invoice_ref || b.invoice_number) : null,
             originalBillAmount: origBill,
             lessAmount: lessAmt,
             finalBillAmount: finalBill,
@@ -7554,7 +7638,12 @@ TRIEYE DETAILING
 
         // Close modal only after a successful save
         closeModal('modalPayment');
-        showToast(`✓ Payment of ₹${amt.toLocaleString()} recorded (${formatPaymentMethod(method)} - ${status})`);
+        const formattedMethod = formatPaymentMethod(method);
+        if (lessAmt > 0) {
+          showToast(`✓ Payment of ₹${amt.toLocaleString()} recorded (${formattedMethod} - ${status}). Less Amount: ₹${lessAmt.toLocaleString()}.`);
+        } else {
+          showToast(`✓ Payment of ₹${amt.toLocaleString()} recorded (${formattedMethod} - ${status})`);
+        }
 
         // Refresh data from Supabase & re-render dashboard
         await syncFromSupabase();
