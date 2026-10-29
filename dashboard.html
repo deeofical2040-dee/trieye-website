@@ -9,14 +9,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <!-- Supabase JS Client & Trieye DB Adapter -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/assets/supabase-config.js"></script>
+  <script src="/assets/trieye-db.js"></script>
   <script>
-    (function() {
-      var isFile = window.location.protocol === 'file:' || !window.location.host;
-      var prefix = isFile ? 'assets/' : '/assets/';
-      window.__TRIEYE_ASSET_PREFIX__ = prefix;
-      document.write('<script src="' + prefix + 'supabase-config.js"><\/script>');
-      document.write('<script src="' + prefix + 'trieye-db.js"><\/script>');
-    })();
+    if ((window.location.protocol === 'file:' || !window.location.host) && !window.TrieyeDB) {
+      document.write('<script src="assets/supabase-config.js"><\/script>');
+      document.write('<script src="assets/trieye-db.js"><\/script>');
+    }
   </script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="/assets/exceljs.min.js"></script>
@@ -2330,15 +2329,7 @@
         <img src="/assets/trieye-logo-dark.png" 
              onerror="this.onerror=null; this.src='assets/trieye-logo-dark.png';" 
              alt="TRIEYE Detailing Studio" 
-             class="auth-logo logo-dark" 
-             width="180" 
-             height="41" 
-             loading="eager" 
-             decoding="async">
-        <img src="/assets/trieye-logo-light.png" 
-             onerror="this.onerror=null; this.src='assets/trieye-logo-light.png';" 
-             alt="TRIEYE Detailing Studio" 
-             class="auth-logo logo-light" 
+             style="height:38px; width:auto; max-width:180px; object-fit:contain; margin:0 auto; display:block;" 
              width="180" 
              height="41" 
              loading="eager" 
@@ -8167,7 +8158,7 @@ TRIEYE DETAILING
 
     let isAdminLoginInProgress = false;
 
-    async function ensureTrieyeDBReady(timeoutMs = 1500) {
+    async function ensureTrieyeDBReady(timeoutMs = 8000) {
       if (window.TrieyeDB && typeof window.TrieyeDB.signInAdmin === 'function') {
         return window.TrieyeDB;
       }
