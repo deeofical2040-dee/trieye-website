@@ -625,27 +625,61 @@
     }
 
     @media print {
+      @page {
+        size: A4 portrait;
+        margin: 10mm;
+      }
+      html, body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        height: auto !important;
+        min-height: 100% !important;
+        overflow: visible !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
       body * {
         visibility: hidden;
       }
-      #invoice-print-area, #invoice-print-area * {
+      .modal, #invoiceModal, #invoiceModal * {
         visibility: visible;
       }
-      #invoice-print-area {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
+      .modal, #invoiceModal {
+        position: static !important;
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        max-height: none !important;
+        height: auto !important;
+        overflow: visible !important;
+        box-shadow: none !important;
+        border: none !important;
+        transform: none !important;
         margin: 0 !important;
-        padding: 24px !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+      }
+      #invoice-print-area {
+        position: static !important;
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        overflow: visible !important;
+        margin: 0 !important;
+        padding: 0 !important;
         background: #ffffff !important;
         color: #000000 !important;
         border: none !important;
         box-shadow: none !important;
       }
-      .admin-audit-card, .invoice-modal-header, .modal-backdrop {
+      .admin-audit-card, #walkin-admin-audit-box, .invoice-modal-header, .modal-backdrop, .auth-overlay {
         display: none !important;
         visibility: hidden !important;
+      }
+      tr, .inv-cust-veh-grid, .inv-totals-box, table, thead, tbody {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
       }
     }
   </style>
@@ -1324,7 +1358,7 @@
 
     // Suggested Add-on Products
     const mbSuggestedProducts = [
-      { name: 'Chain Loop', price: 50 },
+      { name: 'Chain Lube', price: 50 },
       { name: 'Perfume', price: 200 },
       { name: 'Fabric Cloth', price: 150 }
     ];
@@ -1784,7 +1818,7 @@
       const productItems = [];
       items.forEach(it => {
         const isProd = it.item_type === 'PRODUCT' || it.is_product || 
-          ['Chain Loop', 'Perfume', 'Fabric Cloth'].includes(it.service_name) ||
+          ['Chain Lube', 'Chain Loop', 'Perfume', 'Fabric Cloth'].includes(it.service_name) ||
           (!it.service_id && !['Foam Wash', 'Ceramic Coating', 'Interior Deep Cleaning', 'Full Detail Combo', 'PPF', 'Paint Protection Film', 'Underbody Anti-Rust Coating', 'Bike Detailing'].some(s => (it.service_name||'').toLowerCase().includes(s.toLowerCase())));
         if (isProd) productItems.push(it);
         else serviceItems.push(it);
@@ -1961,13 +1995,18 @@
 
     function downloadInvoicePDF() {
       const element = document.getElementById('invoice-print-area');
+      if (!element) {
+        window.print();
+        return;
+      }
       const invNum = (currentPrintInvoice && currentPrintInvoice.invoice_number) ? currentPrintInvoice.invoice_number : 'Invoice';
       const opt = {
-        margin: [8, 8, 8, 8],
+        margin: [10, 10, 10, 10],
         filename: `${invNum}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+        html2canvas: { scale: 2, useCORS: true, logging: false, backgroundColor: '#ffffff', scrollY: 0 },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
       };
       if (window.html2pdf) {
         html2pdf().set(opt).from(element).save();

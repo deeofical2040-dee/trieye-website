@@ -439,12 +439,20 @@
        PRINT STYLESHEET (A4 Optimized)
        ========================================================================= */
     @media print {
-      body {
+      @page {
+        size: A4 portrait;
+        margin: 10mm;
+      }
+      html, body {
         background: #ffffff !important;
         color: #000000 !important;
+        height: auto !important;
+        min-height: 100% !important;
+        overflow: visible !important;
         padding: 0 !important;
+        margin: 0 !important;
       }
-      .top-actions-bar, .card-actions {
+      .top-actions-bar, .card-actions, .auth-overlay {
         display: none !important;
       }
       .invoice-wrapper {
@@ -456,8 +464,11 @@
         background: #ffffff !important;
         border: none !important;
         box-shadow: none !important;
-        padding: 24px !important;
+        padding: 0 !important;
         color: #000000 !important;
+        max-height: none !important;
+        height: auto !important;
+        overflow: visible !important;
       }
       .invoice-header, .info-box, .invoice-table th, .invoice-table td, .payment-badge-box, .invoice-footer {
         border-color: #d1d5db !important;
@@ -478,19 +489,16 @@
         color: #000000 !important;
         background: transparent !important;
       }
+      tr, .info-grid, .totals-section, table, thead, tbody {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-  <script>
-    (function() {
-      var isFile = window.location.protocol === 'file:' || !window.location.host;
-      var prefix = isFile ? 'assets/' : '/assets/';
-      window.__TRIEYE_ASSET_PREFIX__ = prefix;
-      document.write('<script src="' + prefix + 'supabase-config.js"><\/script>');
-      document.write('<script src="' + prefix + 'trieye-db.js"><\/script>');
-    })();
-  </script>
+  <script src="/assets/supabase-config.js"></script>
+  <script src="/assets/trieye-db.js"></script>
   <script>
     document.documentElement.removeAttribute('data-theme');
   </script>
@@ -677,6 +685,10 @@
       }
 
       try {
+        for (let i = 0; i < 40 && (!window.TrieyeDB || typeof window.TrieyeDB.getPublicInvoiceByToken !== 'function'); i++) {
+          await new Promise(r => setTimeout(r, 50));
+        }
+
         let res = null;
         if (window.TrieyeDB && typeof window.TrieyeDB.getPublicInvoiceByToken === 'function') {
           res = await window.TrieyeDB.getPublicInvoiceByToken(token);
@@ -729,21 +741,25 @@
             };
 
         // Render item table
-        if (Array.isArray(inv.items) && inv.items.length > 0 && itemsTbody) {
-          itemsTbody.innerHTML = inv.items.map((item, idx) => {
-            const itemRate = Number(item.rate || item.price || 0);
-            const itemQty = Number(item.qty || 1);
-            const itemTot = itemRate * itemQty;
+        const invItems = (Array.isArray(inv.invoice_items) && inv.invoice_items.length > 0)
+          ? inv.invoice_items
+          : (Array.isArray(inv.items) && inv.items.length > 0 ? inv.items : []);
+
+        if (invItems.length > 0 && itemsTbody) {
+          itemsTbody.innerHTML = invItems.map((item, idx) => {
+            const itemRate = Number(item.unit_price !== undefined ? item.unit_price : (item.rate !== undefined ? item.rate : (item.price || 0)));
+            const itemQty = Number(item.quantity !== undefined ? item.quantity : (item.qty || 1));
+            const itemTot = Number(item.total_price !== undefined ? item.total_price : (itemRate * itemQty));
             return `
               <tr>
                 <td>${idx + 1}</td>
                 <td>
-                  <div class="item-service-name">${escapeHtml(item.name || item.service_name || 'Service Item')}</div>
+                  <div class="item-service-name">${escapeHtml(item.service_name || item.name || 'Service Item')}</div>
                   ${item.description ? `<div class="item-service-desc">${escapeHtml(item.description)}</div>` : ''}
                 </td>
                 <td style="text-align:center;">${itemQty}</td>
                 <td style="text-align:right;" class="mono">₹${itemRate.toLocaleString('en-IN')}</td>
-                <td class="mono" style="font-weight:600; color:var(--text);">₹${itemTot.toLocaleString('en-IN')}</td>
+                <td class="mono" style="font-weight:600; color:var(--text); text-align:right;">₹${itemTot.toLocaleString('en-IN')}</td>
               </tr>
             `;
           }).join('');
@@ -849,22 +865,23 @@
         if (cardActions) {
           cardActions.style.display = 'none';
         }
-
         const opt = {
-          margin: [8, 8, 8, 8],
+          margin: [10, 10, 10, 10],
           filename: cleanFilename,
           image: { type: 'jpeg', quality: 0.98 },
           html2canvas: {
             scale: 2,
             useCORS: true,
             logging: false,
-            backgroundColor: '#ffffff'
+            backgroundColor: '#ffffff',
+            scrollY: 0
           },
           jsPDF: {
             unit: 'mm',
             format: 'a4',
             orientation: 'portrait'
-          }
+          },
+          pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
         };
 
         await html2pdf().set(opt).from(invoiceElement).save();

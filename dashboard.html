@@ -2237,24 +2237,85 @@
       color: var(--white);
     }
 
-    /* Print invoice specific media query */
+    /* Consolidated Print Stylesheet (A4 Optimized) */
     @media print {
+      @page {
+        size: A4 portrait;
+        margin: 10mm;
+      }
+      html, body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        height: auto !important;
+        min-height: 100% !important;
+        overflow: visible !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
       body * {
         visibility: hidden !important;
+      }
+      #invoiceModal, #invoiceModal * {
+        visibility: visible !important;
+      }
+      #invoiceModal {
+        position: static !important;
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        max-height: none !important;
+        height: auto !important;
+        overflow: visible !important;
+        box-shadow: none !important;
+        border: none !important;
+        transform: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+      }
+      #printable-invoice {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        overflow: visible !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        background: #ffffff !important;
+        color: #000000 !important;
+        box-shadow: none !important;
+        border: none !important;
+      }
+      #invoiceModal > div:first-child,
+      .invoice-modal-header,
+      .invoice-modal-actions,
+      .admin-audit-card,
+      #inv-modal-admin-audit,
+      #walkin-admin-audit-box,
+      .auth-overlay,
+      .modal-backdrop,
+      .modal-overlay {
+        display: none !important;
+        visibility: hidden !important;
+      }
+      tr, .inv-cust-veh-grid, .inv-totals-box, table, thead, tbody {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
       }
       #modalReceipt, #modalReceipt * {
         visibility: visible !important;
       }
       #modalReceipt {
-        position: absolute !important;
-        left: 0 !important;
-        top: 0 !important;
+        position: static !important;
         width: 100% !important;
+        max-height: none !important;
         height: auto !important;
+        overflow: visible !important;
         background: #ffffff !important;
         color: #000000 !important;
+        box-shadow: none !important;
+        border: none !important;
         padding: 0 !important;
-        display: block !important;
       }
       #modalReceipt .dash-modal {
         box-shadow: none !important;
@@ -2272,50 +2333,9 @@
         display: none !important;
       }
       #modalReceipt .dash-modal-body {
-        padding: 20px !important;
+        padding: 10px !important;
         color: #000000 !important;
         background: #ffffff !important;
-      }
-      #modalReceipt .dash-modal-body * {
-        color: #000000 !important;
-        background: transparent !important;
-        border-color: #cccccc !important;
-      }
-      #modalReceipt .dash-modal-body .invoice-box {
-        border: 1px solid #000000 !important;
-        background: #f9f9f9 !important;
-      }
-      .admin-audit-card, #inv-modal-admin-audit, #walkin-admin-audit-box {
-        display: none !important;
-        visibility: hidden !important;
-      }
-    }
-  </style>
-
-  <style>
-    @media print {
-      body * {
-        visibility: hidden;
-      }
-      #invoiceModal, #invoiceModal * {
-        visibility: visible;
-      }
-      #invoiceModal {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-        margin: 0;
-        padding: 0;
-        box-shadow: none;
-        transform: none;
-      }
-      #invoiceModal > div:first-child,
-      .invoice-modal-header,
-      .admin-audit-card,
-      #inv-modal-admin-audit {
-        display: none !important;
-        visibility: hidden !important;
       }
     }
   </style>
@@ -5472,6 +5492,11 @@
           if (linkedInv && Array.isArray(linkedInv.invoice_items) && linkedInv.invoice_items.length > 0) {
             const names = linkedInv.invoice_items.map(it => it.service_name).filter(Boolean);
             if (names.length > 0) serviceText = names.join(', ');
+          } else if (Array.isArray(b.services) || Array.isArray(b.products)) {
+            const svcNames = (b.services || []).map(s => s.name || s.service_name).filter(Boolean);
+            const prodNames = (b.products || []).map(p => p.name || p.service_name).filter(Boolean);
+            const allNames = [...svcNames, ...prodNames];
+            if (allNames.length > 0) serviceText = allNames.join(', ');
           }
 
           // 8. Original Service Price
@@ -6581,7 +6606,7 @@
       if (invItems.length > 0) {
         invItems.forEach(it => {
           const isProd = it.item_type === 'PRODUCT' || it.is_product || 
-            ['Chain Loop', 'Perfume', 'Fabric Cloth'].includes(it.service_name) ||
+            ['Chain Lube', 'Chain Loop', 'Perfume', 'Fabric Cloth'].includes(it.service_name) ||
             (!it.service_id && !['Foam Wash', 'Ceramic Coating', 'Interior Deep Cleaning', 'Full Detail Combo', 'PPF', 'Paint Protection Film', 'Underbody Anti-Rust Coating', 'Bike Detailing'].some(s => (it.service_name||'').toLowerCase().includes(s.toLowerCase())));
           if (isProd) rcptProducts.push(it);
           else rcptServices.push(it);
@@ -6592,7 +6617,7 @@
       }
 
       let breakdownHtml = '';
-      if (rcptProducts.length > 0) {
+      if (rcptServices.length > 0 || rcptProducts.length > 0) {
         breakdownHtml = `
           <div style="border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:0.75rem 0; display:flex; flex-direction:column; gap:0.6rem;">
             ${rcptServices.length > 0 ? `
@@ -6602,24 +6627,26 @@
                 </div>
                 ${rcptServices.map(s => `
                   <div style="display:flex; justify-content:space-between; font-size:0.85rem; padding:2px 0 2px 8px;">
-                    <span style="color:var(--text-muted);">${escapeHtml(s.service_name)} (x${s.quantity})</span>
-                    <strong style="font-family:'IBM Plex Mono'; color:var(--white);">₹${Number(s.total_price).toLocaleString()}</strong>
+                    <span style="color:var(--text-muted);">${escapeHtml(s.service_name)} (x${s.quantity || 1})</span>
+                    <strong style="font-family:'IBM Plex Mono'; color:var(--white);">₹${Number(s.total_price !== undefined ? s.total_price : ((s.unit_price || 0) * (s.quantity || 1))).toLocaleString()}</strong>
                   </div>
                 `).join('')}
               </div>
             ` : ''}
 
-            <div>
-              <div style="font-size:0.72rem; font-family:'IBM Plex Mono'; color:#c084fc; font-weight:700; text-transform:uppercase; margin-bottom:4px; margin-top:2px;">
-                📦 Add-on Products &amp; Accessories
-              </div>
-              ${rcptProducts.map(p => `
-                <div style="display:flex; justify-content:space-between; font-size:0.85rem; padding:2px 0 2px 8px;">
-                  <span style="color:var(--text-muted);">${escapeHtml(p.service_name)} (x${p.quantity})</span>
-                  <strong style="font-family:'IBM Plex Mono'; color:#c084fc;">₹${Number(p.total_price).toLocaleString()}</strong>
+            ${rcptProducts.length > 0 ? `
+              <div>
+                <div style="font-size:0.72rem; font-family:'IBM Plex Mono'; color:#c084fc; font-weight:700; text-transform:uppercase; margin-bottom:4px; margin-top:2px;">
+                  📦 Add-on Products &amp; Accessories
                 </div>
-              `).join('')}
-            </div>
+                ${rcptProducts.map(p => `
+                  <div style="display:flex; justify-content:space-between; font-size:0.85rem; padding:2px 0 2px 8px;">
+                    <span style="color:var(--text-muted);">${escapeHtml(p.service_name)} (x${p.quantity || 1})</span>
+                    <strong style="font-family:'IBM Plex Mono'; color:#c084fc;">₹${Number(p.total_price !== undefined ? p.total_price : ((p.unit_price || 0) * (p.quantity || 1))).toLocaleString()}</strong>
+                  </div>
+                `).join('')}
+              </div>
+            ` : ''}
           </div>
         `;
       } else {
@@ -9279,7 +9306,7 @@ async function openInvoiceModal(invoiceId) {
 
   items.forEach(it => {
     const isProd = it.item_type === 'PRODUCT' || it.is_product || 
-      ['Chain Loop', 'Perfume', 'Fabric Cloth'].includes(it.service_name) ||
+      ['Chain Lube', 'Chain Loop', 'Perfume', 'Fabric Cloth'].includes(it.service_name) ||
       (!it.service_id && !['Foam Wash', 'Ceramic Coating', 'Interior Deep Cleaning', 'Full Detail Combo', 'PPF', 'Paint Protection Film', 'Underbody Anti-Rust Coating', 'Bike Detailing'].some(s => (it.service_name||'').toLowerCase().includes(s.toLowerCase())));
     if (isProd) {
       productItems.push(it);
@@ -9408,14 +9435,30 @@ function printInvoice() {
 
 function downloadInvoice() {
   const element = document.getElementById('printable-invoice');
-  const filename = currentPrintInvoice ? currentPrintInvoice.invoice_number + '.pdf' : 'Invoice.pdf';
+  if (!element) {
+    window.print();
+    return;
+  }
+  const filename = currentPrintInvoice ? (currentPrintInvoice.invoice_number || 'Invoice') + '.pdf' : 'Invoice.pdf';
   
+  if (typeof html2pdf === 'undefined') {
+    window.print();
+    return;
+  }
+
   const opt = {
-    margin:       0,
-    filename:     filename,
-    image:        { type: 'jpeg', quality: 0.98 },
-    html2canvas:  { scale: 2, useCORS: true },
-    jsPDF:        { unit: 'in', format: 'a4', orientation: 'portrait' }
+    margin: [10, 10, 10, 10],
+    filename: filename,
+    image: { type: 'jpeg', quality: 0.98 },
+    html2canvas: { 
+      scale: 2, 
+      useCORS: true, 
+      logging: false, 
+      backgroundColor: '#ffffff',
+      scrollY: 0
+    },
+    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
   };
   
   html2pdf().set(opt).from(element).save();
