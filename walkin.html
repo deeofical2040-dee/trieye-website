@@ -1009,6 +1009,7 @@
     <div class="invoice-modal-header">
       <h3 style="margin:0; font-family:'Oswald',sans-serif; letter-spacing:0.04em; font-size:1.15rem;">Invoice &amp; Bill Preview</h3>
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="btn btn-outline" style="color:#fff; border-color:#444;" onclick="openCurrentInvoiceWebBill()">🌐 Open Web Bill</button>
         <button class="btn btn-outline" style="color:#fff; border-color:#444;" onclick="printInvoice()">🖨️ Print Receipt</button>
         <button class="btn btn-outline" style="color:#fff; border-color:#444;" onclick="downloadInvoicePDF()">📥 Download PDF</button>
         <button class="btn btn-green" style="background:#22c55e; color:#fff;" onclick="shareInvoiceWhatsApp()">💬 WhatsApp Bill</button>
@@ -1127,8 +1128,8 @@
   <div id="toastContainer"></div>
 
   <!-- APPLICATION SCRIPTS -->
-  <script src="/assets/supabase-config.js"></script>
-  <script src="/assets/trieye-db.js"></script>
+  <script src="/assets/supabase-config.js?v=20261029_v3"></script>
+  <script src="/assets/trieye-db.js?v=20261029_v3"></script>
 
   <script>
     const ADMIN_THEME_KEY = 'trieye_admin_theme';
@@ -1171,23 +1172,38 @@
     }
 
     // AUTHENTICATION
+    async function ensureTrieyeDBReady(timeoutMs = 6000) {
+      if (window.TrieyeDB && typeof window.TrieyeDB.signInAdmin === 'function') {
+        return window.TrieyeDB;
+      }
+      const startTime = Date.now();
+      while (Date.now() - startTime < timeoutMs) {
+        await new Promise(res => setTimeout(res, 50));
+        if (window.TrieyeDB && typeof window.TrieyeDB.signInAdmin === 'function') {
+          return window.TrieyeDB;
+        }
+      }
+      return (window.TrieyeDB && typeof window.TrieyeDB.signInAdmin === 'function') ? window.TrieyeDB : null;
+    }
+
     async function checkAdminAuth() {
       const overlay = document.getElementById('adminAuthOverlay');
-      if (!window.TrieyeDB) {
+      const db = await ensureTrieyeDBReady(3000);
+      if (!db) {
         if (overlay) overlay.style.display = 'flex';
         return false;
       }
 
       try {
-        const session = await window.TrieyeDB.getSession();
+        const session = await db.getSession();
         if (!session || !session.user) {
           if (overlay) overlay.style.display = 'flex';
           return false;
         }
 
-        const roleCheck = await window.TrieyeDB.verifyAdminRole(session.user.id);
+        const roleCheck = await db.verifyAdminRole(session.user.id);
         if (!roleCheck.isAdmin) {
-          await window.TrieyeDB.signOutAdmin();
+          await db.signOutAdmin();
           if (overlay) overlay.style.display = 'flex';
           const errEl = document.getElementById('authErrorMsg');
           if (errEl) {
@@ -1256,10 +1272,11 @@
       }
 
       try {
-        if (!window.TrieyeDB || typeof window.TrieyeDB.signInAdmin !== 'function') {
-          throw new Error("Authentication module initializing or unavailable.");
+        const db = await ensureTrieyeDBReady(4000);
+        if (!db || typeof db.signInAdmin !== 'function') {
+          throw new Error("Authentication module initializing or unavailable. Please retry in a moment.");
         }
-        const result = await window.TrieyeDB.signInAdmin(email, pass);
+        const result = await db.signInAdmin(email, pass);
         if (!result || !result.success) {
           if (errEl) {
             errEl.innerText = (result && result.error) ? result.error : 'Invalid administrator credentials.';
@@ -2015,6 +2032,33 @@
     function closeInvoiceModal() {
       document.getElementById('invoiceModalBackdrop').style.display = 'none';
       document.getElementById('invoiceModal').style.display = 'none';
+    }
+
+    async function openCurrentInvoiceWebBill() {
+      const inv = currentPrintInvoice || window.currentPrintInvoice;
+      if (!inv) {
+        alert('No active invoice data found.');
+        return;
+      }
+      const metrics = (window.TrieyeDB && typeof window.TrieyeDB.calculateBillMetrics === 'function')
+        ? window.TrieyeDB.calculateBillMetrics(inv)
+        : { paymentStatus: inv.status || 'UNPAID', amountCollected: inv.amount_collected || 0, paymentMethod: 'Cash' };
+
+      let shareToken = inv.share_token || (inv.bookings && inv.bookings.share_token) || '';
+      if (!shareToken && inv.booking_id && window.TrieyeDB && typeof window.TrieyeDB.getOrFetchShareToken === 'function') {
+        shareToken = await window.TrieyeDB.getOrFetchShareToken({ id: inv.booking_id });
+      }
+      if (!shareToken) {
+        shareToken = inv.id || inv.invoice_number;
+      }
+      const isLocalHost = !window.location.origin || 
+                          window.location.hostname === 'localhost' || 
+                          window.location.hostname === '127.0.0.1' || 
+                          window.location.hostname.startsWith('192.168.') ||
+                          window.location.protocol === 'file:';
+      const baseOrigin = isLocalHost ? window.location.origin : 'https://trieye-website.vercel.app';
+      const url = `${baseOrigin}/invoice?token=${encodeURIComponent(shareToken)}&payStatus=${encodeURIComponent(metrics.paymentStatus)}&amtCollected=${encodeURIComponent(metrics.amountCollected)}&payMethod=${encodeURIComponent(metrics.paymentMethod)}`;
+      window.open(url, '_blank');
     }
 
     function printInvoice() {

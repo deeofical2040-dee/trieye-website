@@ -678,6 +678,37 @@ const TrieyeDB = {
             }
           };
         } else {
+          // Reconcile line items if remote RPC did not return invoice_items
+          if ((!rawInvoice.invoice_items || rawInvoice.invoice_items.length === 0) && matchedLocal) {
+            if (Array.isArray(matchedLocal.invoice_items) && matchedLocal.invoice_items.length > 0) {
+              rawInvoice.invoice_items = matchedLocal.invoice_items;
+              rawInvoice.items = matchedLocal.invoice_items;
+            } else if (Array.isArray(matchedLocal.items) && matchedLocal.items.length > 0) {
+              rawInvoice.invoice_items = matchedLocal.items;
+              rawInvoice.items = matchedLocal.items;
+            } else if (Array.isArray(matchedLocal.services) || Array.isArray(matchedLocal.products)) {
+              const combinedItems = [];
+              (matchedLocal.services || []).forEach(s => combinedItems.push({
+                service_name: s.name || s.service_name || 'Detailing Service',
+                quantity: s.quantity || 1,
+                unit_price: Number(s.unit_price || s.price || 0),
+                total_price: (s.quantity || 1) * Number(s.unit_price || s.price || 0),
+                item_type: 'SERVICE'
+              }));
+              (matchedLocal.products || []).forEach(p => combinedItems.push({
+                service_name: p.name || p.service_name || 'Add-on Product',
+                quantity: p.quantity || 1,
+                unit_price: Number(p.unit_price || p.price || 0),
+                total_price: (p.quantity || 1) * Number(p.unit_price || p.price || 0),
+                item_type: 'PRODUCT'
+              }));
+              if (combinedItems.length > 0) {
+                rawInvoice.invoice_items = combinedItems;
+                rawInvoice.items = combinedItems;
+              }
+            }
+          }
+
           // Reconcile: If local booking has authoritative payment info that remote RPC missed:
           if (localPaidStatus === 'PAID' || localAmtCollected > (Number(rawInvoice.amount_collected) || 0)) {
             rawInvoice.amount_collected = localAmtCollected;
@@ -2389,6 +2420,7 @@ const TrieyeDB = {
             customers (id, name, phone, email, notes),
             vehicles (id, vehicle_type, reg_number),
             invoice_items (*),
+            payments (id, amount, method, status, paid_at),
             bookings ( id, share_token, payments (id, amount, method, status) )
           `)
           .eq('id', invoiceId)
