@@ -105,13 +105,19 @@ const TrieyeDB = {
       authorizedAdjustment = Number(invOrBooking.adjustment || 0);
     }
 
-    // 2. Authoritative Original Service Price / Subtotal and Final Bill Amount
-    // Formula: Final Bill Amount = Original Service Price - Less Amount (Authorized Adjustment)
+    // 2. Authoritative Service Price / Subtotal and Final Bill Amount
+    // Formula: Final Bill Amount = Service Price - Less Amount (Authorized Adjustment)
     let originalBillAmount = Number(
-      invOrBooking.subtotal !== undefined && invOrBooking.subtotal !== null ? invOrBooking.subtotal : (
-        invOrBooking.total_bill_amount !== undefined && invOrBooking.total_bill_amount !== null ? invOrBooking.total_bill_amount : (
-          invOrBooking.original_bill_amount !== undefined && invOrBooking.original_bill_amount !== null ? invOrBooking.original_bill_amount : (
-            invOrBooking.original_price || invOrBooking.originalPrice || 0
+      invOrBooking.service_price !== undefined && invOrBooking.service_price !== null ? invOrBooking.service_price : (
+        invOrBooking.servicePrice !== undefined && invOrBooking.servicePrice !== null ? invOrBooking.servicePrice : (
+          invOrBooking.subtotal !== undefined && invOrBooking.subtotal !== null ? invOrBooking.subtotal : (
+            invOrBooking.total_bill_amount !== undefined && invOrBooking.total_bill_amount !== null ? invOrBooking.total_bill_amount : (
+              invOrBooking.original_bill_amount !== undefined && invOrBooking.original_bill_amount !== null ? invOrBooking.original_bill_amount : (
+                invOrBooking.original_service_price !== undefined && invOrBooking.original_service_price !== null ? invOrBooking.original_service_price : (
+                  invOrBooking.original_price || invOrBooking.originalPrice || (invOrBooking.services && invOrBooking.services.base_price ? invOrBooking.services.base_price : 0)
+                )
+              )
+            )
           )
         )
       )
@@ -131,14 +137,15 @@ const TrieyeDB = {
       finalBillAmount = Number(invOrBooking.grand_total);
       originalBillAmount = finalBillAmount + authorizedAdjustment;
     } else if (invOrBooking.total_amount !== undefined && invOrBooking.total_amount !== null && Number(invOrBooking.total_amount) > 0) {
-      finalBillAmount = Number(invOrBooking.total_amount);
-      originalBillAmount = finalBillAmount + authorizedAdjustment;
+      // In online bookings or base job records, total_amount represents the booking service price
+      originalBillAmount = Number(invOrBooking.total_amount);
+      finalBillAmount = Math.max(0, originalBillAmount - authorizedAdjustment);
     } else if (invOrBooking.price !== undefined && invOrBooking.price !== null) {
       originalBillAmount = Number(invOrBooking.price);
       finalBillAmount = Math.max(0, originalBillAmount - authorizedAdjustment);
     }
 
-    // Always strictly enforce the formula: Final Bill Amount = Original Bill Amount - Less Amount
+    // Always strictly enforce the formula: Final Bill Amount = Service Price - Less Amount
     if (originalBillAmount > 0) {
       finalBillAmount = Math.max(0, originalBillAmount - authorizedAdjustment);
     }
@@ -223,6 +230,8 @@ const TrieyeDB = {
     return {
       serviceName,
       serviceDescription,
+      servicePrice: originalBillAmount,
+      service_price: originalBillAmount,
       originalBillAmount,
       originalServicePrice: originalBillAmount,
       lessAmount: authorizedAdjustment,
@@ -481,7 +490,7 @@ const TrieyeDB = {
               discountVal = Number(existingLocal.discount || existingLocal.discount_amount || 0);
             }
 
-            // Resolve subtotal (Original Service Price)
+            // Resolve subtotal (Service Price)
             let subtotalVal = (b.subtotal !== undefined && b.subtotal !== null && Number(b.subtotal) > 0)
               ? Number(b.subtotal)
               : (existingLocal && existingLocal.subtotal && Number(existingLocal.subtotal) > 0
@@ -766,6 +775,8 @@ const TrieyeDB = {
       invoice_items: rawInvoice.invoice_items || rawInvoice.items || [],
       service_name: metrics.serviceName,
       service_description: metrics.serviceDescription || rawInvoice.service_description || 'Precision vehicle detailing package',
+      service_price: metrics.originalBillAmount,
+      servicePrice: metrics.originalBillAmount,
       total_bill_amount: metrics.originalBillAmount,
       original_bill_amount: metrics.originalBillAmount,
       rate: metrics.originalBillAmount,
@@ -2321,6 +2332,8 @@ const TrieyeDB = {
         booking_date: todayIso,
         date: todayIso,
         subtotal: Number(payload.totals.subtotal || 0),
+        service_price: Number(payload.totals.subtotal || 0),
+        servicePrice: Number(payload.totals.subtotal || 0),
         original_price: Number(payload.totals.subtotal || 0),
         originalPrice: Number(payload.totals.subtotal || 0),
         discount: Number(payload.totals.discount || 0),

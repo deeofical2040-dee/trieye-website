@@ -2874,7 +2874,7 @@
           <span id="inv-addon-subtotal" style="font-weight:600;">₹0</span>
         </div>
         <div style="display:flex; justify-content:space-between; padding:5px 0;">
-          <span style="color:#555;">Original Service Price</span>
+          <span style="color:#555;">Service Price</span>
           <span id="inv-subtotal" style="font-weight:600;">₹0</span>
         </div>
         <div style="display:flex; justify-content:space-between; padding:5px 0;" id="inv-less-amount-row">
@@ -3455,7 +3455,7 @@
         <!-- Live Payment Calculation Banner -->
         <div id="pay-modal-calc-banner" style="background:#0f172a; border:1px solid #334155; border-radius:6px; padding:0.65rem 0.85rem; margin-bottom:1rem; font-family:'IBM Plex Mono',monospace; font-size:0.78rem;">
           <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
-            <span style="color:var(--muted);">Original Bill Amount:</span>
+            <span style="color:var(--muted);">Service Price:</span>
             <strong id="pay-calc-orig-bill" style="color:var(--white);">₹0</strong>
           </div>
           <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
@@ -5441,7 +5441,7 @@
           'Vehicle Type',
           'Registration Number',
           'Service / Package',
-          'Original Service Price',
+          'Service Price',
           'Less Amount',
           'Discount Reason',
           'Final Bill Amount',
@@ -5547,7 +5547,7 @@
             if (allNames.length > 0) serviceText = allNames.join(', ');
           }
 
-          // 8. Original Service Price
+          // 8. Service Price
           const origServicePrice = Number(metrics.originalBillAmount || 0);
 
           // 9. Less Amount (Authorized Adjustment / Discount)
@@ -5604,7 +5604,7 @@
               right: { style: 'thin', color: { argb: 'FFE5E7EB' } }
             };
 
-            // Currency formatting in INR for cols: 8 (Original Service Price), 9 (Less Amount), 11 (Final Bill), 12 (Collected)
+            // Currency formatting in INR for cols: 8 (Service Price), 9 (Less Amount), 11 (Final Bill), 12 (Collected)
             if ([8, 9, 11, 12].includes(cIdx + 1)) {
               cell.numFmt = '"₹"#,##0.00';
               cell.alignment = { vertical: 'middle', horizontal: 'right' };
@@ -6753,7 +6753,7 @@
             <span class="status-badge ${metrics.isFullyPaid ? 'conf' : (metrics.isPartial ? 'in-prog' : 'pend')}">${metrics.paymentStatus}</span>
           </div>
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:8px; font-size:0.75rem; font-family:'IBM Plex Mono';">
-            <div><span style="color:var(--muted);">Original Price:</span> <b style="color:#fff;">₹${metrics.originalBillAmount.toLocaleString()}</b></div>
+            <div><span style="color:var(--muted);">Service Price:</span> <b style="color:#fff;">₹${metrics.originalBillAmount.toLocaleString()}</b></div>
             <div><span style="color:var(--muted);">Less Amount:</span> <b style="color:${metrics.lessAmount > 0 ? '#38bdf8' : '#94a3b8'};">${metrics.lessAmount > 0 ? '-₹' + metrics.lessAmount.toLocaleString() : '₹0'}</b></div>
             <div style="grid-column: span 2;"><span style="color:var(--muted);">Adjustment Reason:</span> <b style="color:#fde047;">${escapeHtml(metrics.discountReason || 'None')}</b></div>
             <div><span style="color:var(--muted);">Final Bill:</span> <b style="color:#a3e635;">₹${metrics.finalBillAmount.toLocaleString()}</b></div>
@@ -6809,7 +6809,7 @@
           <!-- Customer-facing Bill Presentation -->
           <div style="background:var(--bg-panel); border:1px solid var(--line-subtle); border-radius:6px; padding:0.85rem; display:flex; flex-direction:column; gap:0.45rem; font-size:0.82rem; font-family:'IBM Plex Mono';">
             <div style="display:flex; justify-content:space-between;">
-              <span style="color:var(--muted);">Original Service Price</span>
+              <span style="color:var(--muted);">Service Price</span>
               <strong style="color:var(--white);">₹${metrics.originalBillAmount.toLocaleString()}</strong>
             </div>
             <div style="display:flex; justify-content:space-between; ${metrics.lessAmount > 0 ? 'color:#38bdf8;' : ''}">
@@ -6931,21 +6931,21 @@
       let paymentLines = '';
       if (metrics.isFullyPaid) {
         paymentLines = 
-`*Original Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
+`*Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
 *Less Amount:* ${lessText}
 *Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
 *Payment Status:* PAID (${formatPaymentMethod(metrics.paymentMethod)})`;
       } else if (metrics.isPartial) {
         paymentLines = 
-`*Original Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
+`*Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
 *Less Amount:* ${lessText}
 *Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
 *Payment Status:* PARTIAL (${formatPaymentMethod(metrics.paymentMethod)})`;
       } else {
         paymentLines = 
-`*Original Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
+`*Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
 *Less Amount:* ${lessText}
 *Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹0
@@ -7400,7 +7400,7 @@ TRIEYE DETAILING
       let lessAmt = parseFloat(lessInput ? lessInput.value : 0) || 0;
       if (lessAmt < 0) lessAmt = 0;
 
-      // Formula: Final Bill Amount = Original Bill Amount − Less Amount
+      // Formula: Final Bill Amount = Service Price − Less Amount
       const finalBill = Math.max(0, origBill - lessAmt);
 
       const amtInput = document.getElementById('pay-modal-amount');
@@ -9390,7 +9390,7 @@ async function openInvoiceModal(invoiceId) {
         <span class="status-badge ${metrics.isFullyPaid ? 'conf' : (metrics.isPartial ? 'in-prog' : 'pend')}">${metrics.paymentStatus}</span>
       </div>
       <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px; font-size:0.75rem; font-family:'IBM Plex Mono';">
-        <div><span style="color:var(--muted);">Original Price:</span> <b style="color:#fff;">₹${metrics.originalBillAmount.toLocaleString()}</b></div>
+        <div><span style="color:var(--muted);">Service Price:</span> <b style="color:#fff;">₹${metrics.originalBillAmount.toLocaleString()}</b></div>
         <div><span style="color:var(--muted);">Less Amount:</span> <b style="color:${metrics.lessAmount > 0 ? '#38bdf8' : '#94a3b8'};">${metrics.lessAmount > 0 ? '-₹' + metrics.lessAmount.toLocaleString() : '₹0'}</b></div>
         <div style="grid-column: span 2;"><span style="color:var(--muted);">Adjustment Reason:</span> <b style="color:#fde047;">${escapeHtml(metrics.discountReason || 'None')}</b></div>
         <div><span style="color:var(--muted);">Final Bill:</span> <b style="color:#a3e635;">₹${metrics.finalBillAmount.toLocaleString()}</b></div>
@@ -9619,21 +9619,21 @@ function shareInvoiceWhatsApp() {
   let paymentLines = '';
   if (metrics.isFullyPaid) {
     paymentLines = 
-`*Original Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
+`*Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
 *Less Amount:* ${lessText}
 *Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
 *Payment Status:* PAID (${formatPaymentMethod(metrics.paymentMethod)})`;
   } else if (metrics.isPartial) {
     paymentLines = 
-`*Original Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
+`*Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
 *Less Amount:* ${lessText}
 *Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
 *Payment Status:* PARTIAL (${formatPaymentMethod(metrics.paymentMethod)})`;
   } else {
     paymentLines = 
-`*Original Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
+`*Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
 *Less Amount:* ${lessText}
 *Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹0

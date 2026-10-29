@@ -1026,7 +1026,7 @@
         <span style="font-size:11px; color:#a1a1aa; font-family:'IBM Plex Mono';">Confidential</span>
       </div>
       <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(130px, 1fr)); gap:10px;">
-        <div><span style="color:#a1a1aa; display:block; font-size:11px;">Original Price:</span> <strong id="audit-orig-price" style="color:#ffffff; font-family:'IBM Plex Mono';">₹0</strong></div>
+        <div><span style="color:#a1a1aa; display:block; font-size:11px;">Service Price:</span> <strong id="audit-orig-price" style="color:#ffffff; font-family:'IBM Plex Mono';">₹0</strong></div>
         <div><span style="color:#a1a1aa; display:block; font-size:11px;">Discount:</span> <strong id="audit-discount" style="color:#f43f5e; font-family:'IBM Plex Mono';">₹0</strong></div>
         <div><span style="color:#a1a1aa; display:block; font-size:11px;">Discount Reason:</span> <strong id="audit-reason" style="color:#38bdf8;">None</strong></div>
         <div><span style="color:#a1a1aa; display:block; font-size:11px;">Final Bill:</span> <strong id="audit-final-bill" style="color:#a3e635; font-family:'IBM Plex Mono';">₹0</strong></div>
@@ -1089,7 +1089,7 @@
             <span id="inv-addon-subtotal" style="font-family:'IBM Plex Mono';">₹0</span>
           </div>
           <div style="display:flex; justify-content:space-between; padding:4px 0; color:#334155;">
-            <span>Original Service Price:</span>
+            <span>Service Price:</span>
             <span id="inv-subtotal" style="font-family:'IBM Plex Mono'; font-weight:600;">₹0</span>
           </div>
           <div style="display:flex; justify-content:space-between; padding:4px 0; color:#334155;" id="inv-less-amount-row">
@@ -1950,7 +1950,7 @@
           };
 
       // Customer-Facing Printable Receipt:
-      // Show Original Service Price, Less Amount, Final Bill Amount, Amount Collected
+      // Show Service Price, Less Amount, Final Bill Amount, Amount Collected
       const subtotalEl = document.getElementById('inv-subtotal');
       if (subtotalEl) subtotalEl.innerText = '₹' + metrics.originalBillAmount.toLocaleString('en-IN');
       
@@ -2128,21 +2128,21 @@
       let paymentDetailsText = '';
       if (metrics.isPaid) {
         paymentDetailsText = 
-`*Original Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
+`*Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
 *Less Amount:* ${lessText}
 *Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
 *Payment Status:* ✅ PAID (${formatPaymentMethod(metrics.paymentMethod)})`;
       } else if (metrics.isPartial) {
         paymentDetailsText = 
-`*Original Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
+`*Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
 *Less Amount:* ${lessText}
 *Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
 *Payment Status:* ⚠️ PARTIAL (${formatPaymentMethod(metrics.paymentMethod)})`;
       } else {
         paymentDetailsText = 
-`*Original Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
+`*Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
 *Less Amount:* ${lessText}
 *Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹0
