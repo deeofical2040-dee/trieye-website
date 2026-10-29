@@ -4299,7 +4299,7 @@
 
       return null;
     }
-    function getPublicInvoiceUrl(shareToken) {
+    function getPublicInvoiceUrl(shareToken, extraParams) {
       if (!shareToken) return '';
       const isLocalHost = !window.location.origin || 
                           window.location.hostname === 'localhost' || 
@@ -4307,7 +4307,15 @@
                           window.location.hostname.startsWith('192.168.') ||
                           window.location.protocol === 'file:';
       const baseOrigin = isLocalHost ? 'https://trieye-website.vercel.app' : window.location.origin;
-      return `${baseOrigin}/invoice?token=${encodeURIComponent(shareToken)}`;
+      let url = `${baseOrigin}/invoice?token=${encodeURIComponent(shareToken)}`;
+      if (extraParams && typeof extraParams === 'object') {
+        Object.keys(extraParams).forEach(k => {
+          if (extraParams[k] !== undefined && extraParams[k] !== null) {
+            url += `&${encodeURIComponent(k)}=${encodeURIComponent(extraParams[k])}`;
+          }
+        });
+      }
+      return url;
     }
     function showToast(msg) {
       const container = document.getElementById('toastContainer');
@@ -4739,6 +4747,21 @@
                   b.payMethod = lb.payMethod || b.payMethod;
                   b.amount_collected = lb.amount_collected;
                   b.amount_paid = lb.amount_paid;
+
+                  // Auto-heal Supabase DB in background so remote invoices are consistent
+                  if (window.TrieyeDB && typeof window.TrieyeDB.recordPayment === 'function' && isUuid(b.id)) {
+                    window.TrieyeDB.recordPayment({
+                      bookingId: b.id,
+                      invoiceId: b.invoice_id || null,
+                      invoiceNumber: b.invoice_ref || b.invoice_number || null,
+                      originalBillAmount: b.subtotal || b.total_amount || b.price,
+                      lessAmount: b.discount || b.discount_amount || 0,
+                      finalBillAmount: b.total_amount || b.price,
+                      amount: b.amount_collected !== undefined ? b.amount_collected : (b.total_amount || b.price),
+                      method: b.payMethod || 'CASH',
+                      status: b.payStatus
+                    }).catch(() => {});
+                  }
                 }
               }
             });
@@ -6676,7 +6699,7 @@
             subtotal: (assocInv.subtotal && Number(assocInv.subtotal) > 0) ? Number(assocInv.subtotal) : (b.subtotal || b.original_price || b.price || b.total_amount),
             grand_total: (assocInv.grand_total && Number(assocInv.grand_total) > 0) ? Number(assocInv.grand_total) : (b.total_amount || b.price),
             total_amount: (assocInv.grand_total && Number(assocInv.grand_total) > 0) ? Number(assocInv.grand_total) : (b.total_amount || b.price),
-            payStatus: b.payStatus || assocInv.status || 'PAID',
+            payStatus: b.payStatus || (assocInv && assocInv.status) || 'UNPAID',
             payMethod: b.payMethod || (assocInv.payments && assocInv.payments[0] && assocInv.payments[0].method) || 'Cash'
           }) 
         : b;
@@ -6936,12 +6959,33 @@ TRIEYE DETAILING
         alert('No active invoice data found.');
         return;
       }
+
+      // Sync payment to Supabase in background before opening if booking is PAID
+      if (b.payStatus === 'PAID' && window.TrieyeDB && typeof window.TrieyeDB.recordPayment === 'function' && isUuid(b.id)) {
+        window.TrieyeDB.recordPayment({
+          bookingId: b.id,
+          invoiceId: b.invoice_id || null,
+          invoiceNumber: b.invoice_ref || b.invoice_number || null,
+          originalBillAmount: b.subtotal || b.total_amount || b.price,
+          lessAmount: b.discount || b.discount_amount || 0,
+          finalBillAmount: b.total_amount || b.price,
+          amount: b.amount_collected !== undefined ? b.amount_collected : (b.total_amount || b.price),
+          method: b.payMethod || 'CASH',
+          status: 'PAID'
+        }).catch(() => {});
+      }
+
       const token = await getOrFetchShareToken(b);
       if (!token) {
         alert('Invoice share token could not be loaded from database.');
         return;
       }
-      const invoiceUrl = getPublicInvoiceUrl(token);
+      const extraParams = {
+        payStatus: b.payStatus || 'UNPAID',
+        amtCollected: b.amount_collected !== undefined ? b.amount_collected : (b.payStatus === 'PAID' ? (b.total_amount || b.price) : 0),
+        payMethod: b.payMethod || 'Cash'
+      };
+      const invoiceUrl = getPublicInvoiceUrl(token, extraParams);
       window.open(invoiceUrl, '_blank');
     }
 

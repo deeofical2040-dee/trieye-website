@@ -107,7 +107,15 @@ const TrieyeDB = {
 
     // 2. Authoritative Original Service Price / Subtotal and Final Bill Amount
     // Formula: Final Bill Amount = Original Service Price - Less Amount (Authorized Adjustment)
-    let originalBillAmount = Number(invOrBooking.subtotal !== undefined && invOrBooking.subtotal !== null ? invOrBooking.subtotal : (invOrBooking.original_price || invOrBooking.originalPrice || 0));
+    let originalBillAmount = Number(
+      invOrBooking.subtotal !== undefined && invOrBooking.subtotal !== null ? invOrBooking.subtotal : (
+        invOrBooking.total_bill_amount !== undefined && invOrBooking.total_bill_amount !== null ? invOrBooking.total_bill_amount : (
+          invOrBooking.original_bill_amount !== undefined && invOrBooking.original_bill_amount !== null ? invOrBooking.original_bill_amount : (
+            invOrBooking.original_price || invOrBooking.originalPrice || 0
+          )
+        )
+      )
+    );
     let finalBillAmount = 0;
 
     const hasExplicitSubtotal = originalBillAmount > 0;
@@ -116,6 +124,9 @@ const TrieyeDB = {
     } else if (itemsSubtotal > 0) {
       originalBillAmount = itemsSubtotal;
       finalBillAmount = Math.max(0, originalBillAmount - authorizedAdjustment);
+    } else if (invOrBooking.final_bill_amount !== undefined && invOrBooking.final_bill_amount !== null && Number(invOrBooking.final_bill_amount) > 0) {
+      finalBillAmount = Number(invOrBooking.final_bill_amount);
+      originalBillAmount = finalBillAmount + authorizedAdjustment;
     } else if (invOrBooking.grand_total !== undefined && invOrBooking.grand_total !== null && Number(invOrBooking.grand_total) > 0) {
       finalBillAmount = Number(invOrBooking.grand_total);
       originalBillAmount = finalBillAmount + authorizedAdjustment;
@@ -176,6 +187,11 @@ const TrieyeDB = {
       }
     }
 
+    if (finalBillAmount <= 0 && amountCollected > 0) {
+      finalBillAmount = amountCollected;
+      if (originalBillAmount <= 0) originalBillAmount = finalBillAmount + authorizedAdjustment;
+    }
+
     // 6. Balance Due = max(0, Final Bill Amount - Valid Payments Collected)
     const balanceDue = Math.max(0, finalBillAmount - amountCollected);
 
@@ -185,12 +201,12 @@ const TrieyeDB = {
 
     if (rawStatus === 'REFUNDED' || rawStatus === 'VOID') {
       paymentStatus = rawStatus;
-    } else if (finalBillAmount > 0 && amountCollected >= finalBillAmount && balanceDue === 0) {
+    } else if (amountCollected > 0 && (finalBillAmount <= 0 || amountCollected >= finalBillAmount) && balanceDue === 0) {
       paymentStatus = 'PAID';
     } else if (amountCollected > 0 && balanceDue > 0) {
       paymentStatus = 'PARTIAL';
     } else if (finalBillAmount === 0 && amountCollected === 0) {
-      paymentStatus = 'PAID';
+      paymentStatus = (rawStatus === 'PAID') ? 'PAID' : 'UNPAID';
     } else {
       paymentStatus = 'UNPAID';
     }
@@ -600,35 +616,45 @@ const TrieyeDB = {
       }
     }
 
-    // Offline / Local cache fallback if Supabase is unavailable or token matches local walkin booking
-    if (!rawInvoice) {
-      try {
-        const localBookings = JSON.parse(localStorage.getItem('trieye_bookings')) || [];
-        const localInvoices = JSON.parse(localStorage.getItem('trieye_invoices')) || [];
-        const found = localBookings.find(b => b.share_token === cleanToken || b.id === cleanToken || b.invoice_ref === cleanToken || b.invoice_number === cleanToken) ||
-                      localInvoices.find(i => i.share_token === cleanToken || i.id === cleanToken || i.invoice_number === cleanToken || (i.bookings && i.bookings.share_token === cleanToken));
-        if (found) {
-          const cust = found.customers || { name: found.name, phone: found.phone };
-          const veh = found.vehicles || { vehicle_type: found.vehicleType, reg_number: found.reg };
-          const rawAmtCollected = found.amount_collected !== undefined ? found.amount_collected : (found.amount_paid !== undefined ? found.amount_paid : (found.paid_amount !== undefined ? found.paid_amount : (found.payStatus === 'PAID' || found.status === 'PAID' ? (found.grand_total || found.total_amount) : 0)));
+    // Offline / Local cache fallback & bidirectional payment reconciliation
+    try {
+      const localBookings = JSON.parse(localStorage.getItem('trieye_bookings')) || [];
+      const localInvoices = JSON.parse(localStorage.getItem('trieye_invoices')) || [];
+      const cleanRef = rawInvoice ? String(rawInvoice.invoice_ref || '').toUpperCase() : '';
+      const matchedLocal = localBookings.find(b => 
+        (cleanToken && (b.share_token === cleanToken || b.id === cleanToken)) ||
+        (cleanRef && (b.invoice_ref === cleanRef || b.invoice_number === cleanRef || ('TRI-' + String(b.id || '').substring(0, 8).toUpperCase()) === cleanRef)) ||
+        (rawInvoice && b.phone && rawInvoice.customer_phone && String(b.phone).replace(/\D/g, '') === String(rawInvoice.customer_phone).replace(/\D/g, ''))
+      ) || localInvoices.find(i => 
+        (cleanToken && (i.share_token === cleanToken || i.id === cleanToken || i.invoice_number === cleanToken)) ||
+        (cleanRef && i.invoice_number === cleanRef)
+      );
+
+      if (matchedLocal) {
+        const localPaidStatus = String(matchedLocal.payStatus || matchedLocal.status || matchedLocal.payment_status || '').toUpperCase();
+        const localAmtCollected = Number(matchedLocal.amount_collected !== undefined ? matchedLocal.amount_collected : (matchedLocal.amount_paid !== undefined ? matchedLocal.amount_paid : (matchedLocal.paid_amount !== undefined ? matchedLocal.paid_amount : (localPaidStatus === 'PAID' ? (matchedLocal.grand_total || matchedLocal.total_amount || matchedLocal.price) : 0))));
+
+        if (!rawInvoice) {
+          const cust = matchedLocal.customers || { name: matchedLocal.name, phone: matchedLocal.phone };
+          const veh = matchedLocal.vehicles || { vehicle_type: matchedLocal.vehicleType, reg_number: matchedLocal.reg };
           rawInvoice = {
-            invoice_ref: found.invoice_ref || found.invoice_number || 'TRI-INVOICE',
+            invoice_ref: matchedLocal.invoice_ref || matchedLocal.invoice_number || 'TRI-INVOICE',
             share_token: cleanToken,
-            invoice_date: (found.date || found.booking_date || found.created_at || new Date().toISOString()).split('T')[0],
+            invoice_date: (matchedLocal.date || matchedLocal.booking_date || matchedLocal.created_at || new Date().toISOString()).split('T')[0],
             customer_name: cust.name || 'Valued Customer',
             customer_phone: cust.phone || 'N/A',
             vehicle_type: veh.vehicle_type || 'Car',
             reg_number: veh.reg_number || 'N/A',
-            service_name: found.service || (found.services && found.services[0]?.name) || 'Detailing Service',
-            service_description: found.service_description || 'Precision wash and detailing package',
-            invoice_items: found.invoice_items || [],
-            items: found.invoice_items || found.items || [],
-            subtotal: found.subtotal,
-            discount: found.discount,
-            grand_total: found.grand_total !== undefined ? found.grand_total : found.total_amount,
-            total_amount: found.grand_total !== undefined ? found.grand_total : found.total_amount,
-            amount_collected: rawAmtCollected,
-            payments: found.payments || (found.payStatus || found.status ? [{ amount: rawAmtCollected, status: found.payStatus || found.status, method: found.payMethod || 'CASH' }] : []),
+            service_name: matchedLocal.service || (matchedLocal.services && matchedLocal.services[0]?.name) || 'Detailing Service',
+            service_description: matchedLocal.service_description || 'Precision wash and detailing package',
+            invoice_items: matchedLocal.invoice_items || [],
+            items: matchedLocal.invoice_items || matchedLocal.items || [],
+            subtotal: matchedLocal.subtotal,
+            discount: matchedLocal.discount,
+            grand_total: matchedLocal.grand_total !== undefined ? matchedLocal.grand_total : matchedLocal.total_amount,
+            total_amount: matchedLocal.grand_total !== undefined ? matchedLocal.grand_total : matchedLocal.total_amount,
+            amount_collected: localAmtCollected,
+            payments: matchedLocal.payments || (localPaidStatus ? [{ amount: localAmtCollected, status: localPaidStatus, method: matchedLocal.payMethod || 'CASH' }] : []),
             business: {
               name: 'TRIEYE DETAILING',
               tagline: 'Detail • Precision • Protection',
@@ -638,10 +664,47 @@ const TrieyeDB = {
               gstin: '33CKMPB5885L1ZO'
             }
           };
+        } else {
+          // Reconcile: If local booking has authoritative payment info that remote RPC missed:
+          if (localPaidStatus === 'PAID' || localAmtCollected > (Number(rawInvoice.amount_collected) || 0)) {
+            rawInvoice.amount_collected = localAmtCollected;
+            rawInvoice.payment_status = localPaidStatus;
+            rawInvoice.status = localPaidStatus;
+            rawInvoice.payment_method = matchedLocal.payMethod || matchedLocal.payment_method || rawInvoice.payment_method || 'Cash';
+            rawInvoice.paid_amount = localAmtCollected;
+            const finalAmt = Number(rawInvoice.final_bill_amount || rawInvoice.grand_total || rawInvoice.total_amount || 0);
+            if (finalAmt > 0) {
+              rawInvoice.balance_due = Math.max(0, finalAmt - localAmtCollected);
+            }
+            if (matchedLocal.payments && matchedLocal.payments.length > 0) {
+              rawInvoice.payments = matchedLocal.payments;
+            } else {
+              rawInvoice.payments = [{
+                amount: localAmtCollected,
+                status: localPaidStatus,
+                method: rawInvoice.payment_method
+              }];
+            }
+
+            // In background, auto-heal Supabase DB if booking ID is a valid UUID
+            if (sb && matchedLocal.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(String(matchedLocal.id).trim())) {
+              TrieyeDB.recordPayment({
+                bookingId: String(matchedLocal.id).trim(),
+                invoiceId: matchedLocal.invoice_id || null,
+                invoiceNumber: matchedLocal.invoice_ref || matchedLocal.invoice_number || null,
+                originalBillAmount: matchedLocal.subtotal || matchedLocal.total_amount || matchedLocal.price,
+                lessAmount: matchedLocal.discount || matchedLocal.discount_amount || 0,
+                finalBillAmount: matchedLocal.total_amount || matchedLocal.price,
+                amount: localAmtCollected,
+                method: rawInvoice.payment_method,
+                status: localPaidStatus
+              }).catch(() => {});
+            }
+          }
         }
-      } catch (e) {
-        console.warn('⚠️ Local invoice cache lookup skipped:', e);
       }
+    } catch (e) {
+      console.warn('⚠️ Local invoice cache lookup/reconciliation skipped:', e);
     }
 
     if (!rawInvoice) {

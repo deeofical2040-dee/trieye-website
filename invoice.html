@@ -703,6 +703,22 @@
         }
 
         const inv = res.invoice;
+
+        // Check for verified payment params passed from dashboard
+        const paramPayStatus = (params.get('payStatus') || '').toUpperCase();
+        const paramAmtCollected = Number(params.get('amtCollected') || 0);
+        const paramPayMethod = params.get('payMethod');
+        if (paramPayStatus === 'PAID') {
+          if (!inv.amount_collected || inv.amount_collected === 0 || inv.payment_status === 'UNPAID') {
+            inv.payment_status = 'PAID';
+            inv.status = 'PAID';
+            inv.amount_collected = paramAmtCollected > 0 ? paramAmtCollected : (inv.final_bill_amount || inv.grand_total || inv.total_amount || 0);
+            inv.paid_amount = inv.amount_collected;
+            inv.balance_due = 0;
+            if (paramPayMethod) inv.payment_method = paramPayMethod;
+          }
+        }
+
         const biz = inv.business || {};
 
         // Populate business details
