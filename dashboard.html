@@ -2889,6 +2889,10 @@
           <span style="color:#555;">Amount Collected</span>
           <span id="inv-amt-collected" style="font-weight:600;">₹0</span>
         </div>
+        <div style="display:flex; justify-content:space-between; padding:5px 0;" id="inv-balance-due-row">
+          <span style="color:#555; font-weight:600;">Balance Due</span>
+          <span id="inv-balance-due" style="font-weight:700; color:#ef4444;">₹0</span>
+        </div>
         <div style="display:flex; justify-content:space-between; padding:10px 0; border-top:2px solid #000; border-bottom:2px solid #000; margin-top:5px; font-size:18px; font-weight:700;">
           <span id="inv-final-payable-label">Paid Amount</span>
           <span id="inv-grandtotal">₹0</span>
@@ -5715,13 +5719,25 @@
       const vehicle = document.getElementById('walkin-vehicle').value;
       const service = document.getElementById('walkin-service').value;
       const svcs = getServices();
-      let price = 2499;
+      let price = 0;
 
-      if (svcs[service] && svcs[service].pricing && svcs[service].pricing[vehicle]) {
-        price = svcs[service].pricing[vehicle];
+      const s = svcs[service] || Object.values(svcs).find(x => x && (x.name === service || x.id === service));
+      if (s) {
+        const p = s.pricing || {};
+        if (vehicle === 'Hatchback') {
+          price = (s.hatchback_price !== null && s.hatchback_price !== undefined && s.hatchback_price !== '') ? s.hatchback_price : (p['Hatchback'] !== undefined ? p['Hatchback'] : s.base_price);
+        } else if (vehicle === 'Sedan') {
+          price = (s.sedan_price !== null && s.sedan_price !== undefined && s.sedan_price !== '') ? s.sedan_price : (p['Sedan'] !== undefined ? p['Sedan'] : s.base_price);
+        } else if (vehicle === 'SUV / 4x4' || vehicle === 'SUV') {
+          price = (s.suv_price !== null && s.suv_price !== undefined && s.suv_price !== '') ? s.suv_price : (p['SUV / 4x4'] !== undefined ? p['SUV / 4x4'] : (p['SUV'] !== undefined ? p['SUV'] : s.base_price));
+        } else if (vehicle === 'Bike' || vehicle === 'Superbike') {
+          price = (s.bike_price !== null && s.bike_price !== undefined && s.bike_price !== '') ? s.bike_price : (p['Superbike'] !== undefined ? p['Superbike'] : (p['Bike'] !== undefined ? p['Bike'] : s.base_price));
+        } else {
+          price = s.base_price !== undefined ? s.base_price : (s.sedan_price || 0);
+        }
       }
 
-      document.getElementById('walkin-price-disp').value = '₹' + Number(price).toLocaleString();
+      document.getElementById('walkin-price-disp').value = '₹' + Number(price || 0).toLocaleString();
     }
 
     // Walkin Registration Input Handler & Validation
@@ -6928,6 +6944,7 @@
       const secureInvoiceUrl = getPublicInvoiceUrl(token);
 
       const lessText = metrics.lessAmount > 0 ? `₹${metrics.lessAmount.toLocaleString('en-IN')}` : '₹0';
+      const balText = `₹${metrics.balanceDue.toLocaleString('en-IN')}`;
       let paymentLines = '';
       if (metrics.isFullyPaid) {
         paymentLines = 
@@ -6935,6 +6952,7 @@
 *Less Amount:* ${lessText}
 *Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
+*Balance Due:* ${balText}
 *Payment Status:* PAID (${formatPaymentMethod(metrics.paymentMethod)})`;
       } else if (metrics.isPartial) {
         paymentLines = 
@@ -6942,6 +6960,7 @@
 *Less Amount:* ${lessText}
 *Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
+*Balance Due:* ${balText}
 *Payment Status:* PARTIAL (${formatPaymentMethod(metrics.paymentMethod)})`;
       } else {
         paymentLines = 
@@ -6949,6 +6968,7 @@
 *Less Amount:* ${lessText}
 *Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹0
+*Balance Due:* ${balText}
 *Payment Status:* UNPAID`;
       }
 
@@ -7007,10 +7027,14 @@ TRIEYE DETAILING
         alert('Invoice share token could not be loaded from database.');
         return;
       }
+      const metrics = (window.TrieyeDB && typeof window.TrieyeDB.calculateBillMetrics === 'function')
+        ? window.TrieyeDB.calculateBillMetrics(b)
+        : { paymentStatus: b.payStatus || 'UNPAID', amountCollected: b.amount_collected || 0, balanceDue: b.balance_due || 0, paymentMethod: b.payMethod || 'Cash' };
       const extraParams = {
-        payStatus: b.payStatus || 'UNPAID',
-        amtCollected: b.amount_collected !== undefined ? b.amount_collected : (b.payStatus === 'PAID' ? (b.total_amount || b.price) : 0),
-        payMethod: b.payMethod || 'Cash'
+        payStatus: metrics.paymentStatus,
+        amtCollected: metrics.amountCollected,
+        balanceDue: metrics.balanceDue,
+        payMethod: metrics.paymentMethod
       };
       const invoiceUrl = getPublicInvoiceUrl(token, extraParams);
       window.open(invoiceUrl, '_blank');
@@ -9395,6 +9419,7 @@ async function openInvoiceModal(invoiceId) {
         <div style="grid-column: span 2;"><span style="color:var(--muted);">Adjustment Reason:</span> <b style="color:#fde047;">${escapeHtml(metrics.discountReason || 'None')}</b></div>
         <div><span style="color:var(--muted);">Final Bill:</span> <b style="color:#a3e635;">₹${metrics.finalBillAmount.toLocaleString()}</b></div>
         <div><span style="color:var(--muted);">Collected:</span> <b style="color:#38bdf8;">₹${metrics.amountCollected.toLocaleString()}</b></div>
+        <div><span style="color:var(--muted);">Balance Due:</span> <b style="color:${metrics.balanceDue === 0 ? '#a3e635' : '#ef4444'};">₹${metrics.balanceDue.toLocaleString()}</b></div>
         <div><span style="color:var(--muted);">Payment Method:</span> <b style="color:#fff;">${escapeHtml(formatPaymentMethod(metrics.paymentMethod))}</b></div>
       </div>
     `;
@@ -9504,6 +9529,12 @@ async function openInvoiceModal(invoiceId) {
   }
   const amtCollEl = document.getElementById('inv-amt-collected');
   if (amtCollEl) amtCollEl.innerText = '₹' + metrics.amountCollected.toLocaleString();
+
+  const balDueEl = document.getElementById('inv-balance-due');
+  if (balDueEl) {
+    balDueEl.innerText = '₹' + metrics.balanceDue.toLocaleString();
+    balDueEl.style.color = metrics.balanceDue === 0 ? '#15803d' : '#ef4444';
+  }
 
   const finalLabelEl = document.getElementById('inv-final-payable-label');
   const grandTotalEl = document.getElementById('inv-grandtotal');
@@ -9616,6 +9647,7 @@ function shareInvoiceWhatsApp() {
       };
 
   const lessText = metrics.lessAmount > 0 ? `₹${metrics.lessAmount.toLocaleString('en-IN')}` : '₹0';
+  const balText = `₹${metrics.balanceDue.toLocaleString('en-IN')}`;
   let paymentLines = '';
   if (metrics.isFullyPaid) {
     paymentLines = 
@@ -9623,6 +9655,7 @@ function shareInvoiceWhatsApp() {
 *Less Amount:* ${lessText}
 *Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
+*Balance Due:* ${balText}
 *Payment Status:* PAID (${formatPaymentMethod(metrics.paymentMethod)})`;
   } else if (metrics.isPartial) {
     paymentLines = 
@@ -9630,6 +9663,7 @@ function shareInvoiceWhatsApp() {
 *Less Amount:* ${lessText}
 *Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
+*Balance Due:* ${balText}
 *Payment Status:* PARTIAL (${formatPaymentMethod(metrics.paymentMethod)})`;
   } else {
     paymentLines = 
@@ -9637,6 +9671,7 @@ function shareInvoiceWhatsApp() {
 *Less Amount:* ${lessText}
 *Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹0
+*Balance Due:* ${balText}
 *Payment Status:* UNPAID`;
   }
 

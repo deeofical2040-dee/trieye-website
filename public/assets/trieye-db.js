@@ -202,18 +202,18 @@ const TrieyeDB = {
     // 6. Balance Due = max(0, Final Bill Amount - Valid Payments Collected)
     const balanceDue = Math.max(0, finalBillAmount - amountCollected);
 
-    // 7. Authoritative Payment Status (reflect actual balance and void/refund rules)
+    // 7. Authoritative Payment Status (Show PAID only when full final bill is collected)
     const rawStatus = String(invOrBooking.status || invOrBooking.payment_status || invOrBooking.payStatus || '').toUpperCase();
     let paymentStatus = 'UNPAID';
 
     if (rawStatus === 'REFUNDED' || rawStatus === 'VOID') {
       paymentStatus = rawStatus;
-    } else if (amountCollected > 0 && (finalBillAmount <= 0 || amountCollected >= finalBillAmount) && balanceDue === 0) {
+    } else if (finalBillAmount > 0 && amountCollected >= finalBillAmount && balanceDue === 0) {
+      paymentStatus = 'PAID';
+    } else if (finalBillAmount === 0 && amountCollected === 0 && (authorizedAdjustment > 0 || rawStatus === 'PAID')) {
       paymentStatus = 'PAID';
     } else if (amountCollected > 0 && balanceDue > 0) {
       paymentStatus = 'PARTIAL';
-    } else if (finalBillAmount === 0 && amountCollected === 0) {
-      paymentStatus = (rawStatus === 'PAID') ? 'PAID' : 'UNPAID';
     } else {
       paymentStatus = 'UNPAID';
     }
@@ -1109,7 +1109,21 @@ const TrieyeDB = {
   },
 
   getCurrentPricing() {
-    return this._currentPricing;
+    if (this._currentPricing && Object.keys(this._currentPricing).length > 0) {
+      return this._currentPricing;
+    }
+    try {
+      const stored = localStorage.getItem('trieye_services_matrix');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        const norm = this.normalizePricingData(parsed);
+        if (norm) {
+          this._currentPricing = norm;
+          return norm;
+        }
+      }
+    } catch (e) {}
+    return null;
   },
 
   normalizePricingData(data) {
@@ -2150,13 +2164,23 @@ const TrieyeDB = {
       let lastInvErr = null;
 
       // Authoritative Payment Calculation
-      const payAmountVal = Number((payload.payment && payload.payment.amount) !== undefined ? payload.payment.amount : (payload.totals && payload.totals.payAmt !== undefined ? payload.totals.payAmt : finalGrandTotal));
+      const payAmountVal = Number(
+        (payload.payment && payload.payment.amount !== undefined && payload.payment.amount !== null)
+          ? payload.payment.amount
+          : (payload.totals && payload.totals.amount_collected !== undefined && payload.totals.amount_collected !== null)
+            ? payload.totals.amount_collected
+            : (payload.totals && payload.totals.amountCollected !== undefined && payload.totals.amountCollected !== null)
+              ? payload.totals.amountCollected
+              : (payload.totals && payload.totals.payAmt !== undefined && payload.totals.payAmt !== null)
+                ? payload.totals.payAmt
+                : 0
+      );
       let payStatusVal = 'UNPAID';
       if (finalGrandTotal > 0 && payAmountVal >= finalGrandTotal) {
         payStatusVal = 'PAID';
       } else if (payAmountVal > 0 && payAmountVal < finalGrandTotal) {
         payStatusVal = 'PARTIAL';
-      } else if (finalGrandTotal === 0 && payAmountVal === 0) {
+      } else if (finalGrandTotal === 0 && payAmountVal === 0 && (Number(payload.totals.subtotal || 0) > 0 || Number(payload.totals.discount || 0) > 0)) {
         payStatusVal = 'PAID';
       } else {
         payStatusVal = 'UNPAID';

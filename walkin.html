@@ -884,10 +884,10 @@
             <div class="form-grid mb-payment-grid">
               <div class="form-group">
                 <label class="form-label" for="mb-pay-status">Payment Status</label>
-                <select class="form-select" id="mb-pay-status" onchange="mbHandlePaymentChange()">
-                  <option value="PAID" selected>Paid</option>
+                <select class="form-select" id="mb-pay-status" onchange="mbHandlePaymentStatusChange()">
+                  <option value="UNPAID" selected>Unpaid</option>
                   <option value="PARTIAL">Partial</option>
-                  <option value="UNPAID">Unpaid</option>
+                  <option value="PAID">Paid</option>
                 </select>
               </div>
               <div class="form-group">
@@ -900,12 +900,12 @@
                 </select>
               </div>
               <div class="form-group">
-                <label class="form-label" for="mb-pay-amount">Amount Paid</label>
+                <label class="form-label" for="mb-pay-amount">Amount Collected (₹)</label>
                 <input type="number" id="mb-pay-amount" class="form-input" value="0" min="0" oninput="mbCalcTotals()">
               </div>
               <div class="form-group">
-                <label class="form-label" for="mb-balance-due">Less Amount</label>
-                <input type="text" id="mb-balance-due" class="form-input" value="₹0" readonly style="background:rgba(255,255,255,0.05); font-weight:700; font-family:'IBM Plex Mono'; color:#38bdf8;">
+                <label class="form-label" for="mb-balance-due">Balance Due</label>
+                <input type="text" id="mb-balance-due" class="form-input" value="₹0" readonly style="background:rgba(255,255,255,0.05); font-weight:700; font-family:'IBM Plex Mono'; color:#ef4444;">
               </div>
             </div>
           </div>
@@ -932,11 +932,11 @@
           </div>
 
           <div style="border-top:1px solid var(--line); padding-top:0.75rem; display:flex; justify-content:space-between; align-items:center;">
-            <span style="color:var(--text-muted);">Subtotal</span>
+            <span style="color:var(--text-muted);">Service Price</span>
             <span id="mb-subtotal" style="font-family:'IBM Plex Mono'; font-weight:700; color:var(--white);">₹0</span>
           </div>
           <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="color:var(--text-muted);">Discount</span>
+            <span style="color:var(--text-muted);">Less Amount</span>
             <div style="display:flex; align-items:center; gap:0.35rem;">
               <span style="color:var(--text-muted); font-size:0.85rem;">₹</span>
               <input type="number" id="mb-discount" class="form-input" style="width:85px; text-align:right; padding:0.35rem 0.5rem; font-size:0.85rem;" value="0" min="0" oninput="mbCalcTotals()">
@@ -949,9 +949,9 @@
             <input type="text" id="mb-discount-reason" class="form-input" style="font-size:0.8rem; padding:0.35rem 0.5rem;" placeholder="e.g. VIP Offer, Studio Promo, Manager Waiver" maxlength="100" oninput="mbCalcTotals()">
           </div>
 
-          <!-- Grand Total Banner -->
+          <!-- Final Bill Amount Banner -->
           <div style="background:rgba(34,197,94,0.12); border:1px solid rgba(34,197,94,0.3); border-radius:8px; padding:0.85rem 1rem; display:flex; justify-content:space-between; align-items:center; margin:0.35rem 0;">
-            <span style="font-weight:700; color:var(--green); font-size:0.95rem;">Grand Total</span>
+            <span style="font-weight:700; color:var(--green); font-size:0.95rem;">Final Bill Amount</span>
             <span id="mb-grandtotal" style="font-family:'IBM Plex Mono'; font-weight:700; font-size:1.25rem; color:var(--green);">₹0</span>
           </div>
 
@@ -959,19 +959,19 @@
           <div style="display:flex; flex-direction:column; gap:0.6rem; padding-top:0.35rem; font-size:0.82rem; border-top:1px dashed var(--line);">
             <div style="display:flex; justify-content:space-between; align-items:center;">
               <span style="color:var(--text-muted);">Payment Status</span>
-              <span id="mb-summary-paystatus" class="pay-badge pay-paid" style="font-size:0.72rem; padding:2px 8px;">PAID</span>
+              <span id="mb-summary-paystatus" class="pay-badge pay-unpaid" style="font-size:0.72rem; padding:2px 8px;">UNPAID</span>
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center;">
               <span style="color:var(--text-muted);">Payment Method</span>
               <span id="mb-summary-paymethod" style="font-family:'IBM Plex Mono'; font-weight:600;">UPI / QR</span>
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="color:var(--text-muted);">Amount Paid</span>
+              <span style="color:var(--text-muted);">Amount Collected</span>
               <span id="mb-summary-paidamt" style="font-family:'IBM Plex Mono'; font-weight:600;">₹0</span>
             </div>
             <div style="display:flex; justify-content:space-between; align-items:center;">
-              <span style="color:var(--text-muted);">Less Amount</span>
-              <span id="mb-summary-balance" style="font-family:'IBM Plex Mono'; font-weight:700; color:#38bdf8;">₹0</span>
+              <span style="color:var(--text-muted);">Balance Due</span>
+              <span id="mb-summary-balance" style="font-family:'IBM Plex Mono'; font-weight:700; color:#ef4444;">₹0</span>
             </div>
           </div>
 
@@ -1031,7 +1031,7 @@
         <div><span style="color:#a1a1aa; display:block; font-size:11px;">Discount Reason:</span> <strong id="audit-reason" style="color:#38bdf8;">None</strong></div>
         <div><span style="color:#a1a1aa; display:block; font-size:11px;">Final Bill:</span> <strong id="audit-final-bill" style="color:#a3e635; font-family:'IBM Plex Mono';">₹0</strong></div>
         <div><span style="color:#a1a1aa; display:block; font-size:11px;">Amount Collected:</span> <strong id="audit-collected" style="color:#ffffff; font-family:'IBM Plex Mono';">₹0</strong></div>
-        <div><span style="color:#a1a1aa; display:block; font-size:11px;">Less Amount:</span> <strong id="audit-balance" style="color:#38bdf8; font-family:'IBM Plex Mono';">₹0</strong></div>
+        <div><span style="color:#a1a1aa; display:block; font-size:11px;">Balance Due:</span> <strong id="audit-balance" style="color:#ef4444; font-family:'IBM Plex Mono';">₹0</strong></div>
         <div><span style="color:#a1a1aa; display:block; font-size:11px;">Payment Status:</span> <strong id="audit-status" style="color:#a3e635; font-family:'IBM Plex Mono';">PAID</strong></div>
       </div>
     </div>
@@ -1103,6 +1103,10 @@
           <div style="display:flex; justify-content:space-between; padding:4px 0; color:#334155;">
             <span>Amount Collected:</span>
             <span id="inv-amt-paid" style="font-family:'IBM Plex Mono'; font-weight:600; color:#0f172a;">₹0</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; padding:4px 0; color:#334155;" id="inv-balance-due-row">
+            <span>Balance Due:</span>
+            <span id="inv-balance-due" style="font-family:'IBM Plex Mono'; font-weight:700; color:#dc2626;">₹0</span>
           </div>
           <div style="display:flex; justify-content:space-between; padding:8px 0; font-size:18px; font-weight:800; border-top:2px solid #0f172a; border-bottom:2px solid #0f172a; margin-top:6px;">
             <span id="inv-final-label">Paid Amount:</span>
@@ -1315,33 +1319,116 @@
     // ==========================================
 
     const defaultServices = {
-      foam_wash: { id: 'svc-1', name: 'Foam Wash', base_price: 350, hatchback_price: 350, sedan_price: 450, suv_price: 600, bike_price: 200, active: true },
-      deep_interior: { id: 'svc-2', name: 'Interior Deep Cleaning', base_price: 1500, hatchback_price: 1500, sedan_price: 1800, suv_price: 2500, bike_price: 500, active: true },
-      ceramic_coating: { id: 'svc-3', name: 'Ceramic Coating (3-Year)', base_price: 12000, hatchback_price: 12000, sedan_price: 15000, suv_price: 18000, bike_price: 6000, active: true },
-      ppf: { id: 'svc-4', name: 'Paint Protection Film (Full Body)', base_price: 45000, hatchback_price: 45000, sedan_price: 55000, suv_price: 70000, bike_price: 15000, active: true },
-      underbody_coating: { id: 'svc-5', name: 'Underbody Anti-Rust Coating', base_price: 2000, hatchback_price: 2000, sedan_price: 2500, suv_price: 3000, bike_price: 800, active: true },
-      bike_detailing: { id: 'svc-6', name: 'Superbike Complete Detailing', base_price: 2500, hatchback_price: 2500, sedan_price: 2500, suv_price: 2500, bike_price: 2500, active: true }
+      'Foam Wash': {
+        name: 'Foam Wash',
+        desc: 'Snow Foam Pre-Wash & Decontamination detailing',
+        duration_minutes: 45,
+        base_price: 699,
+        hatchback_price: 566,
+        sedan_price: 699,
+        suv_price: 874,
+        bike_price: 350,
+        pricing: {
+          'Hatchback': 566,
+          'Sedan': 699,
+          'SUV / 4x4': 874,
+          'Superbike': 350
+        },
+        active: true
+      },
+      'Interior Deep Cleaning': {
+        name: 'Interior Deep Cleaning',
+        desc: 'Steam extraction & interior upholstery deep clean',
+        duration_minutes: 90,
+        base_price: 2299,
+        hatchback_price: 1839,
+        sedan_price: 2299,
+        suv_price: 2874,
+        bike_price: 1150,
+        pricing: {
+          'Hatchback': 1839,
+          'Sedan': 2299,
+          'SUV / 4x4': 2874,
+          'Superbike': 1150
+        },
+        active: true
+      },
+      'Full Detail Combo': {
+        name: 'Full Detail Combo',
+        desc: 'Comprehensive detailing package (Foam Wash + Rubbing Polish + Interior Deep Cleaning)',
+        duration_minutes: 180,
+        base_price: 4999,
+        hatchback_price: 3999,
+        sedan_price: 4999,
+        suv_price: 6249,
+        bike_price: 2500,
+        pricing: {
+          'Hatchback': 3999,
+          'Sedan': 4999,
+          'SUV / 4x4': 6249,
+          'Superbike': 2500
+        },
+        active: true
+      },
+      'Rubbing Polish': {
+        name: 'Rubbing Polish',
+        desc: 'Dual-Action Rubbing Polish & Paint Correction',
+        duration_minutes: 120,
+        base_price: 97,
+        hatchback_price: 69,
+        sedan_price: 97,
+        suv_price: 84,
+        bike_price: 60,
+        pricing: {
+          'Hatchback': 69,
+          'Sedan': 97,
+          'SUV / 4x4': 84,
+          'Superbike': 60
+        },
+        active: true
+      }
     };
 
-    function mbGetServices() {
+    function mbGetServicesMap() {
+      if (window._liveServicesMap && Object.keys(window._liveServicesMap).length > 0) {
+        return window._liveServicesMap;
+      }
+      if (window.TrieyeDB && typeof window.TrieyeDB.getCurrentPricing === 'function') {
+        const p = window.TrieyeDB.getCurrentPricing();
+        if (p && Object.keys(p).length > 0) {
+          window._liveServicesMap = p;
+          return p;
+        }
+      }
       try {
-        const map = JSON.parse(localStorage.getItem('trieye_services_matrix'));
-        if (map && Object.keys(map).length > 0) {
-          return Object.values(map).filter(s => s.active !== false);
+        const stored = localStorage.getItem('trieye_services_matrix');
+        if (stored) {
+          const parsed = JSON.parse(stored);
+          if (parsed && Object.keys(parsed).length > 0) {
+            window._liveServicesMap = parsed;
+            return parsed;
+          }
         }
       } catch (e) {}
-      return Object.values(defaultServices).filter(s => s.active !== false);
+      return defaultServices;
     }
 
-    function mbAddServiceRow() {
+    function mbGetServices() {
+      const map = mbGetServicesMap();
+      return Object.values(map).filter(s => s && s.active !== false);
+    }
+
+    function mbAddServiceRow(preselectedService = '') {
       const container = document.getElementById('mb-services-container');
       if (!container) return;
-      const rowId = `mb-row-${Date.now()}`;
+      const rowId = `mb-row-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
       
       const services = mbGetServices();
       let optionsHtml = '<option value="">-- Select Service --</option>';
       services.forEach(s => {
-        optionsHtml += `<option value="${s.id || ''}" data-name="${escapeHtml(s.name)}" data-base="${s.base_price}" data-hatch="${s.hatchback_price}" data-sedan="${s.sedan_price}" data-suv="${s.suv_price}" data-bike="${s.bike_price}">${escapeHtml(s.name)}</option>`;
+        const sName = s.name || s.id;
+        const isSel = preselectedService && (sName === preselectedService || s.id === preselectedService) ? 'selected' : '';
+        optionsHtml += `<option value="${escapeHtml(sName)}" data-name="${escapeHtml(sName)}" data-id="${s.id || ''}" ${isSel}>${escapeHtml(sName)}</option>`;
       });
 
       const rowDiv = document.createElement('div');
@@ -1367,6 +1454,9 @@
         </div>
       `;
       container.appendChild(rowDiv);
+      if (preselectedService) {
+        mbServiceSelected(rowId);
+      }
     }
 
     function mbServiceSelected(rowId) {
@@ -1374,22 +1464,44 @@
       if (!rowDiv) return;
       const select = rowDiv.querySelector('.mb-svc-select');
       const priceInput = rowDiv.querySelector('.mb-svc-price');
+      if (!select || !priceInput) return;
       
       const opt = select.options[select.selectedIndex];
-      if (!opt || !opt.dataset.name) {
+      if (!opt || !opt.value) {
         priceInput.value = 0;
         mbCalcTotals();
         return;
       }
       
+      const serviceKey = opt.dataset.name || opt.value;
+      const allServices = mbGetServicesMap();
+      const s = allServices[serviceKey] || allServices[opt.value] || Object.values(allServices).find(x => x && (x.name === serviceKey || x.id === opt.value));
+
       const vType = document.getElementById('mb-vtype').value;
       let price = 0;
-      if (vType === 'Hatchback') price = opt.dataset.hatch || opt.dataset.base;
-      else if (vType === 'Sedan') price = opt.dataset.sedan || opt.dataset.base;
-      else if (vType === 'SUV / 4x4' || vType === 'SUV') price = opt.dataset.suv || opt.dataset.base;
-      else if (vType === 'Bike') price = opt.dataset.bike || opt.dataset.base;
-      else price = opt.dataset.base;
+
+      if (s) {
+        const p = s.pricing || {};
+        if (vType === 'Hatchback') {
+          price = (s.hatchback_price !== null && s.hatchback_price !== undefined && s.hatchback_price !== '') ? s.hatchback_price : (p['Hatchback'] !== undefined ? p['Hatchback'] : s.base_price);
+        } else if (vType === 'Sedan') {
+          price = (s.sedan_price !== null && s.sedan_price !== undefined && s.sedan_price !== '') ? s.sedan_price : (p['Sedan'] !== undefined ? p['Sedan'] : s.base_price);
+        } else if (vType === 'SUV / 4x4' || vType === 'SUV') {
+          price = (s.suv_price !== null && s.suv_price !== undefined && s.suv_price !== '') ? s.suv_price : (p['SUV / 4x4'] !== undefined ? p['SUV / 4x4'] : (p['SUV'] !== undefined ? p['SUV'] : s.base_price));
+        } else if (vType === 'Bike' || vType === 'Superbike') {
+          price = (s.bike_price !== null && s.bike_price !== undefined && s.bike_price !== '') ? s.bike_price : (p['Superbike'] !== undefined ? p['Superbike'] : (p['Bike'] !== undefined ? p['Bike'] : s.base_price));
+        } else {
+          price = s.base_price !== undefined ? s.base_price : s.sedan_price;
+        }
+      } else {
+        if (vType === 'Hatchback') price = opt.dataset.hatch || opt.dataset.base;
+        else if (vType === 'Sedan') price = opt.dataset.sedan || opt.dataset.base;
+        else if (vType === 'SUV / 4x4' || vType === 'SUV') price = opt.dataset.suv || opt.dataset.base;
+        else if (vType === 'Bike') price = opt.dataset.bike || opt.dataset.base;
+        else price = opt.dataset.base;
+      }
       
+      price = Number(price) || 0;
       priceInput.value = price;
       mbCalcTotals();
     }
@@ -1399,6 +1511,32 @@
       if (!container) return;
       const rows = container.querySelectorAll('div[id^="mb-row-"]');
       rows.forEach(row => mbServiceSelected(row.id));
+    }
+
+    function mbRefreshAllServiceDropdowns(matrix) {
+      if (matrix && Object.keys(matrix).length > 0) {
+        window._liveServicesMap = matrix;
+      }
+      const container = document.getElementById('mb-services-container');
+      if (!container) return;
+      const rows = container.querySelectorAll('div[id^="mb-row-"]');
+      const services = mbGetServices();
+
+      rows.forEach(row => {
+        const select = row.querySelector('.mb-svc-select');
+        if (!select) return;
+        const currentVal = select.value;
+        let optionsHtml = '<option value="">-- Select Service --</option>';
+        services.forEach(s => {
+          const sName = s.name || s.id;
+          optionsHtml += `<option value="${escapeHtml(sName)}" data-name="${escapeHtml(sName)}" data-id="${s.id || ''}">${escapeHtml(sName)}</option>`;
+        });
+        select.innerHTML = optionsHtml;
+        if (currentVal) {
+          select.value = currentVal;
+          mbServiceSelected(row.id);
+        }
+      });
     }
 
     // Suggested Add-on Products
@@ -1518,15 +1656,15 @@
         addonSubtotal += rowTotal;
       });
 
-      // 3. Subtotal
-      const subtotal = servicesSubtotal + addonSubtotal;
+      // 3. Service Price = Services Subtotal + Add-on Subtotal
+      const servicePrice = servicesSubtotal + addonSubtotal;
 
-      // 4. Discount & Reason
+      // 4. Less Amount (Discount)
       const discountInput = document.getElementById('mb-discount');
       let discount = parseFloat(discountInput ? discountInput.value : 0);
       if (isNaN(discount) || discount < 0) discount = 0;
-      if (discount > subtotal) {
-        discount = subtotal;
+      if (discount > servicePrice) {
+        discount = servicePrice;
         if (discountInput) discountInput.value = discount;
       }
 
@@ -1537,39 +1675,40 @@
         discountReasonRow.style.display = discount > 0 ? 'flex' : 'none';
       }
 
-      // 5. Grand Total
-      const grandTotal = Math.max(0, subtotal - discount);
+      // 5. Final Bill Amount = Service Price − Less Amount
+      const grandTotal = Math.max(0, servicePrice - discount);
 
-      // 6. Payment Status & Amount Paid
+      // 6. Amount Collected & Balance Due
       const payStatusSelect = document.getElementById('mb-pay-status');
-      const payStatus = payStatusSelect ? payStatusSelect.value : 'PAID';
       const payAmtInput = document.getElementById('mb-pay-amount');
-
-      if (payStatus === 'PAID') {
-        if (payAmtInput) {
-          payAmtInput.value = grandTotal;
-          payAmtInput.disabled = true;
-        }
-      } else if (payStatus === 'UNPAID') {
-        if (payAmtInput) {
-          payAmtInput.value = 0;
-          payAmtInput.disabled = true;
-        }
-      } else {
-        if (payAmtInput) payAmtInput.disabled = false;
-      }
 
       let payAmt = parseFloat(payAmtInput ? payAmtInput.value : 0);
       if (isNaN(payAmt) || payAmt < 0) payAmt = 0;
-      if (payStatus !== 'PARTIAL' && payAmt > grandTotal) {
-        payAmt = grandTotal;
-        if (payAmtInput) payAmtInput.value = grandTotal;
+
+      // 7. Balance Due = Final Bill Amount − Amount Collected, never below zero
+      const balanceDue = Math.max(0, grandTotal - payAmt);
+
+      // 8. Payment Status calculation: Show PAID only when full final bill is collected
+      let payStatus = 'UNPAID';
+      if (grandTotal > 0 && payAmt >= grandTotal) {
+        payStatus = 'PAID';
+      } else if (grandTotal === 0 && payAmt === 0 && (servicePrice > 0 || discount > 0)) {
+        payStatus = 'PAID';
+      } else if (payAmt > 0 && payAmt < grandTotal) {
+        payStatus = 'PARTIAL';
+      } else {
+        payStatus = 'UNPAID';
       }
 
-      // 7. Less Amount & Internal Balance Calculation
-      const balanceDue = Math.max(0, grandTotal - payAmt);
+      if (payStatusSelect && !window._userExplicitStatusChange) {
+        payStatusSelect.value = payStatus;
+      }
+
       const balanceDueEl = document.getElementById('mb-balance-due');
-      if (balanceDueEl) balanceDueEl.value = discount > 0 ? '-₹' + discount.toLocaleString() : '₹0';
+      if (balanceDueEl) {
+        balanceDueEl.value = '₹' + balanceDue.toLocaleString('en-IN');
+        balanceDueEl.style.color = balanceDue === 0 ? '#15803d' : '#ef4444';
+      }
 
       // Update Section Inlines
       const svcSubDisp = document.getElementById('mb-svc-subtotal-disp');
@@ -1588,7 +1727,7 @@
       const sumAddon = document.getElementById('mb-summary-addon');
       if (sumAddon) sumAddon.innerText = '₹' + addonSubtotal.toLocaleString();
       const sumSub = document.getElementById('mb-subtotal');
-      if (sumSub) sumSub.innerText = '₹' + subtotal.toLocaleString();
+      if (sumSub) sumSub.innerText = '₹' + servicePrice.toLocaleString();
       const sumGrand = document.getElementById('mb-grandtotal');
       if (sumGrand) sumGrand.innerText = '₹' + grandTotal.toLocaleString();
 
@@ -1608,23 +1747,37 @@
       const sumPaidAmt = document.getElementById('mb-summary-paidamt');
       if (sumPaidAmt) sumPaidAmt.innerText = '₹' + payAmt.toLocaleString();
       const sumBalance = document.getElementById('mb-summary-balance');
-      if (sumBalance) sumBalance.innerText = discount > 0 ? '-₹' + discount.toLocaleString() : '₹0';
+      if (sumBalance) {
+        sumBalance.innerText = '₹' + balanceDue.toLocaleString('en-IN');
+        sumBalance.style.color = balanceDue === 0 ? '#15803d' : '#ef4444';
+      }
 
       mbUpdateAdditionalInfo();
 
       return {
         servicesSubtotal,
         addonSubtotal,
-        subtotal,
-        original_price: subtotal,
-        originalPrice: subtotal,
+        subtotal: servicePrice,
+        service_price: servicePrice,
+        servicePrice: servicePrice,
+        original_price: servicePrice,
+        originalPrice: servicePrice,
         discount,
+        lessAmount: discount,
+        less_amount: discount,
         discount_reason: discountReason,
         discountReason: discountReason,
         grandTotal,
         grand_total: grandTotal,
+        final_bill_amount: grandTotal,
+        finalBillAmount: grandTotal,
+        amount_collected: payAmt,
+        amountCollected: payAmt,
+        amount_paid: payAmt,
         balanceDue,
-        payAmt
+        balance_due: balanceDue,
+        payAmt,
+        paymentStatus: payStatus
       };
     }
 
@@ -1644,17 +1797,27 @@
       }
     }
 
-    function mbHandlePaymentChange() {
-      const payStatus = document.getElementById('mb-pay-status').value;
+    function mbHandlePaymentStatusChange() {
+      const payStatusSelect = document.getElementById('mb-pay-status');
       const payAmtInput = document.getElementById('mb-pay-amount');
-      if (payStatus === 'PAID' || payStatus === 'UNPAID') {
-        payAmtInput.disabled = true;
+      if (!payStatusSelect || !payAmtInput) return;
+
+      const selStatus = payStatusSelect.value;
+      window._userExplicitStatusChange = true;
+      const totals = mbCalcTotals();
+      if (selStatus === 'PAID') {
+        payAmtInput.value = totals.grandTotal;
+      } else if (selStatus === 'UNPAID') {
+        payAmtInput.value = 0;
       } else {
-        payAmtInput.disabled = false;
-        payAmtInput.focus();
+        if (parseFloat(payAmtInput.value || 0) === 0 || parseFloat(payAmtInput.value || 0) >= totals.grandTotal) {
+          payAmtInput.focus();
+        }
       }
+      window._userExplicitStatusChange = false;
       mbCalcTotals();
     }
+    const mbHandlePaymentChange = mbHandlePaymentStatusChange;
 
     async function makeBill() {
       const name = document.getElementById('mb-name').value.trim();
@@ -1963,6 +2126,12 @@
       const amtPaidEl = document.getElementById('inv-amt-paid');
       if (amtPaidEl) amtPaidEl.innerText = '₹' + metrics.amountCollected.toLocaleString('en-IN');
       
+      const balDueEl = document.getElementById('inv-balance-due');
+      if (balDueEl) {
+        balDueEl.innerText = '₹' + metrics.balanceDue.toLocaleString('en-IN');
+        balDueEl.style.color = metrics.balanceDue === 0 ? '#15803d' : '#dc2626';
+      }
+      
       const grandtotalEl = document.getElementById('inv-grandtotal');
       const finalLabelEl = document.getElementById('inv-final-label');
       const payStatusEl = document.getElementById('inv-pay-status');
@@ -2018,7 +2187,10 @@
         if (aReas) aReas.innerText = metrics.discountReason || (metrics.discountAmount > 0 ? 'Not specified' : 'None');
         if (aFin) aFin.innerText = '₹' + metrics.finalBillAmount.toLocaleString('en-IN');
         if (aCol) aCol.innerText = '₹' + metrics.amountCollected.toLocaleString('en-IN');
-        if (aBal) aBal.innerText = metrics.lessAmount > 0 ? ('- ₹' + metrics.lessAmount.toLocaleString('en-IN')) : '₹0';
+        if (aBal) {
+          aBal.innerText = '₹' + metrics.balanceDue.toLocaleString('en-IN');
+          aBal.style.color = metrics.balanceDue === 0 ? '#a3e635' : '#ef4444';
+        }
         if (aStat) {
           aStat.innerText = metrics.paymentStatus;
           aStat.style.color = metrics.isPaid ? '#a3e635' : (metrics.isPartial ? '#fbbf24' : '#f87171');
@@ -2057,7 +2229,7 @@
                           window.location.hostname.startsWith('192.168.') ||
                           window.location.protocol === 'file:';
       const baseOrigin = isLocalHost ? window.location.origin : 'https://trieye-website.vercel.app';
-      const url = `${baseOrigin}/invoice?token=${encodeURIComponent(shareToken)}&payStatus=${encodeURIComponent(metrics.paymentStatus)}&amtCollected=${encodeURIComponent(metrics.amountCollected)}&payMethod=${encodeURIComponent(metrics.paymentMethod)}`;
+      const url = `${baseOrigin}/invoice?token=${encodeURIComponent(shareToken)}&payStatus=${encodeURIComponent(metrics.paymentStatus)}&amtCollected=${encodeURIComponent(metrics.amountCollected)}&balanceDue=${encodeURIComponent(metrics.balanceDue)}&payMethod=${encodeURIComponent(metrics.paymentMethod)}`;
       window.open(url, '_blank');
     }
 
@@ -2125,6 +2297,7 @@
       const invoiceUrl = shareToken ? `${baseOrigin}/invoice?token=${encodeURIComponent(shareToken)}` : '';
 
       const lessText = metrics.lessAmount > 0 ? `₹${metrics.lessAmount.toLocaleString('en-IN')}` : '₹0';
+      const balText = `₹${metrics.balanceDue.toLocaleString('en-IN')}`;
       let paymentDetailsText = '';
       if (metrics.isPaid) {
         paymentDetailsText = 
@@ -2132,6 +2305,7 @@
 *Less Amount:* ${lessText}
 *Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
+*Balance Due:* ${balText}
 *Payment Status:* ✅ PAID (${formatPaymentMethod(metrics.paymentMethod)})`;
       } else if (metrics.isPartial) {
         paymentDetailsText = 
@@ -2139,6 +2313,7 @@
 *Less Amount:* ${lessText}
 *Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
+*Balance Due:* ${balText}
 *Payment Status:* ⚠️ PARTIAL (${formatPaymentMethod(metrics.paymentMethod)})`;
       } else {
         paymentDetailsText = 
@@ -2146,6 +2321,7 @@
 *Less Amount:* ${lessText}
 *Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
 *Amount Collected:* ₹0
+*Balance Due:* ${balText}
 *Payment Status:* ❌ UNPAID`;
       }
 
@@ -2177,17 +2353,27 @@ TRIEYE DETAILING
       // 1. Check admin authentication
       await checkAdminAuth();
 
-      // 2. Initialize 1 default service row
+      // 2. Fetch and hydrate authoritative services catalog
+      if (window.TrieyeDB && typeof window.TrieyeDB.getServices === 'function') {
+        try {
+          const liveServices = await window.TrieyeDB.getServices(defaultServices);
+          if (liveServices && Object.keys(liveServices).length > 0) {
+            window._liveServicesMap = liveServices;
+          }
+        } catch (e) {}
+      }
+
+      // 3. Initialize 1 default service row
       mbAddServiceRow();
 
-      // 3. Ensure upsell products container starts empty
+      // 4. Ensure upsell products container starts empty
       const prodContainer = document.getElementById('mb-products-container');
       if (prodContainer) {
         prodContainer.innerHTML = '';
       }
       mbCalcTotals();
 
-      // 4. Attach vehicle registration formatter & validator
+      // 5. Attach vehicle registration formatter & validator
       const mbRegInput = document.getElementById('mb-reg');
       const mbError = document.getElementById('mb-error');
       if (mbRegInput) {
@@ -2204,6 +2390,23 @@ TRIEYE DETAILING
           });
         }
       }
+
+      // 6. Real-time pricing sync across tabs/updates
+      if (window.TrieyeDB && typeof window.TrieyeDB.subscribePricing === 'function') {
+        window.TrieyeDB.subscribePricing((matrix) => {
+          mbRefreshAllServiceDropdowns(matrix);
+        });
+      }
+      try {
+        if (typeof BroadcastChannel !== 'undefined') {
+          const syncChan = new BroadcastChannel('trieye_pricing_sync');
+          syncChan.onmessage = (msg) => {
+            if (msg.data && msg.data.type === 'PRICING_UPDATED' && msg.data.matrix) {
+              mbRefreshAllServiceDropdowns(msg.data.matrix);
+            }
+          };
+        }
+      } catch (e) {}
     });
   </script>
 </body>

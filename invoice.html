@@ -641,6 +641,10 @@
             <span>Amount Collected</span>
             <span class="mono" id="amount-collected" style="font-weight:600; color:var(--text);">₹0</span>
           </div>
+          <div class="total-row" id="row-balance-due">
+            <span style="font-weight:600;">Balance Due</span>
+            <span class="mono" id="balance-due" style="font-weight:700; color:#ef4444;">₹0</span>
+          </div>
           <div class="total-row grand-total" id="row-final-paid">
             <span id="final-amount-label">Paid Amount</span>
             <span class="grand-total-num mono" id="grand-total">₹0</span>
@@ -707,26 +711,33 @@
         // Check for verified payment params passed from dashboard
         const paramPayStatus = (params.get('payStatus') || '').toUpperCase();
         const paramAmtCollected = Number(params.get('amtCollected') || 0);
+        const paramBalanceDue = params.has('balanceDue') ? Number(params.get('balanceDue')) : null;
         const paramPayMethod = params.get('payMethod');
         if (paramPayStatus === 'PAID') {
-          if (!inv.amount_collected || inv.amount_collected === 0 || inv.payment_status === 'UNPAID') {
-            inv.payment_status = 'PAID';
-            inv.status = 'PAID';
+          inv.payment_status = 'PAID';
+          inv.status = 'PAID';
+          if (paramAmtCollected > 0 || !inv.amount_collected) {
             inv.amount_collected = paramAmtCollected > 0 ? paramAmtCollected : (inv.final_bill_amount || inv.grand_total || inv.total_amount || 0);
-            inv.paid_amount = inv.amount_collected;
-            inv.balance_due = 0;
-            if (paramPayMethod) inv.payment_method = paramPayMethod;
           }
+          inv.paid_amount = inv.amount_collected;
+          inv.balance_due = 0;
+          if (paramPayMethod) inv.payment_method = paramPayMethod;
         } else if (paramPayStatus === 'PARTIAL') {
-          if (!inv.amount_collected || inv.amount_collected === 0 || inv.payment_status === 'UNPAID') {
-            inv.payment_status = 'PARTIAL';
-            inv.status = 'PARTIAL';
-            inv.amount_collected = paramAmtCollected > 0 ? paramAmtCollected : (inv.amount_collected || 0);
-            inv.paid_amount = inv.amount_collected;
-            const fin = Number(inv.final_bill_amount || inv.grand_total || inv.total_amount || 0);
-            inv.balance_due = Math.max(0, fin - inv.amount_collected);
-            if (paramPayMethod) inv.payment_method = paramPayMethod;
-          }
+          inv.payment_status = 'PARTIAL';
+          inv.status = 'PARTIAL';
+          inv.amount_collected = paramAmtCollected;
+          inv.paid_amount = inv.amount_collected;
+          const fin = Number(inv.final_bill_amount || inv.grand_total || inv.total_amount || 0);
+          inv.balance_due = paramBalanceDue !== null ? paramBalanceDue : Math.max(0, fin - inv.amount_collected);
+          if (paramPayMethod) inv.payment_method = paramPayMethod;
+        } else if (paramPayStatus === 'UNPAID') {
+          inv.payment_status = 'UNPAID';
+          inv.status = 'UNPAID';
+          inv.amount_collected = 0;
+          inv.paid_amount = 0;
+          const fin = Number(inv.final_bill_amount || inv.grand_total || inv.total_amount || 0);
+          inv.balance_due = paramBalanceDue !== null ? paramBalanceDue : fin;
+          if (paramPayMethod) inv.payment_method = paramPayMethod;
         }
 
         const biz = inv.business || {};
@@ -819,7 +830,14 @@
         // 4. Amount Collected
         document.getElementById('amount-collected').innerText = '₹' + metrics.amountCollected.toLocaleString('en-IN');
 
-        // 5. Paid Amount / Final Payable
+        // 5. Balance Due
+        const balDueEl = document.getElementById('balance-due');
+        if (balDueEl) {
+          balDueEl.innerText = '₹' + metrics.balanceDue.toLocaleString('en-IN');
+          balDueEl.style.color = metrics.balanceDue === 0 ? '#15803d' : '#ef4444';
+        }
+
+        // 6. Paid Amount / Final Payable
         const finalLabelEl = document.getElementById('final-amount-label');
         const grandTotalEl = document.getElementById('grand-total');
         const payStatusEl = document.getElementById('pay-status');
