@@ -1,40 +1,67 @@
-# TRIEYE Website — Automatic Git Workflow & Production Rules
+# TRIEYE Website — Automatic Git & Vercel Production Workflow
 
 For ALL tasks on the TRIEYE website project:
 
-## Repository Info
+## Repository & Deployment Info
 - **Project Directory:** `/Users/apple/Documents/Trieye`
 - **Remote:** `https://github.com/deeofical2040-dee/trieye-website.git`
-- **Branch:** `main`
+- **Production Branch:** `main`
+- **Vercel Website:** `https://trieye-website.vercel.app`
 
 ---
 
-## Automatic Git Workflow
+## Automatic Git Push & Vercel Deployment Workflow
 After completing ANY requested website changes:
 
-1. **Implement & Verify**: Complete the requested changes and test/verify correctness.
-2. **Check Git Status**: Inspect `git status`.
-3. **Exclude Temporary/Test Files**:
-   - Never stage `scratch/`, test scripts, temporary screenshots, debug files, or generated test artifacts.
+1. **Implement & Build**:
+   - Complete requested changes with precision.
+   - Run `npm run build` to synchronize assets and distribution files.
+
+2. **Run Tests & Verify**:
+   - Run relevant test suites (`npm test` and any task-specific tests).
+   - **Enforcement**: If tests or build fail, **DO NOT PUSH**. Fix the issue and retry until 100% passing.
+
+3. **Check Git Status & Exclude Temporary/Test Files**:
+   - Inspect `git status`.
+   - **NEVER** stage `scratch/`, test scripts, temporary screenshots, debug files, or generated test artifacts.
    - Ensure `scratch/` is always ignored.
-4. **Stage Production Files**: `git add -A` (verify staged files and unstage any non-production artifacts).
-5. **Commit**: Create a meaningful, descriptive commit message based on the work done (e.g., `"Improve Studio Gallery carousel"`, `"Fix mobile responsive layout"`, `"Update TRIEYE website features and UI"`). Never use `"update"`, `"changes"`, etc.
-6. **Sync & Rebase**: Run `git pull --rebase origin main` before pushing. If conflicts occur, STOP immediately and show conflicting files. Never force-resolve blindly.
-7. **Push**: Run `git push origin main`.
-8. **Show Summary**: Output the standard success message format:
+
+4. **Stage Production Files**:
+   - `git add -A` (verify staged files and unstage any non-production artifacts).
+
+5. **Commit**:
+   - Create a meaningful, descriptive commit message based on the work done (e.g., `"Update TRIEYE Monthly Car Care Package workflow and dashboard redemption without QR"`, `"Add automated deployment verification script"`).
+   - Never use `"update"`, `"changes"`, etc.
+
+6. **Sync & Rebase**:
+   - Run `git pull --rebase origin main` before pushing.
+   - If conflicts occur, STOP immediately and show conflicting files. Never force-resolve blindly.
+
+7. **Push to GitHub `main`**:
+   - Run `git push origin main`.
+   - GitHub `main` push triggers automatic Vercel production deployment.
+
+8. **Verify Vercel Production Deployment**:
+   - Run `node scripts/verify-deployment.js` (or `npm run verify-deploy`) to verify that the live production site (`https://trieye-website.vercel.app`) serves HTTP 200 and renders the updated changes.
+   - **NEVER claim deployment succeeded unless verified.**
+
+9. **Output Standard Summary Block**:
 
 ```text
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-✅ TRIEYE — GITHUB UPDATED
+✅ TRIEYE — GITHUB & VERCEL UPDATED
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 Task: <Task Description>
 Branch: main
 Commit: <short commit hash>
-Status: Successfully pushed to GitHub
+Git Status: Successfully pushed to GitHub
+Build & Tests: PASSED (<details>)
+Vercel Deployment: LIVE (HTTP 200 verified)
+Live URL: https://trieye-website.vercel.app
 Scratch/Test files: Not included
 
-🚀 Latest changes are now on origin/main.
+🚀 Latest changes are live in production.
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 ```
 
@@ -42,14 +69,8 @@ Also list the modified production files.
 
 ---
 
-## Vercel Deployment Safety Rules
-- **NEVER** manually deploy, click Deploy, trigger production deployments, or modify Vercel configuration/settings without explicit user approval.
-- **Pre-Push Warning**: Before pushing to `origin/main` on GitHub, always notify and warn the user that pushing to `main` may automatically trigger a live production build/deployment on the connected Vercel project (`trieye-website.vercel.app`).
-- Keep all verification focused strictly on local testing and GitHub sync unless explicit Vercel deployment authorization is granted.
-
----
-
 ## Safety & Security Rules
+- **NEVER** overwrite or delete existing user changes.
 - **NEVER** use `git push --force`, `git push --force-with-lease`, or `git reset --hard` without explicit user confirmation.
 - **NEVER** push secrets, API secret keys, service_role keys, passwords, or personal access tokens.
 - **NEVER** put credentials or tokens in code, URLs, or terminal logs.
