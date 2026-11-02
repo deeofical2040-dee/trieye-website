@@ -770,6 +770,11 @@
         </div>
       </button>
 
+      <a href="/dashboard?sec=packages-sec" class="btn btn-outline" style="border-color:rgba(238,47,118,0.4); color:var(--magenta);" title="Monthly Car Care Packages & Wash Redemption">
+        <span>📦</span>
+        <span>Packages</span>
+      </a>
+
       <a href="/dashboard" class="btn btn-outline" title="Return to Admin Dashboard">
         <span>📊</span>
         <span>Dashboard</span>
@@ -1384,6 +1389,29 @@
           'Sedan': 97,
           'SUV / 4x4': 84,
           'Superbike': 60
+        },
+        active: true
+      },
+      'Monthly Car Care Package': {
+        name: 'Monthly Car Care Package',
+        desc: '30-Day Package: 1 Complete Wash + 2 Basic Washes + 2 Outer Foam Washes',
+        duration_minutes: 60,
+        base_price: 2499,
+        hatchback_price: 1999,
+        sedan_price: 2499,
+        suv_price: 2999,
+        bike_price: 999,
+        pricing: {
+          'Hatchback': 1999,
+          'Sedan': 2499,
+          'SUV / 4x4': 2999,
+          'Superbike': 999
+        },
+        is_package: true,
+        package_washes: {
+          complete: 1,
+          basic: 2,
+          outer_foam: 2
         },
         active: true
       }

@@ -2272,7 +2272,9 @@
       body * {
         visibility: hidden !important;
       }
-      #invoiceModal, #invoiceModal * {
+      #invoiceModal, #invoiceModal *,
+      #modalRedemptionReceipt, #modalRedemptionReceipt *,
+      #redemption-receipt-print-area, #redemption-receipt-print-area * {
         visibility: visible !important;
       }
       #invoiceModal {
@@ -2290,7 +2292,23 @@
         padding: 0 !important;
         background: #ffffff !important;
       }
-      #printable-invoice {
+      #modalRedemptionReceipt {
+        position: static !important;
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        max-height: none !important;
+        height: auto !important;
+        overflow: visible !important;
+        box-shadow: none !important;
+        border: none !important;
+        transform: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #ffffff !important;
+      }
+      #printable-invoice,
+      #redemption-receipt-print-area {
         display: block !important;
         width: 100% !important;
         max-width: 100% !important;
@@ -2304,6 +2322,7 @@
         border: none !important;
       }
       #invoiceModal > div:first-child,
+      #modalRedemptionReceipt > div > div:first-child,
       .invoice-modal-header,
       .invoice-modal-actions,
       .admin-audit-card,
@@ -2311,7 +2330,8 @@
       #walkin-admin-audit-box,
       .auth-overlay,
       .modal-backdrop,
-      .modal-overlay {
+      .modal-overlay,
+      .dash-modal-backdrop {
         display: none !important;
         visibility: hidden !important;
       }
@@ -2484,6 +2504,9 @@
               <span>⚡ Walk-In Billing</span>
               <span style="font-size:0.75rem; opacity:0.8;">↗</span>
             </a>
+          </li>
+          <li class="nav-item" id="nav-packages" onclick="showSection('packages-sec')">
+            <a><span>📦 Car Care Packages</span><span class="nav-counter" id="badge-packages-count" style="display:none;">0</span></a>
           </li>
         </ul>
       </div>
@@ -2741,6 +2764,215 @@
               </thead>
               <tbody id="online-bookings-tbody">
                 <!-- Injected via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. MONTHLY CAR CARE PACKAGES & WASH REDEMPTION SECTION (NO QR CODE) -->
+      <section class="content-section" id="packages-sec">
+        <div class="section-header">
+          <div>
+            <div class="section-title"><span>📦</span> Monthly Car Care Packages</div>
+            <div class="section-subtitle">Staff wash redemption portal, customer wash balance management, and redemption receipts</div>
+          </div>
+          <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="openNewPackageModal()" style="display:flex; align-items:center; gap:0.4rem;">
+              <span>+</span>
+              <span>New Package Purchase</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- SEARCH BAR & FILTERS -->
+        <div class="panel" style="margin-bottom:1.5rem;">
+          <div class="panel-body" style="padding:1.25rem;">
+            <div style="display:flex; gap:0.75rem; flex-wrap:wrap; align-items:center;">
+              <div style="position:relative; flex:1; min-width:280px;">
+                <input type="text" id="pkg-search-input" class="form-input" placeholder="🔍 Search customer by Mobile Number, Vehicle Number, or Package ID..." style="padding-left:1rem; font-size:0.95rem;" oninput="handlePackageSearchInput()" onkeydown="if(event.key==='Enter') executePackageSearch()">
+              </div>
+              <button class="btn btn-primary" onclick="executePackageSearch()" style="padding:0.6rem 1.25rem;">Search</button>
+              <button class="btn btn-outline" onclick="clearPackageSearch()" style="padding:0.6rem 1rem;">Clear</button>
+            </div>
+            <div style="display:flex; gap:0.5rem; margin-top:0.85rem; flex-wrap:wrap; align-items:center;">
+              <span style="font-size:0.75rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin-right:0.25rem;">Filter:</span>
+              <button class="btn btn-outline btn-filter-pkg active" data-filter="ALL" onclick="filterPackagesList('ALL', this)" style="padding:0.25rem 0.75rem; font-size:0.78rem;">All Packages</button>
+              <button class="btn btn-outline btn-filter-pkg" data-filter="ACTIVE" onclick="filterPackagesList('ACTIVE', this)" style="padding:0.25rem 0.75rem; font-size:0.78rem;">Active</button>
+              <button class="btn btn-outline btn-filter-pkg" data-filter="EXPIRED" onclick="filterPackagesList('EXPIRED', this)" style="padding:0.25rem 0.75rem; font-size:0.78rem;">Expired</button>
+              <button class="btn btn-outline btn-filter-pkg" data-filter="EXHAUSTED" onclick="filterPackagesList('EXHAUSTED', this)" style="padding:0.25rem 0.75rem; font-size:0.78rem;">Exhausted</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACTIVE PACKAGE REDEMPTION WORKSPACE (Shown when a package is selected or searched) -->
+        <div id="pkg-active-workspace" style="display:none; margin-bottom:1.75rem;">
+          <div class="panel" style="border:1px solid rgba(238,47,118,0.3); box-shadow:0 8px 30px rgba(0,0,0,0.35);">
+            <div class="panel-header" style="background:linear-gradient(90deg, rgba(238,47,118,0.1) 0%, rgba(30,41,59,0.3) 100%); border-bottom:1px solid rgba(238,47,118,0.2);">
+              <div style="display:flex; justify-content:space-between; align-items:center; width:100%; flex-wrap:wrap; gap:0.75rem;">
+                <div style="display:flex; align-items:center; gap:0.75rem;">
+                  <span style="font-size:1.4rem;">📦</span>
+                  <div>
+                    <div style="font-family:'Oswald',sans-serif; font-size:1.15rem; letter-spacing:0.04em; color:#fff;" id="pkg-view-name">Monthly Car Care Package</div>
+                    <div style="font-size:0.8rem; color:var(--muted); font-family:'IBM Plex Mono';">Package ID: <strong id="pkg-view-code" style="color:#38bdf8;">TRI-PKG-10492</strong></div>
+                  </div>
+                </div>
+                <div style="display:flex; align-items:center; gap:0.6rem;">
+                  <span id="pkg-view-status-badge" class="status-badge conf">ACTIVE</span>
+                  <button class="btn btn-outline" onclick="closeActivePackageView()" style="padding:0.3rem 0.6rem; font-size:0.75rem;">✕ Close View</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel-body" style="padding:1.5rem;">
+              <!-- Customer & Vehicle Info Grid -->
+              <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:1rem; padding:1rem; background:rgba(255,255,255,0.03); border:1px solid var(--line); border-radius:8px; margin-bottom:1.5rem;">
+                <div>
+                  <div style="font-size:0.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em;">Customer</div>
+                  <div style="font-weight:700; font-size:1rem; color:#fff; margin-top:2px;" id="pkg-view-cust-name">-</div>
+                  <div style="font-size:0.82rem; color:var(--muted); font-family:'IBM Plex Mono';" id="pkg-view-cust-phone">-</div>
+                </div>
+                <div>
+                  <div style="font-size:0.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em;">Vehicle Registered</div>
+                  <div style="font-weight:700; font-size:1rem; color:#fff; font-family:'IBM Plex Mono'; margin-top:2px;" id="pkg-view-veh-reg">-</div>
+                  <div style="font-size:0.82rem; color:var(--magenta);" id="pkg-view-veh-type">Car</div>
+                </div>
+                <div>
+                  <div style="font-size:0.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em;">Package Validity</div>
+                  <div style="font-weight:600; font-size:0.95rem; color:#fff; margin-top:2px;" id="pkg-view-dates">Purchased: -</div>
+                  <div style="font-size:0.82rem; color:#a3e635; font-family:'IBM Plex Mono';" id="pkg-view-days-left">Expires in - days</div>
+                </div>
+              </div>
+
+              <!-- Remaining Washes Display (3 Categories) -->
+              <div style="margin-bottom:1.5rem;">
+                <div style="font-size:0.82rem; font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:0.05em; color:var(--muted); margin-bottom:0.75rem;">
+                  Remaining Wash Allowances
+                </div>
+                <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:1rem;">
+                  <!-- Complete Wash Card -->
+                  <div class="pkg-wash-balance-card" id="card-bal-complete" style="padding:1.1rem; border-radius:10px; background:rgba(34,197,94,0.06); border:1px solid rgba(34,197,94,0.3); text-align:center;">
+                    <div style="font-size:1.75rem; margin-bottom:0.25rem;">🚗</div>
+                    <div style="font-size:0.85rem; font-weight:700; color:#fff;">Complete Wash</div>
+                    <div style="font-family:'IBM Plex Mono'; font-size:2rem; font-weight:800; color:#22c55e; margin:0.35rem 0;" id="pkg-bal-complete">0</div>
+                    <div style="font-size:0.72rem; color:var(--muted);">remaining this month</div>
+                  </div>
+
+                  <!-- Basic Wash Card -->
+                  <div class="pkg-wash-balance-card" id="card-bal-basic" style="padding:1.1rem; border-radius:10px; background:rgba(56,189,248,0.06); border:1px solid rgba(56,189,248,0.3); text-align:center;">
+                    <div style="font-size:1.75rem; margin-bottom:0.25rem;">🚿</div>
+                    <div style="font-size:0.85rem; font-weight:700; color:#fff;">Basic Wash</div>
+                    <div style="font-family:'IBM Plex Mono'; font-size:2rem; font-weight:800; color:#38bdf8; margin:0.35rem 0;" id="pkg-bal-basic">0</div>
+                    <div style="font-size:0.72rem; color:var(--muted);">remaining this month</div>
+                  </div>
+
+                  <!-- Outer Foam Wash Card -->
+                  <div class="pkg-wash-balance-card" id="card-bal-outer" style="padding:1.1rem; border-radius:10px; background:rgba(238,47,118,0.06); border:1px solid rgba(238,47,118,0.3); text-align:center;">
+                    <div style="font-size:1.75rem; margin-bottom:0.25rem;">🫧</div>
+                    <div style="font-size:0.85rem; font-weight:700; color:#fff;">Outer Foam Wash</div>
+                    <div style="font-family:'IBM Plex Mono'; font-size:2rem; font-weight:800; color:#ee2f76; margin:0.35rem 0;" id="pkg-bal-outer">0</div>
+                    <div style="font-size:0.72rem; color:var(--muted);">remaining this month</div>
+                  </div>
+                </div>
+
+                <!-- Total Balance Bar -->
+                <div style="margin-top:0.75rem; padding:0.6rem 1rem; background:rgba(255,255,255,0.02); border:1px dashed var(--line); border-radius:6px; display:flex; justify-content:space-between; align-items:center;">
+                  <span style="font-size:0.85rem; color:var(--muted);">Total Available Washes Remaining:</span>
+                  <strong style="font-family:'IBM Plex Mono'; font-size:1.1rem; color:#fff;" id="pkg-bal-total">0 Washes</strong>
+                </div>
+              </div>
+
+              <!-- REDEEM WASH ACTION PANEL -->
+              <div style="background:rgba(24,24,27,0.7); border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:1.25rem; margin-bottom:1.5rem;">
+                <div style="font-family:'Oswald',sans-serif; font-size:1.05rem; letter-spacing:0.04em; color:#a3e635; margin-bottom:0.35rem; display:flex; align-items:center; gap:0.4rem;">
+                  <span>⚡</span> REDEEM WASH TODAY
+                </div>
+                <div style="font-size:0.8rem; color:var(--muted); margin-bottom:1rem;">
+                  Select the wash used by the customer today. System will deduct 1 wash from their allowance and generate an updated receipt.
+                </div>
+
+                <div class="form-grid" style="grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:1rem; margin-bottom:1rem;">
+                  <div class="form-group">
+                    <label class="form-label" style="color:#fff; font-weight:600;">Wash Category to Deduct *</label>
+                    <select class="form-select" id="pkg-redeem-category" style="font-weight:600;">
+                      <option value="complete">Complete Wash</option>
+                      <option value="basic">Basic Wash</option>
+                      <option value="outer_foam">Outer Foam Wash</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Today's Payable Amount (₹)</label>
+                    <input type="number" id="pkg-redeem-payable" class="form-input" value="0" min="0" placeholder="0">
+                    <span style="font-size:0.7rem; color:var(--muted); margin-top:2px;">₹0 for package wash. Enter extra amount only if add-ons/services were added.</span>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Staff Notes (Optional)</label>
+                    <input type="text" id="pkg-redeem-notes" class="form-input" placeholder="e.g. Bay 02, exterior pre-wash">
+                  </div>
+                </div>
+
+                <div style="display:flex; justify-content:flex-end;">
+                  <button type="button" class="btn btn-primary" id="btn-redeem-wash" onclick="executeRedeemWash()" style="padding:0.75rem 2rem; font-size:1rem; font-weight:700; background:#22c55e; border-color:#22c55e; display:flex; align-items:center; gap:0.5rem;">
+                    <span>🧼</span>
+                    <span>Redeem Wash</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Package Redemption History Table -->
+              <div>
+                <div style="font-family:'Oswald',sans-serif; font-size:0.95rem; letter-spacing:0.04em; color:var(--muted); margin-bottom:0.6rem; display:flex; justify-content:space-between; align-items:center;">
+                  <span>📜 Redemption History for this Package</span>
+                  <span id="pkg-history-count" style="font-family:'IBM Plex Mono'; font-size:0.78rem;">0 Redemptions</span>
+                </div>
+                <div class="table-wrap">
+                  <table class="trieye-table" style="font-size:0.82rem;">
+                    <thead>
+                      <tr>
+                        <th>Receipt #</th>
+                        <th>Date &amp; Time</th>
+                        <th>Wash Redeemed</th>
+                        <th>Balance Snapshot (Complete / Basic / Outer)</th>
+                        <th>Paid Today</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody id="pkg-history-tbody">
+                      <tr><td colspan="6" style="text-align:center; color:var(--muted); padding:1.25rem;">No redemptions recorded for this package yet.</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ALL PACKAGES DIRECTORY TABLE -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><span>📋</span> Car Care Packages Directory</div>
+            <div style="font-family:'IBM Plex Mono'; font-size:0.82rem; color:var(--muted);" id="pkg-directory-count">0 packages recorded</div>
+          </div>
+          <div class="table-wrap">
+            <table class="trieye-table">
+              <thead>
+                <tr>
+                  <th>Package ID</th>
+                  <th>Customer</th>
+                  <th>Vehicle</th>
+                  <th>Complete Left</th>
+                  <th>Basic Left</th>
+                  <th>Outer Foam Left</th>
+                  <th>Total Left</th>
+                  <th>Expiry Date</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="pkg-directory-tbody">
+                <tr><td colspan="10" style="text-align:center; color:var(--muted); padding:2rem;">Loading packages...</td></tr>
               </tbody>
             </table>
           </div>
@@ -3542,6 +3774,192 @@
     </div>
   </div>
 
+  <!-- NEW PACKAGE PURCHASE MODAL (NO QR CODE) -->
+  <div class="dash-modal-backdrop" id="modalNewPackage">
+    <div class="dash-modal" style="max-width:520px;">
+      <div class="dash-modal-header">
+        <div class="dash-modal-title"><span>📦</span> Issue Monthly Car Care Package</div>
+        <button class="dash-modal-close" onclick="closeModal('modalNewPackage')">&times;</button>
+      </div>
+      <div class="dash-modal-body">
+        <form id="newPackageForm" onsubmit="event.preventDefault(); handleNewPackageSubmit();">
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label class="form-label">Customer Mobile Number *</label>
+            <input type="tel" id="npkg-phone" class="form-input" placeholder="9876543210" maxlength="10" required oninput="handleNewPackagePhoneInput()">
+          </div>
+
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label class="form-label">Customer Name *</label>
+            <input type="text" id="npkg-name" class="form-input" placeholder="Customer Name" required>
+          </div>
+
+          <div class="form-grid" style="grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:1rem;">
+            <div class="form-group">
+              <label class="form-label">Vehicle Registration *</label>
+              <input type="text" id="npkg-reg" class="form-input" placeholder="TN 01 AB 1234" maxlength="13" required style="text-transform:uppercase;">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Vehicle Type *</label>
+              <select class="form-select" id="npkg-vtype" onchange="updateNewPackagePrice()">
+                <option value="Hatchback">Hatchback</option>
+                <option value="Sedan" selected>Sedan</option>
+                <option value="SUV / 4x4">SUV</option>
+                <option value="Bike">Bike</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="background:rgba(255,255,255,0.03); border:1px solid var(--line); border-radius:8px; padding:12px; margin-bottom:1rem;">
+            <div style="font-size:0.75rem; color:#38bdf8; text-transform:uppercase; font-family:'IBM Plex Mono'; font-weight:700; margin-bottom:6px;">
+              Included Monthly Wash Allocations (30 Days)
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; text-align:center;">
+              <div style="background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.3); border-radius:6px; padding:6px;">
+                <div style="font-size:0.75rem; color:var(--muted);">Complete</div>
+                <strong style="color:#22c55e; font-size:1.1rem; font-family:'IBM Plex Mono';" id="npkg-alloc-complete">1</strong>
+              </div>
+              <div style="background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.3); border-radius:6px; padding:6px;">
+                <div style="font-size:0.75rem; color:var(--muted);">Basic</div>
+                <strong style="color:#38bdf8; font-size:1.1rem; font-family:'IBM Plex Mono';" id="npkg-alloc-basic">2</strong>
+              </div>
+              <div style="background:rgba(238,47,118,0.1); border:1px solid rgba(238,47,118,0.3); border-radius:6px; padding:6px;">
+                <div style="font-size:0.75rem; color:var(--muted);">Outer Foam</div>
+                <strong style="color:#ee2f76; font-size:1.1rem; font-family:'IBM Plex Mono';" id="npkg-alloc-outer">2</strong>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-grid" style="grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:1rem;">
+            <div class="form-group">
+              <label class="form-label">Package Price (₹) *</label>
+              <input type="number" id="npkg-price" class="form-input" value="2499" min="0" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Payment Method</label>
+              <select class="form-select" id="npkg-pay-method">
+                <option value="UPI">UPI</option>
+                <option value="Cash">Cash</option>
+                <option value="Card">Card</option>
+                <option value="Bank Transfer">Bank Transfer</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:0.5rem; margin-top:1.25rem;">
+            <button type="button" class="btn btn-outline" onclick="closeModal('modalNewPackage')">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="btn-submit-new-pkg" style="background:#22c55e; border-color:#22c55e;">
+              Activate &amp; Purchase Package
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- PACKAGE REDEMPTION RECEIPT MODAL (NO QR CODE) -->
+  <div class="dash-modal-backdrop" id="modalRedemptionReceipt" style="z-index:999999;">
+    <div class="dash-modal" style="max-width:560px; padding:0; overflow:hidden; background:#fff; color:#111;">
+      <div style="padding:14px 20px; background:#18181b; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #27272a;">
+        <span style="font-family:'Oswald',sans-serif; letter-spacing:0.04em; color:#a3e635; font-size:0.95rem; font-weight:700;">
+          🧾 Package Redemption Receipt
+        </span>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-outline" onclick="printRedemptionReceipt()" style="color:#fff; border-color:#555; padding:4px 10px; font-size:0.75rem;">🖨️ Print</button>
+          <button class="btn btn-green" onclick="shareRedemptionReceiptWhatsApp()" style="background:#22c55e; color:#fff; padding:4px 10px; font-size:0.75rem;">💬 WhatsApp</button>
+          <button class="dash-modal-close" onclick="closeModal('modalRedemptionReceipt')" style="color:#fff; font-size:1.2rem; background:transparent; border:none; cursor:pointer;">&times;</button>
+        </div>
+      </div>
+
+      <!-- PRINTABLE RECEIPT CONTENT AREA -->
+      <div id="redemption-receipt-print-area" style="padding:28px 24px; font-family:'Space Grotesk', -apple-system, sans-serif; color:#0f172a; background:#ffffff;">
+        <!-- Header -->
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; border-bottom:2px solid #ee2f76; padding-bottom:14px; margin-bottom:14px;">
+          <div>
+            <h1 style="margin:0; color:#ee2f76; font-size:22px; font-weight:800; font-family:'Oswald', sans-serif; letter-spacing:1px;">TRIEYE DETAILING</h1>
+            <p style="margin:3px 0 0; color:#475569; font-size:11.5px; line-height:1.4;">Premium Automotive Detailing &amp; Paint Protection<br>Villivakkam, Chennai | Contact: +91 99401 81934 / +91 93630 68836</p>
+          </div>
+          <div style="text-align:right;">
+            <span style="background:#f1f5f9; color:#0f172a; font-family:'IBM Plex Mono'; font-size:11px; font-weight:700; padding:3px 8px; border-radius:4px; display:inline-block;" id="rcpt-num">TRI-RDM-XXXX-XX</span>
+            <div style="font-size:10.5px; color:#64748b; margin-top:4px;" id="rcpt-datetime">Date &amp; Time</div>
+          </div>
+        </div>
+
+        <div style="text-align:center; margin-bottom:14px;">
+          <div style="font-family:'Oswald',sans-serif; letter-spacing:0.06em; font-size:15px; font-weight:700; color:#0f172a; text-transform:uppercase;">
+            Monthly Car Care Package — Redemption Receipt
+          </div>
+          <div style="font-size:11px; color:#64748b; font-family:'IBM Plex Mono'; margin-top:2px;">
+            Package ID: <strong id="rcpt-pkg-code" style="color:#0284c7;">TRI-PKG-XXXXXX</strong> &bull; Valid Till: <strong id="rcpt-expiry">DD/MM/YYYY</strong>
+          </div>
+        </div>
+
+        <!-- Customer & Vehicle Info -->
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:10px 14px; margin-bottom:14px; font-size:12px; display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <div>
+            <span style="color:#64748b; display:block; font-size:10px; text-transform:uppercase;">Customer</span>
+            <strong id="rcpt-cust-name" style="color:#0f172a; font-size:13px;">-</strong>
+            <div id="rcpt-cust-phone" style="color:#475569; font-family:'IBM Plex Mono'; font-size:11px;">-</div>
+          </div>
+          <div>
+            <span style="color:#64748b; display:block; font-size:10px; text-transform:uppercase;">Vehicle</span>
+            <strong id="rcpt-veh-reg" style="color:#0f172a; font-size:13px; font-family:'IBM Plex Mono';">-</strong>
+            <div id="rcpt-veh-type" style="color:#475569; font-size:11px;">Car</div>
+          </div>
+        </div>
+
+        <!-- Today's Service Redeemed Box -->
+        <div style="background:#f0fdf4; border:1.5px solid #86efac; border-radius:6px; padding:12px 14px; margin-bottom:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <div style="font-size:10.5px; color:#15803d; font-weight:700; text-transform:uppercase; letter-spacing:0.04em;">Today's Wash Redeemed</div>
+              <div style="font-size:16px; font-weight:800; color:#166534; margin-top:2px;" id="rcpt-wash-redeemed">Complete Wash</div>
+              <div style="font-size:11px; color:#475569; margin-top:2px;">Deducted 1 wash from Monthly Car Care Package balance</div>
+            </div>
+            <div style="text-align:right;">
+              <div style="font-size:10px; color:#64748b; text-transform:uppercase;">Today's Payable</div>
+              <div style="font-size:18px; font-weight:800; font-family:'IBM Plex Mono'; color:#0f172a;" id="rcpt-payable-amt">₹0</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Updated Remaining Wash Balance Table -->
+        <div style="border:1px solid #cbd5e1; border-radius:6px; overflow:hidden; margin-bottom:14px;">
+          <div style="background:#0f172a; color:#fff; padding:6px 12px; font-family:'Oswald',sans-serif; font-size:12px; letter-spacing:0.04em; text-transform:uppercase; display:flex; justify-content:space-between; align-items:center;">
+            <span>Updated Remaining Wash Balance</span>
+            <span style="font-family:'IBM Plex Mono'; font-size:11px; color:#a3e635;" id="rcpt-rem-total">0 Washes Left</span>
+          </div>
+          <table style="width:100%; border-collapse:collapse; font-size:12px;">
+            <tbody>
+              <tr style="border-bottom:1px solid #e2e8f0;">
+                <td style="padding:8px 12px; font-weight:600; color:#334155;">🚗 Complete Wash</td>
+                <td style="padding:8px 12px; text-align:right; font-family:'IBM Plex Mono'; font-weight:700; color:#0f172a;" id="rcpt-rem-complete">0 remaining</td>
+              </tr>
+              <tr style="border-bottom:1px solid #e2e8f0; background:#f8fafc;">
+                <td style="padding:8px 12px; font-weight:600; color:#334155;">🚿 Basic Wash</td>
+                <td style="padding:8px 12px; text-align:right; font-family:'IBM Plex Mono'; font-weight:700; color:#0f172a;" id="rcpt-rem-basic">0 remaining</td>
+              </tr>
+              <tr>
+                <td style="padding:8px 12px; font-weight:600; color:#334155;">🫧 Outer Foam Wash</td>
+                <td style="padding:8px 12px; text-align:right; font-family:'IBM Plex Mono'; font-weight:700; color:#0f172a;" id="rcpt-rem-outer">0 remaining</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Footer Notice -->
+        <div style="border-top:1px dashed #cbd5e1; padding-top:10px; font-size:11px; color:#64748b; display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            Please present your vehicle number or Package ID for your next redemption.<br>
+            <strong style="color:#0f172a;">Valid until <span id="rcpt-footer-expiry">DD/MM/YYYY</span>.</strong>
+          </div>
+          <div style="text-align:right; font-weight:700; color:#ee2f76; font-family:'Oswald',sans-serif; letter-spacing:0.04em;">
+            TRIEYE DETAILING
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ADD BAY MODAL -->
   <div class="dash-modal-backdrop" id="modalAddBay">
     <div class="dash-modal">
@@ -3794,6 +4212,29 @@
           'Sedan': 97,
           'SUV / 4x4': 84,
           'Superbike': 60
+        },
+        active: true
+      },
+      'Monthly Car Care Package': {
+        name: 'Monthly Car Care Package',
+        desc: '30-Day Package: 1 Complete Wash + 2 Basic Washes + 2 Outer Foam Washes',
+        duration_minutes: 60,
+        base_price: 2499,
+        hatchback_price: 1999,
+        sedan_price: 2499,
+        suv_price: 2999,
+        bike_price: 999,
+        pricing: {
+          'Hatchback': 1999,
+          'Sedan': 2499,
+          'SUV / 4x4': 2999,
+          'Superbike': 999
+        },
+        is_package: true,
+        package_washes: {
+          complete: 1,
+          basic: 2,
+          outer_foam: 2
         },
         active: true
       }
@@ -4485,6 +4926,7 @@
         'queue-sec': 'nav-queue',
         'online-sec': 'nav-online',
         'walkin-sec': 'nav-walkin',
+        'packages-sec': 'nav-packages',
         'bays-sec': 'nav-bays',
         'slots-sec': 'nav-slots',
         'customers-sec': 'nav-customers',
@@ -4498,6 +4940,9 @@
       const navEl = document.getElementById(navMap[secId]);
       if (navEl) navEl.classList.add('active');
 
+      if (secId === 'packages-sec') {
+        renderPackagesSection();
+      }
       if (secId === 'online-sec') {
         initOnlineCalendarState();
         filterOnlineBookings('TODAY');
@@ -4873,6 +5318,9 @@
       renderCompletedJobsTable();
       renderReports();
       populateServiceSelects();
+      if (typeof renderPackagesSection === 'function') {
+        renderPackagesSection();
+      }
     }
 
     // 1. UPDATE KPI CARDS & OVERVIEW
@@ -8181,6 +8629,623 @@ TRIEYE DETAILING
       }
     }
 
+    // 11B. MONTHLY CAR CARE PACKAGES & WASH REDEMPTION (NO QR CODE)
+    let currentPackageFilter = 'ALL';
+    let currentSelectedPackageId = null;
+    let currentRedemptionReceiptData = null;
+
+    async function renderPackagesSection() {
+      if (!window.TrieyeDB || typeof window.TrieyeDB.getPackages !== 'function') return;
+      try {
+        const packages = await window.TrieyeDB.getPackages();
+
+        // 1. Update navigation counter badge
+        const activeCount = packages.filter(p => (p.status || '').toUpperCase() === 'ACTIVE').length;
+        const badge = document.getElementById('badge-packages-count');
+        if (badge) {
+          if (activeCount > 0) {
+            badge.innerText = activeCount;
+            badge.style.display = 'inline-block';
+          } else {
+            badge.style.display = 'none';
+          }
+        }
+
+        // 2. If a package is actively selected, refresh its details view
+        if (currentSelectedPackageId) {
+          await selectActivePackage(currentSelectedPackageId, false);
+        }
+
+        // 3. Render directory table according to active filter
+        await applyPackagesFilter();
+      } catch (err) {
+        console.error('Error rendering packages section:', err);
+      }
+    }
+
+    function filterPackagesList(filter, btn) {
+      currentPackageFilter = filter || 'ALL';
+      document.querySelectorAll('.btn-filter-pkg').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      applyPackagesFilter();
+    }
+
+    async function applyPackagesFilter() {
+      if (!window.TrieyeDB || typeof window.TrieyeDB.getPackages !== 'function') return;
+      const packages = await window.TrieyeDB.getPackages();
+      let filtered = packages;
+      if (currentPackageFilter !== 'ALL') {
+        filtered = packages.filter(p => (p.status || '').toUpperCase() === currentPackageFilter.toUpperCase());
+      }
+      renderPackagesDirectoryTable(filtered);
+    }
+
+    function handlePackageSearchInput() {
+      const val = (document.getElementById('pkg-search-input')?.value || '').trim();
+      if (!val) {
+        applyPackagesFilter();
+      }
+    }
+
+    async function executePackageSearch() {
+      const input = document.getElementById('pkg-search-input');
+      const query = (input?.value || '').trim();
+      if (!query) {
+        applyPackagesFilter();
+        return;
+      }
+
+      if (!window.TrieyeDB || typeof window.TrieyeDB.searchPackages !== 'function') return;
+      const matches = await window.TrieyeDB.searchPackages(query);
+
+      if (matches.length === 0) {
+        const tbody = document.getElementById('pkg-directory-tbody');
+        if (tbody) {
+          tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; color:#f87171; padding:2rem;">No packages found matching "<strong>${escapeHtml(query)}</strong>". Try searching by 10-digit mobile number, vehicle number, or Package ID.</td></tr>`;
+        }
+        const countEl = document.getElementById('pkg-directory-count');
+        if (countEl) countEl.innerText = '0 packages matched';
+        return;
+      }
+
+      // Render matches in directory table
+      renderPackagesDirectoryTable(matches);
+
+      // If exact 1 match, auto-select it directly for redemption
+      if (matches.length === 1) {
+        await selectActivePackage(matches[0].id, true);
+      }
+    }
+
+    function clearPackageSearch() {
+      const input = document.getElementById('pkg-search-input');
+      if (input) input.value = '';
+      closeActivePackageView();
+      applyPackagesFilter();
+    }
+
+    async function selectActivePackage(packageId, scrollIntoView = true) {
+      if (!packageId || !window.TrieyeDB) return;
+      const pkg = await window.TrieyeDB.getPackageById(packageId);
+      if (!pkg) {
+        alert('Package not found.');
+        return;
+      }
+
+      currentSelectedPackageId = pkg.id;
+      const workspace = document.getElementById('pkg-active-workspace');
+      if (!workspace) return;
+      workspace.style.display = 'block';
+
+      // Header & Info
+      const nameEl = document.getElementById('pkg-view-name');
+      if (nameEl) nameEl.innerText = pkg.package_name || 'Monthly Car Care Package';
+      const codeEl = document.getElementById('pkg-view-code');
+      if (codeEl) codeEl.innerText = pkg.package_id || 'TRI-PKG-XXXXXX';
+
+      const badgeEl = document.getElementById('pkg-view-status-badge');
+      if (badgeEl) {
+        const st = (pkg.status || 'ACTIVE').toUpperCase();
+        badgeEl.innerText = st;
+        badgeEl.className = 'status-badge ' + (st === 'ACTIVE' ? 'conf' : (st === 'EXPIRED' ? 'can' : 'prog'));
+      }
+
+      const custNameEl = document.getElementById('pkg-view-cust-name');
+      if (custNameEl) custNameEl.innerText = pkg.customer_name || 'Customer';
+      const custPhoneEl = document.getElementById('pkg-view-cust-phone');
+      if (custPhoneEl) custPhoneEl.innerText = pkg.customer_phone ? `+91 ${pkg.customer_phone}` : '-';
+
+      const vehRegEl = document.getElementById('pkg-view-veh-reg');
+      if (vehRegEl) vehRegEl.innerText = pkg.reg_number || '-';
+      const vehTypeEl = document.getElementById('pkg-view-veh-type');
+      if (vehTypeEl) vehTypeEl.innerText = `${pkg.vehicle_type || 'Car'} • Purchased for ₹${Number(pkg.price || 0).toLocaleString('en-IN')}`;
+
+      const datesEl = document.getElementById('pkg-view-dates');
+      if (datesEl) datesEl.innerText = `Purchased: ${pkg.purchase_date || '-'} | Valid: ${pkg.expiry_date || '-'}`;
+
+      const daysLeftEl = document.getElementById('pkg-view-days-left');
+      if (daysLeftEl) {
+        const todayStr = window.TrieyeDB.getLocalDateIso(new Date());
+        if (pkg.expiry_date) {
+          const expDate = new Date(pkg.expiry_date);
+          const curDate = new Date(todayStr);
+          const diffTime = expDate - curDate;
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          if (diffDays < 0) {
+            daysLeftEl.innerText = `Expired ${Math.abs(diffDays)} day${Math.abs(diffDays) === 1 ? '' : 's'} ago`;
+            daysLeftEl.style.color = '#f87171';
+          } else if (diffDays === 0) {
+            daysLeftEl.innerText = `Expires TODAY`;
+            daysLeftEl.style.color = '#fbbf24';
+          } else {
+            daysLeftEl.innerText = `Expires in ${diffDays} day${diffDays === 1 ? '' : 's'}`;
+            daysLeftEl.style.color = '#a3e635';
+          }
+        } else {
+          daysLeftEl.innerText = '-';
+        }
+      }
+
+      // Washes Balances
+      const rem = pkg.remaining_washes || pkg.washes_remaining || { complete: 0, basic: 0, outer_foam: 0 };
+      const compVal = Number(rem.complete || 0);
+      const basicVal = Number(rem.basic || 0);
+      const outerVal = Number(rem.outer_foam || 0);
+      const totalVal = compVal + basicVal + outerVal;
+
+      const compEl = document.getElementById('pkg-bal-complete');
+      if (compEl) compEl.innerText = compVal;
+      const basicEl = document.getElementById('pkg-bal-basic');
+      if (basicEl) basicEl.innerText = basicVal;
+      const outerEl = document.getElementById('pkg-bal-outer');
+      if (outerEl) outerEl.innerText = outerVal;
+      const totEl = document.getElementById('pkg-bal-total');
+      if (totEl) totEl.innerText = `${totalVal} Wash${totalVal === 1 ? '' : 'es'}`;
+
+      // Card dimming
+      const compCard = document.getElementById('card-bal-complete');
+      if (compCard) compCard.style.opacity = compVal > 0 ? '1' : '0.45';
+      const basicCard = document.getElementById('card-bal-basic');
+      if (basicCard) basicCard.style.opacity = basicVal > 0 ? '1' : '0.45';
+      const outerCard = document.getElementById('card-bal-outer');
+      if (outerCard) outerCard.style.opacity = outerVal > 0 ? '1' : '0.45';
+
+      // Category options
+      const catSelect = document.getElementById('pkg-redeem-category');
+      if (catSelect) {
+        catSelect.innerHTML = `
+          <option value="complete" ${compVal <= 0 ? 'disabled' : ''}>Complete Wash (${compVal} left)</option>
+          <option value="basic" ${basicVal <= 0 ? 'disabled' : ''}>Basic Wash (${basicVal} left)</option>
+          <option value="outer_foam" ${outerVal <= 0 ? 'disabled' : ''}>Outer Foam Wash (${outerVal} left)</option>
+        `;
+        if (compVal > 0) catSelect.value = 'complete';
+        else if (basicVal > 0) catSelect.value = 'basic';
+        else if (outerVal > 0) catSelect.value = 'outer_foam';
+      }
+
+      // Button state
+      const redeemBtn = document.getElementById('btn-redeem-wash');
+      if (redeemBtn) {
+        const isExp = pkg.status === 'EXPIRED';
+        const isExh = totalVal <= 0 || pkg.status === 'EXHAUSTED';
+        if (isExp) {
+          redeemBtn.disabled = true;
+          redeemBtn.style.opacity = '0.5';
+          redeemBtn.title = 'Cannot redeem washes on an expired package.';
+        } else if (isExh) {
+          redeemBtn.disabled = true;
+          redeemBtn.style.opacity = '0.5';
+          redeemBtn.title = 'All wash allowances have been used.';
+        } else {
+          redeemBtn.disabled = false;
+          redeemBtn.style.opacity = '1';
+          redeemBtn.title = 'Click to redeem 1 wash';
+        }
+      }
+
+      // History
+      await renderPackageRedemptionsHistory(pkg.id);
+
+      if (scrollIntoView) {
+        workspace.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    function closeActivePackageView() {
+      currentSelectedPackageId = null;
+      const workspace = document.getElementById('pkg-active-workspace');
+      if (workspace) workspace.style.display = 'none';
+    }
+
+    async function renderPackageRedemptionsHistory(packageId) {
+      const tbody = document.getElementById('pkg-history-tbody');
+      const countEl = document.getElementById('pkg-history-count');
+      if (!tbody) return;
+
+      const redemptions = await window.TrieyeDB.getPackageRedemptions(packageId);
+      if (countEl) countEl.innerText = `${redemptions.length} Redemption${redemptions.length === 1 ? '' : 's'}`;
+
+      if (redemptions.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--muted); padding:1.25rem;">No redemptions recorded for this package yet.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = '';
+      redemptions.forEach(r => {
+        const tr = document.createElement('tr');
+        const rDate = r.redeemed_at ? new Date(r.redeemed_at).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' }) : (r.redeemed_date || '-');
+        const snap = r.balance_snapshot || {};
+        const payableText = Number(r.payable_amount || 0) > 0 ? `₹${Number(r.payable_amount).toLocaleString('en-IN')}` : '₹0 (Included)';
+        
+        tr.innerHTML = `
+          <td style="font-family:'IBM Plex Mono'; font-weight:700; color:#38bdf8;">${escapeHtml(r.redemption_number || r.id)}</td>
+          <td>${escapeHtml(rDate)}</td>
+          <td><strong style="color:#a3e635;">${escapeHtml(r.wash_type_name || r.wash_category || 'Wash')}</strong></td>
+          <td style="font-family:'IBM Plex Mono'; font-size:0.78rem;">
+            Complete: <strong>${snap.complete ?? '-'}</strong> | Basic: <strong>${snap.basic ?? '-'}</strong> | Outer: <strong>${snap.outer_foam ?? '-'}</strong>
+          </td>
+          <td style="font-family:'IBM Plex Mono'; font-weight:600;">${payableText}</td>
+          <td>
+            <button class="btn btn-outline" style="padding:0.25rem 0.6rem; font-size:0.75rem;" onclick='openRedemptionReceipt(${JSON.stringify(r.id)})'>
+              🧾 Receipt
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderPackagesDirectoryTable(packages) {
+      const tbody = document.getElementById('pkg-directory-tbody');
+      const countEl = document.getElementById('pkg-directory-count');
+      if (!tbody) return;
+
+      if (countEl) countEl.innerText = `${packages.length} package${packages.length === 1 ? '' : 's'} recorded`;
+
+      if (!packages || packages.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; color:var(--muted); padding:2rem;">No packages found in directory.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = '';
+      packages.forEach(pkg => {
+        const tr = document.createElement('tr');
+        const rem = pkg.remaining_washes || pkg.washes_remaining || { complete: 0, basic: 0, outer_foam: 0 };
+        const compVal = Number(rem.complete || 0);
+        const basicVal = Number(rem.basic || 0);
+        const outerVal = Number(rem.outer_foam || 0);
+        const totalVal = compVal + basicVal + outerVal;
+
+        const st = (pkg.status || 'ACTIVE').toUpperCase();
+        const statusClass = st === 'ACTIVE' ? 'conf' : (st === 'EXPIRED' ? 'can' : 'prog');
+        
+        tr.innerHTML = `
+          <td style="font-family:'IBM Plex Mono'; font-weight:700; color:#38bdf8;">${escapeHtml(pkg.package_id || pkg.id)}</td>
+          <td>
+            <div style="font-weight:600; color:#fff;">${escapeHtml(pkg.customer_name || 'Customer')}</div>
+            <div style="font-family:'IBM Plex Mono'; font-size:0.72rem; color:var(--muted);">${escapeHtml(pkg.customer_phone || '-')}</div>
+          </td>
+          <td>
+            <div style="font-family:'IBM Plex Mono'; font-weight:600;">${escapeHtml(pkg.reg_number || '-')}</div>
+            <div style="font-size:0.72rem; color:var(--muted);">${escapeHtml(pkg.vehicle_type || 'Car')}</div>
+          </td>
+          <td style="font-family:'IBM Plex Mono'; font-weight:700; color:${compVal > 0 ? '#22c55e' : 'var(--muted)'};">${compVal}</td>
+          <td style="font-family:'IBM Plex Mono'; font-weight:700; color:${basicVal > 0 ? '#38bdf8' : 'var(--muted)'};">${basicVal}</td>
+          <td style="font-family:'IBM Plex Mono'; font-weight:700; color:${outerVal > 0 ? '#ee2f76' : 'var(--muted)'};">${outerVal}</td>
+          <td style="font-family:'IBM Plex Mono'; font-weight:800; color:#fff;">${totalVal}</td>
+          <td style="font-family:'IBM Plex Mono'; font-size:0.78rem;">${escapeHtml(pkg.expiry_date || '-')}</td>
+          <td><span class="status-badge ${statusClass}">${escapeHtml(st)}</span></td>
+          <td>
+            <button class="btn btn-primary" style="padding:0.3rem 0.75rem; font-size:0.75rem;" onclick="selectActivePackage('${escapeHtml(pkg.id)}')">
+              Redeem / Manage
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function executeRedeemWash() {
+      if (!currentSelectedPackageId) {
+        alert('Please select or search for an active package first.');
+        return;
+      }
+
+      const catSelect = document.getElementById('pkg-redeem-category');
+      const washCategory = catSelect?.value;
+      if (!washCategory) {
+        alert('Please select a wash category.');
+        return;
+      }
+
+      const payableAmt = Number(document.getElementById('pkg-redeem-payable')?.value || 0);
+      const notes = (document.getElementById('pkg-redeem-notes')?.value || '').trim();
+
+      const catLabel = washCategory === 'complete' ? 'Complete Wash' : (washCategory === 'basic' ? 'Basic Wash' : 'Outer Foam Wash');
+      const confirmMsg = `Redeem 1 ${catLabel} for this customer?` + (payableAmt > 0 ? `\nToday's payable amount: ₹${payableAmt}` : '\nToday\'s payable amount: ₹0 (Included in package)');
+
+      if (!confirm(confirmMsg)) {
+        return;
+      }
+
+      const btn = document.getElementById('btn-redeem-wash');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerText = 'Redeeming...';
+      }
+
+      try {
+        const res = await window.TrieyeDB.redeemPackageWash(currentSelectedPackageId, washCategory, {
+          payable_amount: payableAmt,
+          notes: notes,
+          staff_name: 'Staff'
+        });
+
+        if (!res.success) {
+          alert(`Redemption failed: ${res.error}`);
+          return;
+        }
+
+        // Reset inputs
+        const payableInput = document.getElementById('pkg-redeem-payable');
+        if (payableInput) payableInput.value = '0';
+        const notesInput = document.getElementById('pkg-redeem-notes');
+        if (notesInput) notesInput.value = '';
+
+        // Refresh views
+        await selectActivePackage(currentSelectedPackageId, false);
+        await applyPackagesFilter();
+
+        showToast(`✓ ${catLabel} redeemed successfully!`);
+
+        // Automatically open the redemption receipt modal
+        if (res.redemption) {
+          openRedemptionReceipt(res.redemption.id, res.redemption);
+        }
+      } catch (err) {
+        console.error('Error redeeming wash:', err);
+        alert(`Error: ${err.message || err}`);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<span>🧼</span><span>Redeem Wash</span>';
+        }
+      }
+    }
+
+    async function openRedemptionReceipt(redemptionId, redemptionObj = null) {
+      let redemption = redemptionObj;
+      if (!redemption && window.TrieyeDB) {
+        const all = await window.TrieyeDB.getPackageRedemptions();
+        redemption = all.find(r => r.id === redemptionId || r.redemption_number === redemptionId);
+      }
+
+      if (!redemption) {
+        alert('Redemption receipt record not found.');
+        return;
+      }
+
+      currentRedemptionReceiptData = redemption;
+
+      // Populate receipt DOM
+      const numEl = document.getElementById('rcpt-num');
+      if (numEl) numEl.innerText = redemption.redemption_number || redemption.id;
+
+      const dtEl = document.getElementById('rcpt-datetime');
+      if (dtEl) {
+        const d = redemption.redeemed_at ? new Date(redemption.redeemed_at) : new Date();
+        dtEl.innerText = d.toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' });
+      }
+
+      const pkgCodeEl = document.getElementById('rcpt-pkg-code');
+      if (pkgCodeEl) pkgCodeEl.innerText = redemption.package_code || redemption.package_id || '-';
+
+      const expEl = document.getElementById('rcpt-expiry');
+      if (expEl) expEl.innerText = redemption.expiry_date || '-';
+
+      const footerExpEl = document.getElementById('rcpt-footer-expiry');
+      if (footerExpEl) footerExpEl.innerText = redemption.expiry_date || '-';
+
+      const custNameEl = document.getElementById('rcpt-cust-name');
+      if (custNameEl) custNameEl.innerText = redemption.customer_name || 'Valued Customer';
+
+      const custPhoneEl = document.getElementById('rcpt-cust-phone');
+      if (custPhoneEl) custPhoneEl.innerText = redemption.customer_phone ? `+91 ${redemption.customer_phone}` : '-';
+
+      const vehRegEl = document.getElementById('rcpt-veh-reg');
+      if (vehRegEl) vehRegEl.innerText = redemption.reg_number || '-';
+
+      const vehTypeEl = document.getElementById('rcpt-veh-type');
+      if (vehTypeEl) vehTypeEl.innerText = redemption.vehicle_type || 'Car';
+
+      const washRedeemedEl = document.getElementById('rcpt-wash-redeemed');
+      if (washRedeemedEl) washRedeemedEl.innerText = redemption.wash_type_name || redemption.wash_category || 'Wash';
+
+      const payableAmtEl = document.getElementById('rcpt-payable-amt');
+      if (payableAmtEl) {
+        const pAmt = Number(redemption.payable_amount || 0);
+        payableAmtEl.innerText = pAmt > 0 ? `₹${pAmt.toLocaleString('en-IN')}` : '₹0';
+      }
+
+      const snap = redemption.balance_snapshot || {};
+      const compLeft = snap.complete ?? 0;
+      const basicLeft = snap.basic ?? 0;
+      const outerLeft = snap.outer_foam ?? 0;
+      const totalLeft = snap.total !== undefined ? snap.total : (compLeft + basicLeft + outerLeft);
+
+      const remCompEl = document.getElementById('rcpt-rem-complete');
+      if (remCompEl) remCompEl.innerText = `${compLeft} remaining`;
+
+      const remBasicEl = document.getElementById('rcpt-rem-basic');
+      if (remBasicEl) remBasicEl.innerText = `${basicLeft} remaining`;
+
+      const remOuterEl = document.getElementById('rcpt-rem-outer');
+      if (remOuterEl) remOuterEl.innerText = `${outerLeft} remaining`;
+
+      const remTotalEl = document.getElementById('rcpt-rem-total');
+      if (remTotalEl) remTotalEl.innerText = `${totalLeft} Washes Left`;
+
+      openModal('modalRedemptionReceipt');
+    }
+
+    function printRedemptionReceipt() {
+      window.print();
+    }
+
+    function shareRedemptionReceiptWhatsApp() {
+      if (!currentRedemptionReceiptData) {
+        alert('No receipt data available.');
+        return;
+      }
+      const r = currentRedemptionReceiptData;
+      const cleanPhone = String(r.customer_phone || '').replace(/\D/g, '').slice(-10);
+      if (!cleanPhone) {
+        alert('No customer phone number available to share via WhatsApp.');
+        return;
+      }
+
+      const snap = r.balance_snapshot || {};
+      const compLeft = snap.complete ?? 0;
+      const basicLeft = snap.basic ?? 0;
+      const outerLeft = snap.outer_foam ?? 0;
+      const totalLeft = snap.total !== undefined ? snap.total : (compLeft + basicLeft + outerLeft);
+      const payableText = Number(r.payable_amount || 0) > 0 ? `₹${Number(r.payable_amount).toLocaleString('en-IN')}` : '₹0 (Included in Package)';
+
+      const text = `*TRIEYE DETAILING — PACKAGE REDEMPTION RECEIPT*\n\n` +
+        `Hi ${r.customer_name || 'Valued Customer'},\n\n` +
+        `Your wash redemption has been recorded successfully.\n\n` +
+        `*Receipt #:* ${r.redemption_number || r.id}\n` +
+        `*Package ID:* ${r.package_code || r.package_id || '-'}\n` +
+        `*Vehicle:* ${r.reg_number || 'N/A'} (${r.vehicle_type || 'Car'})\n\n` +
+        `*Today\'s Wash Redeemed:* ${r.wash_type_name || 'Wash'}\n` +
+        `*Today\'s Payable Amount:* ${payableText}\n\n` +
+        `*Updated Remaining Wash Balance:*\n` +
+        `• Complete Wash: ${compLeft} remaining\n` +
+        `• Basic Wash: ${basicLeft} remaining\n` +
+        `• Outer Foam Wash: ${outerLeft} remaining\n` +
+        `*Total Washes Left:* ${totalLeft}\n` +
+        `*Package Valid Until:* ${r.expiry_date || '-'}\n\n` +
+        `Thank you for choosing TRIEYE DETAILING!\n*Detail • Precision • Protection*`;
+
+      const url = `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(text)}`;
+      window.open(url, '_blank');
+    }
+
+    function openNewPackageModal() {
+      const form = document.getElementById('newPackageForm');
+      if (form) form.reset();
+      const regInput = document.getElementById('npkg-reg');
+      if (regInput && window.TrieyeDB && typeof window.TrieyeDB.attachVehicleInput === 'function') {
+        window.TrieyeDB.attachVehicleInput(regInput);
+      }
+      updateNewPackagePrice();
+      openModal('modalNewPackage');
+    }
+
+    function updateNewPackagePrice() {
+      const vType = document.getElementById('npkg-vtype')?.value || 'Sedan';
+      const priceInput = document.getElementById('npkg-price');
+      if (!priceInput) return;
+      
+      let price = 2499;
+      if (vType === 'Hatchback') price = 1999;
+      else if (vType === 'Sedan') price = 2499;
+      else if (vType.includes('SUV')) price = 2999;
+      else if (vType === 'Bike') price = 999;
+
+      if (window.TrieyeDB && typeof window.TrieyeDB.getServices === 'function') {
+        const services = window.TrieyeDB.getServices();
+        const pkgService = services.find(s => (s.name || '').toLowerCase().includes('care package'));
+        if (pkgService && pkgService.prices && pkgService.prices[vType] !== undefined) {
+          price = Number(pkgService.prices[vType]);
+        }
+      }
+      priceInput.value = price;
+    }
+
+    function handleNewPackagePhoneInput() {
+      const phoneVal = (document.getElementById('npkg-phone')?.value || '').replace(/\D/g, '');
+      if (phoneVal.length === 10) {
+        if (window.TrieyeDB && typeof window.TrieyeDB.getCustomers === 'function') {
+          const custs = window.TrieyeDB.getCustomers();
+          const match = custs[phoneVal];
+          if (match) {
+            const nameInput = document.getElementById('npkg-name');
+            if (nameInput && !nameInput.value) nameInput.value = match.name || '';
+            const regInput = document.getElementById('npkg-reg');
+            if (regInput && !regInput.value) regInput.value = match.vehicleReg || match.reg || '';
+            const vtypeInput = document.getElementById('npkg-vtype');
+            if (vtypeInput && match.vehicleType) {
+              vtypeInput.value = match.vehicleType;
+              updateNewPackagePrice();
+            }
+          }
+        }
+      }
+    }
+
+    async function handleNewPackageSubmit() {
+      const phone = (document.getElementById('npkg-phone')?.value || '').trim();
+      const name = (document.getElementById('npkg-name')?.value || '').trim();
+      const reg = (document.getElementById('npkg-reg')?.value || '').trim();
+      const vtype = document.getElementById('npkg-vtype')?.value || 'Car';
+      const price = Number(document.getElementById('npkg-price')?.value || 2499);
+      const payMethod = document.getElementById('npkg-pay-method')?.value || 'UPI';
+
+      if (!phone || phone.replace(/\D/g, '').length < 10) {
+        alert('Please enter a valid 10-digit mobile number.');
+        return;
+      }
+      if (!name) {
+        alert('Please enter customer name.');
+        return;
+      }
+      if (!reg) {
+        alert('Please enter vehicle registration number.');
+        return;
+      }
+
+      const btn = document.getElementById('btn-submit-new-pkg');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerText = 'Activating...';
+      }
+
+      try {
+        const res = await window.TrieyeDB.createPackage({
+          customer_name: name,
+          customer_phone: phone,
+          reg_number: reg,
+          vehicle_type: vtype,
+          price: price,
+          payment_method: payMethod,
+          package_name: 'Monthly Car Care Package'
+        });
+
+        if (!res.success) {
+          alert(`Failed to create package: ${res.error}`);
+          return;
+        }
+
+        closeModal('modalNewPackage');
+        showToast(`✓ Monthly Car Care Package activated for ${name}!`);
+
+        // Refresh section and select newly created package
+        await renderPackagesSection();
+        if (res.package) {
+          await selectActivePackage(res.package.id, true);
+        }
+      } catch (err) {
+        console.error('Error creating package:', err);
+        alert(`Error: ${err.message || err}`);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerText = 'Activate & Purchase Package';
+        }
+      }
+    }
+
     // 12. SETTINGS & AUTH GATEWAY
     function saveStudioSettings(e) {
       e.preventDefault();
@@ -8519,6 +9584,14 @@ TRIEYE DETAILING
     window.addEventListener('DOMContentLoaded', async () => {
       initializeData();
       renderAll();
+
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const secParam = urlParams.get('sec');
+        if (secParam && typeof showSection === 'function') {
+          showSection(secParam);
+        }
+      } catch (e) {}
 
       // Check Supabase session first before loading sensitive admin data
       const isAuthed = await checkAdminAuth();

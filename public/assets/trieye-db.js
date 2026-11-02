@@ -2434,6 +2434,28 @@ const TrieyeDB = {
         localStorage.setItem('trieye_invoices', JSON.stringify(localInvoices));
       } catch (e) {}
 
+      // Auto-activate Car Care Package if invoice contains Monthly Car Care Package
+      try {
+        const hasPackageItem = (payload.services || []).some(s => (s.name || '').toLowerCase().includes('monthly car care package')) ||
+                               (localItemsPayload || []).some(it => (it.service_name || '').toLowerCase().includes('monthly car care package'));
+        if (hasPackageItem) {
+          const pkgRes = await this.createPackage({
+            customer_name: payload.customer.name,
+            customer_phone: cleanCustPhone,
+            reg_number: payload.vehicle.reg_number,
+            vehicle_type: payload.vehicle.vehicle_type,
+            price: finalGrandTotal || Number(payload.totals.subtotal || 2499),
+            invoice_id: invoiceId,
+            invoice_number: invData.invoice_number
+          });
+          if (pkgRes && pkgRes.package) {
+            invData.package = pkgRes.package;
+          }
+        }
+      } catch (pkgErr) {
+        console.warn('⚠️ Package auto-activation notice:', pkgErr);
+      }
+
       return {
         success: true,
         invoice: invData,
@@ -2837,6 +2859,280 @@ const TrieyeDB = {
 
   _formatTrackBookingResult(b) {
     return this._formatTrackBookingItem(b);
+  },
+
+  // ==========================================
+  // 11. MONTHLY CAR CARE PACKAGES & REDEMPTIONS (NO QR CODE)
+  // ==========================================
+  async getPackages() {
+    let packages = [];
+    try {
+      const stored = localStorage.getItem('trieye_car_care_packages');
+      if (stored) {
+        packages = JSON.parse(stored) || [];
+      }
+    } catch (e) {
+      packages = [];
+    }
+
+    const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
+    if (sb) {
+      try {
+        const { data, error } = await sb.from('packages').select('*').order('created_at', { ascending: false });
+        if (!error && Array.isArray(data) && data.length > 0) {
+          const localMap = {};
+          packages.forEach(p => { if (p && p.id) localMap[p.id] = p; });
+          data.forEach(p => {
+            localMap[p.id] = Object.assign({}, localMap[p.id] || {}, p);
+          });
+          packages = Object.values(localMap);
+          try { localStorage.setItem('trieye_car_care_packages', JSON.stringify(packages)); } catch (e) {}
+        }
+      } catch (e) {}
+    }
+
+    const todayStr = this.getLocalDateIso(new Date());
+    packages.forEach(pkg => {
+      if (!pkg.remaining_washes) {
+        pkg.remaining_washes = {
+          complete: Number(pkg.complete_wash !== undefined ? pkg.complete_wash : (pkg.initial_washes?.complete ?? 1)),
+          basic: Number(pkg.basic_wash !== undefined ? pkg.basic_wash : (pkg.initial_washes?.basic ?? 2)),
+          outer_foam: Number(pkg.outer_foam_wash !== undefined ? pkg.outer_foam_wash : (pkg.initial_washes?.outer_foam ?? 2))
+        };
+      }
+      const totalLeft = (Number(pkg.remaining_washes.complete) || 0) + 
+                        (Number(pkg.remaining_washes.basic) || 0) + 
+                        (Number(pkg.remaining_washes.outer_foam) || 0);
+
+      const isExpired = pkg.expiry_date && pkg.expiry_date < todayStr;
+      if (isExpired) {
+        pkg.status = 'EXPIRED';
+      } else if (totalLeft <= 0) {
+        pkg.status = 'EXHAUSTED';
+      } else {
+        pkg.status = 'ACTIVE';
+      }
+    });
+
+    return packages;
+  },
+
+  async getPackageById(idOrCode) {
+    if (!idOrCode) return null;
+    const packages = await this.getPackages();
+    const clean = String(idOrCode).trim().toUpperCase();
+    return packages.find(p => 
+      (p.id && String(p.id).toUpperCase() === clean) ||
+      (p.package_id && String(p.package_id).toUpperCase() === clean)
+    ) || null;
+  },
+
+  async searchPackages(query) {
+    const packages = await this.getPackages();
+    if (!query || !String(query).trim()) return packages;
+
+    const q = String(query).trim().toUpperCase();
+    const cleanPhone = q.replace(/\D/g, '').slice(-10);
+    const cleanReg = q.replace(/[^A-Z0-9]/g, '');
+
+    return packages.filter(p => {
+      const pId = String(p.package_id || p.id || '').toUpperCase();
+      if (pId.includes(q)) return true;
+
+      const pPhone = String(p.customer_phone || p.phone || '').replace(/\D/g, '').slice(-10);
+      if (cleanPhone && cleanPhone.length >= 4 && pPhone.includes(cleanPhone)) return true;
+
+      const pReg = String(p.reg_number || p.reg || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+      if (cleanReg && cleanReg.length >= 3 && pReg.includes(cleanReg)) return true;
+
+      const pName = String(p.customer_name || p.name || '').toUpperCase();
+      if (pName.includes(q)) return true;
+
+      return false;
+    });
+  },
+
+  async createPackage(payload) {
+    if (!payload) return { success: false, error: 'Package payload is required' };
+    const name = String(payload.customer_name || payload.name || '').trim();
+    const phone = String(payload.customer_phone || payload.phone || '').replace(/\D/g, '').slice(-10);
+    const rawReg = String(payload.reg_number || payload.reg || '').trim();
+
+    if (!name || !phone || !rawReg) {
+      return { success: false, error: 'Customer Name, Phone, and Vehicle Number are required.' };
+    }
+
+    const reg = this.formatVehicleNumber(rawReg);
+    const id = 'pkg_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
+    const pkgNum = Math.floor(100000 + Math.random() * 900000);
+    const packageId = payload.package_id || `TRI-PKG-${pkgNum}`;
+
+    const purchaseDate = payload.purchase_date || this.getLocalDateIso(new Date());
+    let expiryDate = payload.expiry_date;
+    if (!expiryDate) {
+      const exp = new Date(purchaseDate);
+      exp.setDate(exp.getDate() + 30);
+      expiryDate = this.getLocalDateIso(exp);
+    }
+
+    const initialWashes = {
+      complete: Number(payload.complete_wash !== undefined ? payload.complete_wash : (payload.initial_washes?.complete ?? 1)),
+      basic: Number(payload.basic_wash !== undefined ? payload.basic_wash : (payload.initial_washes?.basic ?? 2)),
+      outer_foam: Number(payload.outer_foam_wash !== undefined ? payload.outer_foam_wash : (payload.initial_washes?.outer_foam ?? 2))
+    };
+
+    const remainingWashes = Object.assign({}, initialWashes);
+
+    const newPackage = {
+      id,
+      package_id: packageId,
+      package_name: payload.package_name || 'Monthly Car Care Package',
+      customer_name: name,
+      customer_phone: phone,
+      reg_number: reg,
+      vehicle_type: payload.vehicle_type || 'Car',
+      purchase_date: purchaseDate,
+      expiry_date: expiryDate,
+      price: Number(payload.price || 2499),
+      initial_washes: initialWashes,
+      remaining_washes: remainingWashes,
+      redemptions_count: 0,
+      status: 'ACTIVE',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    };
+
+    const packages = await this.getPackages();
+    packages.unshift(newPackage);
+    try {
+      localStorage.setItem('trieye_car_care_packages', JSON.stringify(packages));
+    } catch (e) {}
+
+    const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
+    if (sb) {
+      try {
+        await sb.from('packages').upsert([newPackage]);
+      } catch (e) {}
+    }
+
+    return { success: true, package: newPackage };
+  },
+
+  async redeemPackageWash(packageId, washCategory, options = {}) {
+    if (!packageId) return { success: false, error: 'Package ID required' };
+    const pkg = await this.getPackageById(packageId);
+    if (!pkg) return { success: false, error: 'Package not found' };
+
+    const todayStr = this.getLocalDateIso(new Date());
+    if (pkg.expiry_date && pkg.expiry_date < todayStr) {
+      pkg.status = 'EXPIRED';
+      return { success: false, error: `Package expired on ${pkg.expiry_date}. Cannot redeem washes.` };
+    }
+
+    const validCategories = ['complete', 'basic', 'outer_foam'];
+    if (!validCategories.includes(washCategory)) {
+      return { success: false, error: 'Invalid wash category selected.' };
+    }
+
+    if (!pkg.remaining_washes) {
+      pkg.remaining_washes = { complete: 0, basic: 0, outer_foam: 0 };
+    }
+
+    const currentCount = Number(pkg.remaining_washes[washCategory]) || 0;
+    if (currentCount <= 0) {
+      const catLabel = washCategory === 'complete' ? 'Complete Wash' : (washCategory === 'basic' ? 'Basic Wash' : 'Outer Foam Wash');
+      return { success: false, error: `No remaining washes available for ${catLabel}.` };
+    }
+
+    pkg.remaining_washes[washCategory] = currentCount - 1;
+    pkg.redemptions_count = (pkg.redemptions_count || 0) + 1;
+    pkg.updated_at = new Date().toISOString();
+
+    const totalRemaining = (Number(pkg.remaining_washes.complete) || 0) +
+                           (Number(pkg.remaining_washes.basic) || 0) +
+                           (Number(pkg.remaining_washes.outer_foam) || 0);
+
+    if (totalRemaining <= 0) {
+      pkg.status = 'EXHAUSTED';
+    }
+
+    const catName = washCategory === 'complete' ? 'Complete Wash' : (washCategory === 'basic' ? 'Basic Wash' : 'Outer Foam Wash');
+    const rdmNumber = `TRI-RDM-${String(pkg.package_id || pkg.id).replace(/^TRI-PKG-/, '')}-${String(pkg.redemptions_count).padStart(2, '0')}`;
+
+    const redemption = {
+      id: 'rdm_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
+      redemption_number: rdmNumber,
+      package_id: pkg.id,
+      package_code: pkg.package_id,
+      package_name: pkg.package_name || 'Monthly Car Care Package',
+      customer_name: pkg.customer_name,
+      customer_phone: pkg.customer_phone,
+      reg_number: pkg.reg_number,
+      vehicle_type: pkg.vehicle_type,
+      wash_category: washCategory,
+      wash_type_name: catName,
+      redeemed_at: new Date().toISOString(),
+      redeemed_date: todayStr,
+      expiry_date: pkg.expiry_date,
+      payable_amount: Number(options.payable_amount || 0),
+      staff_notes: options.notes || '',
+      balance_snapshot: {
+        complete: pkg.remaining_washes.complete,
+        basic: pkg.remaining_washes.basic,
+        outer_foam: pkg.remaining_washes.outer_foam,
+        total: totalRemaining
+      }
+    };
+
+    const packages = await this.getPackages();
+    const idx = packages.findIndex(p => p.id === pkg.id);
+    if (idx !== -1) {
+      packages[idx] = pkg;
+    } else {
+      packages.unshift(pkg);
+    }
+    try {
+      localStorage.setItem('trieye_car_care_packages', JSON.stringify(packages));
+    } catch (e) {}
+
+    let redemptions = [];
+    try {
+      redemptions = JSON.parse(localStorage.getItem('trieye_package_redemptions')) || [];
+    } catch (e) {}
+    redemptions.unshift(redemption);
+    try {
+      localStorage.setItem('trieye_package_redemptions', JSON.stringify(redemptions));
+    } catch (e) {}
+
+    const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
+    if (sb) {
+      try {
+        await sb.from('packages').upsert([pkg]);
+        await sb.from('package_redemptions').insert([redemption]);
+      } catch (e) {}
+    }
+
+    return {
+      success: true,
+      package: pkg,
+      redemption: redemption
+    };
+  },
+
+  async getPackageRedemptions(packageId) {
+    let redemptions = [];
+    try {
+      redemptions = JSON.parse(localStorage.getItem('trieye_package_redemptions')) || [];
+    } catch (e) {}
+
+    if (packageId) {
+      const clean = String(packageId).trim().toUpperCase();
+      return redemptions.filter(r => 
+        (r.package_id && String(r.package_id).toUpperCase() === clean) ||
+        (r.package_code && String(r.package_code).toUpperCase() === clean)
+      );
+    }
+    return redemptions;
   }
 };
 

@@ -70,5 +70,29 @@
       "Superbike": 350
     },
     "active": true
+  },
+  "Monthly Car Care Package": {
+    "id": "trieye-pkg-monthly-car-care",
+    "name": "Monthly Car Care Package",
+    "desc": "30-Day Package: 1 Complete Wash + 2 Basic Washes + 2 Outer Foam Washes",
+    "base_price": 2499,
+    "hatchback_price": 1999,
+    "sedan_price": 2499,
+    "suv_price": 2999,
+    "bike_price": 999,
+    "duration_minutes": 60,
+    "pricing": {
+      "Hatchback": 1999,
+      "Sedan": 2499,
+      "SUV / 4x4": 2999,
+      "Superbike": 999
+    },
+    "is_package": true,
+    "package_washes": {
+      "complete": 1,
+      "basic": 2,
+      "outer_foam": 2
+    },
+    "active": true
   }
 }
