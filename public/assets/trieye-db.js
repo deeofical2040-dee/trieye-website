@@ -2895,15 +2895,55 @@ const TrieyeDB = {
       packages = [];
     }
 
+    let allCustMap = {};
+    try {
+      if (typeof this.getCustomers === 'function') {
+        allCustMap = await this.getCustomers() || {};
+      }
+    } catch (e) {}
+    if (!allCustMap || Object.keys(allCustMap).length === 0) {
+      try {
+        allCustMap = JSON.parse(localStorage.getItem('trieye_customers')) || {};
+      } catch (e) {}
+    }
+
     const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
+    let invoices = [];
     if (sb) {
       try {
-        // 1. Try direct public.packages query from Supabase
-        const { data: dbData, error: dbErr } = await sb.from('packages').select('*').order('created_at', { ascending: false });
+        // 1. Try direct public.packages query from Supabase with customers relation
+        let dbData = null;
+        let dbErr = null;
+        try {
+          const res = await sb
+            .from('packages')
+            .select(`
+              *,
+              customers (id, name, phone, email)
+            `)
+            .order('created_at', { ascending: false });
+          dbData = res.data;
+          dbErr = res.error;
+        } catch (errRel) {
+          dbErr = errRel;
+        }
+
+        if (dbErr || !dbData) {
+          const res2 = await sb.from('packages').select('*').order('created_at', { ascending: false });
+          dbData = res2.data;
+          dbErr = res2.error;
+        }
+
         if (!dbErr && Array.isArray(dbData) && dbData.length > 0) {
           const map = {};
           packages.forEach(p => { if (p) map[p.package_id || p.id] = p; });
           dbData.forEach(p => {
+            const rawRelCust = p.customers;
+            const relCust = Array.isArray(rawRelCust) ? (rawRelCust[0] || {}) : (rawRelCust || {});
+            p.customer_name = p.customer_name || relCust.name || '';
+            p.customer_phone = p.customer_phone || relCust.phone || '';
+            p.customer_id = p.customer_id || relCust.id || null;
+
             const rem = {
               complete: Number(p.complete_wash !== undefined ? p.complete_wash : 1),
               basic: Number(p.basic_wash !== undefined ? p.basic_wash : 1),
@@ -2926,7 +2966,6 @@ const TrieyeDB = {
 
       // 2. Reconcile from invoices in Supabase (if packages table was empty or not yet created)
       try {
-        let invoices = [];
         if (typeof this.getInvoices === 'function') {
           invoices = await this.getInvoices();
         }
@@ -2940,10 +2979,13 @@ const TrieyeDB = {
 
             if (isPkgInv) {
               const invNum = inv.invoice_number || '';
-              const cust = inv.customers || {};
-              const veh = inv.vehicles || {};
+              const rawCust = inv.customers;
+              const cust = Array.isArray(rawCust) ? (rawCust[0] || {}) : (rawCust || {});
+              const rawVeh = inv.vehicles;
+              const veh = Array.isArray(rawVeh) ? (rawVeh[0] || {}) : (rawVeh || {});
               const cleanPhone = String(cust.phone || inv.customer_phone || '').replace(/\D/g, '').slice(-10);
               const reg = veh.reg_number || inv.reg_number || '';
+              const invoiceCustName = (cust.name || inv.customer_name || '').trim();
               
               // Find matching item description for package ID
               const pkgItem = items.find(it => String(it.service_name || '').toLowerCase().includes('car care'));
@@ -2977,7 +3019,7 @@ const TrieyeDB = {
                   package_id: pkgCode,
                   package_name: 'TRIEYE Monthly Car Care Pack',
                   customer_id: inv.customer_id || cust.id || null,
-                  customer_name: cust.name || inv.customer_name || 'Valued Customer',
+                  customer_name: invoiceCustName || 'Name not available',
                   customer_phone: cleanPhone,
                   vehicle_id: inv.vehicle_id || veh.id || null,
                   reg_number: reg,
@@ -3008,6 +3050,15 @@ const TrieyeDB = {
                 existing.invoice_number = existing.invoice_number || invNum;
                 existing.invoice_id = existing.invoice_id || inv.id;
                 existing.vehicle_category = existing.vehicle_category || vCategory;
+                if (invoiceCustName && (!existing.customer_name || existing.customer_name === 'Valued Customer' || existing.customer_name === 'Customer' || existing.customer_name === 'Name not available')) {
+                  existing.customer_name = invoiceCustName;
+                }
+                if (cleanPhone && !existing.customer_phone) {
+                  existing.customer_phone = cleanPhone;
+                }
+                if (!existing.customer_id && (inv.customer_id || cust.id)) {
+                  existing.customer_id = inv.customer_id || cust.id;
+                }
               }
             }
           });
@@ -3024,6 +3075,51 @@ const TrieyeDB = {
     const todayStr = this.getLocalDateIso(new Date());
 
     packages.forEach(pkg => {
+      // Reconcile and resolve actual customer names across all packages
+      const cleanP = String(pkg.customer_phone || '').replace(/\D/g, '').slice(-10);
+      let cName = (pkg.customer_name || '').trim();
+      const isMissingOrGeneric = !cName || 
+        cName.toLowerCase() === 'customer' || 
+        cName.toLowerCase() === 'valued customer' || 
+        cName.toLowerCase() === 'walk-in customer' ||
+        cName.toLowerCase() === 'name not available';
+
+      if (isMissingOrGeneric) {
+        // Match from customer CRM map by phone
+        if (cleanP && allCustMap[cleanP] && allCustMap[cleanP].name && allCustMap[cleanP].name.trim()) {
+          cName = allCustMap[cleanP].name.trim();
+        }
+        // Match from customer CRM map by customer_id
+        if ((!cName || isMissingOrGeneric) && pkg.customer_id && allCustMap) {
+          const matchCust = Object.values(allCustMap).find(c => c && c.id === pkg.customer_id);
+          if (matchCust && matchCust.name && matchCust.name.trim()) {
+            cName = matchCust.name.trim();
+          }
+        }
+        // Match from invoices list
+        if ((!cName || isMissingOrGeneric) && Array.isArray(invoices)) {
+          const matchInv = invoices.find(i => 
+            (pkg.invoice_id && i.id === pkg.invoice_id) || 
+            (pkg.invoice_number && i.invoice_number === pkg.invoice_number)
+          );
+          if (matchInv) {
+            const rawC = matchInv.customers;
+            const cObj = Array.isArray(rawC) ? (rawC[0] || {}) : (rawC || {});
+            cName = (cObj.name || matchInv.customer_name || '').trim();
+          }
+        }
+      }
+
+      // Check if cName is still generic or empty
+      if (!cName || 
+          cName.toLowerCase() === 'customer' || 
+          cName.toLowerCase() === 'valued customer' || 
+          cName.toLowerCase() === 'walk-in customer') {
+        pkg.customer_name = 'Name not available';
+      } else {
+        pkg.customer_name = cName;
+      }
+
       // Ensure remaining_washes object exists with 6 total entitlement
       if (!pkg.remaining_washes || pkg.initial_washes?.total !== 6) {
         pkg.initial_washes = { complete: 1, basic: 1, outer_foam: 4, total: 6 };

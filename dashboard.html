@@ -3022,7 +3022,6 @@
                 <tr>
                   <th>Package ID</th>
                   <th>Customer</th>
-                  <th>Mobile</th>
                   <th>Vehicle Number</th>
                   <th>Vehicle Category</th>
                   <th>Complete Left</th>
@@ -3035,7 +3034,7 @@
                 </tr>
               </thead>
               <tbody id="pkg-directory-tbody">
-                <tr><td colspan="12" style="text-align:center; color:var(--muted); padding:2rem;">Loading packages...</td></tr>
+                <tr><td colspan="11" style="text-align:center; color:var(--muted); padding:2rem;">Loading packages...</td></tr>
               </tbody>
             </table>
           </div>
@@ -8840,7 +8839,7 @@ TRIEYE DETAILING
       if (matches.length === 0) {
         const tbody = document.getElementById('pkg-directory-tbody');
         if (tbody) {
-          tbody.innerHTML = `<tr><td colspan="12" style="text-align:center; color:#f87171; padding:2rem;">No packages found matching "<strong>${escapeHtml(query)}</strong>". Try searching by 10-digit mobile number, vehicle number, or Package ID.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="11" style="text-align:center; color:#f87171; padding:2rem;">No packages found matching "<strong>${escapeHtml(query)}</strong>". Try searching by 10-digit mobile number, vehicle number, or Package ID.</td></tr>`;
         }
         const countEl = document.getElementById('pkg-directory-count');
         if (countEl) countEl.innerText = '0 packages matched';
@@ -8877,10 +8876,31 @@ TRIEYE DETAILING
       workspace.style.display = 'block';
 
       // 1. Prominent Customer Details
+      const rawPkgName = (pkg.customer_name || '').trim();
+      const hasRealName = rawPkgName && 
+        rawPkgName.toLowerCase() !== 'customer' && 
+        rawPkgName.toLowerCase() !== 'valued customer' && 
+        rawPkgName.toLowerCase() !== 'walk-in customer' && 
+        rawPkgName.toLowerCase() !== 'name not available';
+      const displayName = hasRealName ? rawPkgName : 'Name not available';
+
       const custNameEl = document.getElementById('pkg-view-cust-name');
-      if (custNameEl) custNameEl.innerText = pkg.customer_name || 'Customer';
+      if (custNameEl) {
+        custNameEl.innerText = displayName;
+        custNameEl.style.color = hasRealName ? '#fff' : 'var(--muted)';
+      }
+
       const custPhoneEl = document.getElementById('pkg-view-cust-phone');
-      if (custPhoneEl) custPhoneEl.innerText = pkg.customer_phone ? `+91 ${pkg.customer_phone}` : '-';
+      if (custPhoneEl) {
+        const cleanDigits = String(pkg.customer_phone || '').replace(/\D/g, '');
+        if (cleanDigits) {
+          const telHref = `tel:${cleanDigits.length === 10 ? '+91' + cleanDigits : '+' + cleanDigits}`;
+          const formatted = cleanDigits.length === 10 ? `+91 ${cleanDigits}` : cleanDigits;
+          custPhoneEl.innerHTML = `<a href="${telHref}" style="color:#38bdf8; text-decoration:none;" title="Call ${escapeHtml(displayName)}">${escapeHtml(formatted)}</a>`;
+        } else {
+          custPhoneEl.innerText = '-';
+        }
+      }
 
       const vehRegEl = document.getElementById('pkg-view-veh-reg');
       if (vehRegEl) vehRegEl.innerText = pkg.reg_number || '-';
@@ -9066,7 +9086,7 @@ TRIEYE DETAILING
       if (countEl) countEl.innerText = `${packages.length} package${packages.length === 1 ? '' : 's'} recorded`;
 
       if (!packages || packages.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; color:var(--muted); padding:2rem;">No packages found in directory.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="11" style="text-align:center; color:var(--muted); padding:2rem;">No packages found in directory.</td></tr>';
         return;
       }
 
@@ -9083,13 +9103,33 @@ TRIEYE DETAILING
         const payStatusClass = (pStatus === 'PAID') ? 'conf' : (pStatus === 'PARTIAL' || pStatus === 'PARTIALLY PAID' ? 'prog' : 'can');
         const payStatusLabel = (pStatus === 'PARTIAL') ? 'PARTIALLY PAID' : pStatus;
         
+        // Customer Name (line 1, bold) & Mobile link (line 2, smaller text)
+        const rawName = (pkg.customer_name || '').trim();
+        const hasValidName = rawName && 
+          rawName.toLowerCase() !== 'customer' && 
+          rawName.toLowerCase() !== 'valued customer' && 
+          rawName.toLowerCase() !== 'walk-in customer' && 
+          rawName.toLowerCase() !== 'name not available';
+        const displayName = hasValidName ? rawName : 'Name not available';
+
+        const cleanDigits = String(pkg.customer_phone || '').replace(/\D/g, '');
+        const phoneFormatted = cleanDigits.length === 10 ? cleanDigits : (pkg.customer_phone || '-');
+        const telHref = cleanDigits ? `tel:${cleanDigits.length === 10 ? '+91' + cleanDigits : '+' + cleanDigits}` : '';
+        const phoneHtml = cleanDigits ? `
+          <a href="${telHref}" style="font-family:'IBM Plex Mono'; font-size:0.78rem; font-weight:600; color:#38bdf8; text-decoration:none; display:inline-flex; align-items:center; gap:4px;" title="Call ${escapeHtml(displayName)}">
+            <span>📞</span> <span>${escapeHtml(phoneFormatted)}</span>
+          </a>
+        ` : `<span style="font-family:'IBM Plex Mono'; font-size:0.78rem; color:var(--muted);">-</span>`;
+
         tr.innerHTML = `
           <td style="font-family:'IBM Plex Mono'; font-weight:700; color:#38bdf8; font-size:0.8rem; padding:7px 10px;">${escapeHtml(pkg.package_id || pkg.id)}</td>
           <td style="padding:7px 10px;">
-            <div style="font-weight:700; color:#fff; font-size:0.88rem;">${escapeHtml(pkg.customer_name || 'Customer')}</div>
-          </td>
-          <td style="padding:7px 10px;">
-            <span style="font-family:'IBM Plex Mono'; font-size:0.82rem; font-weight:700; color:#38bdf8;">📞 ${escapeHtml(pkg.customer_phone || '-')}</span>
+            <div style="font-weight:700; color:${hasValidName ? '#fff' : 'var(--muted)'}; font-size:0.88rem; line-height:1.25; margin-bottom:3px;">
+              ${escapeHtml(displayName)}
+            </div>
+            <div>
+              ${phoneHtml}
+            </div>
           </td>
           <td style="padding:7px 10px;">
             <span style="font-family:'IBM Plex Mono'; font-weight:700; color:#fff; background:rgba(255,255,255,0.06); padding:2px 6px; border-radius:4px; font-size:0.8rem;">${escapeHtml(pkg.reg_number || '-')}</span>
@@ -9584,7 +9624,24 @@ TRIEYE DETAILING
         } catch (e) {}
       }
 
+      const rawPkgName = (pkg.customer_name || '').trim();
+      const hasRealName = rawPkgName && 
+        rawPkgName.toLowerCase() !== 'customer' && 
+        rawPkgName.toLowerCase() !== 'valued customer' && 
+        rawPkgName.toLowerCase() !== 'walk-in customer' && 
+        rawPkgName.toLowerCase() !== 'name not available';
+      const displayName = hasRealName ? rawPkgName : 'Name not available';
+
       if (invoice) {
+        if (!invoice.customers || !invoice.customers.name || invoice.customers.name === 'Valued Customer' || invoice.customers.name === 'Customer') {
+          invoice.customers = invoice.customers || {};
+          invoice.customers.name = displayName;
+          invoice.customer_name = displayName;
+        }
+        if (!invoice.customers.phone && pkg.customer_phone) {
+          invoice.customers.phone = pkg.customer_phone;
+          invoice.customer_phone = pkg.customer_phone;
+        }
         openInvoiceModal(invoice);
         return;
       }
@@ -9600,10 +9657,10 @@ TRIEYE DETAILING
         invoice_number: pkg.invoice_number || pkg.package_id || 'TRI-INV-PKG',
         created_at: pkg.purchase_date ? (pkg.purchase_date + 'T10:00:00Z') : new Date().toISOString(),
         customer_id: pkg.customer_id,
-        customer_name: pkg.customer_name,
+        customer_name: displayName,
         customer_phone: pkg.customer_phone,
         customers: {
-          name: pkg.customer_name,
+          name: displayName,
           phone: pkg.customer_phone,
           reg_number: pkg.reg_number
         },
@@ -10860,11 +10917,14 @@ let currentPrintInvoice = null;
 
 async function openInvoiceModal(invoiceId) {
   currentPrintInvoice = null;
-  const inv = await window.TrieyeDB.getInvoiceById(invoiceId);
+  const inv = (invoiceId && typeof invoiceId === 'object' && invoiceId.id) 
+    ? invoiceId 
+    : await window.TrieyeDB.getInvoiceById(invoiceId);
   if (!inv) return;
   currentPrintInvoice = inv;
   
-  const cust = inv.customers || {};
+  const rawCust = inv.customers;
+  const cust = Array.isArray(rawCust) ? (rawCust[0] || {}) : (rawCust || {});
   const veh = inv.vehicles || {};
   const items = inv.invoice_items || [];
   const metrics = window.TrieyeDB && typeof window.TrieyeDB.calculateBillMetrics === 'function'
@@ -10908,8 +10968,28 @@ async function openInvoiceModal(invoiceId) {
   document.getElementById('inv-num').innerText = inv.invoice_number;
   document.getElementById('inv-date').innerText = 'Date: ' + new Date(inv.created_at).toLocaleString();
   
-  document.getElementById('inv-cust-name').innerText = cust.name || 'Valued Customer';
-  document.getElementById('inv-cust-phone').innerText = cust.phone ? '+91 ' + cust.phone : 'N/A';
+  const rawCustName = (cust.name || inv.customer_name || '').trim();
+  const hasRealCustName = rawCustName && 
+    rawCustName.toLowerCase() !== 'customer' && 
+    rawCustName.toLowerCase() !== 'valued customer' && 
+    rawCustName.toLowerCase() !== 'walk-in customer' && 
+    rawCustName.toLowerCase() !== 'name not available';
+  const displayCustName = hasRealCustName ? rawCustName : 'Name not available';
+
+  const rawPhone = cust.phone || inv.customer_phone || '';
+  const cleanPhoneDigits = String(rawPhone).replace(/\D/g, '');
+
+  document.getElementById('inv-cust-name').innerText = displayCustName;
+  const phoneEl = document.getElementById('inv-cust-phone');
+  if (phoneEl) {
+    if (cleanPhoneDigits) {
+      const telHref = `tel:${cleanPhoneDigits.length === 10 ? '+91' + cleanPhoneDigits : '+' + cleanPhoneDigits}`;
+      const formatted = cleanPhoneDigits.length === 10 ? `+91 ${cleanPhoneDigits}` : cleanPhoneDigits;
+      phoneEl.innerHTML = `<a href="${telHref}" style="color:inherit; text-decoration:none;" title="Call ${escapeHtml(displayCustName)}">${escapeHtml(formatted)}</a>`;
+    } else {
+      phoneEl.innerText = 'N/A';
+    }
+  }
   
   document.getElementById('inv-veh-reg').innerText = veh.reg_number || 'N/A';
   document.getElementById('inv-veh-model').innerText = veh.vehicle_type || 'Car';
