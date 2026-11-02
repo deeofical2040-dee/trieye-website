@@ -71,27 +71,63 @@
     },
     "active": true
   },
-  "Monthly Car Care Package": {
+  "TRIEYE Monthly Car Care Pack": {
     "id": "trieye-pkg-monthly-car-care",
-    "name": "Monthly Car Care Package",
-    "desc": "30-Day Package: 1 Complete Wash + 2 Basic Washes + 2 Outer Foam Washes",
+    "name": "TRIEYE Monthly Car Care Pack",
+    "desc": "30-Day Package: 1 Complete Wash + 1 Basic Wash + 4 Outer Foam Washes (Total: 6 Washes)",
     "base_price": 2499,
-    "hatchback_price": 1999,
-    "sedan_price": 2499,
-    "suv_price": 2999,
+    "small_car_price": 2499,
+    "medium_car_price": 2699,
+    "hatchback_price": 2499,
+    "sedan_price": 2699,
+    "suv_price": 2799,
     "bike_price": 999,
     "duration_minutes": 60,
     "pricing": {
-      "Hatchback": 1999,
-      "Sedan": 2499,
-      "SUV / 4x4": 2999,
+      "Small Car": 2499,
+      "Medium Car": 2699,
+      "SUV": 2799,
+      "Hatchback": 2499,
+      "Sedan": 2699,
+      "SUV / 4x4": 2799,
       "Superbike": 999
     },
     "is_package": true,
     "package_washes": {
       "complete": 1,
-      "basic": 2,
-      "outer_foam": 2
+      "basic": 1,
+      "outer_foam": 4,
+      "total": 6
+    },
+    "active": true
+  },
+  "Monthly Car Care Package": {
+    "id": "trieye-pkg-monthly-car-care",
+    "name": "TRIEYE Monthly Car Care Pack",
+    "desc": "30-Day Package: 1 Complete Wash + 1 Basic Wash + 4 Outer Foam Washes (Total: 6 Washes)",
+    "base_price": 2499,
+    "small_car_price": 2499,
+    "medium_car_price": 2699,
+    "hatchback_price": 2499,
+    "sedan_price": 2699,
+    "suv_price": 2799,
+    "bike_price": 999,
+    "duration_minutes": 60,
+    "pricing": {
+      "Small Car": 2499,
+      "Medium Car": 2699,
+      "SUV": 2799,
+      "Hatchback": 2499,
+      "Sedan": 2699,
+      "SUV / 4x4": 2799,
+      "Superbike": 999
+    },
+    "is_package": true,
+    "package_washes": {
+      "complete": 1,
+      "basic": 1,
+      "outer_foam": 4,
+      "total": 6
     },
     "active": true
   }

@@ -2819,6 +2819,7 @@
                 </div>
                 <div style="display:flex; align-items:center; gap:0.6rem;">
                   <span id="pkg-view-status-badge" class="status-badge conf">ACTIVE</span>
+                  <button class="btn btn-outline" id="btn-view-pkg-invoice" onclick="viewPackageInvoice(currentSelectedPackageId)" style="padding:0.3rem 0.6rem; font-size:0.75rem; border-color:#38bdf8; color:#38bdf8;">🧾 View Invoice</button>
                   <button class="btn btn-outline" onclick="closeActivePackageView()" style="padding:0.3rem 0.6rem; font-size:0.75rem;">✕ Close View</button>
                 </div>
               </div>
@@ -2854,24 +2855,30 @@
                   <div class="pkg-wash-balance-card" id="card-bal-complete" style="padding:1.1rem; border-radius:10px; background:rgba(34,197,94,0.06); border:1px solid rgba(34,197,94,0.3); text-align:center;">
                     <div style="font-size:1.75rem; margin-bottom:0.25rem;">🚗</div>
                     <div style="font-size:0.85rem; font-weight:700; color:#fff;">Complete Wash</div>
-                    <div style="font-family:'IBM Plex Mono'; font-size:2rem; font-weight:800; color:#22c55e; margin:0.35rem 0;" id="pkg-bal-complete">0</div>
-                    <div style="font-size:0.72rem; color:var(--muted);">remaining this month</div>
+                    <div style="font-family:'IBM Plex Mono'; font-size:2rem; font-weight:800; color:#22c55e; margin:0.35rem 0;">
+                      <span id="pkg-bal-complete">0</span><span style="font-size:1rem; color:var(--muted); font-weight:500;"> / 1</span>
+                    </div>
+                    <div style="font-size:0.72rem; color:var(--muted);">1 wash allocation included</div>
                   </div>
 
                   <!-- Basic Wash Card -->
                   <div class="pkg-wash-balance-card" id="card-bal-basic" style="padding:1.1rem; border-radius:10px; background:rgba(56,189,248,0.06); border:1px solid rgba(56,189,248,0.3); text-align:center;">
                     <div style="font-size:1.75rem; margin-bottom:0.25rem;">🚿</div>
                     <div style="font-size:0.85rem; font-weight:700; color:#fff;">Basic Wash</div>
-                    <div style="font-family:'IBM Plex Mono'; font-size:2rem; font-weight:800; color:#38bdf8; margin:0.35rem 0;" id="pkg-bal-basic">0</div>
-                    <div style="font-size:0.72rem; color:var(--muted);">remaining this month</div>
+                    <div style="font-family:'IBM Plex Mono'; font-size:2rem; font-weight:800; color:#38bdf8; margin:0.35rem 0;">
+                      <span id="pkg-bal-basic">0</span><span style="font-size:1rem; color:var(--muted); font-weight:500;"> / 1</span>
+                    </div>
+                    <div style="font-size:0.72rem; color:var(--muted);">1 wash allocation included</div>
                   </div>
 
                   <!-- Outer Foam Wash Card -->
                   <div class="pkg-wash-balance-card" id="card-bal-outer" style="padding:1.1rem; border-radius:10px; background:rgba(238,47,118,0.06); border:1px solid rgba(238,47,118,0.3); text-align:center;">
                     <div style="font-size:1.75rem; margin-bottom:0.25rem;">🫧</div>
                     <div style="font-size:0.85rem; font-weight:700; color:#fff;">Outer Foam Wash</div>
-                    <div style="font-family:'IBM Plex Mono'; font-size:2rem; font-weight:800; color:#ee2f76; margin:0.35rem 0;" id="pkg-bal-outer">0</div>
-                    <div style="font-size:0.72rem; color:var(--muted);">remaining this month</div>
+                    <div style="font-family:'IBM Plex Mono'; font-size:2rem; font-weight:800; color:#ee2f76; margin:0.35rem 0;">
+                      <span id="pkg-bal-outer">0</span><span style="font-size:1rem; color:var(--muted); font-weight:500;"> / 4</span>
+                    </div>
+                    <div style="font-size:0.72rem; color:var(--muted);">4 wash allocations included</div>
                   </div>
                 </div>
 
@@ -2961,18 +2968,20 @@
                 <tr>
                   <th>Package ID</th>
                   <th>Customer</th>
-                  <th>Vehicle</th>
+                  <th>Mobile</th>
+                  <th>Vehicle Number</th>
+                  <th>Vehicle Category</th>
                   <th>Complete Left</th>
                   <th>Basic Left</th>
                   <th>Outer Foam Left</th>
                   <th>Total Left</th>
                   <th>Expiry Date</th>
-                  <th>Status</th>
-                  <th>Action</th>
+                  <th>Payment Status</th>
+                  <th>Actions</th>
                 </tr>
               </thead>
               <tbody id="pkg-directory-tbody">
-                <tr><td colspan="10" style="text-align:center; color:var(--muted); padding:2rem;">Loading packages...</td></tr>
+                <tr><td colspan="12" style="text-align:center; color:var(--muted); padding:2rem;">Loading packages...</td></tr>
               </tbody>
             </table>
           </div>
@@ -3776,63 +3785,104 @@
 
   <!-- NEW PACKAGE PURCHASE MODAL (NO QR CODE) -->
   <div class="dash-modal-backdrop" id="modalNewPackage">
-    <div class="dash-modal" style="max-width:520px;">
+    <div class="dash-modal" style="max-width:560px;">
       <div class="dash-modal-header">
-        <div class="dash-modal-title"><span>📦</span> Issue Monthly Car Care Package</div>
+        <div class="dash-modal-title"><span>📦</span> Issue TRIEYE Monthly Car Care Pack</div>
         <button class="dash-modal-close" onclick="closeModal('modalNewPackage')">&times;</button>
       </div>
       <div class="dash-modal-body">
         <form id="newPackageForm" onsubmit="event.preventDefault(); handleNewPackageSubmit();">
+          <!-- 1. Customer Select or Create New -->
           <div class="form-group" style="margin-bottom:1rem;">
-            <label class="form-label">Customer Mobile Number *</label>
-            <input type="tel" id="npkg-phone" class="form-input" placeholder="9876543210" maxlength="10" required oninput="handleNewPackagePhoneInput()">
-          </div>
-
-          <div class="form-group" style="margin-bottom:1rem;">
-            <label class="form-label">Customer Name *</label>
-            <input type="text" id="npkg-name" class="form-input" placeholder="Customer Name" required>
+            <label class="form-label" style="display:flex; justify-content:space-between; align-items:center;">
+              <span>Select Existing Customer (or Enter New Below)</span>
+              <span style="font-size:0.7rem; color:#38bdf8; text-transform:none; font-weight:normal;">Auto-fills details</span>
+            </label>
+            <select class="form-select" id="npkg-cust-select" onchange="handleNewPackageCustomerSelect(this.value)">
+              <option value="">-- Enter New Customer Details --</option>
+            </select>
           </div>
 
           <div class="form-grid" style="grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:1rem;">
             <div class="form-group">
-              <label class="form-label">Vehicle Registration *</label>
+              <label class="form-label">Customer Name *</label>
+              <input type="text" id="npkg-name" class="form-input" placeholder="Customer Name" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Mobile Number *</label>
+              <input type="tel" id="npkg-phone" class="form-input" placeholder="9876543210" maxlength="10" required oninput="handleNewPackagePhoneInput()">
+            </div>
+          </div>
+
+          <!-- 2. Vehicle Registration & Category -->
+          <div class="form-grid" style="grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:1rem;">
+            <div class="form-group">
+              <label class="form-label">Vehicle Registration Number *</label>
               <input type="text" id="npkg-reg" class="form-input" placeholder="TN 01 AB 1234" maxlength="13" required style="text-transform:uppercase;">
             </div>
             <div class="form-group">
-              <label class="form-label">Vehicle Type *</label>
+              <label class="form-label">Vehicle Category *</label>
               <select class="form-select" id="npkg-vtype" onchange="updateNewPackagePrice()">
-                <option value="Hatchback">Hatchback</option>
-                <option value="Sedan" selected>Sedan</option>
-                <option value="SUV / 4x4">SUV</option>
-                <option value="Bike">Bike</option>
+                <option value="Small Car">Small Car (Hatchback) — ₹2,499</option>
+                <option value="Medium Car" selected>Medium Car (Sedan) — ₹2,699</option>
+                <option value="SUV">SUV / 4x4 — ₹2,799</option>
               </select>
             </div>
           </div>
 
+          <!-- 3. Included Monthly Washes (6 Total) & 30-Day Validity -->
           <div style="background:rgba(255,255,255,0.03); border:1px solid var(--line); border-radius:8px; padding:12px; margin-bottom:1rem;">
-            <div style="font-size:0.75rem; color:#38bdf8; text-transform:uppercase; font-family:'IBM Plex Mono'; font-weight:700; margin-bottom:6px;">
-              Included Monthly Wash Allocations (30 Days)
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:4px;">
+              <div style="font-size:0.75rem; color:#38bdf8; text-transform:uppercase; font-family:'IBM Plex Mono'; font-weight:700;">
+                Monthly Wash Allocations (30 Days)
+              </div>
+              <div id="npkg-validity-dates" style="font-size:0.75rem; color:var(--muted); font-family:'IBM Plex Mono';">
+                Valid: 30 Days from Purchase
+              </div>
             </div>
-            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; text-align:center;">
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:6px; text-align:center;">
               <div style="background:rgba(34,197,94,0.1); border:1px solid rgba(34,197,94,0.3); border-radius:6px; padding:6px;">
-                <div style="font-size:0.75rem; color:var(--muted);">Complete</div>
+                <div style="font-size:0.68rem; color:var(--muted);">Complete</div>
                 <strong style="color:#22c55e; font-size:1.1rem; font-family:'IBM Plex Mono';" id="npkg-alloc-complete">1</strong>
               </div>
               <div style="background:rgba(56,189,248,0.1); border:1px solid rgba(56,189,248,0.3); border-radius:6px; padding:6px;">
-                <div style="font-size:0.75rem; color:var(--muted);">Basic</div>
-                <strong style="color:#38bdf8; font-size:1.1rem; font-family:'IBM Plex Mono';" id="npkg-alloc-basic">2</strong>
+                <div style="font-size:0.68rem; color:var(--muted);">Basic</div>
+                <strong style="color:#38bdf8; font-size:1.1rem; font-family:'IBM Plex Mono';" id="npkg-alloc-basic">1</strong>
               </div>
               <div style="background:rgba(238,47,118,0.1); border:1px solid rgba(238,47,118,0.3); border-radius:6px; padding:6px;">
-                <div style="font-size:0.75rem; color:var(--muted);">Outer Foam</div>
-                <strong style="color:#ee2f76; font-size:1.1rem; font-family:'IBM Plex Mono';" id="npkg-alloc-outer">2</strong>
+                <div style="font-size:0.68rem; color:var(--muted);">Outer Foam</div>
+                <strong style="color:#ee2f76; font-size:1.1rem; font-family:'IBM Plex Mono';" id="npkg-alloc-outer">4</strong>
               </div>
+              <div style="background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.2); border-radius:6px; padding:6px;">
+                <div style="font-size:0.68rem; color:var(--muted);">Total Washes</div>
+                <strong style="color:#fff; font-size:1.1rem; font-family:'IBM Plex Mono';" id="npkg-alloc-total">6</strong>
+              </div>
+            </div>
+            <div style="font-size:0.72rem; color:var(--muted); margin-top:8px; line-height:1.4;">
+              ✓ Included washes are 100% covered at ₹0 redemption charge. Package valid for exactly 30 days.
             </div>
           </div>
 
+          <!-- 4. Pricing, Amount Collected & Balance Due -->
           <div class="form-grid" style="grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:1rem;">
             <div class="form-group">
               <label class="form-label">Package Price (₹) *</label>
-              <input type="number" id="npkg-price" class="form-input" value="2499" min="0" required>
+              <input type="number" id="npkg-price" class="form-input" value="2699" min="0" required oninput="calculateNewPackageBilling()">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Amount Paid / Collected (₹) *</label>
+              <input type="number" id="npkg-amt-paid" class="form-input" value="2699" min="0" required oninput="calculateNewPackageBilling()">
+            </div>
+          </div>
+
+          <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr; gap:0.75rem; margin-bottom:1rem;">
+            <div class="form-group">
+              <label class="form-label">Balance Due (₹)</label>
+              <input type="number" id="npkg-bal-due" class="form-input" value="0" readonly style="background:rgba(255,255,255,0.05); color:#22c55e; font-weight:700;">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Payment Status</label>
+              <input type="text" id="npkg-pay-status" class="form-input" value="PAID" readonly style="background:rgba(255,255,255,0.05); color:#22c55e; font-weight:700;">
             </div>
             <div class="form-group">
               <label class="form-label">Payment Method</label>
@@ -4215,26 +4265,61 @@
         },
         active: true
       },
-      'Monthly Car Care Package': {
-        name: 'Monthly Car Care Package',
-        desc: '30-Day Package: 1 Complete Wash + 2 Basic Washes + 2 Outer Foam Washes',
+      'TRIEYE Monthly Car Care Pack': {
+        name: 'TRIEYE Monthly Car Care Pack',
+        desc: '30-Day Package: 1 Complete Wash + 1 Basic Wash + 4 Outer Foam Washes (Total: 6 Washes)',
         duration_minutes: 60,
         base_price: 2499,
-        hatchback_price: 1999,
-        sedan_price: 2499,
-        suv_price: 2999,
+        small_car_price: 2499,
+        medium_car_price: 2699,
+        hatchback_price: 2499,
+        sedan_price: 2699,
+        suv_price: 2799,
         bike_price: 999,
         pricing: {
-          'Hatchback': 1999,
-          'Sedan': 2499,
-          'SUV / 4x4': 2999,
+          'Small Car': 2499,
+          'Medium Car': 2699,
+          'SUV': 2799,
+          'Hatchback': 2499,
+          'Sedan': 2699,
+          'SUV / 4x4': 2799,
           'Superbike': 999
         },
         is_package: true,
         package_washes: {
           complete: 1,
-          basic: 2,
-          outer_foam: 2
+          basic: 1,
+          outer_foam: 4,
+          total: 6
+        },
+        active: true
+      },
+      'Monthly Car Care Package': {
+        name: 'TRIEYE Monthly Car Care Pack',
+        desc: '30-Day Package: 1 Complete Wash + 1 Basic Wash + 4 Outer Foam Washes (Total: 6 Washes)',
+        duration_minutes: 60,
+        base_price: 2499,
+        small_car_price: 2499,
+        medium_car_price: 2699,
+        hatchback_price: 2499,
+        sedan_price: 2699,
+        suv_price: 2799,
+        bike_price: 999,
+        pricing: {
+          'Small Car': 2499,
+          'Medium Car': 2699,
+          'SUV': 2799,
+          'Hatchback': 2499,
+          'Sedan': 2699,
+          'SUV / 4x4': 2799,
+          'Superbike': 999
+        },
+        is_package: true,
+        package_washes: {
+          complete: 1,
+          basic: 1,
+          outer_foam: 4,
+          total: 6
         },
         active: true
       }
@@ -8701,7 +8786,7 @@ TRIEYE DETAILING
       if (matches.length === 0) {
         const tbody = document.getElementById('pkg-directory-tbody');
         if (tbody) {
-          tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; color:#f87171; padding:2rem;">No packages found matching "<strong>${escapeHtml(query)}</strong>". Try searching by 10-digit mobile number, vehicle number, or Package ID.</td></tr>`;
+          tbody.innerHTML = `<tr><td colspan="12" style="text-align:center; color:#f87171; padding:2rem;">No packages found matching "<strong>${escapeHtml(query)}</strong>". Try searching by 10-digit mobile number, vehicle number, or Package ID.</td></tr>`;
         }
         const countEl = document.getElementById('pkg-directory-count');
         if (countEl) countEl.innerText = '0 packages matched';
@@ -8903,7 +8988,7 @@ TRIEYE DETAILING
       if (countEl) countEl.innerText = `${packages.length} package${packages.length === 1 ? '' : 's'} recorded`;
 
       if (!packages || packages.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; color:var(--muted); padding:2rem;">No packages found in directory.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; color:var(--muted); padding:2rem;">No packages found in directory.</td></tr>';
         return;
       }
 
@@ -8916,28 +9001,28 @@ TRIEYE DETAILING
         const outerVal = Number(rem.outer_foam || 0);
         const totalVal = compVal + basicVal + outerVal;
 
-        const st = (pkg.status || 'ACTIVE').toUpperCase();
-        const statusClass = st === 'ACTIVE' ? 'conf' : (st === 'EXPIRED' ? 'can' : 'prog');
+        const pStatus = (pkg.payment_status || (pkg.balance_due > 0 ? 'PARTIAL' : 'PAID')).toUpperCase();
+        const payStatusClass = (pStatus === 'PAID') ? 'conf' : (pStatus === 'PARTIAL' || pStatus === 'PARTIALLY PAID' ? 'prog' : 'can');
+        const payStatusLabel = (pStatus === 'PARTIAL') ? 'PARTIALLY PAID' : pStatus;
         
         tr.innerHTML = `
           <td style="font-family:'IBM Plex Mono'; font-weight:700; color:#38bdf8;">${escapeHtml(pkg.package_id || pkg.id)}</td>
-          <td>
-            <div style="font-weight:600; color:#fff;">${escapeHtml(pkg.customer_name || 'Customer')}</div>
-            <div style="font-family:'IBM Plex Mono'; font-size:0.72rem; color:var(--muted);">${escapeHtml(pkg.customer_phone || '-')}</div>
-          </td>
-          <td>
-            <div style="font-family:'IBM Plex Mono'; font-weight:600;">${escapeHtml(pkg.reg_number || '-')}</div>
-            <div style="font-size:0.72rem; color:var(--muted);">${escapeHtml(pkg.vehicle_type || 'Car')}</div>
-          </td>
-          <td style="font-family:'IBM Plex Mono'; font-weight:700; color:${compVal > 0 ? '#22c55e' : 'var(--muted)'};">${compVal}</td>
-          <td style="font-family:'IBM Plex Mono'; font-weight:700; color:${basicVal > 0 ? '#38bdf8' : 'var(--muted)'};">${basicVal}</td>
-          <td style="font-family:'IBM Plex Mono'; font-weight:700; color:${outerVal > 0 ? '#ee2f76' : 'var(--muted)'};">${outerVal}</td>
-          <td style="font-family:'IBM Plex Mono'; font-weight:800; color:#fff;">${totalVal}</td>
+          <td><strong style="color:#fff;">${escapeHtml(pkg.customer_name || 'Customer')}</strong></td>
+          <td style="font-family:'IBM Plex Mono'; font-size:0.82rem; color:var(--muted);">${escapeHtml(pkg.customer_phone || '-')}</td>
+          <td style="font-family:'IBM Plex Mono'; font-weight:600; color:#fff;">${escapeHtml(pkg.reg_number || '-')}</td>
+          <td><span class="status-badge" style="background:rgba(255,255,255,0.06); color:#ddd;">${escapeHtml(pkg.vehicle_category || pkg.vehicle_type || 'Medium Car')}</span></td>
+          <td style="font-family:'IBM Plex Mono'; font-weight:700; color:${compVal > 0 ? '#22c55e' : 'var(--muted)'};">${compVal} / 1</td>
+          <td style="font-family:'IBM Plex Mono'; font-weight:700; color:${basicVal > 0 ? '#38bdf8' : 'var(--muted)'};">${basicVal} / 1</td>
+          <td style="font-family:'IBM Plex Mono'; font-weight:700; color:${outerVal > 0 ? '#ee2f76' : 'var(--muted)'};">${outerVal} / 4</td>
+          <td style="font-family:'IBM Plex Mono'; font-weight:800; color:#fff;">${totalVal} / 6</td>
           <td style="font-family:'IBM Plex Mono'; font-size:0.78rem;">${escapeHtml(pkg.expiry_date || '-')}</td>
-          <td><span class="status-badge ${statusClass}">${escapeHtml(st)}</span></td>
-          <td>
-            <button class="btn btn-primary" style="padding:0.3rem 0.75rem; font-size:0.75rem;" onclick="selectActivePackage('${escapeHtml(pkg.id)}')">
-              Redeem / Manage
+          <td><span class="status-badge ${payStatusClass}">${escapeHtml(payStatusLabel)}</span></td>
+          <td style="white-space:nowrap;">
+            <button class="btn btn-primary" style="padding:0.25rem 0.6rem; font-size:0.75rem; margin-right:4px;" onclick="selectActivePackage('${escapeHtml(pkg.id)}')">
+              🧼 Redeem
+            </button>
+            <button class="btn btn-outline" style="padding:0.25rem 0.6rem; font-size:0.75rem; border-color:#38bdf8; color:#38bdf8;" onclick="viewPackageInvoice('${escapeHtml(pkg.id)}')">
+              🧾 Invoice
             </button>
           </td>
         `;
@@ -9131,54 +9216,173 @@ TRIEYE DETAILING
       window.open(url, '_blank');
     }
 
-    function openNewPackageModal() {
+    async function openNewPackageModal() {
       const form = document.getElementById('newPackageForm');
       if (form) form.reset();
+
       const regInput = document.getElementById('npkg-reg');
       if (regInput && window.TrieyeDB && typeof window.TrieyeDB.attachVehicleInput === 'function') {
         window.TrieyeDB.attachVehicleInput(regInput);
       }
+
+      // Populate existing customer selection dropdown
+      const selectEl = document.getElementById('npkg-cust-select');
+      if (selectEl) {
+        selectEl.innerHTML = '<option value="">-- Enter New Customer Details --</option>';
+        let custMap = {};
+        if (window.TrieyeDB && typeof window.TrieyeDB.getCustomers === 'function') {
+          try {
+            custMap = await window.TrieyeDB.getCustomers();
+          } catch (e) {}
+        }
+        if (!custMap || Object.keys(custMap).length === 0) {
+          custMap = typeof getCustomers === 'function' ? getCustomers() : {};
+        }
+
+        const custArr = Object.values(custMap || {}).filter(c => c && (c.name || c.phone));
+        custArr.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+
+        custArr.forEach(c => {
+          const cleanPhone = String(c.phone || '').replace(/\D/g, '').slice(-10);
+          const name = c.name || 'Customer';
+          const reg = c.vehicleReg || c.reg || '';
+          const opt = document.createElement('option');
+          opt.value = cleanPhone;
+          opt.innerText = `${name} (${cleanPhone})${reg ? ' • ' + reg : ''}`;
+          selectEl.appendChild(opt);
+        });
+      }
+
+      // Display 30-day validity dates
+      const today = new Date();
+      const expDate = new Date();
+      expDate.setDate(expDate.getDate() + 30);
+      const formatDate = d => d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+      const valEl = document.getElementById('npkg-validity-dates');
+      if (valEl) {
+        valEl.innerText = `${formatDate(today)} → ${formatDate(expDate)} (30 Days)`;
+      }
+
+      // Set default vehicle category to Medium Car
+      const vtypeEl = document.getElementById('npkg-vtype');
+      if (vtypeEl) vtypeEl.value = 'Medium Car';
+
       updateNewPackagePrice();
       openModal('modalNewPackage');
     }
 
+    function handleNewPackageCustomerSelect(phoneKey) {
+      if (!phoneKey) {
+        // Clear inputs for manual entry
+        const nameInput = document.getElementById('npkg-name');
+        if (nameInput) nameInput.value = '';
+        const phoneInput = document.getElementById('npkg-phone');
+        if (phoneInput) phoneInput.value = '';
+        const regInput = document.getElementById('npkg-reg');
+        if (regInput) regInput.value = '';
+        updateNewPackagePrice();
+        return;
+      }
+
+      let custMap = {};
+      if (typeof getCustomers === 'function') custMap = getCustomers();
+      let cust = custMap[phoneKey];
+
+      if (!cust && window.TrieyeDB) {
+        try {
+          const local = JSON.parse(localStorage.getItem('trieye_customers')) || {};
+          cust = local[phoneKey];
+        } catch (e) {}
+      }
+
+      if (cust) {
+        const nameInput = document.getElementById('npkg-name');
+        if (nameInput) nameInput.value = cust.name || '';
+        const phoneInput = document.getElementById('npkg-phone');
+        if (phoneInput) phoneInput.value = String(cust.phone || phoneKey).replace(/\D/g, '').slice(-10);
+        const regInput = document.getElementById('npkg-reg');
+        if (regInput) regInput.value = cust.vehicleReg || cust.reg || '';
+
+        const vtypeInput = document.getElementById('npkg-vtype');
+        if (vtypeInput && (cust.vehicleType || cust.category)) {
+          const cType = String(cust.vehicleType || cust.category).toLowerCase();
+          if (cType.includes('small') || cType.includes('hatch')) {
+            vtypeInput.value = 'Small Car';
+          } else if (cType.includes('suv') || cType.includes('4x4')) {
+            vtypeInput.value = 'SUV';
+          } else {
+            vtypeInput.value = 'Medium Car';
+          }
+        }
+        updateNewPackagePrice();
+      }
+    }
+
     function updateNewPackagePrice() {
-      const vType = document.getElementById('npkg-vtype')?.value || 'Sedan';
+      const vType = document.getElementById('npkg-vtype')?.value || 'Medium Car';
       const priceInput = document.getElementById('npkg-price');
+      const amtPaidInput = document.getElementById('npkg-amt-paid');
       if (!priceInput) return;
       
-      let price = 2499;
-      if (vType === 'Hatchback') price = 1999;
-      else if (vType === 'Sedan') price = 2499;
-      else if (vType.includes('SUV')) price = 2999;
-      else if (vType === 'Bike') price = 999;
-
-      if (window.TrieyeDB && typeof window.TrieyeDB.getServices === 'function') {
-        const services = window.TrieyeDB.getServices();
-        const pkgService = services.find(s => (s.name || '').toLowerCase().includes('care package'));
-        if (pkgService && pkgService.prices && pkgService.prices[vType] !== undefined) {
-          price = Number(pkgService.prices[vType]);
-        }
+      let price = 2699;
+      if (window.TrieyeDB && typeof window.TrieyeDB.getPackagePriceByCategory === 'function') {
+        price = window.TrieyeDB.getPackagePriceByCategory(vType);
+      } else {
+        if (vType === 'Small Car' || vType === 'Hatchback') price = 2499;
+        else if (vType === 'SUV' || vType.includes('SUV')) price = 2799;
+        else price = 2699;
       }
+
       priceInput.value = price;
+      if (amtPaidInput) amtPaidInput.value = price;
+
+      calculateNewPackageBilling();
+    }
+
+    function calculateNewPackageBilling() {
+      const price = Number(document.getElementById('npkg-price')?.value || 0);
+      const amtPaid = Number(document.getElementById('npkg-amt-paid')?.value || 0);
+      const balDue = Math.max(0, price - amtPaid);
+
+      const balEl = document.getElementById('npkg-bal-due');
+      if (balEl) balEl.value = balDue;
+
+      const stEl = document.getElementById('npkg-pay-status');
+      if (stEl) {
+        const isPaid = balDue === 0;
+        const isPartial = amtPaid > 0 && balDue > 0;
+        const status = isPaid ? 'PAID' : (isPartial ? 'PARTIALLY PAID' : 'PENDING');
+        stEl.value = status;
+        stEl.style.color = isPaid ? '#22c55e' : (isPartial ? '#fbbf24' : '#f87171');
+      }
     }
 
     function handleNewPackagePhoneInput() {
       const phoneVal = (document.getElementById('npkg-phone')?.value || '').replace(/\D/g, '');
       if (phoneVal.length === 10) {
-        if (window.TrieyeDB && typeof window.TrieyeDB.getCustomers === 'function') {
-          const custs = window.TrieyeDB.getCustomers();
-          const match = custs[phoneVal];
-          if (match) {
-            const nameInput = document.getElementById('npkg-name');
-            if (nameInput && !nameInput.value) nameInput.value = match.name || '';
-            const regInput = document.getElementById('npkg-reg');
-            if (regInput && !regInput.value) regInput.value = match.vehicleReg || match.reg || '';
-            const vtypeInput = document.getElementById('npkg-vtype');
-            if (vtypeInput && match.vehicleType) {
-              vtypeInput.value = match.vehicleType;
-              updateNewPackagePrice();
-            }
+        let custMap = {};
+        if (typeof getCustomers === 'function') custMap = getCustomers();
+        if ((!custMap || !custMap[phoneVal]) && window.TrieyeDB) {
+          try {
+            const local = JSON.parse(localStorage.getItem('trieye_customers')) || {};
+            custMap = local;
+          } catch (e) {}
+        }
+        const match = custMap[phoneVal];
+        if (match) {
+          const selectEl = document.getElementById('npkg-cust-select');
+          if (selectEl) selectEl.value = phoneVal;
+          const nameInput = document.getElementById('npkg-name');
+          if (nameInput && !nameInput.value) nameInput.value = match.name || '';
+          const regInput = document.getElementById('npkg-reg');
+          if (regInput && !regInput.value) regInput.value = match.vehicleReg || match.reg || '';
+          const vtypeInput = document.getElementById('npkg-vtype');
+          if (vtypeInput && (match.vehicleType || match.category)) {
+            const cType = String(match.vehicleType || match.category).toLowerCase();
+            if (cType.includes('small') || cType.includes('hatch')) vtypeInput.value = 'Small Car';
+            else if (cType.includes('suv') || cType.includes('4x4')) vtypeInput.value = 'SUV';
+            else vtypeInput.value = 'Medium Car';
+            updateNewPackagePrice();
           }
         }
       }
@@ -9187,53 +9391,76 @@ TRIEYE DETAILING
     async function handleNewPackageSubmit() {
       const phone = (document.getElementById('npkg-phone')?.value || '').trim();
       const name = (document.getElementById('npkg-name')?.value || '').trim();
-      const reg = (document.getElementById('npkg-reg')?.value || '').trim();
-      const vtype = document.getElementById('npkg-vtype')?.value || 'Car';
-      const price = Number(document.getElementById('npkg-price')?.value || 2499);
+      const rawReg = (document.getElementById('npkg-reg')?.value || '').trim();
+      const vtype = document.getElementById('npkg-vtype')?.value || 'Medium Car';
+      const price = Number(document.getElementById('npkg-price')?.value || 2699);
+      const amtPaid = Number(document.getElementById('npkg-amt-paid')?.value || price);
+      const balDue = Math.max(0, price - amtPaid);
+      const payStatus = balDue === 0 ? 'PAID' : (amtPaid > 0 ? 'PARTIAL' : 'UNPAID');
       const payMethod = document.getElementById('npkg-pay-method')?.value || 'UPI';
 
-      if (!phone || phone.replace(/\D/g, '').length < 10) {
+      const cleanPhone = phone.replace(/\D/g, '').slice(-10);
+      if (!cleanPhone || cleanPhone.length < 10) {
         alert('Please enter a valid 10-digit mobile number.');
+        document.getElementById('npkg-phone')?.focus();
         return;
       }
       if (!name) {
         alert('Please enter customer name.');
+        document.getElementById('npkg-name')?.focus();
         return;
       }
-      if (!reg) {
+      if (!rawReg) {
         alert('Please enter vehicle registration number.');
+        document.getElementById('npkg-reg')?.focus();
         return;
       }
+
+      const normReg = window.TrieyeDB && typeof window.TrieyeDB.formatVehicleNumber === 'function'
+        ? window.TrieyeDB.formatVehicleNumber(rawReg)
+        : rawReg.toUpperCase();
 
       const btn = document.getElementById('btn-submit-new-pkg');
       if (btn) {
         btn.disabled = true;
-        btn.innerText = 'Activating...';
+        btn.innerText = 'Activating & Generating Invoice...';
       }
 
       try {
-        const res = await window.TrieyeDB.createPackage({
+        const res = await window.TrieyeDB.purchaseMonthlyPackage({
           customer_name: name,
-          customer_phone: phone,
-          reg_number: reg,
+          customer_phone: cleanPhone,
+          reg_number: normReg,
           vehicle_type: vtype,
+          vehicle_category: vtype,
           price: price,
+          amount_paid: amtPaid,
+          amount_collected: amtPaid,
+          balance_due: balDue,
+          payment_status: payStatus,
           payment_method: payMethod,
-          package_name: 'Monthly Car Care Package'
+          package_name: 'TRIEYE Monthly Car Care Pack'
         });
 
-        if (!res.success) {
-          alert(`Failed to create package: ${res.error}`);
+        if (!res || !res.success) {
+          alert(`Failed to activate package: ${(res && res.error) || 'Unknown error'}`);
           return;
         }
 
         closeModal('modalNewPackage');
-        showToast(`✓ Monthly Car Care Package activated for ${name}!`);
+        showToast(`✓ Package ${res.package?.package_id || ''} activated for ${name}!`);
 
-        // Refresh section and select newly created package
+        // 1. Refresh packages directory table & counters
         await renderPackagesSection();
+
+        // 2. Select newly created package in active workspace
         if (res.package) {
           await selectActivePackage(res.package.id, true);
+        }
+
+        // 3. Immediately display the purchase Tax Invoice preview
+        if (res.invoice && typeof openInvoiceModal === 'function') {
+          openInvoiceModal(res.invoice);
         }
       } catch (err) {
         console.error('Error creating package:', err);
@@ -9241,9 +9468,102 @@ TRIEYE DETAILING
       } finally {
         if (btn) {
           btn.disabled = false;
-          btn.innerText = 'Activate & Purchase Package';
+          btn.innerHTML = '<span>Activate &amp; Purchase Package</span>';
         }
       }
+    }
+
+    async function viewPackageInvoice(packageId) {
+      if (!packageId || !window.TrieyeDB) return;
+      const pkg = await window.TrieyeDB.getPackageById(packageId);
+      if (!pkg) {
+        alert('Package record not found.');
+        return;
+      }
+
+      let invoice = null;
+      if (pkg.invoice_id && typeof window.TrieyeDB.getInvoiceById === 'function') {
+        try {
+          invoice = await window.TrieyeDB.getInvoiceById(pkg.invoice_id);
+        } catch (e) {}
+      }
+      if (!invoice && typeof window.TrieyeDB.getInvoices === 'function') {
+        try {
+          const invs = await window.TrieyeDB.getInvoices();
+          invoice = invs.find(i => 
+            (pkg.invoice_id && i.id === pkg.invoice_id) ||
+            (pkg.invoice_number && i.invoice_number === pkg.invoice_number) ||
+            (i.items || i.invoice_items || []).some(it => (it.description || '').includes(pkg.package_id))
+          );
+        } catch (e) {}
+      }
+
+      if (invoice) {
+        openInvoiceModal(invoice);
+        return;
+      }
+
+      // Fallback printable tax invoice object from package record
+      const price = Number(pkg.price || 2699);
+      const amtPaid = Number(pkg.amount_paid !== undefined ? pkg.amount_paid : price);
+      const balDue = Number(pkg.balance_due !== undefined ? pkg.balance_due : Math.max(0, price - amtPaid));
+      const payStatus = pkg.payment_status || (balDue === 0 ? 'PAID' : (amtPaid > 0 ? 'PARTIAL' : 'UNPAID'));
+
+      const synInv = {
+        id: pkg.invoice_id || ('pkg_inv_' + pkg.id),
+        invoice_number: pkg.invoice_number || pkg.package_id || 'TRI-INV-PKG',
+        created_at: pkg.purchase_date ? (pkg.purchase_date + 'T10:00:00Z') : new Date().toISOString(),
+        customer_id: pkg.customer_id,
+        customer_name: pkg.customer_name,
+        customer_phone: pkg.customer_phone,
+        customers: {
+          name: pkg.customer_name,
+          phone: pkg.customer_phone,
+          reg_number: pkg.reg_number
+        },
+        vehicle_id: pkg.vehicle_id,
+        vehicles: {
+          reg_number: pkg.reg_number,
+          vehicle_type: pkg.vehicle_category || pkg.vehicle_type || 'Medium Car'
+        },
+        subtotal: price,
+        discount: 0,
+        discount_amount: 0,
+        grand_total: price,
+        amount_collected: amtPaid,
+        amount_paid: amtPaid,
+        balance_due: balDue,
+        payment_method: pkg.payment_method || 'UPI',
+        payment_status: payStatus,
+        status: payStatus,
+        items: [
+          {
+            service_name: 'TRIEYE Monthly Car Care Pack',
+            description: `Package ID: ${pkg.package_id || pkg.id} • 6 Washes (1 Complete + 1 Basic + 4 Outer Foam) • Valid for 30 Days (Expires: ${pkg.expiry_date || '-'})`,
+            quantity: 1,
+            unit_price: price,
+            total_price: price
+          }
+        ],
+        invoice_items: [
+          {
+            service_name: 'TRIEYE Monthly Car Care Pack',
+            description: `Package ID: ${pkg.package_id || pkg.id} • 6 Washes (1 Complete + 1 Basic + 4 Outer Foam) • Valid for 30 Days (Expires: ${pkg.expiry_date || '-'})`,
+            quantity: 1,
+            unit_price: price,
+            total_price: price
+          }
+        ],
+        payments: [
+          {
+            amount: amtPaid,
+            method: pkg.payment_method || 'UPI',
+            status: payStatus
+          }
+        ]
+      };
+
+      openInvoiceModal(synInv);
     }
 
     // 12. SETTINGS & AUTH GATEWAY

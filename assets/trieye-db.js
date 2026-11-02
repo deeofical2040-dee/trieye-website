@@ -2404,49 +2404,61 @@ const TrieyeDB = {
         localStorage.setItem('trieye_bookings', JSON.stringify(localBookings));
       } catch (e) {}
 
+      const invFull = {
+        id: invoiceId,
+        invoice_number: invData.invoice_number,
+        booking_id: bookingId,
+        created_at: invData.created_at,
+        subtotal: Number(payload.totals.subtotal || 0),
+        original_price: Number(payload.totals.subtotal || 0),
+        services_subtotal: Number(payload.totals.servicesSubtotal || payload.totals.subtotal || 0),
+        addon_subtotal: Number(payload.totals.addonSubtotal || 0),
+        discount: Number(payload.totals.discount || 0),
+        discount_reason: discountReasonVal,
+        discountReason: discountReasonVal,
+        grand_total: finalGrandTotal,
+        amount_collected: payAmountVal,
+        amount_paid: payAmountVal,
+        balance_due: balanceDueVal,
+        status: payStatusVal,
+        customers: { name: payload.customer.name, phone: cleanCustPhone },
+        vehicles: { vehicle_type: payload.vehicle.vehicle_type, reg_number: payload.vehicle.reg_number },
+        invoice_items: localItemsPayload,
+        items: localItemsPayload,
+        payments: [{ amount: payAmountVal, method: (payload.payment && payload.payment.method) || 'Cash', status: payStatusVal }]
+      };
+
       // Synchronize with local storage invoices cache
       try {
         const localInvoices = JSON.parse(localStorage.getItem('trieye_invoices')) || [];
-        const invFull = {
-          id: invoiceId,
-          invoice_number: invData.invoice_number,
-          booking_id: bookingId,
-          created_at: invData.created_at,
-          subtotal: Number(payload.totals.subtotal || 0),
-          original_price: Number(payload.totals.subtotal || 0),
-          services_subtotal: Number(payload.totals.servicesSubtotal || payload.totals.subtotal || 0),
-          addon_subtotal: Number(payload.totals.addonSubtotal || 0),
-          discount: Number(payload.totals.discount || 0),
-          discount_reason: discountReasonVal,
-          discountReason: discountReasonVal,
-          grand_total: finalGrandTotal,
-          amount_collected: payAmountVal,
-          amount_paid: payAmountVal,
-          balance_due: balanceDueVal,
-          status: payStatusVal,
-          customers: { name: payload.customer.name, phone: cleanCustPhone },
-          vehicles: { vehicle_type: payload.vehicle.vehicle_type, reg_number: payload.vehicle.reg_number },
-          invoice_items: localItemsPayload,
-          items: localItemsPayload,
-          payments: [{ amount: payAmountVal, method: (payload.payment && payload.payment.method) || 'Cash', status: payStatusVal }]
-        };
         localInvoices.unshift(invFull);
         localStorage.setItem('trieye_invoices', JSON.stringify(localInvoices));
       } catch (e) {}
 
-      // Auto-activate Car Care Package if invoice contains Monthly Car Care Package
+      // Auto-activate Car Care Package if invoice contains Monthly Car Care Package (and not already called from package purchase)
       try {
-        const hasPackageItem = (payload.services || []).some(s => (s.name || '').toLowerCase().includes('monthly car care package')) ||
-                               (localItemsPayload || []).some(it => (it.service_name || '').toLowerCase().includes('monthly car care package'));
-        if (hasPackageItem) {
-          const pkgRes = await this.createPackage({
+        const hasPackageItem = (payload.services || []).some(s => {
+          const sName = (s.name || '').toLowerCase();
+          return sName.includes('monthly car care') || sName.includes('car care pack');
+        }) || (localItemsPayload || []).some(it => {
+          const sName = (it.service_name || '').toLowerCase();
+          return sName.includes('monthly car care') || sName.includes('car care pack');
+        });
+        if (hasPackageItem && !payload._isPackagePurchase) {
+          const pkgRes = await this.purchaseMonthlyPackage({
             customer_name: payload.customer.name,
             customer_phone: cleanCustPhone,
             reg_number: payload.vehicle.reg_number,
             vehicle_type: payload.vehicle.vehicle_type,
+            vehicle_category: payload.vehicle.vehicle_type,
             price: finalGrandTotal || Number(payload.totals.subtotal || 2499),
+            amount_paid: payAmountVal,
+            balance_due: balanceDueVal,
+            payment_status: payStatusVal,
+            payment_method: (payload.payment && payload.payment.method) || 'Cash',
             invoice_id: invoiceId,
-            invoice_number: invData.invoice_number
+            invoice_number: invData.invoice_number,
+            _skipInvoiceCreation: true
           });
           if (pkgRes && pkgRes.package) {
             invData.package = pkgRes.package;
@@ -2458,7 +2470,7 @@ const TrieyeDB = {
 
       return {
         success: true,
-        invoice: invData,
+        invoice: Object.assign({}, invData, invFull),
         booking: createdBookingRecord
       };
     } catch (err) {
@@ -2864,6 +2876,14 @@ const TrieyeDB = {
   // ==========================================
   // 11. MONTHLY CAR CARE PACKAGES & REDEMPTIONS (NO QR CODE)
   // ==========================================
+  getPackagePriceByCategory(category) {
+    const cat = String(category || '').toLowerCase();
+    if (cat.includes('small') || cat.includes('hatch')) return 2499;
+    if (cat.includes('suv') || cat.includes('4x4')) return 2799;
+    if (cat.includes('bike')) return 999;
+    return 2699; // Medium Car / Sedan default
+  },
+
   async getPackages() {
     let packages = [];
     try {
@@ -2878,31 +2898,164 @@ const TrieyeDB = {
     const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
     if (sb) {
       try {
-        const { data, error } = await sb.from('packages').select('*').order('created_at', { ascending: false });
-        if (!error && Array.isArray(data) && data.length > 0) {
-          const localMap = {};
-          packages.forEach(p => { if (p && p.id) localMap[p.id] = p; });
-          data.forEach(p => {
-            localMap[p.id] = Object.assign({}, localMap[p.id] || {}, p);
+        // 1. Try direct public.packages query from Supabase
+        const { data: dbData, error: dbErr } = await sb.from('packages').select('*').order('created_at', { ascending: false });
+        if (!dbErr && Array.isArray(dbData) && dbData.length > 0) {
+          const map = {};
+          packages.forEach(p => { if (p) map[p.package_id || p.id] = p; });
+          dbData.forEach(p => {
+            const rem = {
+              complete: Number(p.complete_wash !== undefined ? p.complete_wash : 1),
+              basic: Number(p.basic_wash !== undefined ? p.basic_wash : 1),
+              outer_foam: Number(p.outer_foam_wash !== undefined ? p.outer_foam_wash : 4)
+            };
+            rem.total = rem.complete + rem.basic + rem.outer_foam;
+            p.remaining_washes = rem;
+            p.initial_washes = {
+              complete: Number(p.initial_complete || 1),
+              basic: Number(p.initial_basic || 1),
+              outer_foam: Number(p.initial_outer_foam || 4),
+              total: 6
+            };
+            const pKey = p.package_id || p.id;
+            map[pKey] = Object.assign({}, map[pKey] || {}, p);
           });
-          packages = Object.values(localMap);
-          try { localStorage.setItem('trieye_car_care_packages', JSON.stringify(packages)); } catch (e) {}
+          packages = Object.values(map);
+        }
+      } catch (e) {}
+
+      // 2. Reconcile from invoices in Supabase (if packages table was empty or not yet created)
+      try {
+        let invoices = [];
+        if (typeof this.getInvoices === 'function') {
+          invoices = await this.getInvoices();
+        }
+        if (Array.isArray(invoices) && invoices.length > 0) {
+          invoices.forEach(inv => {
+            const items = inv.invoice_items || inv.items || [];
+            const isPkgInv = items.some(it => {
+              const sName = String(it.service_name || '').toLowerCase();
+              return sName.includes('monthly car care') || sName.includes('car care pack');
+            });
+
+            if (isPkgInv) {
+              const invNum = inv.invoice_number || '';
+              const cust = inv.customers || {};
+              const veh = inv.vehicles || {};
+              const cleanPhone = String(cust.phone || inv.customer_phone || '').replace(/\D/g, '').slice(-10);
+              const reg = veh.reg_number || inv.reg_number || '';
+              
+              // Find matching item description for package ID
+              const pkgItem = items.find(it => String(it.service_name || '').toLowerCase().includes('car care'));
+              let pkgCode = '';
+              if (pkgItem && pkgItem.description) {
+                const match = pkgItem.description.match(/TRI-PKG-[A-Z0-9_-]+/i);
+                if (match) pkgCode = match[0];
+              }
+              if (!pkgCode) {
+                const numOnly = invNum.replace(/\D/g, '').slice(-6) || '10492';
+                pkgCode = `TRI-PKG-${numOnly}`;
+              }
+
+              // Check if already in packages array
+              const existing = packages.find(p => 
+                (p.invoice_id && p.invoice_id === inv.id) || 
+                (p.package_id && p.package_id === pkgCode) ||
+                (p.invoice_number && p.invoice_number === invNum)
+              );
+
+              const priceVal = Number(inv.grand_total || inv.subtotal || 2699);
+              const pDate = (inv.created_at || '').slice(0, 10) || this.getLocalDateIso(new Date());
+              const expObj = new Date(pDate);
+              expObj.setDate(expObj.getDate() + 30);
+              const eDate = this.getLocalDateIso(expObj);
+              const vCategory = veh.vehicle_type || inv.vehicle_type || 'Medium Car';
+
+              if (!existing) {
+                const synPkg = {
+                  id: 'pkg_' + (inv.id || Date.now()),
+                  package_id: pkgCode,
+                  package_name: 'TRIEYE Monthly Car Care Pack',
+                  customer_id: inv.customer_id || cust.id || null,
+                  customer_name: cust.name || inv.customer_name || 'Valued Customer',
+                  customer_phone: cleanPhone,
+                  vehicle_id: inv.vehicle_id || veh.id || null,
+                  reg_number: reg,
+                  vehicle_type: vCategory,
+                  vehicle_category: vCategory,
+                  purchase_date: pDate,
+                  expiry_date: eDate,
+                  price: priceVal,
+                  amount_paid: Number(inv.amount_collected || (inv.status === 'PAID' ? priceVal : 0)),
+                  balance_due: Number(inv.balance_due || 0),
+                  payment_status: (inv.status || 'PAID').toUpperCase(),
+                  payment_method: inv.payment_method || 'UPI',
+                  invoice_id: inv.id,
+                  invoice_number: invNum,
+                  share_token: inv.share_token || (inv.bookings && inv.bookings.share_token) || '',
+                  initial_washes: { complete: 1, basic: 1, outer_foam: 4, total: 6 },
+                  remaining_washes: { complete: 1, basic: 1, outer_foam: 4, total: 6 },
+                  redemptions_count: 0,
+                  status: 'ACTIVE',
+                  created_at: inv.created_at || new Date().toISOString(),
+                  updated_at: inv.created_at || new Date().toISOString()
+                };
+                packages.push(synPkg);
+              } else {
+                if (!existing.initial_washes || existing.initial_washes.total !== 6) {
+                  existing.initial_washes = { complete: 1, basic: 1, outer_foam: 4, total: 6 };
+                }
+                existing.invoice_number = existing.invoice_number || invNum;
+                existing.invoice_id = existing.invoice_id || inv.id;
+                existing.vehicle_category = existing.vehicle_category || vCategory;
+              }
+            }
+          });
         }
       } catch (e) {}
     }
 
+    // 3. Reconcile wash deductions from redemptions
+    let allRedemptions = [];
+    try {
+      allRedemptions = JSON.parse(localStorage.getItem('trieye_package_redemptions')) || [];
+    } catch (e) {}
+
     const todayStr = this.getLocalDateIso(new Date());
+
     packages.forEach(pkg => {
-      if (!pkg.remaining_washes) {
+      // Ensure remaining_washes object exists with 6 total entitlement
+      if (!pkg.remaining_washes || pkg.initial_washes?.total !== 6) {
+        pkg.initial_washes = { complete: 1, basic: 1, outer_foam: 4, total: 6 };
         pkg.remaining_washes = {
-          complete: Number(pkg.complete_wash !== undefined ? pkg.complete_wash : (pkg.initial_washes?.complete ?? 1)),
-          basic: Number(pkg.basic_wash !== undefined ? pkg.basic_wash : (pkg.initial_washes?.basic ?? 2)),
-          outer_foam: Number(pkg.outer_foam_wash !== undefined ? pkg.outer_foam_wash : (pkg.initial_washes?.outer_foam ?? 2))
+          complete: Number(pkg.complete_wash !== undefined ? pkg.complete_wash : 1),
+          basic: Number(pkg.basic_wash !== undefined ? pkg.basic_wash : 1),
+          outer_foam: Number(pkg.outer_foam_wash !== undefined ? pkg.outer_foam_wash : 4),
+          total: 6
         };
       }
+
+      // Check redemptions recorded for this package
+      const pkgRedemptions = allRedemptions.filter(r => 
+        (r.package_id && r.package_id === pkg.id) ||
+        (r.package_code && r.package_code === pkg.package_id)
+      );
+
+      if (pkgRedemptions.length > 0) {
+        pkg.redemptions_count = pkgRedemptions.length;
+        const latestRdm = pkgRedemptions[0];
+        if (latestRdm && latestRdm.balance_snapshot) {
+          pkg.remaining_washes.complete = Number(latestRdm.balance_snapshot.complete ?? pkg.remaining_washes.complete);
+          pkg.remaining_washes.basic = Number(latestRdm.balance_snapshot.basic ?? pkg.remaining_washes.basic);
+          pkg.remaining_washes.outer_foam = Number(latestRdm.balance_snapshot.outer_foam ?? pkg.remaining_washes.outer_foam);
+        }
+      }
+
       const totalLeft = (Number(pkg.remaining_washes.complete) || 0) + 
                         (Number(pkg.remaining_washes.basic) || 0) + 
                         (Number(pkg.remaining_washes.outer_foam) || 0);
+
+      pkg.remaining_washes.total = totalLeft;
 
       const isExpired = pkg.expiry_date && pkg.expiry_date < todayStr;
       if (isExpired) {
@@ -2913,6 +3066,10 @@ const TrieyeDB = {
         pkg.status = 'ACTIVE';
       }
     });
+
+    try {
+      localStorage.setItem('trieye_car_care_packages', JSON.stringify(packages));
+    } catch (e) {}
 
     return packages;
   },
@@ -2952,20 +3109,30 @@ const TrieyeDB = {
     });
   },
 
-  async createPackage(payload) {
-    if (!payload) return { success: false, error: 'Package payload is required' };
+  async purchaseMonthlyPackage(payload) {
+    if (!payload) return { success: false, error: 'Package payload required.' };
+
     const name = String(payload.customer_name || payload.name || '').trim();
     const phone = String(payload.customer_phone || payload.phone || '').replace(/\D/g, '').slice(-10);
     const rawReg = String(payload.reg_number || payload.reg || '').trim();
+    const vCategory = payload.vehicle_category || payload.vehicle_type || 'Medium Car';
 
-    if (!name || !phone || !rawReg) {
-      return { success: false, error: 'Customer Name, Phone, and Vehicle Number are required.' };
+    if (!name) return { success: false, error: 'Customer name is required.' };
+    if (!phone || phone.length < 10) return { success: false, error: 'A valid 10-digit mobile number is required.' };
+    if (!rawReg) return { success: false, error: 'Vehicle registration number is required.' };
+
+    const normReg = this.formatVehicleNumber(rawReg);
+    if (!this.validateVehicleNumber(normReg)) {
+      return { success: false, error: 'Enter vehicle number in TN 01 AB 1234 format.' };
     }
 
-    const reg = this.formatVehicleNumber(rawReg);
-    const id = 'pkg_' + Date.now() + '_' + Math.floor(Math.random() * 10000);
     const pkgNum = Math.floor(100000 + Math.random() * 900000);
     const packageId = payload.package_id || `TRI-PKG-${pkgNum}`;
+    const price = Number(payload.price || this.getPackagePriceByCategory(vCategory));
+    const amountPaid = Number(payload.amount_paid !== undefined ? payload.amount_paid : (payload.amount_collected !== undefined ? payload.amount_collected : price));
+    const balanceDue = Math.max(0, price - amountPaid);
+    const payMethod = payload.payment_method || 'UPI';
+    const payStatus = balanceDue === 0 ? 'PAID' : (amountPaid > 0 ? 'PARTIAL' : 'UNPAID');
 
     const purchaseDate = payload.purchase_date || this.getLocalDateIso(new Date());
     let expiryDate = payload.expiry_date;
@@ -2975,25 +3142,93 @@ const TrieyeDB = {
       expiryDate = this.getLocalDateIso(exp);
     }
 
+    // Official Entitlements: Complete: 1, Basic: 1, Outer Foam: 4 (Total: 6)
     const initialWashes = {
-      complete: Number(payload.complete_wash !== undefined ? payload.complete_wash : (payload.initial_washes?.complete ?? 1)),
-      basic: Number(payload.basic_wash !== undefined ? payload.basic_wash : (payload.initial_washes?.basic ?? 2)),
-      outer_foam: Number(payload.outer_foam_wash !== undefined ? payload.outer_foam_wash : (payload.initial_washes?.outer_foam ?? 2))
+      complete: 1,
+      basic: 1,
+      outer_foam: 4,
+      total: 6
     };
-
     const remainingWashes = Object.assign({}, initialWashes);
 
+    // 1. Create real purchase invoice using the existing billing system
+    let createdInv = {};
+    if (payload._skipInvoiceCreation) {
+      createdInv = {
+        id: payload.invoice_id,
+        invoice_number: payload.invoice_number
+      };
+    } else {
+      const invoicePayload = {
+        _isPackagePurchase: true,
+        customer: {
+          id: payload.customer_id || null,
+          name: name,
+          phone: phone,
+          email: payload.customer_email || null
+        },
+        vehicle: {
+          id: payload.vehicle_id || null,
+          reg_number: normReg,
+          vehicle_type: vCategory
+        },
+        services: [
+          {
+            id: 'trieye-pkg-monthly-car-care',
+            name: 'TRIEYE Monthly Car Care Pack',
+            description: `30-Day Package (1 Complete Wash + 1 Basic Wash + 4 Outer Foam Washes) — Package ID: ${packageId}`,
+            price: price,
+            quantity: 1
+          }
+        ],
+        products: [],
+        totals: {
+          subtotal: price,
+          discount: 0,
+          grand_total: price,
+          grandTotal: price,
+          amount_collected: amountPaid,
+          amountCollected: amountPaid,
+          balance_due: balanceDue,
+          balanceDue: balanceDue,
+          discount_reason: ''
+        },
+        payment: {
+          method: payMethod,
+          amount: amountPaid,
+          status: payStatus
+        }
+      };
+
+      const invoiceRes = await this.createInvoice(invoicePayload);
+      if (!invoiceRes || !invoiceRes.success) {
+        return { success: false, error: (invoiceRes && invoiceRes.error) || 'Failed to generate invoice for package.' };
+      }
+      createdInv = invoiceRes.invoice || {};
+    }
+
+    // 2. Build full package record
     const newPackage = {
-      id,
+      id: 'pkg_' + Date.now() + '_' + Math.floor(Math.random() * 10000),
       package_id: packageId,
-      package_name: payload.package_name || 'Monthly Car Care Package',
+      package_name: 'TRIEYE Monthly Car Care Pack',
+      customer_id: createdInv.customer_id || null,
       customer_name: name,
       customer_phone: phone,
-      reg_number: reg,
-      vehicle_type: payload.vehicle_type || 'Car',
+      vehicle_id: createdInv.vehicle_id || null,
+      reg_number: normReg,
+      vehicle_type: vCategory,
+      vehicle_category: vCategory,
       purchase_date: purchaseDate,
       expiry_date: expiryDate,
-      price: Number(payload.price || 2499),
+      price: price,
+      amount_paid: amountPaid,
+      balance_due: balanceDue,
+      payment_status: payStatus,
+      payment_method: payMethod,
+      invoice_id: createdInv.id || null,
+      invoice_number: createdInv.invoice_number || null,
+      share_token: createdInv.share_token || null,
       initial_washes: initialWashes,
       remaining_washes: remainingWashes,
       redemptions_count: 0,
@@ -3002,20 +3237,124 @@ const TrieyeDB = {
       updated_at: new Date().toISOString()
     };
 
+    // 3. Cache locally
     const packages = await this.getPackages();
     packages.unshift(newPackage);
     try {
       localStorage.setItem('trieye_car_care_packages', JSON.stringify(packages));
     } catch (e) {}
 
+    // 4. Persist to Supabase packages table if table exists
     const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (sb) {
       try {
-        await sb.from('packages').upsert([newPackage]);
+        const pkgDbRow = {
+          package_id: packageId,
+          package_name: 'TRIEYE Monthly Car Care Pack',
+          customer_name: name,
+          customer_phone: phone,
+          reg_number: normReg,
+          vehicle_type: vCategory,
+          vehicle_category: vCategory,
+          purchase_date: purchaseDate,
+          expiry_date: expiryDate,
+          price: price,
+          amount_paid: amountPaid,
+          balance_due: balanceDue,
+          payment_status: payStatus,
+          payment_method: payMethod,
+          complete_wash: remainingWashes.complete,
+          basic_wash: remainingWashes.basic,
+          outer_foam_wash: remainingWashes.outer_foam,
+          initial_complete: 1,
+          initial_basic: 1,
+          initial_outer_foam: 4,
+          status: 'ACTIVE'
+        };
+        if (createdInv.id && uuidRegex.test(String(createdInv.id))) {
+          pkgDbRow.invoice_id = createdInv.id;
+        }
+        if (createdInv.invoice_number) {
+          pkgDbRow.invoice_number = createdInv.invoice_number;
+        }
+        if (createdInv.customer_id && uuidRegex.test(String(createdInv.customer_id))) {
+          pkgDbRow.customer_id = createdInv.customer_id;
+        }
+        if (createdInv.vehicle_id && uuidRegex.test(String(createdInv.vehicle_id))) {
+          pkgDbRow.vehicle_id = createdInv.vehicle_id;
+        }
+
+        const { data: insData, error: insErr } = await sb.from('packages').upsert([pkgDbRow], { onConflict: 'package_id' }).select();
+        if (!insErr && insData && insData[0] && insData[0].id) {
+          newPackage.id = insData[0].id;
+        }
       } catch (e) {}
     }
 
-    return { success: true, package: newPackage };
+    const fullInvoice = Object.assign({}, createdInv, {
+      id: createdInv.id || newPackage.invoice_id,
+      invoice_number: createdInv.invoice_number || newPackage.invoice_number,
+      created_at: newPackage.created_at,
+      customer_id: newPackage.customer_id,
+      customer_name: newPackage.customer_name,
+      customer_phone: newPackage.customer_phone,
+      customers: {
+        name: newPackage.customer_name,
+        phone: newPackage.customer_phone,
+        reg_number: newPackage.reg_number
+      },
+      vehicle_id: newPackage.vehicle_id,
+      vehicles: {
+        reg_number: newPackage.reg_number,
+        vehicle_type: newPackage.vehicle_category || newPackage.vehicle_type
+      },
+      subtotal: price,
+      discount: 0,
+      discount_amount: 0,
+      grand_total: price,
+      amount_collected: amountPaid,
+      amount_paid: amountPaid,
+      balance_due: balanceDue,
+      payment_method: payMethod,
+      payment_status: payStatus,
+      status: payStatus,
+      items: [
+        {
+          service_name: 'TRIEYE Monthly Car Care Pack',
+          description: `Package ID: ${newPackage.package_id} • 6 Washes (1 Complete + 1 Basic + 4 Outer Foam) • Valid for 30 Days (Expires: ${newPackage.expiry_date})`,
+          quantity: 1,
+          unit_price: price,
+          total_price: price
+        }
+      ],
+      invoice_items: [
+        {
+          service_name: 'TRIEYE Monthly Car Care Pack',
+          description: `Package ID: ${newPackage.package_id} • 6 Washes (1 Complete + 1 Basic + 4 Outer Foam) • Valid for 30 Days (Expires: ${newPackage.expiry_date})`,
+          quantity: 1,
+          unit_price: price,
+          total_price: price
+        }
+      ],
+      payments: [
+        {
+          amount: amountPaid,
+          method: payMethod,
+          status: payStatus
+        }
+      ]
+    });
+
+    return {
+      success: true,
+      package: newPackage,
+      invoice: fullInvoice
+    };
+  },
+
+  async createPackage(payload) {
+    return this.purchaseMonthlyPackage(payload);
   },
 
   async redeemPackageWash(packageId, washCategory, options = {}) {
@@ -3035,7 +3374,7 @@ const TrieyeDB = {
     }
 
     if (!pkg.remaining_washes) {
-      pkg.remaining_washes = { complete: 0, basic: 0, outer_foam: 0 };
+      pkg.remaining_washes = { complete: 1, basic: 1, outer_foam: 4, total: 6 };
     }
 
     const currentCount = Number(pkg.remaining_washes[washCategory]) || 0;
@@ -3052,29 +3391,35 @@ const TrieyeDB = {
                            (Number(pkg.remaining_washes.basic) || 0) +
                            (Number(pkg.remaining_washes.outer_foam) || 0);
 
+    pkg.remaining_washes.total = totalRemaining;
+
     if (totalRemaining <= 0) {
       pkg.status = 'EXHAUSTED';
     }
 
     const catName = washCategory === 'complete' ? 'Complete Wash' : (washCategory === 'basic' ? 'Basic Wash' : 'Outer Foam Wash');
-    const rdmNumber = `TRI-RDM-${String(pkg.package_id || pkg.id).replace(/^TRI-PKG-/, '')}-${String(pkg.redemptions_count).padStart(2, '0')}`;
+    const cleanPkgCode = String(pkg.package_id || pkg.id).replace(/^TRI-PKG-/, '');
+    const rdmNumber = `TRI-RDM-${cleanPkgCode}-${String(pkg.redemptions_count).padStart(2, '0')}`;
+
+    const payableAmt = Number(options.payable_amount || 0); // ₹0 for included wash
 
     const redemption = {
       id: 'rdm_' + Date.now() + '_' + Math.floor(Math.random() * 1000),
       redemption_number: rdmNumber,
       package_id: pkg.id,
       package_code: pkg.package_id,
-      package_name: pkg.package_name || 'Monthly Car Care Package',
+      package_name: pkg.package_name || 'TRIEYE Monthly Car Care Pack',
+      customer_id: pkg.customer_id,
       customer_name: pkg.customer_name,
       customer_phone: pkg.customer_phone,
       reg_number: pkg.reg_number,
-      vehicle_type: pkg.vehicle_type,
+      vehicle_type: pkg.vehicle_type || pkg.vehicle_category || 'Car',
       wash_category: washCategory,
       wash_type_name: catName,
       redeemed_at: new Date().toISOString(),
       redeemed_date: todayStr,
       expiry_date: pkg.expiry_date,
-      payable_amount: Number(options.payable_amount || 0),
+      payable_amount: payableAmt,
       staff_notes: options.notes || '',
       balance_snapshot: {
         complete: pkg.remaining_washes.complete,
@@ -3085,7 +3430,7 @@ const TrieyeDB = {
     };
 
     const packages = await this.getPackages();
-    const idx = packages.findIndex(p => p.id === pkg.id);
+    const idx = packages.findIndex(p => p.id === pkg.id || p.package_id === pkg.package_id);
     if (idx !== -1) {
       packages[idx] = pkg;
     } else {
@@ -3105,10 +3450,44 @@ const TrieyeDB = {
     } catch (e) {}
 
     const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (sb) {
       try {
-        await sb.from('packages').upsert([pkg]);
-        await sb.from('package_redemptions').insert([redemption]);
+        await sb.from('packages').update({
+          complete_wash: pkg.remaining_washes.complete,
+          basic_wash: pkg.remaining_washes.basic,
+          outer_foam_wash: pkg.remaining_washes.outer_foam,
+          status: pkg.status,
+          updated_at: new Date().toISOString()
+        }).eq('package_id', pkg.package_id);
+
+        const rdmRow = {
+          redemption_number: redemption.redemption_number,
+          package_code: pkg.package_id,
+          wash_category: washCategory,
+          wash_type_name: catName,
+          payable_amount: payableAmt,
+          staff_notes: options.notes || '',
+          balance_snapshot: redemption.balance_snapshot,
+          redeemed_at: redemption.redeemed_at
+        };
+        if (pkg.id && uuidRegex.test(String(pkg.id))) {
+          rdmRow.package_id = pkg.id;
+        }
+        await sb.from('package_redemptions').insert([rdmRow]);
+      } catch (e) {}
+
+      try {
+        const bPayload = {
+          booking_date: todayStr,
+          status: 'COMPLETED',
+          source: 'PACKAGE_REDEMPTION',
+          total_amount: payableAmt,
+          booking_time: redemption.redemption_number
+        };
+        if (pkg.customer_id && uuidRegex.test(String(pkg.customer_id))) bPayload.customer_id = pkg.customer_id;
+        if (pkg.vehicle_id && uuidRegex.test(String(pkg.vehicle_id))) bPayload.vehicle_id = pkg.vehicle_id;
+        await sb.from('bookings').insert(bPayload);
       } catch (e) {}
     }
 
@@ -3124,6 +3503,20 @@ const TrieyeDB = {
     try {
       redemptions = JSON.parse(localStorage.getItem('trieye_package_redemptions')) || [];
     } catch (e) {}
+
+    const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
+    if (sb) {
+      try {
+        const { data, error } = await sb.from('package_redemptions').select('*').order('redeemed_at', { ascending: false });
+        if (!error && Array.isArray(data) && data.length > 0) {
+          const map = {};
+          redemptions.forEach(r => { if (r && (r.id || r.redemption_number)) map[r.redemption_number || r.id] = r; });
+          data.forEach(r => { map[r.redemption_number || r.id] = Object.assign({}, map[r.redemption_number || r.id] || {}, r); });
+          redemptions = Object.values(map);
+          try { localStorage.setItem('trieye_package_redemptions', JSON.stringify(redemptions)); } catch (e) {}
+        }
+      } catch (e) {}
+    }
 
     if (packageId) {
       const clean = String(packageId).trim().toUpperCase();
