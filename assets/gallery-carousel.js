@@ -9,7 +9,8 @@
     {
       id: 1,
       type: "image",
-      src: "/assets/foam-wash.jpg",
+      src: "/images/gallery-foam-wash.webp",
+      fallbackSrc: "/images/car-wash.webp",
       tag: "01 / FOAM WASH",
       title: "HIGH-DENSITY SNOW FOAM & DECON",
       alt: "Snow Foam Pre-Wash and Decon at TRIEYE Detailing Studio"
@@ -17,7 +18,8 @@
     {
       id: 2,
       type: "image",
-      src: "/assets/rubbing-polish.jpg",
+      src: "/images/gallery-paint-correction.webp",
+      fallbackSrc: "/images/paint-correction.webp",
       tag: "02 / PAINT CORRECTION",
       title: "DUAL-ACTION MACHINE POLISHING",
       alt: "Dual-Action Paint Correction Rubbing Polish"
@@ -25,7 +27,8 @@
     {
       id: 3,
       type: "image",
-      src: "/assets/interior-clean.jpg",
+      src: "/images/gallery-interior-clean.webp",
+      fallbackSrc: "/images/interior-detailing.webp",
       tag: "03 / INTERIOR DETAILING",
       title: "DEEP STEAM EXTRACTION & LEATHER SPA",
       alt: "Interior Detailing Steam Extraction and Leather Spa"
@@ -33,7 +36,8 @@
     {
       id: 4,
       type: "image",
-      src: "/assets/ceramic-coating.jpg",
+      src: "/images/gallery-ceramic-coating.webp",
+      fallbackSrc: "/images/ceramic-coating.webp",
       tag: "04 / CERAMIC COATING",
       title: "9H HYDROPHOBIC SURFACE SHIELD",
       alt: "Hydrophobic 9H Ceramic Coating Protection"
@@ -41,7 +45,8 @@
     {
       id: 5,
       type: "image",
-      src: "/assets/ppf/ppf-installation.jpg",
+      src: "/images/gallery-ppf-installation.webp",
+      fallbackSrc: "/images/ppf.webp",
       tag: "05 / PPF INSTALLATION",
       title: "PRECISION PAINT PROTECTION FILM",
       alt: "Paint Protection Film Installation at TRIEYE Studio"
@@ -49,7 +54,8 @@
     {
       id: 6,
       type: "image",
-      src: "/assets/graphene/graphene-workmanship.jpg",
+      src: "/images/gallery-graphene-matrix.webp",
+      fallbackSrc: "/images/graphene-coating.webp",
       tag: "06 / GRAPHENE MATRIX",
       title: "PRECISION APPLICATION & FINISH",
       alt: "Precision Graphene Matrix Coating Application and Inspection"
@@ -57,7 +63,8 @@
     {
       id: 7,
       type: "image",
-      src: "/assets/bike/bike-detail-finish.jpg",
+      src: "/images/gallery-superbike-detailing.webp",
+      fallbackSrc: "/images/bike-detailing.webp",
       tag: "07 / SUPERBIKE DETAILING",
       title: "FULL MOTORCYCLE RESTORATION",
       alt: "Superbike Detailing and Hand Polishing at TRIEYE Studio"

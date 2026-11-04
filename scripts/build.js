@@ -67,7 +67,15 @@ const requiredImages = [
   'graphene-coating.webp',
   'paint-correction.webp',
   'interior-detailing.webp',
-  'ppf.webp'
+  'ppf.webp',
+  'bike-detailing.webp',
+  'gallery-foam-wash.webp',
+  'gallery-paint-correction.webp',
+  'gallery-interior-clean.webp',
+  'gallery-ceramic-coating.webp',
+  'gallery-ppf-installation.webp',
+  'gallery-graphene-matrix.webp',
+  'gallery-superbike-detailing.webp'
 ];
 
 let allPassed = true;
