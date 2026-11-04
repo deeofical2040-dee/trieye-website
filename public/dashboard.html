@@ -34,7 +34,12 @@
       })();
     }
   </script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="/assets/html2pdf.bundle.min.js"></script>
+  <script>
+    if (typeof html2pdf === 'undefined') {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"><\/script>');
+    }
+  </script>
   <script src="/assets/exceljs.min.js"></script>
   <script>
     (function() {
@@ -1465,45 +1470,138 @@
       }
     }
 
-    /* Responsive Invoice Preview Modal */
-    #invoiceModal {
+    /* Responsive Invoice Preview Modal & Backdrop */
+    .invoice-modal-backdrop {
       position: fixed;
-      top: 5%;
-      left: 50%;
-      transform: translate(-50%, 0);
-      width: 210mm;
-      max-width: 95vw;
-      max-height: 90vh;
-      overflow-y: auto;
-      background: #ffffff;
-      color: #000000;
-      padding: 0;
-      border-radius: 8px;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+      inset: 0;
+      z-index: 999998;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(5px);
+      -webkit-backdrop-filter: blur(5px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem 1rem;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+    .invoice-modal-container {
+      background: #0f172a;
+      border: 1px solid #334155;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 880px;
+      height: 94vh;
+      max-height: 940px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.85);
+      overflow: hidden;
+      position: relative;
+      z-index: 999999;
+      animation: modalPop 0.22s cubic-bezier(0.16, 1, 0.3, 1);
     }
     .invoice-modal-header {
-      padding: 10px 20px;
-      background: #111111;
+      flex-shrink: 0;
+      padding: 12px 18px;
+      background: #090d16;
+      border-bottom: 1px solid #1e293b;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
       color: #ffffff;
-      border-top-left-radius: 8px;
-      border-top-right-radius: 8px;
-      position: sticky;
-      top: 0;
-      z-index: 10;
     }
     .invoice-modal-actions {
       display: flex;
-      gap: 8px;
+      gap: 7px;
       flex-wrap: wrap;
+      align-items: center;
+    }
+    .btn-inv-action {
+      padding: 6px 12px !important;
+      font-size: 0.82rem !important;
+      font-weight: 600 !important;
+      border-radius: 6px !important;
+      display: inline-flex !important;
+      align-items: center !important;
+      gap: 5px !important;
+      cursor: pointer !important;
+      height: 34px !important;
+      white-space: nowrap !important;
+      transition: all 0.15s ease !important;
+    }
+    .btn-inv-print {
+      background: #0284c7 !important;
+      color: #ffffff !important;
+      border: 1px solid #0284c7 !important;
+    }
+    .btn-inv-print:hover {
+      background: #0369a1 !important;
+    }
+    .btn-inv-pdf {
+      background: #059669 !important;
+      color: #ffffff !important;
+      border: 1px solid #059669 !important;
+    }
+    .btn-inv-pdf:hover {
+      background: #047857 !important;
+    }
+    .btn-inv-wa {
+      background: rgba(34, 197, 94, 0.12) !important;
+      color: #22c55e !important;
+      border: 1px solid #22c55e !important;
+    }
+    .btn-inv-wa:hover {
+      background: rgba(34, 197, 94, 0.22) !important;
+    }
+    .btn-inv-new {
+      background: #334155 !important;
+      color: #f8fafc !important;
+      border: 1px solid #475569 !important;
+    }
+    .btn-inv-new:hover {
+      background: #475569 !important;
+    }
+    .btn-inv-close {
+      background: rgba(248, 113, 113, 0.1) !important;
+      color: #f87171 !important;
+      border: 1px solid rgba(248, 113, 113, 0.4) !important;
+    }
+    .btn-inv-close:hover {
+      background: rgba(248, 113, 113, 0.2) !important;
+      color: #ffffff !important;
+    }
+    .invoice-modal-scroll-area {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      background: #1e293b;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    .invoice-sheet-wrapper {
+      width: 100%;
+      max-width: 794px;
+      display: flex;
+      justify-content: center;
     }
     #printable-invoice {
-      padding: 15mm;
-      background: #ffffff;
-      font-family: 'Inter', sans-serif;
-      color: #000000;
+      background: #ffffff !important;
+      color: #000000 !important;
+      width: 100%;
+      max-width: 794px;
+      min-height: 1020px;
+      padding: 38px 34px;
+      border-radius: 6px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      box-sizing: border-box;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     }
 
     /* RESPONSIVE BREAKPOINTS */
@@ -1610,25 +1708,31 @@
       .mb-payment-grid {
         grid-template-columns: repeat(2, 1fr) !important;
       }
-      #invoiceModal {
-        top: 2% !important;
-        left: 3% !important;
-        width: 94% !important;
-        max-width: 94% !important;
-        transform: none !important;
-        max-height: 96vh !important;
+      .invoice-modal-backdrop {
+        padding: 0.5rem !important;
+      }
+      .invoice-modal-container {
+        height: 96vh !important;
+        max-height: none !important;
+        border-radius: 8px !important;
       }
       .invoice-modal-header {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 8px;
-        padding: 10px 12px;
+        padding: 10px 12px !important;
       }
       .invoice-modal-actions {
-        justify-content: flex-start;
+        width: 100% !important;
+        gap: 6px !important;
+      }
+      .btn-inv-action {
+        padding: 5px 8px !important;
+        font-size: 0.75rem !important;
+        height: 30px !important;
+      }
+      .invoice-modal-scroll-area {
+        padding: 12px 8px !important;
       }
       #printable-invoice {
-        padding: 14px !important;
+        padding: 20px 16px !important;
       }
     }
 
@@ -1818,35 +1922,33 @@
       .dash-modal-body .form-grid {
         grid-template-columns: 1fr !important;
       }
-      #invoiceModal {
-        top: 2% !important;
-        left: 2% !important;
-        right: 2% !important;
-        transform: none !important;
-        width: auto !important;
-        max-width: 96vw !important;
-        max-height: 96vh !important;
-        border-radius: 8px !important;
+      .invoice-modal-backdrop {
+        padding: 4px !important;
+      }
+      .invoice-modal-container {
+        height: 98vh !important;
+        border-radius: 6px !important;
       }
       .invoice-modal-header {
-        padding: 8px 10px !important;
-        flex-direction: column !important;
-        align-items: stretch !important;
-        gap: 8px !important;
+        padding: 8px !important;
+        gap: 6px !important;
       }
       .invoice-modal-actions {
         display: grid !important;
-        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)) !important;
-        gap: 5px !important;
+        grid-template-columns: repeat(auto-fit, minmax(70px, 1fr)) !important;
+        gap: 4px !important;
       }
-      .invoice-modal-actions .btn {
-        padding: 0.35rem 0.45rem !important;
-        font-size: 0.7rem !important;
-        text-align: center !important;
+      .btn-inv-action {
+        padding: 3px 4px !important;
+        font-size: 0.68rem !important;
+        height: 28px !important;
         justify-content: center !important;
       }
+      .invoice-modal-scroll-area {
+        padding: 8px 4px !important;
+      }
       #printable-invoice {
-        padding: 10px 8px !important;
+        padding: 14px 10px !important;
       }
     }
 
@@ -2303,11 +2405,25 @@
       body * {
         visibility: hidden !important;
       }
+      .invoice-modal-backdrop,
+      .invoice-modal-container,
+      .invoice-modal-scroll-area,
+      .invoice-sheet-wrapper,
       #invoiceModal, #invoiceModal *,
+      #printable-invoice, #printable-invoice *,
       #modalRedemptionReceipt, #modalRedemptionReceipt *,
       #redemption-receipt-print-area, #redemption-receipt-print-area * {
         visibility: visible !important;
       }
+      .invoice-modal-backdrop {
+        position: static !important;
+        display: block !important;
+        background: transparent !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        overflow: visible !important;
+      }
+      .invoice-modal-container,
       #invoiceModal {
         position: static !important;
         display: block !important;
@@ -2321,7 +2437,19 @@
         transform: none !important;
         margin: 0 !important;
         padding: 0 !important;
-        background: #ffffff !important;
+        background: transparent !important;
+      }
+      .invoice-modal-scroll-area,
+      .invoice-sheet-wrapper {
+        position: static !important;
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        overflow: visible !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        background: transparent !important;
       }
       #modalRedemptionReceipt {
         position: static !important;
@@ -2352,8 +2480,6 @@
         box-shadow: none !important;
         border: none !important;
       }
-      #invoiceModal > div:first-child,
-      #modalRedemptionReceipt > div > div:first-child,
       .invoice-modal-header,
       .invoice-modal-actions,
       .admin-audit-card,
@@ -2362,7 +2488,11 @@
       .auth-overlay,
       .modal-backdrop,
       .modal-overlay,
-      .dash-modal-backdrop {
+      .dash-modal-backdrop,
+      .sidebar,
+      .topbar,
+      .main-content > section,
+      #modalRedemptionReceipt > div > div:first-child {
         display: none !important;
         visibility: hidden !important;
       }
@@ -3335,133 +3465,156 @@
   </div>
 </section>
 
-<!-- PRINTABLE A4 INVOICE MODAL -->
-<div class="modal-backdrop" id="invoiceModalBackdrop" style="display:none; z-index:999998; position:fixed; inset:0; background:rgba(0,0,0,0.8);" onclick="closeInvoiceModal()"></div>
-<div class="modal" id="invoiceModal" style="display:none;">
-  <div class="invoice-modal-header">
-    <h3 style="margin:0; font-family:'Oswald',sans-serif; letter-spacing:0.04em; font-size:1.15rem;">Invoice Preview</h3>
-    <div class="invoice-modal-actions">
-      <button class="btn btn-primary" onclick="printInvoice()">🖨️ PRINT</button>
-      <button class="btn btn-primary" onclick="downloadInvoice()">⬇️ DOWNLOAD PDF</button>
-      <button class="btn btn-outline" style="border-color:#25D366; color:#25D366;" onclick="shareInvoiceWhatsApp()">💬 WHATSAPP</button>
-      <button class="btn" style="background:#333; color:white;" onclick="closeInvoiceModal()">NEW BILL</button>
-      <button class="btn btn-outline" style="border-color:#ff4d4f; color:#ff4d4f;" onclick="closeInvoiceModal()">❌ CLOSE</button>
+<!-- PRINTABLE A4 INVOICE MODAL (RESPONSIVE VIEWPORT & PROTECTED EVENTS) -->
+<div class="invoice-modal-backdrop" id="invoiceModalBackdrop" style="display:none;" onclick="handleInvoiceBackdropClick(event)">
+  <div class="invoice-modal-container" id="invoiceModal" onclick="event.stopPropagation()">
+    <!-- 1. FIXED TOP TOOLBAR -->
+    <div class="invoice-modal-header">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="font-size:1.25rem;">🧾</span>
+        <div>
+          <h3 style="margin:0; font-family:'Oswald',sans-serif; letter-spacing:0.04em; font-size:1.1rem; color:#ffffff; font-weight:700;">Invoice Preview</h3>
+          <div id="inv-header-ref" style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:#38bdf8; font-weight:600;">TR-INVOICE</div>
+        </div>
+      </div>
+      <div class="invoice-modal-actions">
+        <button type="button" class="btn btn-inv-action btn-inv-print" onclick="event.stopPropagation(); printInvoice();">
+          <span>🖨️</span><span>Print</span>
+        </button>
+        <button type="button" class="btn btn-inv-action btn-inv-pdf" id="btn-download-pdf" onclick="event.stopPropagation(); downloadInvoice();">
+          <span>⬇️</span><span>Download PDF</span>
+        </button>
+        <button type="button" class="btn btn-inv-action btn-inv-wa" onclick="event.stopPropagation(); shareInvoiceWhatsApp();">
+          <span>💬</span><span>WhatsApp</span>
+        </button>
+        <button type="button" class="btn btn-inv-action btn-inv-new" onclick="event.stopPropagation(); handleInvoiceNewBill();">
+          <span>➕</span><span>New Bill</span>
+        </button>
+        <button type="button" class="btn btn-inv-action btn-inv-close" onclick="event.stopPropagation(); closeInvoiceModal();">
+          <span>✕</span><span>Close</span>
+        </button>
+      </div>
     </div>
-  </div>
-  
-  <!-- ADMIN ONLY AUDIT BOX (HIDDEN ON PRINT/PDF) -->
-  <div id="inv-modal-admin-audit" class="admin-audit-card" style="display:none; margin:1rem 1.5rem; background:#0f172a; border:1px solid #334155; border-radius:8px; padding:0.85rem;">
-    <!-- Populated via JS for admin inspection -->
-  </div>
 
-  <!-- A4 PRINTABLE CONTENT (Strict styling to match trieye branding) -->
-  <div id="printable-invoice">
-    <!-- Header -->
-    <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:10mm; border-bottom:2px solid #000; padding-bottom:5mm; flex-wrap:wrap; gap:10px;">
-      <div>
-        <!-- Invoice background is white, so use logo-light (which has dark text) -->
-        <img src="/images/trieye-logo-light.png" alt="Trieye" style="height:40px; margin-bottom:5px;" onerror="this.onerror=null; this.src='/assets/trieye-logo-light.png';">
-        <div style="font-family:'Oswald', sans-serif; font-size:12px; letter-spacing:1px; color:#555;">DETAIL • PRECISION • PROTECTION</div>
-        <div style="margin-top:10px; font-size:12px; color:#333; line-height:1.4;">
-          1st, 19, 6th Street, Main Rd<br>
-          Baba Nagar, Villivakkam<br>
-          Chennai, Tamil Nadu 600049<br>
-          +91 99401 81934 / +91 93630 68836 | care@trieyestudio.com<br>
-          GSTIN: 33CKMPB5885L1ZO
-        </div>
+    <!-- 2. SCROLLABLE PREVIEW VIEWPORT -->
+    <div class="invoice-modal-scroll-area" id="invoiceModalScrollArea">
+      <!-- ADMIN AUDIT STRIP (HIDDEN ON PRINT/PDF) -->
+      <div id="inv-modal-admin-audit" class="admin-audit-card" style="display:none; width:100%; max-width:794px; background:#0f172a; border:1px solid #334155; border-radius:8px; padding:10px 14px; box-sizing:border-box;">
+        <!-- Populated via JS for admin inspection -->
       </div>
-      <div style="text-align:right;">
-        <h1 style="margin:0; font-family:'Oswald', sans-serif; font-size:30px; letter-spacing:2px; color:#000;">TAX INVOICE</h1>
-        <div style="margin-top:5px; font-size:14px; font-weight:600;" id="inv-num">TR-2026-000000</div>
-        <div style="font-size:13px; color:#555;" id="inv-date">Date: 2026-01-01 10:00 AM</div>
-      </div>
-    </div>
-    
-    <!-- Customer & Vehicle -->
-    <div class="inv-cust-veh-grid" style="display:flex; justify-content:space-between; margin-bottom:10mm;">
-      <div style="width:48%; background:#f9f9f9; padding:10px; border-left:4px solid #000;">
-        <div style="font-size:11px; color:#777; font-weight:600; text-transform:uppercase; margin-bottom:5px;">Billed To</div>
-        <div style="font-size:16px; font-weight:700; margin-bottom:2px;" id="inv-cust-name">Customer Name</div>
-        <div style="font-size:13px; color:#333;" id="inv-cust-phone">+91 0000000000</div>
-      </div>
-      <div style="width:48%; background:#f9f9f9; padding:10px; border-left:4px solid #a3e635;">
-        <div style="font-size:11px; color:#777; font-weight:600; text-transform:uppercase; margin-bottom:5px;">Vehicle Details</div>
-        <div style="font-size:16px; font-weight:700; margin-bottom:2px;" id="inv-veh-reg">TN 01 AB 1234</div>
-        <div style="font-size:13px; color:#333;" id="inv-veh-model">Sedan</div>
-      </div>
-    </div>
-    
-    <!-- Items Table -->
-    <div style="width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; margin-bottom:10mm;">
-      <table style="width:100%; min-width:440px; border-collapse:collapse; font-size:14px;">
-        <thead>
-          <tr style="background:#000; color:#fff;">
-            <th style="padding:10px; text-align:left;">Item / Description</th>
-            <th style="padding:10px; text-align:center; width:15%;">Qty</th>
-            <th style="padding:10px; text-align:right; width:20%;">Rate (₹)</th>
-            <th style="padding:10px; text-align:right; width:20%;">Amount (₹)</th>
-          </tr>
-        </thead>
-        <tbody id="inv-items-tbody">
-          <!-- JS fills this -->
-        </tbody>
-      </table>
-    </div>
-    
-    <!-- Totals -->
-    <div style="display:flex; justify-content:flex-end; margin-bottom:10mm;">
-      <div class="inv-totals-box" style="width:45%; min-width:260px;">
-        <div id="inv-services-subtotal-row" style="display:none; justify-content:space-between; padding:4px 0; font-size:13px; color:#555;">
-          <span>Services Subtotal</span>
-          <span id="inv-services-subtotal" style="font-weight:600;">₹0</span>
-        </div>
-        <div id="inv-addon-subtotal-row" style="display:none; justify-content:space-between; padding:4px 0; font-size:13px; color:#555;">
-          <span>Add-on Products Subtotal</span>
-          <span id="inv-addon-subtotal" style="font-weight:600;">₹0</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; padding:5px 0;">
-          <span style="color:#555;">Service Price</span>
-          <span id="inv-subtotal" style="font-weight:600;">₹0</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; padding:5px 0;" id="inv-less-amount-row">
-          <span style="color:#555;">Less Amount</span>
-          <span id="inv-less-amount" style="font-weight:600; color:#0284c7;">₹0</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; padding:5px 0; border-top:1px dashed #cbd5e1; margin-top:2px;" id="inv-final-bill-row">
-          <span style="color:#111; font-weight:600;">Final Bill Amount</span>
-          <span id="inv-final-bill" style="font-weight:700;">₹0</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; padding:5px 0;" id="inv-amt-collected-row">
-          <span style="color:#555;">Amount Collected</span>
-          <span id="inv-amt-collected" style="font-weight:600;">₹0</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; padding:5px 0;" id="inv-balance-due-row">
-          <span style="color:#555; font-weight:600;">Balance Due</span>
-          <span id="inv-balance-due" style="font-weight:700; color:#ef4444;">₹0</span>
-        </div>
-        <div style="display:flex; justify-content:space-between; padding:10px 0; border-top:2px solid #000; border-bottom:2px solid #000; margin-top:5px; font-size:18px; font-weight:700;">
-          <span id="inv-final-payable-label">Paid Amount</span>
-          <span id="inv-grandtotal">₹0</span>
-        </div>
-        
-        <!-- Payment Info -->
-        <div style="margin-top:10px; padding:10px; background:#f0fdf4; border:1px solid #a3e635; font-size:13px;">
-          <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
-            <span>Payment Status:</span>
-            <span id="inv-pay-status" style="font-weight:700; color:#15803d;">PAID</span>
+
+      <!-- 3. A4 PRINTABLE INVOICE SHEET (Pure White Document) -->
+      <div class="invoice-sheet-wrapper" style="width:100%; max-width:794px; display:flex; justify-content:center;">
+        <div id="printable-invoice" style="background:#ffffff !important; color:#000000 !important; width:100%; max-width:794px; min-height:1020px; padding:38px 34px; border-radius:6px; box-shadow:0 10px 30px rgba(0,0,0,0.35); box-sizing:border-box; font-family:'Inter', -apple-system, sans-serif;">
+          <!-- Header -->
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:26px; border-bottom:2px solid #000; padding-bottom:18px; flex-wrap:wrap; gap:12px;">
+            <div>
+              <!-- Invoice background is white, so use logo-light (which has dark text) -->
+              <img src="/images/trieye-logo-light.png" alt="Trieye" style="height:42px; margin-bottom:6px; display:block;" onerror="this.onerror=null; this.src='/assets/trieye-logo-light.png';">
+              <div style="font-family:'Oswald', sans-serif; font-size:12px; letter-spacing:1px; color:#555; text-transform:uppercase;">DETAIL • PRECISION • PROTECTION</div>
+              <div style="margin-top:10px; font-size:12px; color:#333; line-height:1.45;">
+                1st, 19, 6th Street, Main Rd<br>
+                Baba Nagar, Villivakkam<br>
+                Chennai, Tamil Nadu 600049<br>
+                +91 99401 81934 / +91 93630 68836 | care@trieyestudio.com<br>
+                GSTIN: 33CKMPB5885L1ZO
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <h1 style="margin:0; font-family:'Oswald', sans-serif; font-size:28px; letter-spacing:2px; color:#000;">TAX INVOICE</h1>
+              <div style="margin-top:6px; font-size:14px; font-weight:700; font-family:'IBM Plex Mono';" id="inv-num">TR-2026-000000</div>
+              <div style="font-size:12.5px; color:#555; margin-top:2px;" id="inv-date">Date: 2026-01-01 10:00 AM</div>
+            </div>
           </div>
-          <div style="display:flex; justify-content:space-between;">
-            <span>Method:</span>
-            <span id="inv-pay-method" style="font-weight:700;">UPI</span>
+          
+          <!-- Customer & Vehicle -->
+          <div class="inv-cust-veh-grid" style="display:flex; justify-content:space-between; margin-bottom:24px; gap:16px;">
+            <div style="flex:1; background:#f8fafc; padding:12px 14px; border-left:4px solid #000; border-radius:0 4px 4px 0;">
+              <div style="font-size:10.5px; color:#64748b; font-weight:700; text-transform:uppercase; margin-bottom:4px; letter-spacing:0.04em;">Billed To</div>
+              <div style="font-size:15px; font-weight:700; color:#0f172a; margin-bottom:2px;" id="inv-cust-name">Customer Name</div>
+              <div style="font-size:13px; color:#334155; font-family:'IBM Plex Mono';" id="inv-cust-phone">+91 0000000000</div>
+            </div>
+            <div style="flex:1; background:#f8fafc; padding:12px 14px; border-left:4px solid #a3e635; border-radius:0 4px 4px 0;">
+              <div style="font-size:10.5px; color:#64748b; font-weight:700; text-transform:uppercase; margin-bottom:4px; letter-spacing:0.04em;">Vehicle Details</div>
+              <div style="font-size:15px; font-weight:700; color:#0f172a; margin-bottom:2px; font-family:'IBM Plex Mono';" id="inv-veh-reg">TN 01 AB 1234</div>
+              <div style="font-size:13px; color:#334155;" id="inv-veh-model">Sedan</div>
+            </div>
+          </div>
+          
+          <!-- Items Table -->
+          <div style="width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch; margin-bottom:24px; border:1px solid #e2e8f0; border-radius:4px;">
+            <table style="width:100%; min-width:440px; border-collapse:collapse; font-size:13.5px;">
+              <thead>
+                <tr style="background:#0f172a; color:#fff;">
+                  <th style="padding:10px 12px; text-align:left; font-size:12px; letter-spacing:0.03em; text-transform:uppercase;">Item / Description</th>
+                  <th style="padding:10px 12px; text-align:center; width:15%; font-size:12px; letter-spacing:0.03em; text-transform:uppercase;">Qty</th>
+                  <th style="padding:10px 12px; text-align:right; width:20%; font-size:12px; letter-spacing:0.03em; text-transform:uppercase;">Rate (₹)</th>
+                  <th style="padding:10px 12px; text-align:right; width:20%; font-size:12px; letter-spacing:0.03em; text-transform:uppercase;">Amount (₹)</th>
+                </tr>
+              </thead>
+              <tbody id="inv-items-tbody">
+                <!-- JS fills this -->
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Totals -->
+          <div style="display:flex; justify-content:flex-end; margin-bottom:28px;">
+            <div class="inv-totals-box" style="width:48%; min-width:280px;">
+              <div id="inv-services-subtotal-row" style="display:none; justify-content:space-between; padding:4px 0; font-size:13px; color:#555;">
+                <span>Services Subtotal</span>
+                <span id="inv-services-subtotal" style="font-weight:600; font-family:'IBM Plex Mono';">₹0</span>
+              </div>
+              <div id="inv-addon-subtotal-row" style="display:none; justify-content:space-between; padding:4px 0; font-size:13px; color:#555;">
+                <span>Add-on Products Subtotal</span>
+                <span id="inv-addon-subtotal" style="font-weight:600; font-family:'IBM Plex Mono';">₹0</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; padding:5px 0; font-size:13px;">
+                <span style="color:#555;">Service Price</span>
+                <span id="inv-subtotal" style="font-weight:600; font-family:'IBM Plex Mono';">₹0</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; padding:5px 0; font-size:13px;" id="inv-less-amount-row">
+                <span style="color:#555;">Less Amount</span>
+                <span id="inv-less-amount" style="font-weight:600; color:#0284c7; font-family:'IBM Plex Mono';">₹0</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; padding:6px 0; border-top:1px dashed #cbd5e1; margin-top:2px; font-size:13.5px;" id="inv-final-bill-row">
+                <span style="color:#111; font-weight:700;">Final Bill Amount</span>
+                <span id="inv-final-bill" style="font-weight:700; font-family:'IBM Plex Mono';">₹0</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; padding:5px 0; font-size:13px;" id="inv-amt-collected-row">
+                <span style="color:#555;">Amount Collected</span>
+                <span id="inv-amt-collected" style="font-weight:600; font-family:'IBM Plex Mono';">₹0</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; padding:5px 0; font-size:13px;" id="inv-balance-due-row">
+                <span style="color:#555; font-weight:600;">Balance Due</span>
+                <span id="inv-balance-due" style="font-weight:700; color:#ef4444; font-family:'IBM Plex Mono';">₹0</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; padding:10px 0; border-top:2px solid #000; border-bottom:2px solid #000; margin-top:6px; font-size:17px; font-weight:800;">
+                <span id="inv-final-payable-label">Paid Amount</span>
+                <span id="inv-grandtotal" style="font-family:'IBM Plex Mono';">₹0</span>
+              </div>
+              
+              <!-- Payment Info -->
+              <div style="margin-top:10px; padding:10px 12px; background:#f0fdf4; border:1px solid #86efac; border-radius:4px; font-size:12.5px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
+                  <span style="color:#166534; font-weight:600;">Payment Status:</span>
+                  <span id="inv-pay-status" style="font-weight:700; color:#15803d; font-family:'IBM Plex Mono';">PAID</span>
+                </div>
+                <div style="display:flex; justify-content:space-between;">
+                  <span style="color:#166534; font-weight:600;">Method:</span>
+                  <span id="inv-pay-method" style="font-weight:700; color:#166534; font-family:'IBM Plex Mono';">UPI</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Footer -->
+          <div style="text-align:center; border-top:1px solid #e2e8f0; padding-top:24px; font-size:12px; color:#64748b; line-height:1.5;">
+            <div style="font-weight:700; font-size:15px; color:#0f172a; margin-bottom:4px;">Thank you for choosing TRIEYE DETAILING</div>
+            <div>Follow us on Instagram <strong style="color:#ee2f76;">@trieye_studio</strong> &bull; Visit us: <strong style="color:#0f172a;">trieye-website.vercel.app</strong></div>
           </div>
         </div>
       </div>
-    </div>
-    
-    <!-- Footer -->
-    <div style="text-align:center; border-top:1px solid #eee; padding-top:10mm; font-size:13px; color:#555;">
-      <div style="font-weight:600; font-size:16px; color:#000; margin-bottom:5px;">Thank you for choosing TRIEYE DETAILING</div>
-      <div>Follow us on Instagram @trieye_studio</div>
     </div>
   </div>
 </div>
@@ -12383,51 +12536,129 @@ async function openInvoiceModal(invoiceId) {
   const payMethodEl = document.getElementById('inv-pay-method');
   if (payMethodEl) payMethodEl.innerText = formatPaymentMethod(metrics.paymentMethod);
 
-  document.getElementById('invoiceModalBackdrop').style.display = 'block';
-  document.getElementById('invoiceModal').style.display = 'block';
+  const subRef = document.getElementById('inv-header-ref');
+  if (subRef) subRef.innerText = inv.invoice_number || 'TR-INVOICE';
+
+  const backdrop = document.getElementById('invoiceModalBackdrop');
+  if (backdrop) backdrop.style.display = 'flex';
+  const modal = document.getElementById('invoiceModal');
+  if (modal) modal.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+
+  const scrollArea = document.getElementById('invoiceModalScrollArea');
+  if (scrollArea) scrollArea.scrollTop = 0;
+}
+
+function handleInvoiceBackdropClick(event) {
+  if (event.target === document.getElementById('invoiceModalBackdrop')) {
+    closeInvoiceModal();
+  }
+}
+
+function handleInvoiceNewBill() {
+  closeInvoiceModal();
+  window.location.href = '/walkin';
 }
 
 function closeInvoiceModal() {
-  document.getElementById('invoiceModalBackdrop').style.display = 'none';
-  document.getElementById('invoiceModal').style.display = 'none';
+  const backdrop = document.getElementById('invoiceModalBackdrop');
+  const modal = document.getElementById('invoiceModal');
+  if (backdrop) backdrop.style.display = 'none';
+  if (modal) modal.style.display = 'none';
+  document.body.style.overflow = '';
+  currentPrintInvoice = null;
 }
 
 function printInvoice() {
   const originalTitle = document.title;
-  document.title = currentPrintInvoice ? currentPrintInvoice.invoice_number : 'Invoice';
+  const invNum = currentPrintInvoice ? (currentPrintInvoice.invoice_number || 'Invoice') : 'Invoice';
+  document.title = `TRIEYE-Invoice-${invNum}`;
   window.print();
   document.title = originalTitle;
 }
 
-function downloadInvoice() {
-  const element = document.getElementById('printable-invoice');
-  if (!element) {
-    window.print();
-    return;
-  }
-  const filename = currentPrintInvoice ? (currentPrintInvoice.invoice_number || 'Invoice') + '.pdf' : 'Invoice.pdf';
-  
-  if (typeof html2pdf === 'undefined') {
+async function downloadInvoice() {
+  const invoiceEl = document.getElementById('printable-invoice');
+  if (!invoiceEl) {
     window.print();
     return;
   }
 
-  const opt = {
-    margin: [10, 10, 10, 10],
-    filename: filename,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { 
-      scale: 2, 
-      useCORS: true, 
-      logging: false, 
-      backgroundColor: '#ffffff',
-      scrollY: 0
-    },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
-  };
-  
-  html2pdf().set(opt).from(element).save();
+  const inv = currentPrintInvoice || {};
+  const rawNum = inv.invoice_number || document.getElementById('inv-num')?.innerText?.trim() || 'TR-INVOICE';
+  const cleanNum = rawNum.replace(/[^a-zA-Z0-9_-]/g, '');
+  const filename = `TRIEYE-Invoice-${cleanNum}.pdf`;
+
+  const btn = document.getElementById('btn-download-pdf');
+  const originalHtml = btn ? btn.innerHTML : '<span>⬇️</span><span>Download PDF</span>';
+
+  if (typeof html2pdf === 'undefined') {
+    console.warn('html2pdf library not loaded, falling back to browser print.');
+    window.print();
+    return;
+  }
+
+  try {
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = '<span>⏳</span><span>Generating PDF...</span>';
+    }
+
+    // Ensure scroll container is at top before capturing
+    const scrollArea = document.getElementById('invoiceModalScrollArea');
+    if (scrollArea) scrollArea.scrollTop = 0;
+
+    // Wait for images inside invoice to be ready
+    const images = Array.from(invoiceEl.querySelectorAll('img'));
+    await Promise.all(images.map(img => {
+      if (img.complete) return Promise.resolve();
+      return new Promise(resolve => {
+        img.onload = resolve;
+        img.onerror = resolve;
+        setTimeout(resolve, 500); // 500ms safety timeout
+      });
+    }));
+
+    // Configure html2pdf for pristine A4 export
+    const opt = {
+      margin: [8, 8, 8, 8],
+      filename: filename,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+        logging: false,
+        backgroundColor: '#ffffff',
+        scrollX: 0,
+        scrollY: 0
+      },
+      jsPDF: {
+        unit: 'mm',
+        format: 'a4',
+        orientation: 'portrait'
+      },
+      pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+    };
+
+    // Render directly from invoice element
+    await html2pdf().set(opt).from(invoiceEl).save();
+
+    if (typeof showToast === 'function') {
+      showToast(`✓ Downloaded ${filename}`);
+    }
+  } catch (err) {
+    console.error('Invoice PDF Generation Error:', err);
+
+    // Fallback to print dialog if canvas rendering fails
+    alert('PDF rendering encountered an issue. Opening standard print/save dialog.');
+    window.print();
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = originalHtml;
+    }
+  }
 }
 
 function shareInvoiceWhatsApp() {
