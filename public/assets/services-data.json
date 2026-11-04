@@ -130,5 +130,51 @@
       "total": 6
     },
     "active": true
+  },
+  "TRIEYE Monthly Bike Wash Pack": {
+    "id": "trieye-pkg-monthly-bike-wash",
+    "name": "TRIEYE Monthly Bike Wash Pack",
+    "desc": "30-Day Package: 3 Washes Included for 1 Registered Bike (Scooter ₹400, Commuter ₹500, Tourer ₹600)",
+    "base_price": 500,
+    "scooter_price": 400,
+    "commuter_price": 500,
+    "tourer_price": 600,
+    "duration_minutes": 30,
+    "pricing": {
+      "Scooter": 400,
+      "Commuter Bike": 500,
+      "Tourer Bike": 600,
+      "Superbike": 600
+    },
+    "is_package": true,
+    "package_type": "BIKE",
+    "package_washes": {
+      "bike_wash": 3,
+      "total": 3
+    },
+    "active": true
+  },
+  "Monthly Bike Wash Package": {
+    "id": "trieye-pkg-monthly-bike-wash",
+    "name": "TRIEYE Monthly Bike Wash Pack",
+    "desc": "30-Day Package: 3 Washes Included for 1 Registered Bike (Scooter ₹400, Commuter ₹500, Tourer ₹600)",
+    "base_price": 500,
+    "scooter_price": 400,
+    "commuter_price": 500,
+    "tourer_price": 600,
+    "duration_minutes": 30,
+    "pricing": {
+      "Scooter": 400,
+      "Commuter Bike": 500,
+      "Tourer Bike": 600,
+      "Superbike": 600
+    },
+    "is_package": true,
+    "package_type": "BIKE",
+    "package_washes": {
+      "bike_wash": 3,
+      "total": 3
+    },
+    "active": true
   }
 }

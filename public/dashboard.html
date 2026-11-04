@@ -2537,7 +2537,10 @@
             </a>
           </li>
           <li class="nav-item" id="nav-packages" onclick="showSection('packages-sec')">
-            <a><span>📦 Car Care Packages</span><span class="nav-counter" id="badge-packages-count" style="display:none;">0</span></a>
+            <a><span>🚗 Car Care Packages</span><span class="nav-counter" id="badge-packages-count" style="display:none;">0</span></a>
+          </li>
+          <li class="nav-item" id="nav-bike-packages" onclick="showSection('bike-packages-sec')">
+            <a><span>🏍️ Bike Care Packages</span><span class="nav-counter" id="badge-bike-packages-count" style="display:none;">0</span></a>
           </li>
         </ul>
       </div>
@@ -2803,9 +2806,23 @@
 
       <!-- 4. MONTHLY CAR CARE PACKAGES & WASH REDEMPTION SECTION (NO QR CODE) -->
       <section class="content-section" id="packages-sec">
+        <!-- TOP TABS: CAR vs BIKE PACKAGES -->
+        <div style="display:flex; gap:0.5rem; margin-bottom:1.25rem; flex-wrap:wrap;">
+          <button type="button" class="btn btn-primary" onclick="showSection('packages-sec')" style="padding:0.45rem 1rem; font-size:0.85rem; display:flex; align-items:center; gap:0.4rem;">
+            <span>🚗</span>
+            <span>Car Care Packages</span>
+            <span class="badge" id="tab-badge-car-count" style="background:rgba(255,255,255,0.2); padding:1px 6px; border-radius:10px; font-size:0.75rem;">0</span>
+          </button>
+          <button type="button" class="btn btn-outline" onclick="showSection('bike-packages-sec')" style="padding:0.45rem 1rem; font-size:0.85rem; display:flex; align-items:center; gap:0.4rem;">
+            <span>🏍️</span>
+            <span>Bike Care Packages</span>
+            <span class="badge" id="tab-badge-bike-count" style="background:rgba(255,255,255,0.2); padding:1px 6px; border-radius:10px; font-size:0.75rem;">0</span>
+          </button>
+        </div>
+
         <div class="section-header">
           <div>
-            <div class="section-title"><span>📦</span> Monthly Car Care Packages</div>
+            <div class="section-title"><span>🚗</span> Monthly Car Care Packages</div>
             <div class="section-subtitle">Staff wash redemption portal, customer wash balance management, and redemption receipts</div>
           </div>
           <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
@@ -3035,6 +3052,241 @@
               </thead>
               <tbody id="pkg-directory-tbody">
                 <tr><td colspan="11" style="text-align:center; color:var(--muted); padding:2rem;">Loading packages...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4B. MONTHLY BIKE WASH PACKAGES & REDEMPTION SECTION (NO QR CODE) -->
+      <section class="content-section" id="bike-packages-sec">
+        <!-- TOP TABS: CAR vs BIKE PACKAGES -->
+        <div style="display:flex; gap:0.5rem; margin-bottom:1.25rem; flex-wrap:wrap;">
+          <button type="button" class="btn btn-outline" onclick="showSection('packages-sec')" style="padding:0.45rem 1rem; font-size:0.85rem; display:flex; align-items:center; gap:0.4rem;">
+            <span>🚗</span>
+            <span>Car Care Packages</span>
+            <span class="badge" id="tab-badge-car-count-b" style="background:rgba(255,255,255,0.2); padding:1px 6px; border-radius:10px; font-size:0.75rem;">0</span>
+          </button>
+          <button type="button" class="btn btn-primary" onclick="showSection('bike-packages-sec')" style="padding:0.45rem 1rem; font-size:0.85rem; display:flex; align-items:center; gap:0.4rem; background:#a3e635; color:#0f172a; border-color:#a3e635;">
+            <span>🏍️</span>
+            <span>Bike Care Packages</span>
+            <span class="badge" id="tab-badge-bike-count-b" style="background:rgba(0,0,0,0.25); color:#0f172a; padding:1px 6px; border-radius:10px; font-size:0.75rem;">0</span>
+          </button>
+        </div>
+
+        <div class="section-header">
+          <div>
+            <div class="section-title"><span style="color:#a3e635;">🏍️</span> Monthly Bike Wash Packages</div>
+            <div class="section-subtitle">Staff wash redemption portal, customer wash balance management, and bike redemption receipts</div>
+          </div>
+          <div style="display:flex; gap:0.5rem; align-items:center; flex-wrap:wrap;">
+            <button class="btn btn-primary" onclick="openNewBikePackageModal()" style="display:flex; align-items:center; gap:0.4rem; background:#a3e635; color:#0f172a; border-color:#a3e635; font-weight:700;">
+              <span>+</span>
+              <span>New Bike Package Purchase</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- SEARCH BAR & FILTERS -->
+        <div class="panel" style="margin-bottom:1.5rem;">
+          <div class="panel-body" style="padding:1.25rem;">
+            <div style="display:flex; gap:0.75rem; flex-wrap:wrap; align-items:center;">
+              <div style="position:relative; flex:1; min-width:280px;">
+                <input type="text" id="bpkg-search-input" class="form-input" placeholder="🔍 Search customer by Mobile Number, Bike Number, or Package ID..." style="padding-left:1rem; font-size:0.95rem;" oninput="handleBikePackageSearchInput()" onkeydown="if(event.key==='Enter') executeBikePackageSearch()">
+              </div>
+              <button class="btn btn-primary" onclick="executeBikePackageSearch()" style="padding:0.6rem 1.25rem; background:#a3e635; color:#0f172a; border-color:#a3e635;">Search</button>
+              <button class="btn btn-outline" onclick="clearBikePackageSearch()" style="padding:0.6rem 1rem;">Clear</button>
+            </div>
+            <div style="display:flex; gap:0.5rem; margin-top:0.85rem; flex-wrap:wrap; align-items:center;">
+              <span style="font-size:0.75rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.05em; margin-right:0.25rem;">Filter:</span>
+              <button class="btn btn-outline btn-filter-bpkg active" data-filter="ALL" onclick="filterBikePackagesList('ALL', this)" style="padding:0.25rem 0.75rem; font-size:0.78rem;">All Packages</button>
+              <button class="btn btn-outline btn-filter-bpkg" data-filter="ACTIVE" onclick="filterBikePackagesList('ACTIVE', this)" style="padding:0.25rem 0.75rem; font-size:0.78rem;">Active</button>
+              <button class="btn btn-outline btn-filter-bpkg" data-filter="EXPIRED" onclick="filterBikePackagesList('EXPIRED', this)" style="padding:0.25rem 0.75rem; font-size:0.78rem;">Expired</button>
+              <button class="btn btn-outline btn-filter-bpkg" data-filter="EXHAUSTED" onclick="filterBikePackagesList('EXHAUSTED', this)" style="padding:0.25rem 0.75rem; font-size:0.78rem;">Exhausted</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACTIVE BIKE PACKAGE REDEMPTION WORKSPACE -->
+        <div id="bpkg-active-workspace" style="display:none; margin-bottom:1.25rem;">
+          <div class="panel" style="border:1px solid rgba(163,230,53,0.35); box-shadow:0 8px 30px rgba(0,0,0,0.4); border-radius:10px; overflow:hidden;">
+            <!-- 1. PROMINENT CUSTOMER DETAILS HEADER -->
+            <div class="panel-header" style="background:linear-gradient(90deg, rgba(163,230,53,0.12) 0%, rgba(30,41,59,0.3) 100%); border-bottom:1px solid rgba(163,230,53,0.25); padding:0.85rem 1.15rem;">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start; width:100%; flex-wrap:wrap; gap:0.75rem;">
+                <div style="display:flex; flex-direction:column; gap:3px;">
+                  <!-- Customer Name in large bold text -->
+                  <div style="display:flex; align-items:center; gap:0.6rem; flex-wrap:wrap;">
+                    <span style="font-size:1.35rem; font-weight:800; color:var(--white); letter-spacing:-0.01em;" id="bpkg-view-cust-name">-</span>
+                    <span id="bpkg-view-status-badge" class="status-badge conf" style="font-size:0.72rem; padding:2px 8px;">ACTIVE</span>
+                    <span style="font-family:'IBM Plex Mono'; font-size:0.78rem; color:#a3e635; font-weight:600; background:rgba(163,230,53,0.1); border:1px solid rgba(163,230,53,0.25); border-radius:4px; padding:2px 6px;" id="bpkg-view-days-left">Expires in - days</span>
+                  </div>
+                  <!-- Mobile Number directly below name + Bike details -->
+                  <div style="display:flex; align-items:center; gap:0.65rem; flex-wrap:wrap; font-size:0.82rem;">
+                    <span style="font-family:'IBM Plex Mono'; font-weight:700; color:#38bdf8; display:flex; align-items:center; gap:4px;">
+                      <span>📞</span>
+                      <span id="bpkg-view-cust-phone">-</span>
+                    </span>
+                    <span style="color:var(--line);">|</span>
+                    <span style="font-family:'IBM Plex Mono'; font-weight:700; color:var(--white); background:var(--bg-panel-2); border:1px solid var(--line); padding:2px 8px; border-radius:4px;" id="bpkg-view-veh-reg">-</span>
+                    <span style="color:#a3e635; font-weight:600; font-size:0.8rem;" id="bpkg-view-veh-type">Commuter Bike</span>
+                    <span style="color:var(--line);">|</span>
+                    <span style="font-size:0.75rem; color:var(--muted); font-family:'IBM Plex Mono';" id="bpkg-view-exp-date">Expires: -</span>
+                  </div>
+                </div>
+
+                <!-- Header Actions -->
+                <div style="display:flex; align-items:center; gap:0.5rem;">
+                  <button class="btn btn-outline" id="btn-view-bpkg-invoice" onclick="viewBikePackageInvoice(currentSelectedBikePackageId)" style="padding:0.35rem 0.75rem; font-size:0.75rem; border-color:#38bdf8; color:#38bdf8;">🧾 View Invoice</button>
+                  <button class="btn btn-outline" onclick="closeActiveBikePackageView()" style="padding:0.35rem 0.65rem; font-size:0.75rem;">✕ Close View</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel-body" style="padding:0.9rem 1.15rem;">
+              <!-- 2. WASH BALANCE CARDS (3-wash allocation) -->
+              <div class="pkg-cards-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+                <!-- Included Washes Card -->
+                <div class="pkg-wash-balance-card" id="card-bal-bike-washes" style="padding:0.75rem 1rem; border-radius:8px; background:rgba(163,230,53,0.06); border:1px solid rgba(163,230,53,0.3); display:flex; align-items:center; justify-content:space-between;">
+                  <div style="display:flex; align-items:center; gap:0.6rem;">
+                    <span style="font-size:1.5rem;">🏍️</span>
+                    <div>
+                      <div style="font-size:0.85rem; font-weight:700; color:var(--white);">Included Bike Washes</div>
+                      <div style="font-size:0.72rem; color:var(--muted);">3 washes in 30-day plan</div>
+                    </div>
+                  </div>
+                  <div style="font-family:'IBM Plex Mono'; font-size:1.6rem; font-weight:800; color:#a3e635;">
+                    <span id="bpkg-bal-washes">0</span><span style="font-size:0.9rem; color:var(--muted); font-weight:500;">/3</span>
+                  </div>
+                </div>
+
+                <!-- Plan & Savings Card -->
+                <div style="padding:0.75rem 1rem; border-radius:8px; background:rgba(56,189,248,0.06); border:1px solid rgba(56,189,248,0.3); display:flex; align-items:center; justify-content:space-between;">
+                  <div style="display:flex; align-items:center; gap:0.6rem;">
+                    <span style="font-size:1.5rem;">🏷️</span>
+                    <div>
+                      <div style="font-size:0.85rem; font-weight:700; color:var(--white);" id="bpkg-bal-plan-title">Commuter Bike Pack</div>
+                      <div style="font-size:0.72rem; color:#38bdf8;" id="bpkg-bal-plan-savings">₹500 / month • Saves ₹100</div>
+                    </div>
+                  </div>
+                  <div style="font-family:'IBM Plex Mono'; font-size:1.1rem; font-weight:700; color:#38bdf8;" id="bpkg-bal-plan-badge">
+                    30 Days
+                  </div>
+                </div>
+
+                <!-- Total Washes Remaining Card -->
+                <div style="padding:0.75rem 1rem; border-radius:8px; background:rgba(255,255,255,0.04); border:1px solid var(--line); display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center;">
+                  <div style="font-size:0.72rem; color:var(--muted); text-transform:uppercase; letter-spacing:0.04em;">Total Washes Remaining</div>
+                  <div style="font-family:'IBM Plex Mono'; font-size:1.5rem; font-weight:800; color:var(--white);" id="bpkg-bal-total">3 / 3</div>
+                </div>
+              </div>
+
+              <!-- 3. COMPACT REDEEM WASH SECTION -->
+              <div style="background:rgba(24,24,27,0.85); border:1px solid rgba(255,255,255,0.1); border-radius:8px; padding:0.75rem 1rem; margin-bottom:0.85rem;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem; flex-wrap:wrap; gap:4px;">
+                  <div style="font-family:'Oswald',sans-serif; font-size:0.88rem; letter-spacing:0.04em; color:#a3e635; display:flex; align-items:center; gap:0.35rem;">
+                    <span>⚡</span> REDEEM BIKE WASH TODAY
+                  </div>
+                  <div style="font-size:0.72rem; color:var(--muted);">
+                    Included washes are covered at ₹0 payable amount. Additional services billed separately.
+                  </div>
+                </div>
+
+                <div class="pkg-redeem-grid" style="grid-template-columns: 1.5fr 1fr 1.5fr auto;">
+                  <div class="form-group" style="margin:0;">
+                    <label class="form-label" style="font-size:0.72rem; margin-bottom:3px; color:var(--white);">Wash Item to Deduct *</label>
+                    <select class="form-select" id="bpkg-redeem-category" style="padding:0.42rem 0.65rem; font-size:0.85rem; font-weight:600;">
+                      <option value="bike_wash">1 Bike Wash (3 / 3 left)</option>
+                    </select>
+                  </div>
+
+                  <div class="form-group" style="margin:0;">
+                    <label class="form-label" style="font-size:0.72rem; margin-bottom:3px;">Today's Payable (₹)</label>
+                    <input type="number" id="bpkg-redeem-payable" class="form-input" value="0" min="0" placeholder="0" style="padding:0.42rem 0.65rem; font-size:0.85rem; font-weight:700; color:#a3e635;">
+                  </div>
+
+                  <div class="form-group" style="margin:0;">
+                    <label class="form-label" style="font-size:0.72rem; margin-bottom:3px;">Staff Notes (Optional)</label>
+                    <input type="text" id="bpkg-redeem-notes" class="form-input" placeholder="Bike Bay, polish notes..." style="padding:0.42rem 0.65rem; font-size:0.85rem;">
+                  </div>
+
+                  <div>
+                    <button type="button" class="btn btn-primary" id="btn-redeem-bike-wash" onclick="executeRedeemBikeWash()" style="padding:0.48rem 1.25rem; font-size:0.88rem; font-weight:700; background:#a3e635; color:#0f172a; border-color:#a3e635; display:flex; align-items:center; gap:0.4rem; height:37px; white-space:nowrap;">
+                      <span>🧼</span>
+                      <span>Redeem Wash</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 4. REDEMPTION HISTORY (Compact table) -->
+              <div style="margin-bottom:0.75rem;">
+                <div style="font-family:'Oswald',sans-serif; font-size:0.88rem; letter-spacing:0.04em; color:var(--muted); margin-bottom:0.35rem; display:flex; justify-content:space-between; align-items:center;">
+                  <span>📜 Bike Redemption History</span>
+                  <span id="bpkg-history-count" style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:#a3e635;">0 Redemptions</span>
+                </div>
+                <div class="table-wrap" style="max-height:200px; overflow-y:auto; border:1px solid var(--line); border-radius:6px;">
+                  <table class="trieye-table" style="font-size:0.78rem; margin:0;">
+                    <thead>
+                      <tr>
+                        <th style="padding:6px 10px;">Date &amp; Time</th>
+                        <th style="padding:6px 10px;">Wash Type</th>
+                        <th style="padding:6px 10px;">Balance Before → After</th>
+                        <th style="padding:6px 10px;">Processed By</th>
+                        <th style="padding:6px 10px;">Amount</th>
+                        <th style="padding:6px 10px; text-align:right;">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody id="bpkg-history-tbody">
+                      <tr><td colspan="6" style="text-align:center; color:var(--muted); padding:1rem;">No redemptions recorded for this bike package yet.</td></tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- 5. PACKAGE INFORMATION FOOTER -->
+              <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem; padding:0.45rem 0.75rem; background:rgba(255,255,255,0.02); border:1px solid var(--line); border-radius:6px; font-size:0.74rem; color:var(--muted); font-family:'IBM Plex Mono';">
+                <div>
+                  <span>Package ID: </span><strong style="color:#a3e635;" id="bpkg-footer-id">TRI-BPKG-XXXXXX</strong>
+                </div>
+                <div>
+                  <span>Purchased: </span><strong style="color:var(--white);" id="bpkg-footer-purchase">-</strong>
+                </div>
+                <div>
+                  <span>Expires: </span><strong style="color:var(--white);" id="bpkg-footer-expiry">-</strong>
+                </div>
+                <div>
+                  <span>Price: </span><strong style="color:var(--white);" id="bpkg-footer-price">₹500</strong>
+                </div>
+                <div>
+                  <span>Status: </span><span id="bpkg-footer-status" class="status-badge conf" style="font-size:0.68rem; padding:1px 6px;">ACTIVE</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ALL BIKE PACKAGES DIRECTORY TABLE -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title"><span>📋</span> Bike Care Packages Directory</div>
+            <div style="font-family:'IBM Plex Mono'; font-size:0.82rem; color:var(--muted);" id="bpkg-directory-count">0 packages recorded</div>
+          </div>
+          <div class="table-wrap">
+            <table class="trieye-table">
+              <thead>
+                <tr>
+                  <th>Package ID</th>
+                  <th>Customer</th>
+                  <th>Bike Number</th>
+                  <th>Bike Category</th>
+                  <th>Washes Left</th>
+                  <th>Expiry Date</th>
+                  <th>Payment Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="bpkg-directory-tbody">
+                <tr><td colspan="8" style="text-align:center; color:var(--muted); padding:2rem;">Loading bike packages...</td></tr>
               </tbody>
             </table>
           </div>
@@ -3959,6 +4211,113 @@
     </div>
   </div>
 
+  <!-- NEW BIKE PACKAGE PURCHASE MODAL (NO QR CODE) -->
+  <div class="dash-modal-backdrop" id="modalNewBikePackage">
+    <div class="dash-modal" style="max-width:560px;">
+      <div class="dash-modal-header" style="border-bottom:1px solid rgba(163,230,53,0.3);">
+        <div class="dash-modal-title"><span style="color:#a3e635;">🏍️</span> Issue TRIEYE Monthly Bike Wash Pack</div>
+        <button class="dash-modal-close" onclick="closeModal('modalNewBikePackage')">&times;</button>
+      </div>
+      <div class="dash-modal-body">
+        <form id="newBikePackageForm" onsubmit="event.preventDefault(); handleNewBikePackageSubmit();">
+          <!-- 1. Customer Select or Create New -->
+          <div class="form-group" style="margin-bottom:1rem;">
+            <label class="form-label" style="display:flex; justify-content:space-between; align-items:center;">
+              <span>Select Existing Customer (or Enter New Below)</span>
+              <span style="font-size:0.7rem; color:#a3e635; text-transform:none; font-weight:normal;">Auto-fills details</span>
+            </label>
+            <select class="form-select" id="nbpkg-cust-select" onchange="handleNewBikePackageCustomerSelect(this.value)">
+              <option value="">-- Enter New Customer Details --</option>
+            </select>
+          </div>
+
+          <div class="form-grid" style="grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:1rem;">
+            <div class="form-group">
+              <label class="form-label">Customer Name *</label>
+              <input type="text" id="nbpkg-name" class="form-input" placeholder="Customer Name" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Mobile Number *</label>
+              <input type="tel" id="nbpkg-phone" class="form-input" placeholder="9876543210" maxlength="10" required oninput="handleNewBikePackagePhoneInput()">
+            </div>
+          </div>
+
+          <!-- 2. Bike Registration & Category -->
+          <div class="form-grid" style="grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:1rem;">
+            <div class="form-group">
+              <label class="form-label">Bike Registration Number *</label>
+              <input type="text" id="nbpkg-reg" class="form-input" placeholder="TN 01 AB 1234" maxlength="13" required style="text-transform:uppercase;">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Bike Category *</label>
+              <select class="form-select" id="nbpkg-vtype" onchange="updateNewBikePackagePrice()">
+                <option value="Scooter">Scooter — ₹400 (Saves ₹50)</option>
+                <option value="Commuter Bike" selected>Commuter Bike — ₹500 (Saves ₹100)</option>
+                <option value="Tourer Bike">Tourer Bike — ₹600 (Saves ₹150)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 3. Included Washes (3 Total) & 30-Day Rules -->
+          <div style="background:rgba(163,230,53,0.06); border:1px solid rgba(163,230,53,0.25); border-radius:8px; padding:12px; margin-bottom:1rem;">
+            <div style="font-family:'Oswald',sans-serif; font-size:0.85rem; letter-spacing:0.04em; color:#a3e635; margin-bottom:6px; display:flex; justify-content:space-between; align-items:center;">
+              <span>🏍️ 3 WASHES INCLUDED IN MONTHLY PLAN</span>
+              <span style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--white); font-weight:700;">Valid for 30 Days</span>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; font-size:0.78rem;">
+              <div style="color:var(--white);">• Valid for 1 registered bike only</div>
+              <div style="color:var(--white);">• Single wash redemption at a time</div>
+              <div style="color:var(--muted);">• Unlimited washes not included</div>
+              <div style="color:var(--muted);">• Additional services billed separately</div>
+            </div>
+            <div style="margin-top:8px; padding-top:6px; border-top:1px dashed rgba(255,255,255,0.1); font-size:0.74rem; color:var(--muted); font-family:'IBM Plex Mono';" id="nbpkg-dates-preview">
+              Valid: Today &rarr; 30 Days from purchase
+            </div>
+          </div>
+
+          <!-- 4. Billing, Amount Collected & Balance Due -->
+          <div class="form-grid" style="grid-template-columns:1fr 1fr 1fr; gap:0.75rem; margin-bottom:1rem;">
+            <div class="form-group">
+              <label class="form-label">Package Price (₹)</label>
+              <input type="number" id="nbpkg-price" class="form-input" value="500" readonly style="font-weight:700; color:#a3e635; background:var(--bg-panel-2);">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Amount Collected (₹) *</label>
+              <input type="number" id="nbpkg-amt-paid" class="form-input" value="500" min="0" required oninput="calculateNewBikePackageBilling()" style="font-weight:700;">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Balance Due (₹)</label>
+              <input type="number" id="nbpkg-bal-due" class="form-input" value="0" readonly style="color:#f87171; font-weight:700; background:var(--bg-panel-2);">
+            </div>
+          </div>
+
+          <div class="form-grid" style="grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:1rem;">
+            <div class="form-group">
+              <label class="form-label">Payment Method *</label>
+              <select class="form-select" id="nbpkg-pay-method">
+                <option value="UPI" selected>UPI / GPay / PhonePe</option>
+                <option value="Cash">Cash</option>
+                <option value="Card">Credit / Debit Card</option>
+                <option value="Net Banking">Net Banking</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Payment Status</label>
+              <input type="text" id="nbpkg-pay-status" class="form-input" value="PAID" readonly style="font-weight:700; color:#22c55e; background:var(--bg-panel-2);">
+            </div>
+          </div>
+
+          <div style="display:flex; justify-content:flex-end; gap:0.5rem; margin-top:1.25rem;">
+            <button type="button" class="btn btn-outline" onclick="closeModal('modalNewBikePackage')">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="btn-submit-new-bpkg" style="background:#a3e635; color:#0f172a; border-color:#a3e635; font-weight:700;">
+              Activate &amp; Purchase Bike Package
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
   <!-- PACKAGE REDEMPTION RECEIPT MODAL (NO QR CODE) -->
   <div class="dash-modal-backdrop" id="modalRedemptionReceipt" style="z-index:999999;">
     <div class="dash-modal" style="max-width:560px; padding:0; overflow:hidden; background:#fff; color:#111;">
@@ -3988,8 +4347,8 @@
         </div>
 
         <div style="text-align:center; margin-bottom:14px;">
-          <div style="font-family:'Oswald',sans-serif; letter-spacing:0.06em; font-size:15px; font-weight:700; color:#0f172a; text-transform:uppercase;">
-            Monthly Car Care Package — Redemption Receipt
+          <div style="font-family:'Oswald',sans-serif; letter-spacing:0.06em; font-size:15px; font-weight:700; color:#0f172a; text-transform:uppercase;" id="rcpt-title-banner">
+            Monthly Package — Redemption Receipt
           </div>
           <div style="font-size:11px; color:#64748b; font-family:'IBM Plex Mono'; margin-top:2px;">
             Package ID: <strong id="rcpt-pkg-code" style="color:#0284c7;">TRI-PKG-XXXXXX</strong> &bull; Valid Till: <strong id="rcpt-expiry">DD/MM/YYYY</strong>
@@ -4016,7 +4375,7 @@
             <div>
               <div style="font-size:10.5px; color:#15803d; font-weight:700; text-transform:uppercase; letter-spacing:0.04em;">Today's Wash Redeemed</div>
               <div style="font-size:16px; font-weight:800; color:#166534; margin-top:2px;" id="rcpt-wash-redeemed">Complete Wash</div>
-              <div style="font-size:11px; color:#475569; margin-top:2px;">Deducted 1 wash from Monthly Car Care Package balance</div>
+              <div style="font-size:11px; color:#475569; margin-top:2px;" id="rcpt-wash-desc">Deducted 1 wash from Monthly Package balance</div>
             </div>
             <div style="text-align:right;">
               <div style="font-size:10px; color:#64748b; text-transform:uppercase;">Today's Payable</div>
@@ -4032,7 +4391,7 @@
             <span style="font-family:'IBM Plex Mono'; font-size:11px; color:#a3e635;" id="rcpt-rem-total">0 Washes Left</span>
           </div>
           <table style="width:100%; border-collapse:collapse; font-size:12px;">
-            <tbody>
+            <tbody id="rcpt-car-balance-rows">
               <tr style="border-bottom:1px solid #e2e8f0;">
                 <td style="padding:8px 12px; font-weight:600; color:#334155;">🚗 Complete Wash</td>
                 <td style="padding:8px 12px; text-align:right; font-family:'IBM Plex Mono'; font-weight:700; color:#0f172a;" id="rcpt-rem-complete">0 remaining</td>
@@ -4046,13 +4405,19 @@
                 <td style="padding:8px 12px; text-align:right; font-family:'IBM Plex Mono'; font-weight:700; color:#0f172a;" id="rcpt-rem-outer">0 remaining</td>
               </tr>
             </tbody>
+            <tbody id="rcpt-bike-balance-rows" style="display:none;">
+              <tr>
+                <td style="padding:8px 12px; font-weight:600; color:#334155;">🏍️ Included Bike Washes (30 Days)</td>
+                <td style="padding:8px 12px; text-align:right; font-family:'IBM Plex Mono'; font-weight:700; color:#0f172a;" id="rcpt-rem-bike">0 remaining</td>
+              </tr>
+            </tbody>
           </table>
         </div>
 
         <!-- Footer Notice -->
         <div style="border-top:1px dashed #cbd5e1; padding-top:10px; font-size:11px; color:#64748b; display:flex; justify-content:space-between; align-items:center;">
           <div>
-            Please present your vehicle number or Package ID for your next redemption.<br>
+            Please present your vehicle/bike registration number or Package ID for your next redemption.<br>
             <strong style="color:#0f172a;">Valid until <span id="rcpt-footer-expiry">DD/MM/YYYY</span>.</strong>
           </div>
           <div style="text-align:right; font-weight:700; color:#ee2f76; font-family:'Oswald',sans-serif; letter-spacing:0.04em;">
@@ -5065,6 +5430,7 @@
         'online-sec': 'nav-online',
         'walkin-sec': 'nav-walkin',
         'packages-sec': 'nav-packages',
+        'bike-packages-sec': 'nav-bike-packages',
         'bays-sec': 'nav-bays',
         'slots-sec': 'nav-slots',
         'customers-sec': 'nav-customers',
@@ -5080,6 +5446,9 @@
 
       if (secId === 'packages-sec') {
         renderPackagesSection();
+      }
+      if (secId === 'bike-packages-sec') {
+        renderBikePackagesSection();
       }
       if (secId === 'online-sec') {
         initOnlineCalendarState();
@@ -5458,6 +5827,9 @@
       populateServiceSelects();
       if (typeof renderPackagesSection === 'function') {
         renderPackagesSection();
+      }
+      if (typeof renderBikePackagesSection === 'function') {
+        renderBikePackagesSection();
       }
     }
 
@@ -8775,7 +9147,8 @@ TRIEYE DETAILING
     async function renderPackagesSection() {
       if (!window.TrieyeDB || typeof window.TrieyeDB.getPackages !== 'function') return;
       try {
-        const packages = await window.TrieyeDB.getPackages();
+        const getCarPkgsFn = window.TrieyeDB.getCarPackages || window.TrieyeDB.getPackages;
+        const packages = await getCarPkgsFn.call(window.TrieyeDB);
 
         // 1. Update navigation counter badge
         const activeCount = packages.filter(p => (p.status || '').toUpperCase() === 'ACTIVE').length;
@@ -8787,6 +9160,33 @@ TRIEYE DETAILING
           } else {
             badge.style.display = 'none';
           }
+        }
+
+        // Update Car Tab badges
+        const tabCarBadge = document.getElementById('tab-badge-car-count');
+        if (tabCarBadge) tabCarBadge.innerText = activeCount;
+        const tabCarBadgeB = document.getElementById('tab-badge-car-count-b');
+        if (tabCarBadgeB) tabCarBadgeB.innerText = activeCount;
+
+        // Also update Bike Tab & sidebar badges if available
+        if (typeof window.TrieyeDB.getBikePackages === 'function') {
+          try {
+            const bikePkgs = await window.TrieyeDB.getBikePackages();
+            const activeBikeCount = bikePkgs.filter(p => (p.status || '').toUpperCase() === 'ACTIVE').length;
+            const bBadge = document.getElementById('badge-bike-packages-count');
+            if (bBadge) {
+              if (activeBikeCount > 0) {
+                bBadge.innerText = activeBikeCount;
+                bBadge.style.display = 'inline-block';
+              } else {
+                bBadge.style.display = 'none';
+              }
+            }
+            const tabBikeBadge = document.getElementById('tab-badge-bike-count');
+            if (tabBikeBadge) tabBikeBadge.innerText = activeBikeCount;
+            const tabBikeBadgeB = document.getElementById('tab-badge-bike-count-b');
+            if (tabBikeBadgeB) tabBikeBadgeB.innerText = activeBikeCount;
+          } catch (e) {}
         }
 
         // 2. If a package is actively selected, refresh its details view
@@ -8810,7 +9210,8 @@ TRIEYE DETAILING
 
     async function applyPackagesFilter() {
       if (!window.TrieyeDB || typeof window.TrieyeDB.getPackages !== 'function') return;
-      const packages = await window.TrieyeDB.getPackages();
+      const getCarPkgsFn = window.TrieyeDB.getCarPackages || window.TrieyeDB.getPackages;
+      const packages = await getCarPkgsFn.call(window.TrieyeDB);
       let filtered = packages;
       if (currentPackageFilter !== 'ALL') {
         filtered = packages.filter(p => (p.status || '').toUpperCase() === currentPackageFilter.toUpperCase());
@@ -8833,8 +9234,9 @@ TRIEYE DETAILING
         return;
       }
 
-      if (!window.TrieyeDB || typeof window.TrieyeDB.searchPackages !== 'function') return;
-      const matches = await window.TrieyeDB.searchPackages(query);
+      if (!window.TrieyeDB) return;
+      const searchFn = window.TrieyeDB.searchCarPackages || window.TrieyeDB.searchPackages;
+      const matches = await searchFn.call(window.TrieyeDB, query);
 
       if (matches.length === 0) {
         const tbody = document.getElementById('pkg-directory-tbody');
@@ -9238,7 +9640,16 @@ TRIEYE DETAILING
 
       currentRedemptionReceiptData = redemption;
 
+      const isBike = redemption.package_type === 'BIKE' || 
+                     redemption.wash_category === 'bike_wash' || 
+                     String(redemption.package_code || redemption.package_id || '').includes('BPKG');
+
       // Populate receipt DOM
+      const titleBanner = document.getElementById('rcpt-title-banner');
+      if (titleBanner) {
+        titleBanner.innerText = isBike ? 'Monthly Bike Wash Pack — Redemption Receipt' : 'Monthly Car Care Pack — Redemption Receipt';
+      }
+
       const numEl = document.getElementById('rcpt-num');
       if (numEl) numEl.innerText = redemption.redemption_number || redemption.id;
 
@@ -9267,10 +9678,17 @@ TRIEYE DETAILING
       if (vehRegEl) vehRegEl.innerText = redemption.reg_number || '-';
 
       const vehTypeEl = document.getElementById('rcpt-veh-type');
-      if (vehTypeEl) vehTypeEl.innerText = redemption.vehicle_type || 'Car';
+      if (vehTypeEl) vehTypeEl.innerText = redemption.vehicle_type || (isBike ? 'Bike' : 'Car');
 
       const washRedeemedEl = document.getElementById('rcpt-wash-redeemed');
-      if (washRedeemedEl) washRedeemedEl.innerText = redemption.wash_type_name || redemption.wash_category || 'Wash';
+      if (washRedeemedEl) washRedeemedEl.innerText = redemption.wash_type_name || (isBike ? 'Bike Wash' : 'Wash');
+
+      const washDescEl = document.getElementById('rcpt-wash-desc');
+      if (washDescEl) {
+        washDescEl.innerText = isBike 
+          ? 'Deducted 1 wash from Monthly Bike Wash Pack balance' 
+          : 'Deducted 1 wash from Monthly Car Care Pack balance';
+      }
 
       const payableAmtEl = document.getElementById('rcpt-payable-amt');
       if (payableAmtEl) {
@@ -9279,22 +9697,40 @@ TRIEYE DETAILING
       }
 
       const snap = redemption.balance_snapshot || {};
-      const compLeft = snap.complete ?? 0;
-      const basicLeft = snap.basic ?? 0;
-      const outerLeft = snap.outer_foam ?? 0;
-      const totalLeft = snap.total !== undefined ? snap.total : (compLeft + basicLeft + outerLeft);
+      const carRows = document.getElementById('rcpt-car-balance-rows');
+      const bikeRows = document.getElementById('rcpt-bike-balance-rows');
 
-      const remCompEl = document.getElementById('rcpt-rem-complete');
-      if (remCompEl) remCompEl.innerText = `${compLeft} remaining`;
+      if (isBike) {
+        if (carRows) carRows.style.display = 'none';
+        if (bikeRows) bikeRows.style.display = 'table-row-group';
 
-      const remBasicEl = document.getElementById('rcpt-rem-basic');
-      if (remBasicEl) remBasicEl.innerText = `${basicLeft} remaining`;
+        const bikeLeft = snap.bike_wash !== undefined ? snap.bike_wash : (snap.total !== undefined ? snap.total : 0);
+        const remBikeEl = document.getElementById('rcpt-rem-bike');
+        if (remBikeEl) remBikeEl.innerText = `${bikeLeft} remaining (out of 3)`;
 
-      const remOuterEl = document.getElementById('rcpt-rem-outer');
-      if (remOuterEl) remOuterEl.innerText = `${outerLeft} remaining`;
+        const remTotalEl = document.getElementById('rcpt-rem-total');
+        if (remTotalEl) remTotalEl.innerText = `${bikeLeft} / 3 Washes Left`;
+      } else {
+        if (carRows) carRows.style.display = 'table-row-group';
+        if (bikeRows) bikeRows.style.display = 'none';
 
-      const remTotalEl = document.getElementById('rcpt-rem-total');
-      if (remTotalEl) remTotalEl.innerText = `${totalLeft} Washes Left`;
+        const compLeft = snap.complete ?? 0;
+        const basicLeft = snap.basic ?? 0;
+        const outerLeft = snap.outer_foam ?? 0;
+        const totalLeft = snap.total !== undefined ? snap.total : (compLeft + basicLeft + outerLeft);
+
+        const remCompEl = document.getElementById('rcpt-rem-complete');
+        if (remCompEl) remCompEl.innerText = `${compLeft} remaining`;
+
+        const remBasicEl = document.getElementById('rcpt-rem-basic');
+        if (remBasicEl) remBasicEl.innerText = `${basicLeft} remaining`;
+
+        const remOuterEl = document.getElementById('rcpt-rem-outer');
+        if (remOuterEl) remOuterEl.innerText = `${outerLeft} remaining`;
+
+        const remTotalEl = document.getElementById('rcpt-rem-total');
+        if (remTotalEl) remTotalEl.innerText = `${totalLeft} Washes Left`;
+      }
 
       openModal('modalRedemptionReceipt');
     }
@@ -9316,25 +9752,39 @@ TRIEYE DETAILING
       }
 
       const snap = r.balance_snapshot || {};
-      const compLeft = snap.complete ?? 0;
-      const basicLeft = snap.basic ?? 0;
-      const outerLeft = snap.outer_foam ?? 0;
-      const totalLeft = snap.total !== undefined ? snap.total : (compLeft + basicLeft + outerLeft);
+      const isBike = r.package_type === 'BIKE' || 
+                     r.wash_category === 'bike_wash' || 
+                     String(r.package_code || r.package_id || '').includes('BPKG');
+
       const payableText = Number(r.payable_amount || 0) > 0 ? `₹${Number(r.payable_amount).toLocaleString('en-IN')}` : '₹0 (Included in Package)';
 
-      const text = `*TRIEYE DETAILING — PACKAGE REDEMPTION RECEIPT*\n\n` +
+      let balanceSection = '';
+      if (isBike) {
+        const bikeLeft = snap.bike_wash !== undefined ? snap.bike_wash : (snap.total !== undefined ? snap.total : 0);
+        balanceSection = `*Updated Remaining Wash Balance:*\n` +
+          `• Included Bike Washes: ${bikeLeft} remaining (out of 3)\n` +
+          `*Total Washes Left:* ${bikeLeft} / 3\n`;
+      } else {
+        const compLeft = snap.complete ?? 0;
+        const basicLeft = snap.basic ?? 0;
+        const outerLeft = snap.outer_foam ?? 0;
+        const totalLeft = snap.total !== undefined ? snap.total : (compLeft + basicLeft + outerLeft);
+        balanceSection = `*Updated Remaining Wash Balance:*\n` +
+          `• Complete Wash: ${compLeft} remaining\n` +
+          `• Basic Wash: ${basicLeft} remaining\n` +
+          `• Outer Foam Wash: ${outerLeft} remaining\n` +
+          `*Total Washes Left:* ${totalLeft}\n`;
+      }
+
+      const text = `*TRIEYE DETAILING — ${isBike ? 'BIKE PACKAGE' : 'CAR PACKAGE'} REDEMPTION RECEIPT*\n\n` +
         `Hi ${r.customer_name || 'Valued Customer'},\n\n` +
         `Your wash redemption has been recorded successfully.\n\n` +
         `*Receipt #:* ${r.redemption_number || r.id}\n` +
         `*Package ID:* ${r.package_code || r.package_id || '-'}\n` +
-        `*Vehicle:* ${r.reg_number || 'N/A'} (${r.vehicle_type || 'Car'})\n\n` +
-        `*Today\'s Wash Redeemed:* ${r.wash_type_name || 'Wash'}\n` +
+        `*Vehicle:* ${r.reg_number || 'N/A'} (${r.vehicle_type || (isBike ? 'Bike' : 'Car')})\n\n` +
+        `*Today\'s Wash Redeemed:* ${r.wash_type_name || (isBike ? 'Bike Wash' : 'Wash')}\n` +
         `*Today\'s Payable Amount:* ${payableText}\n\n` +
-        `*Updated Remaining Wash Balance:*\n` +
-        `• Complete Wash: ${compLeft} remaining\n` +
-        `• Basic Wash: ${basicLeft} remaining\n` +
-        `• Outer Foam Wash: ${outerLeft} remaining\n` +
-        `*Total Washes Left:* ${totalLeft}\n` +
+        balanceSection +
         `*Package Valid Until:* ${r.expiry_date || '-'}\n\n` +
         `Thank you for choosing TRIEYE DETAILING!\n*Detail • Precision • Protection*`;
 
@@ -9692,6 +10142,822 @@ TRIEYE DETAILING
           {
             service_name: 'TRIEYE Monthly Car Care Pack',
             description: `Package ID: ${pkg.package_id || pkg.id} • 6 Washes (1 Complete + 1 Basic + 4 Outer Foam) • Valid for 30 Days (Expires: ${pkg.expiry_date || '-'})`,
+            quantity: 1,
+            unit_price: price,
+            total_price: price
+          }
+        ],
+        payments: [
+          {
+            amount: amtPaid,
+            method: pkg.payment_method || 'UPI',
+            status: payStatus
+          }
+        ]
+      };
+
+      openInvoiceModal(synInv);
+    }
+
+    // 11C. MONTHLY BIKE WASH PACKAGES & REDEMPTION (NO QR CODE)
+    let currentBikePackageFilter = 'ALL';
+    let currentSelectedBikePackageId = null;
+
+    async function renderBikePackagesSection() {
+      if (!window.TrieyeDB || typeof window.TrieyeDB.getBikePackages !== 'function') return;
+      try {
+        const bikePackages = await window.TrieyeDB.getBikePackages();
+
+        // 1. Update navigation counter badges
+        const activeCount = bikePackages.filter(p => (p.status || '').toUpperCase() === 'ACTIVE').length;
+        const badge = document.getElementById('badge-bike-packages-count');
+        if (badge) {
+          if (activeCount > 0) {
+            badge.innerText = activeCount;
+            badge.style.display = 'inline-block';
+          } else {
+            badge.style.display = 'none';
+          }
+        }
+        const tabBikeBadge = document.getElementById('tab-badge-bike-count');
+        if (tabBikeBadge) tabBikeBadge.innerText = activeCount;
+        const tabBikeBadgeB = document.getElementById('tab-badge-bike-count-b');
+        if (tabBikeBadgeB) tabBikeBadgeB.innerText = activeCount;
+
+        // Also update car tab badges if available
+        if (typeof window.TrieyeDB.getCarPackages === 'function') {
+          try {
+            const carPkgs = await window.TrieyeDB.getCarPackages();
+            const activeCarCount = carPkgs.filter(p => (p.status || '').toUpperCase() === 'ACTIVE').length;
+            const tabCarBadge = document.getElementById('tab-badge-car-count');
+            if (tabCarBadge) tabCarBadge.innerText = activeCarCount;
+            const tabCarBadgeB = document.getElementById('tab-badge-car-count-b');
+            if (tabCarBadgeB) tabCarBadgeB.innerText = activeCarCount;
+          } catch (e) {}
+        }
+
+        // 2. If a package is actively selected, refresh its details view
+        if (currentSelectedBikePackageId) {
+          await selectActiveBikePackage(currentSelectedBikePackageId, false);
+        }
+
+        // 3. Render directory table according to active filter
+        await applyBikePackagesFilter();
+      } catch (err) {
+        console.error('Error rendering bike packages section:', err);
+      }
+    }
+
+    function filterBikePackagesList(filter, btn) {
+      currentBikePackageFilter = filter || 'ALL';
+      document.querySelectorAll('.btn-filter-bpkg').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
+      applyBikePackagesFilter();
+    }
+
+    async function applyBikePackagesFilter() {
+      if (!window.TrieyeDB || typeof window.TrieyeDB.getBikePackages !== 'function') return;
+      const packages = await window.TrieyeDB.getBikePackages();
+      let filtered = packages;
+      if (currentBikePackageFilter !== 'ALL') {
+        filtered = packages.filter(p => (p.status || '').toUpperCase() === currentBikePackageFilter.toUpperCase());
+      }
+      renderBikePackagesDirectoryTable(filtered);
+    }
+
+    function handleBikePackageSearchInput() {
+      const val = (document.getElementById('bpkg-search-input')?.value || '').trim();
+      if (!val) {
+        applyBikePackagesFilter();
+      }
+    }
+
+    async function executeBikePackageSearch() {
+      const input = document.getElementById('bpkg-search-input');
+      const query = (input?.value || '').trim();
+      if (!query) {
+        applyBikePackagesFilter();
+        return;
+      }
+
+      if (!window.TrieyeDB || typeof window.TrieyeDB.searchBikePackages !== 'function') return;
+      const matches = await window.TrieyeDB.searchBikePackages(query);
+
+      if (matches.length === 0) {
+        const tbody = document.getElementById('bpkg-directory-tbody');
+        if (tbody) {
+          tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; color:#f87171; padding:2rem;">No bike packages found matching "<strong>${escapeHtml(query)}</strong>". Try searching by 10-digit mobile number, bike number, or Package ID.</td></tr>`;
+        }
+        const countEl = document.getElementById('bpkg-directory-count');
+        if (countEl) countEl.innerText = '0 packages matched';
+        return;
+      }
+
+      // Render matches in directory table
+      renderBikePackagesDirectoryTable(matches);
+
+      // If exact 1 match, auto-select it directly for redemption
+      if (matches.length === 1) {
+        await selectActiveBikePackage(matches[0].id, true);
+      }
+    }
+
+    function clearBikePackageSearch() {
+      const input = document.getElementById('bpkg-search-input');
+      if (input) input.value = '';
+      closeActiveBikePackageView();
+      applyBikePackagesFilter();
+    }
+
+    async function selectActiveBikePackage(packageId, scrollIntoView = true) {
+      if (!packageId || !window.TrieyeDB) return;
+      const pkg = await window.TrieyeDB.getPackageById(packageId);
+      if (!pkg) {
+        alert('Bike package not found.');
+        return;
+      }
+
+      currentSelectedBikePackageId = pkg.id;
+      const workspace = document.getElementById('bpkg-active-workspace');
+      if (!workspace) return;
+      workspace.style.display = 'block';
+
+      // 1. Prominent Customer Details
+      const rawPkgName = (pkg.customer_name || '').trim();
+      const hasRealName = rawPkgName && 
+        rawPkgName.toLowerCase() !== 'customer' && 
+        rawPkgName.toLowerCase() !== 'valued customer' && 
+        rawPkgName.toLowerCase() !== 'walk-in customer' && 
+        rawPkgName.toLowerCase() !== 'name not available';
+      const displayName = hasRealName ? rawPkgName : 'Name not available';
+
+      const custNameEl = document.getElementById('bpkg-view-cust-name');
+      if (custNameEl) {
+        custNameEl.innerText = displayName;
+        custNameEl.style.color = hasRealName ? 'var(--white)' : 'var(--muted)';
+      }
+
+      const custPhoneEl = document.getElementById('bpkg-view-cust-phone');
+      if (custPhoneEl) {
+        const cleanDigits = String(pkg.customer_phone || '').replace(/\D/g, '');
+        if (cleanDigits) {
+          const telHref = `tel:${cleanDigits.length === 10 ? '+91' + cleanDigits : '+' + cleanDigits}`;
+          const formatted = cleanDigits.length === 10 ? `+91 ${cleanDigits}` : cleanDigits;
+          custPhoneEl.innerHTML = `<a href="${telHref}" style="color:#38bdf8; text-decoration:none;" title="Call ${escapeHtml(displayName)}">${escapeHtml(formatted)}</a>`;
+        } else {
+          custPhoneEl.innerText = '-';
+        }
+      }
+
+      const vehRegEl = document.getElementById('bpkg-view-veh-reg');
+      if (vehRegEl) vehRegEl.innerText = pkg.reg_number || '-';
+      const vehTypeEl = document.getElementById('bpkg-view-veh-type');
+      if (vehTypeEl) vehTypeEl.innerText = `${pkg.vehicle_category || pkg.vehicle_type || 'Commuter Bike'}`;
+
+      const expDateEl = document.getElementById('bpkg-view-exp-date');
+      if (expDateEl) expDateEl.innerText = `Expires: ${pkg.expiry_date || '-'}`;
+
+      const st = (pkg.status || 'ACTIVE').toUpperCase();
+      const badgeEl = document.getElementById('bpkg-view-status-badge');
+      if (badgeEl) {
+        badgeEl.innerText = st;
+        badgeEl.className = 'status-badge ' + (st === 'ACTIVE' ? 'conf' : (st === 'EXPIRED' ? 'can' : 'prog'));
+      }
+
+      const daysLeftEl = document.getElementById('bpkg-view-days-left');
+      if (daysLeftEl) {
+        const todayStr = window.TrieyeDB.getLocalDateIso(new Date());
+        if (pkg.expiry_date) {
+          const expDate = new Date(pkg.expiry_date);
+          const curDate = new Date(todayStr);
+          const diffTime = expDate - curDate;
+          const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+          if (diffDays < 0) {
+            daysLeftEl.innerText = `Expired ${Math.abs(diffDays)} day${Math.abs(diffDays) === 1 ? '' : 's'} ago`;
+            daysLeftEl.style.color = '#f87171';
+            daysLeftEl.style.borderColor = 'rgba(248,113,113,0.3)';
+            daysLeftEl.style.background = 'rgba(248,113,113,0.1)';
+          } else if (diffDays === 0) {
+            daysLeftEl.innerText = `Expires TODAY`;
+            daysLeftEl.style.color = '#fbbf24';
+            daysLeftEl.style.borderColor = 'rgba(251,191,36,0.3)';
+            daysLeftEl.style.background = 'rgba(251,191,36,0.1)';
+          } else {
+            daysLeftEl.innerText = `Expires in ${diffDays} day${diffDays === 1 ? '' : 's'}`;
+            daysLeftEl.style.color = '#a3e635';
+            daysLeftEl.style.borderColor = 'rgba(163,230,53,0.25)';
+            daysLeftEl.style.background = 'rgba(163,230,53,0.1)';
+          }
+        } else {
+          daysLeftEl.innerText = '-';
+        }
+      }
+
+      // 2. Washes Balance (3 washes total)
+      const rem = pkg.remaining_washes || pkg.washes_remaining || { bike_wash: 0, total: 0 };
+      const bikeVal = Number(rem.bike_wash !== undefined ? rem.bike_wash : (rem.total !== undefined ? rem.total : 0));
+
+      const washesEl = document.getElementById('bpkg-bal-washes');
+      if (washesEl) washesEl.innerText = bikeVal;
+      const totEl = document.getElementById('bpkg-bal-total');
+      if (totEl) totEl.innerText = `${bikeVal} / 3`;
+
+      // Card dimming
+      const washesCard = document.getElementById('card-bal-bike-washes');
+      if (washesCard) washesCard.style.opacity = bikeVal > 0 ? '1' : '0.45';
+
+      // Plan Details & Savings
+      const cat = pkg.vehicle_category || pkg.vehicle_type || 'Commuter Bike';
+      const plan = (window.TrieyeDB && typeof window.TrieyeDB.getBikePackagePlan === 'function') 
+        ? window.TrieyeDB.getBikePackagePlan(cat) 
+        : { category: cat, packagePrice: pkg.price || 500, savings: 100 };
+      
+      const planTitleEl = document.getElementById('bpkg-bal-plan-title');
+      if (planTitleEl) planTitleEl.innerText = `${plan.category} Pack`;
+      const planSavingsEl = document.getElementById('bpkg-bal-plan-savings');
+      if (planSavingsEl) planSavingsEl.innerText = `₹${plan.packagePrice} / month • Saves ₹${plan.savings}`;
+
+      // Category options
+      const catSelect = document.getElementById('bpkg-redeem-category');
+      if (catSelect) {
+        catSelect.innerHTML = `<option value="bike_wash" ${bikeVal <= 0 ? 'disabled' : ''}>1 Bike Wash (${bikeVal} / 3 left)</option>`;
+      }
+
+      // Button state
+      const redeemBtn = document.getElementById('btn-redeem-bike-wash');
+      if (redeemBtn) {
+        const isExp = pkg.status === 'EXPIRED';
+        const isExh = bikeVal <= 0 || pkg.status === 'EXHAUSTED';
+        if (isExp) {
+          redeemBtn.disabled = true;
+          redeemBtn.style.opacity = '0.5';
+          redeemBtn.title = 'Cannot redeem washes on an expired package.';
+        } else if (isExh) {
+          redeemBtn.disabled = true;
+          redeemBtn.style.opacity = '0.5';
+          redeemBtn.title = 'All 3 washes have been used.';
+        } else {
+          redeemBtn.disabled = false;
+          redeemBtn.style.opacity = '1';
+          redeemBtn.title = 'Click to redeem 1 bike wash';
+        }
+      }
+
+      // 3. Compact Footer Information
+      const footId = document.getElementById('bpkg-footer-id');
+      if (footId) footId.innerText = pkg.package_id || pkg.id;
+      const footPurch = document.getElementById('bpkg-footer-purchase');
+      if (footPurch) footPurch.innerText = pkg.purchase_date || '-';
+      const footExp = document.getElementById('bpkg-footer-expiry');
+      if (footExp) footExp.innerText = pkg.expiry_date || '-';
+      const footPrice = document.getElementById('bpkg-footer-price');
+      if (footPrice) footPrice.innerText = `₹${Number(pkg.price || plan.packagePrice).toLocaleString('en-IN')}`;
+      const footStatus = document.getElementById('bpkg-footer-status');
+      if (footStatus) {
+        footStatus.innerText = st;
+        footStatus.className = 'status-badge ' + (st === 'ACTIVE' ? 'conf' : (st === 'EXPIRED' ? 'can' : 'prog'));
+      }
+
+      // History
+      await renderBikePackageRedemptionsHistory(pkg.id);
+
+      if (scrollIntoView) {
+        workspace.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    }
+
+    function closeActiveBikePackageView() {
+      currentSelectedBikePackageId = null;
+      const workspace = document.getElementById('bpkg-active-workspace');
+      if (workspace) workspace.style.display = 'none';
+    }
+
+    async function renderBikePackageRedemptionsHistory(packageId) {
+      const tbody = document.getElementById('bpkg-history-tbody');
+      const countEl = document.getElementById('bpkg-history-count');
+      if (!tbody) return;
+
+      const redemptions = await window.TrieyeDB.getPackageRedemptions(packageId);
+      if (countEl) countEl.innerText = `${redemptions.length} Redemption${redemptions.length === 1 ? '' : 's'}`;
+
+      if (redemptions.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; color:var(--muted); padding:1rem;">No redemptions recorded for this bike package yet.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = '';
+      redemptions.forEach(r => {
+        const tr = document.createElement('tr');
+        const rDate = r.redeemed_at ? new Date(r.redeemed_at).toLocaleString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : (r.redeemed_date || '-');
+        const snap = r.balance_snapshot || {};
+        const afterVal = snap.bike_wash !== undefined ? snap.bike_wash : (snap.total !== undefined ? snap.total : '-');
+        const beforeVal = (afterVal !== '-') ? (afterVal + 1) : '-';
+        
+        const washLabel = escapeHtml(r.wash_type_name || 'Bike Wash');
+        const processedBy = escapeHtml(r.staff_name || 'Staff');
+        const payableText = Number(r.payable_amount || 0) > 0 ? `₹${Number(r.payable_amount).toLocaleString('en-IN')}` : '₹0 (Included)';
+
+        tr.innerHTML = `
+          <td style="font-family:'IBM Plex Mono'; font-size:0.75rem; padding:6px 10px; color:var(--white);">${escapeHtml(rDate)}</td>
+          <td style="padding:6px 10px;"><strong style="color:#a3e635;">${washLabel}</strong></td>
+          <td style="font-family:'IBM Plex Mono'; font-size:0.75rem; padding:6px 10px;">
+            Washes Left: <strong>${beforeVal}</strong> → <strong>${afterVal}</strong> <span style="color:var(--muted); font-size:0.7rem;">(out of 3)</span>
+          </td>
+          <td style="padding:6px 10px; color:var(--muted); font-size:0.78rem;">${processedBy}</td>
+          <td style="font-family:'IBM Plex Mono'; font-weight:600; padding:6px 10px; color:var(--white);">${payableText}</td>
+          <td style="text-align:right; padding:6px 10px;">
+            <button class="btn btn-outline" style="padding:0.2rem 0.55rem; font-size:0.72rem; border-color:#a3e635; color:#a3e635;" onclick='openRedemptionReceipt(${JSON.stringify(r.id)})'>
+              🧾 Receipt
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderBikePackagesDirectoryTable(packages) {
+      const tbody = document.getElementById('bpkg-directory-tbody');
+      const countEl = document.getElementById('bpkg-directory-count');
+      if (!tbody) return;
+
+      if (countEl) countEl.innerText = `${packages.length} package${packages.length === 1 ? '' : 's'} recorded`;
+
+      if (!packages || packages.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:var(--muted); padding:2rem;">No bike packages found in directory.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = '';
+      packages.forEach(pkg => {
+        const tr = document.createElement('tr');
+        const rem = pkg.remaining_washes || pkg.washes_remaining || { bike_wash: 0, total: 0 };
+        const bikeVal = Number(rem.bike_wash !== undefined ? rem.bike_wash : (rem.total !== undefined ? rem.total : 0));
+
+        const pStatus = (pkg.payment_status || (pkg.balance_due > 0 ? 'PARTIAL' : 'PAID')).toUpperCase();
+        const payStatusClass = (pStatus === 'PAID') ? 'conf' : (pStatus === 'PARTIAL' || pStatus === 'PARTIALLY PAID' ? 'prog' : 'can');
+        const payStatusLabel = (pStatus === 'PARTIAL') ? 'PARTIALLY PAID' : pStatus;
+        
+        // Customer Name (line 1, bold) & Mobile link (line 2, smaller text)
+        const rawName = (pkg.customer_name || '').trim();
+        const hasValidName = rawName && 
+          rawName.toLowerCase() !== 'customer' && 
+          rawName.toLowerCase() !== 'valued customer' && 
+          rawName.toLowerCase() !== 'walk-in customer' && 
+          rawName.toLowerCase() !== 'name not available';
+        const displayName = hasValidName ? rawName : 'Name not available';
+
+        const cleanDigits = String(pkg.customer_phone || '').replace(/\D/g, '');
+        const phoneFormatted = cleanDigits.length === 10 ? cleanDigits : (pkg.customer_phone || '-');
+        const telHref = cleanDigits ? `tel:${cleanDigits.length === 10 ? '+91' + cleanDigits : '+' + cleanDigits}` : '';
+        const phoneHtml = cleanDigits ? `
+          <a href="${telHref}" style="font-family:'IBM Plex Mono'; font-size:0.78rem; font-weight:600; color:#38bdf8; text-decoration:none; display:inline-flex; align-items:center; gap:4px;" title="Call ${escapeHtml(displayName)}">
+            <span>📞</span> <span>${escapeHtml(phoneFormatted)}</span>
+          </a>
+        ` : `<span style="font-family:'IBM Plex Mono'; font-size:0.78rem; color:var(--muted);">-</span>`;
+
+        tr.innerHTML = `
+          <td style="font-family:'IBM Plex Mono'; font-weight:700; color:#a3e635; font-size:0.8rem; padding:7px 10px;">${escapeHtml(pkg.package_id || pkg.id)}</td>
+          <td style="padding:7px 10px;">
+            <div style="font-weight:700; color:${hasValidName ? 'var(--white)' : 'var(--muted)'}; font-size:0.88rem; line-height:1.25; margin-bottom:3px;">
+              ${escapeHtml(displayName)}
+            </div>
+            <div>
+              ${phoneHtml}
+            </div>
+          </td>
+          <td style="padding:7px 10px;">
+            <span style="font-family:'IBM Plex Mono'; font-weight:700; color:var(--white); background:var(--bg-panel-2); border:1px solid var(--line); padding:2px 6px; border-radius:4px; font-size:0.8rem;">${escapeHtml(pkg.reg_number || '-')}</span>
+          </td>
+          <td style="padding:7px 10px;">
+            <span style="font-size:0.75rem; color:#a3e635; font-weight:600;">${escapeHtml(pkg.vehicle_category || pkg.vehicle_type || 'Commuter Bike')}</span>
+          </td>
+          <td style="font-family:'IBM Plex Mono'; font-weight:800; color:${bikeVal > 0 ? '#a3e635' : 'var(--muted)'}; font-size:0.85rem; padding:7px 10px;">${bikeVal} / 3</td>
+          <td style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--muted); padding:7px 10px;">${escapeHtml(pkg.expiry_date || '-')}</td>
+          <td style="padding:7px 10px;"><span class="status-badge ${payStatusClass}" style="font-size:0.68rem; padding:2px 6px;">${escapeHtml(payStatusLabel)}</span></td>
+          <td style="white-space:nowrap; text-align:right; padding:7px 10px;">
+            <button class="btn btn-primary" style="padding:0.25rem 0.55rem; font-size:0.74rem; margin-right:4px; background:#a3e635; color:#0f172a; border-color:#a3e635;" onclick="selectActiveBikePackage('${escapeHtml(pkg.id)}')">
+              🧼 Redeem
+            </button>
+            <button class="btn btn-outline" style="padding:0.25rem 0.55rem; font-size:0.74rem; border-color:#38bdf8; color:#38bdf8;" onclick="viewBikePackageInvoice('${escapeHtml(pkg.id)}')">
+              🧾 Invoice
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function executeRedeemBikeWash() {
+      if (!currentSelectedBikePackageId) {
+        alert('Please select or search for an active bike package first.');
+        return;
+      }
+
+      const payableAmt = Number(document.getElementById('bpkg-redeem-payable')?.value || 0);
+      const notes = (document.getElementById('bpkg-redeem-notes')?.value || '').trim();
+
+      const confirmMsg = `Redeem 1 Bike Wash for this customer?` + (payableAmt > 0 ? `\nToday's payable amount: ₹${payableAmt}` : '\nToday\'s payable amount: ₹0 (Included in package)');
+
+      if (!confirm(confirmMsg)) {
+        return;
+      }
+
+      const btn = document.getElementById('btn-redeem-bike-wash');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerText = 'Redeeming...';
+      }
+
+      try {
+        const res = await window.TrieyeDB.redeemPackageWash(currentSelectedBikePackageId, 'bike_wash', {
+          payable_amount: payableAmt,
+          notes: notes,
+          staff_name: 'Staff'
+        });
+
+        if (!res.success) {
+          alert(`Redemption failed: ${res.error}`);
+          return;
+        }
+
+        // Reset inputs
+        const payableInput = document.getElementById('bpkg-redeem-payable');
+        if (payableInput) payableInput.value = '0';
+        const notesInput = document.getElementById('bpkg-redeem-notes');
+        if (notesInput) notesInput.value = '';
+
+        // Refresh views
+        await selectActiveBikePackage(currentSelectedBikePackageId, false);
+        await applyBikePackagesFilter();
+
+        showToast(`✓ Bike Wash redeemed successfully!`);
+
+        // Automatically open the redemption receipt modal
+        if (res.redemption) {
+          openRedemptionReceipt(res.redemption.id, res.redemption);
+        }
+      } catch (err) {
+        console.error('Error redeeming bike wash:', err);
+        alert(`Error: ${err.message || err}`);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<span>🧼</span><span>Redeem Wash</span>';
+        }
+      }
+    }
+
+    async function openNewBikePackageModal() {
+      const form = document.getElementById('newBikePackageForm');
+      if (form) form.reset();
+
+      const regInput = document.getElementById('nbpkg-reg');
+      if (regInput && window.TrieyeDB && typeof window.TrieyeDB.attachVehicleInput === 'function') {
+        window.TrieyeDB.attachVehicleInput(regInput);
+      }
+
+      // Populate existing customer selection dropdown
+      const selectEl = document.getElementById('nbpkg-cust-select');
+      if (selectEl) {
+        selectEl.innerHTML = '<option value="">-- Enter New Customer Details --</option>';
+        let custMap = {};
+        if (window.TrieyeDB && typeof window.TrieyeDB.getCustomers === 'function') {
+          try {
+            custMap = await window.TrieyeDB.getCustomers();
+          } catch (e) {}
+        }
+        if (!custMap || Object.keys(custMap).length === 0) {
+          custMap = typeof getCustomers === 'function' ? getCustomers() : {};
+        }
+
+        const custArr = Object.values(custMap || {}).filter(c => c && (c.name || c.phone));
+        custArr.sort((a, b) => String(a.name || '').localeCompare(String(b.name || '')));
+
+        custArr.forEach(c => {
+          const cleanPhone = String(c.phone || '').replace(/\D/g, '').slice(-10);
+          const name = c.name || 'Customer';
+          const reg = c.vehicleReg || c.reg || '';
+          const opt = document.createElement('option');
+          opt.value = cleanPhone;
+          opt.innerText = `${name} (${cleanPhone})${reg ? ' • ' + reg : ''}`;
+          selectEl.appendChild(opt);
+        });
+      }
+
+      // Display 30-day validity dates
+      const today = new Date();
+      const expDate = new Date();
+      expDate.setDate(expDate.getDate() + 30);
+      const formatDate = d => d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+      const valEl = document.getElementById('nbpkg-dates-preview');
+      if (valEl) {
+        valEl.innerText = `Valid: ${formatDate(today)} → ${formatDate(expDate)} (30 Days)`;
+      }
+
+      // Set default vehicle category to Commuter Bike
+      const vtypeEl = document.getElementById('nbpkg-vtype');
+      if (vtypeEl) vtypeEl.value = 'Commuter Bike';
+
+      updateNewBikePackagePrice();
+      openModal('modalNewBikePackage');
+    }
+
+    function handleNewBikePackageCustomerSelect(phoneKey) {
+      if (!phoneKey) {
+        // Clear inputs for manual entry
+        const nameInput = document.getElementById('nbpkg-name');
+        if (nameInput) nameInput.value = '';
+        const phoneInput = document.getElementById('nbpkg-phone');
+        if (phoneInput) phoneInput.value = '';
+        const regInput = document.getElementById('nbpkg-reg');
+        if (regInput) regInput.value = '';
+        updateNewBikePackagePrice();
+        return;
+      }
+
+      let custMap = {};
+      if (typeof getCustomers === 'function') custMap = getCustomers();
+      let cust = custMap[phoneKey];
+
+      if (!cust && window.TrieyeDB) {
+        try {
+          const local = JSON.parse(localStorage.getItem('trieye_customers')) || {};
+          cust = local[phoneKey];
+        } catch (e) {}
+      }
+
+      if (cust) {
+        const nameInput = document.getElementById('nbpkg-name');
+        if (nameInput) nameInput.value = cust.name || '';
+        const phoneInput = document.getElementById('nbpkg-phone');
+        if (phoneInput) phoneInput.value = String(cust.phone || phoneKey).replace(/\D/g, '').slice(-10);
+        const regInput = document.getElementById('nbpkg-reg');
+        if (regInput) regInput.value = cust.vehicleReg || cust.reg || '';
+
+        const vtypeInput = document.getElementById('nbpkg-vtype');
+        if (vtypeInput && (cust.vehicleType || cust.category)) {
+          const cType = String(cust.vehicleType || cust.category).toLowerCase();
+          if (cType.includes('scooter')) {
+            vtypeInput.value = 'Scooter';
+          } else if (cType.includes('tourer')) {
+            vtypeInput.value = 'Tourer Bike';
+          } else {
+            vtypeInput.value = 'Commuter Bike';
+          }
+        }
+        updateNewBikePackagePrice();
+      }
+    }
+
+    function updateNewBikePackagePrice() {
+      const vType = document.getElementById('nbpkg-vtype')?.value || 'Commuter Bike';
+      const priceInput = document.getElementById('nbpkg-price');
+      const amtPaidInput = document.getElementById('nbpkg-amt-paid');
+      if (!priceInput) return;
+      
+      let price = 500;
+      if (window.TrieyeDB && typeof window.TrieyeDB.getBikePackagePriceByCategory === 'function') {
+        price = window.TrieyeDB.getBikePackagePriceByCategory(vType);
+      } else {
+        if (vType === 'Scooter') price = 400;
+        else if (vType === 'Tourer Bike') price = 600;
+        else price = 500;
+      }
+
+      priceInput.value = price;
+      if (amtPaidInput) amtPaidInput.value = price;
+
+      calculateNewBikePackageBilling();
+    }
+
+    function calculateNewBikePackageBilling() {
+      const price = Number(document.getElementById('nbpkg-price')?.value || 0);
+      const amtPaid = Number(document.getElementById('nbpkg-amt-paid')?.value || 0);
+      const balDue = Math.max(0, price - amtPaid);
+
+      const balEl = document.getElementById('nbpkg-bal-due');
+      if (balEl) balEl.value = balDue;
+
+      const stEl = document.getElementById('nbpkg-pay-status');
+      if (stEl) {
+        const isPaid = balDue === 0;
+        const isPartial = amtPaid > 0 && balDue > 0;
+        const status = isPaid ? 'PAID' : (isPartial ? 'PARTIALLY PAID' : 'PENDING');
+        stEl.value = status;
+        stEl.style.color = isPaid ? '#22c55e' : (isPartial ? '#fbbf24' : '#f87171');
+      }
+    }
+
+    function handleNewBikePackagePhoneInput() {
+      const phoneVal = (document.getElementById('nbpkg-phone')?.value || '').replace(/\D/g, '');
+      if (phoneVal.length === 10) {
+        let custMap = {};
+        if (typeof getCustomers === 'function') custMap = getCustomers();
+        if ((!custMap || !custMap[phoneVal]) && window.TrieyeDB) {
+          try {
+            const local = JSON.parse(localStorage.getItem('trieye_customers')) || {};
+            custMap = local;
+          } catch (e) {}
+        }
+        const match = custMap[phoneVal];
+        if (match) {
+          const selectEl = document.getElementById('nbpkg-cust-select');
+          if (selectEl) selectEl.value = phoneVal;
+          const nameInput = document.getElementById('nbpkg-name');
+          if (nameInput && !nameInput.value) nameInput.value = match.name || '';
+          const regInput = document.getElementById('nbpkg-reg');
+          if (regInput && !regInput.value) regInput.value = match.vehicleReg || match.reg || '';
+          const vtypeInput = document.getElementById('nbpkg-vtype');
+          if (vtypeInput && (match.vehicleType || match.category)) {
+            const cType = String(match.vehicleType || match.category).toLowerCase();
+            if (cType.includes('scooter')) vtypeInput.value = 'Scooter';
+            else if (cType.includes('tourer')) vtypeInput.value = 'Tourer Bike';
+            else vtypeInput.value = 'Commuter Bike';
+            updateNewBikePackagePrice();
+          }
+        }
+      }
+    }
+
+    async function handleNewBikePackageSubmit() {
+      const phone = (document.getElementById('nbpkg-phone')?.value || '').trim();
+      const name = (document.getElementById('nbpkg-name')?.value || '').trim();
+      const rawReg = (document.getElementById('nbpkg-reg')?.value || '').trim();
+      const vtype = document.getElementById('nbpkg-vtype')?.value || 'Commuter Bike';
+      const price = Number(document.getElementById('nbpkg-price')?.value || 500);
+      const amtPaid = Number(document.getElementById('nbpkg-amt-paid')?.value || price);
+      const balDue = Math.max(0, price - amtPaid);
+      const payStatus = balDue === 0 ? 'PAID' : (amtPaid > 0 ? 'PARTIAL' : 'UNPAID');
+      const payMethod = document.getElementById('nbpkg-pay-method')?.value || 'UPI';
+
+      const cleanPhone = phone.replace(/\D/g, '').slice(-10);
+      if (!cleanPhone || cleanPhone.length < 10) {
+        alert('Please enter a valid 10-digit mobile number.');
+        document.getElementById('nbpkg-phone')?.focus();
+        return;
+      }
+      if (!name) {
+        alert('Please enter customer name.');
+        document.getElementById('nbpkg-name')?.focus();
+        return;
+      }
+      if (!rawReg) {
+        alert('Please enter bike registration number.');
+        document.getElementById('nbpkg-reg')?.focus();
+        return;
+      }
+
+      const normReg = window.TrieyeDB && typeof window.TrieyeDB.formatVehicleNumber === 'function'
+        ? window.TrieyeDB.formatVehicleNumber(rawReg)
+        : rawReg.toUpperCase();
+
+      const btn = document.getElementById('btn-submit-new-bpkg');
+      if (btn) {
+        btn.disabled = true;
+        btn.innerText = 'Activating & Generating Invoice...';
+      }
+
+      try {
+        const res = await window.TrieyeDB.purchaseMonthlyBikePackage({
+          customer_name: name,
+          customer_phone: cleanPhone,
+          reg_number: normReg,
+          vehicle_type: 'Bike',
+          vehicle_category: vtype,
+          price: price,
+          amount_paid: amtPaid,
+          amount_collected: amtPaid,
+          balance_due: balDue,
+          payment_status: payStatus,
+          payment_method: payMethod,
+          package_name: 'TRIEYE Monthly Bike Wash Pack'
+        });
+
+        if (!res || !res.success) {
+          alert(`Failed to activate bike package: ${(res && res.error) || 'Unknown error'}`);
+          return;
+        }
+
+        closeModal('modalNewBikePackage');
+        showToast(`✓ Bike Package ${res.package?.package_id || ''} activated for ${name}!`);
+
+        // 1. Refresh bike packages directory table & counters
+        await renderBikePackagesSection();
+
+        // 2. Select newly created package in active workspace
+        if (res.package) {
+          await selectActiveBikePackage(res.package.id, true);
+        }
+
+        // 3. Immediately display the purchase Tax Invoice preview
+        if (res.invoice && typeof openInvoiceModal === 'function') {
+          openInvoiceModal(res.invoice);
+        }
+      } catch (err) {
+        console.error('Error creating bike package:', err);
+        alert(`Error: ${err.message || err}`);
+      } finally {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<span>Activate &amp; Purchase Bike Package</span>';
+        }
+      }
+    }
+
+    async function viewBikePackageInvoice(packageId) {
+      if (!packageId || !window.TrieyeDB) return;
+      const pkg = await window.TrieyeDB.getPackageById(packageId);
+      if (!pkg) {
+        alert('Bike package record not found.');
+        return;
+      }
+
+      let invoice = null;
+      if (pkg.invoice_id && typeof window.TrieyeDB.getInvoiceById === 'function') {
+        try {
+          invoice = await window.TrieyeDB.getInvoiceById(pkg.invoice_id);
+        } catch (e) {}
+      }
+      if (!invoice && typeof window.TrieyeDB.getInvoices === 'function') {
+        try {
+          const invs = await window.TrieyeDB.getInvoices();
+          invoice = invs.find(i => 
+            (pkg.invoice_id && i.id === pkg.invoice_id) ||
+            (pkg.invoice_number && i.invoice_number === pkg.invoice_number) ||
+            (i.items || i.invoice_items || []).some(it => (it.description || '').includes(pkg.package_id))
+          );
+        } catch (e) {}
+      }
+
+      const rawPkgName = (pkg.customer_name || '').trim();
+      const hasRealName = rawPkgName && 
+        rawPkgName.toLowerCase() !== 'customer' && 
+        rawPkgName.toLowerCase() !== 'valued customer' && 
+        rawPkgName.toLowerCase() !== 'walk-in customer' && 
+        rawPkgName.toLowerCase() !== 'name not available';
+      const displayName = hasRealName ? rawPkgName : 'Name not available';
+
+      if (invoice) {
+        if (!invoice.customers || !invoice.customers.name || invoice.customers.name === 'Valued Customer' || invoice.customers.name === 'Customer') {
+          invoice.customers = invoice.customers || {};
+          invoice.customers.name = displayName;
+          invoice.customer_name = displayName;
+        }
+        if (!invoice.customers.phone && pkg.customer_phone) {
+          invoice.customers.phone = pkg.customer_phone;
+          invoice.customer_phone = pkg.customer_phone;
+        }
+        openInvoiceModal(invoice);
+        return;
+      }
+
+      // Fallback printable tax invoice object from package record
+      const price = Number(pkg.price || 500);
+      const amtPaid = Number(pkg.amount_paid !== undefined ? pkg.amount_paid : price);
+      const balDue = Number(pkg.balance_due !== undefined ? pkg.balance_due : Math.max(0, price - amtPaid));
+      const payStatus = pkg.payment_status || (balDue === 0 ? 'PAID' : (amtPaid > 0 ? 'PARTIAL' : 'UNPAID'));
+      const planCategory = pkg.vehicle_category || pkg.vehicle_type || 'Commuter Bike';
+
+      const synInv = {
+        id: pkg.invoice_id || ('bpkg_inv_' + pkg.id),
+        invoice_number: pkg.invoice_number || pkg.package_id || 'TRI-INV-BPKG',
+        created_at: pkg.purchase_date ? (pkg.purchase_date + 'T10:00:00Z') : new Date().toISOString(),
+        customer_id: pkg.customer_id,
+        customer_name: displayName,
+        customer_phone: pkg.customer_phone,
+        customers: {
+          name: displayName,
+          phone: pkg.customer_phone,
+          reg_number: pkg.reg_number
+        },
+        vehicle_id: pkg.vehicle_id,
+        vehicles: {
+          reg_number: pkg.reg_number,
+          vehicle_type: planCategory
+        },
+        subtotal: price,
+        discount: 0,
+        discount_amount: 0,
+        grand_total: price,
+        amount_collected: amtPaid,
+        amount_paid: amtPaid,
+        balance_due: balDue,
+        payment_method: pkg.payment_method || 'UPI',
+        payment_status: payStatus,
+        status: payStatus,
+        items: [
+          {
+            service_name: 'TRIEYE Monthly Bike Wash Pack',
+            description: `Package ID: ${pkg.package_id || pkg.id} • ${planCategory} • 3 Bike Washes • Valid for 30 Days (Expires: ${pkg.expiry_date || '-'})`,
+            quantity: 1,
+            unit_price: price,
+            total_price: price
+          }
+        ],
+        invoice_items: [
+          {
+            service_name: 'TRIEYE Monthly Bike Wash Pack',
+            description: `Package ID: ${pkg.package_id || pkg.id} • ${planCategory} • 3 Bike Washes • Valid for 30 Days (Expires: ${pkg.expiry_date || '-'})`,
             quantity: 1,
             unit_price: price,
             total_price: price
