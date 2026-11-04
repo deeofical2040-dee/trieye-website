@@ -1,0 +1,2735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>TRIEYE — Automotive Splash Screen Demo Gallery</title>
+  <meta name="description" content="Explore 10 futuristic, premium automotive splash screen animations for TRIEYE Detailing Studio. Macro lighting, projector optics, tyre dynamics, and cinematic reveals.">
+  <link rel="icon" type="image/png" href="/assets/trieye-logo-clean.png">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600;700;800;900&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* -------------------------------------------------------------
+       DESIGN SYSTEM & ROOT TOKENS
+       Aesthetic: AAA Racing Game & Cinematic Automotive Luxury
+       ------------------------------------------------------------- */
+    :root {
+      --bg-main: #050606;
+      --bg-panel: #0a0c0e;
+      --bg-card: #0e1112;
+      --bg-card-hover: #13171a;
+      --bg-overlay: rgba(5, 6, 6, 0.96);
+
+      --lime: #A8FF00;
+      --lime-glow: rgba(168, 255, 0, 0.45);
+      --lime-dim: rgba(168, 255, 0, 0.12);
+      --lime-border: rgba(168, 255, 0, 0.28);
+
+      --white: #ffffff;
+      --chrome: #c4ccd3;
+      --chrome-bright: #eef2f5;
+      --text-muted: #838e96;
+      --text-sub: #b2bec7;
+      
+      --amber: #ff9e00;
+      --amber-glow: rgba(255, 158, 0, 0.5);
+
+      --line: rgba(255, 255, 255, 0.08);
+      --line-bright: rgba(255, 255, 255, 0.16);
+
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+
+      --font-heading: 'Oswald', 'Inter', -apple-system, sans-serif;
+      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+
+      --transition: all 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      background-color: var(--bg-main);
+      color: var(--white);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      line-height: 1.5;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* Subtle automotive carbon/grid texture overlay */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(168, 255, 0, 0.05) 0%, transparent 65%),
+        linear-gradient(to right, rgba(255,255,255,0.015) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255,255,255,0.015) 1px, transparent 1px);
+      background-size: 100% 100%, 48px 48px, 48px 48px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* -------------------------------------------------------------
+       TOP NAVIGATION BAR
+       ------------------------------------------------------------- */
+    .demos-nav {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(5, 6, 6, 0.88);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--line);
+      height: 72px;
+      display: flex;
+      align-items: center;
+      padding: 0 2rem;
+    }
+
+    .nav-inner {
+      width: 100%;
+      max-width: 1440px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .nav-brand-logo {
+      height: 28px;
+      width: auto;
+      object-fit: contain;
+    }
+
+    .nav-brand-tagline {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      font-weight: 600;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: var(--lime);
+      border-left: 1px solid var(--line-bright);
+      padding-left: 0.9rem;
+      display: none;
+    }
+
+    @media (min-width: 768px) {
+      .nav-brand-tagline {
+        display: block;
+      }
+    }
+
+    .nav-right-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .nav-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--lime);
+      background: var(--lime-dim);
+      border: 1px solid var(--lime-border);
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .nav-badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--lime);
+      box-shadow: 0 0 8px var(--lime);
+      animation: pulseDot 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    .nav-back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text-sub);
+      text-decoration: none;
+      padding: 0.45rem 0.9rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.02);
+      transition: var(--transition);
+    }
+
+    .nav-back-link:hover {
+      color: var(--white);
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--line-bright);
+    }
+
+    /* -------------------------------------------------------------
+       HERO HEADER SECTION
+       ------------------------------------------------------------- */
+    .demos-hero {
+      position: relative;
+      z-index: 1;
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 3rem 2rem 2rem;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 2rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-content {
+      max-width: 720px;
+    }
+
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--lime);
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    .hero-title {
+      font-family: var(--font-heading);
+      font-size: clamp(2.2rem, 5vw, 3.6rem);
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      line-height: 1.05;
+      text-transform: uppercase;
+      color: var(--white);
+      margin-bottom: 0.85rem;
+    }
+
+    .hero-title span {
+      color: var(--lime);
+      text-shadow: 0 0 35px var(--lime-glow);
+    }
+
+    .hero-tagline-bar {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--chrome-bright);
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--lime-border);
+    }
+
+    .hero-tagline-bar strong {
+      color: var(--lime);
+    }
+
+    .hero-desc {
+      color: var(--text-sub);
+      font-size: 0.95rem;
+      line-height: 1.65;
+      max-width: 640px;
+    }
+
+    .hero-stats {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+    }
+
+    .stat-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      padding: 0.75rem 1.15rem;
+      border-radius: var(--radius-md);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .stat-badge-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--lime-dim);
+      border: 1px solid var(--lime-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--lime);
+      font-size: 0.95rem;
+    }
+
+    .stat-badge-texts {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-badge-title {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.1;
+      letter-spacing: 0.05em;
+    }
+
+    .stat-badge-sub {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    /* -------------------------------------------------------------
+       DEMO CARDS GRID
+       Desktop: 3 columns | Tablet: 2 columns | Mobile: 1 column
+       ------------------------------------------------------------- */
+    .demos-grid-section {
+      position: relative;
+      z-index: 1;
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 1rem 2rem 5rem;
+    }
+
+    .demos-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.75rem;
+    }
+
+    @media (max-width: 1100px) {
+      .demos-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 640px) {
+      .demos-grid {
+        grid-template-columns: 1fr;
+      }
+      .demos-nav, .demos-hero, .demos-grid-section {
+        padding-left: 1.25rem;
+        padding-right: 1.25rem;
+      }
+    }
+
+    /* Card Component */
+    .demo-card {
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      transition: var(--transition);
+      position: relative;
+      outline: none;
+    }
+
+    .demo-card:hover, .demo-card:focus-visible {
+      transform: translateY(-5px);
+      border-color: var(--lime-border);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75), 0 0 24px rgba(168, 255, 0, 0.15);
+      background: var(--bg-card-hover);
+    }
+
+    .demo-thumbnail-wrap {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #020303;
+      overflow: hidden;
+    }
+
+    .demo-thumb-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.4s ease;
+      filter: brightness(0.92) contrast(1.05);
+    }
+
+    .demo-card:hover .demo-thumb-img {
+      transform: scale(1.06);
+      filter: brightness(1.04) contrast(1.1);
+    }
+
+    /* Subtle corner badge for ratio */
+    .thumb-num-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--lime);
+      background: rgba(5, 6, 6, 0.85);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--lime-border);
+      padding: 0.25rem 0.6rem;
+      border-radius: var(--radius-sm);
+      letter-spacing: 0.1em;
+      z-index: 2;
+    }
+
+    /* Hover Play Action Overlay */
+    .thumb-play-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(5, 6, 6, 0.45);
+      backdrop-filter: blur(2px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      z-index: 3;
+    }
+
+    .demo-card:hover .thumb-play-overlay,
+    .demo-card:focus-visible .thumb-play-overlay {
+      opacity: 1;
+    }
+
+    .thumb-play-badge {
+      width: 54px;
+      height: 54px;
+      border-radius: 50%;
+      background: var(--lime);
+      color: #050606;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      font-weight: 900;
+      box-shadow: 0 0 30px var(--lime-glow);
+      transform: scale(0.85);
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .demo-card:hover .thumb-play-badge {
+      transform: scale(1);
+    }
+
+    /* Card Details Body */
+    .demo-card-body {
+      padding: 1.35rem 1.4rem 1.4rem;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      justify-content: space-between;
+      gap: 0.85rem;
+    }
+
+    .card-top-row {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    .card-title-group {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .card-title {
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: var(--white);
+      line-height: 1.15;
+    }
+
+    .card-duration-pill {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--line);
+      padding: 0.2rem 0.55rem;
+      border-radius: var(--radius-sm);
+      white-space: nowrap;
+    }
+
+    .card-description {
+      color: var(--text-sub);
+      font-size: 0.86rem;
+      line-height: 1.55;
+      flex-grow: 1;
+    }
+
+    .card-action-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 0.65rem;
+      border-top: 1px solid var(--line);
+    }
+
+    .card-preview-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--lime);
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      transition: var(--transition);
+      padding: 0.25rem 0;
+    }
+
+    .card-preview-btn span.btn-arrow {
+      transition: transform 0.2s ease;
+    }
+
+    .demo-card:hover .card-preview-btn span.btn-arrow {
+      transform: translateX(4px);
+    }
+
+    .card-macro-tag {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    /* -------------------------------------------------------------
+       INTERACTIVE FULLSCREEN PREVIEW OVERLAY & PLAYER
+       ------------------------------------------------------------- */
+    .player-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      background: #020303;
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .player-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Player Top Header Bar */
+    .player-topbar {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      height: 72px;
+      padding: 0 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(180deg, rgba(2, 3, 3, 0.95) 0%, rgba(2, 3, 3, 0) 100%);
+      pointer-events: none;
+    }
+
+    .player-topbar > * {
+      pointer-events: auto;
+    }
+
+    .player-info-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      background: rgba(14, 17, 18, 0.85);
+      border: 1px solid var(--line);
+      padding: 0.5rem 1rem;
+      border-radius: var(--radius-md);
+      backdrop-filter: blur(12px);
+    }
+
+    .player-num {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--lime);
+      letter-spacing: 0.1em;
+    }
+
+    .player-title {
+      font-family: var(--font-heading);
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--white);
+    }
+
+    .player-top-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .player-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      background: rgba(14, 17, 18, 0.85);
+      border: 1px solid var(--line);
+      color: var(--text-sub);
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      font-weight: 600;
+      padding: 0.5rem 0.85rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: var(--transition);
+      backdrop-filter: blur(12px);
+    }
+
+    .player-btn:hover {
+      color: var(--white);
+      border-color: var(--line-bright);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .player-btn.active-lime {
+      color: var(--lime);
+      border-color: var(--lime-border);
+      background: var(--lime-dim);
+    }
+
+    .player-close-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: rgba(14, 17, 18, 0.85);
+      border: 1px solid var(--line);
+      color: var(--white);
+      font-size: 1.15rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: var(--transition);
+      backdrop-filter: blur(12px);
+    }
+
+    .player-close-btn:hover {
+      background: rgba(238, 47, 118, 0.2);
+      border-color: rgba(238, 47, 118, 0.6);
+      color: #ee2f76;
+      transform: scale(1.05);
+    }
+
+    /* Animation Canvas Stage */
+    .animation-stage {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      background: #020303;
+    }
+
+    .stage-canvas {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* Player Bottom Dock */
+    .player-bottombar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 20;
+      padding: 1.5rem 2rem 1.75rem;
+      background: linear-gradient(0deg, rgba(2, 3, 3, 0.96) 0%, rgba(2, 3, 3, 0) 100%);
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      pointer-events: none;
+    }
+
+    .player-bottombar > * {
+      pointer-events: auto;
+    }
+
+    /* Timeline scrubber */
+    .player-timeline-wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .player-timeline-track {
+      flex: 1;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.12);
+      border-radius: 999px;
+      overflow: hidden;
+      cursor: pointer;
+      position: relative;
+      transition: height 0.15s ease;
+    }
+
+    .player-timeline-track:hover {
+      height: 8px;
+    }
+
+    .player-timeline-fill {
+      position: absolute;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 0%;
+      background: linear-gradient(90deg, #A8FF00, #d4ff70);
+      box-shadow: 0 0 12px var(--lime-glow);
+      border-radius: 999px;
+      transition: width 0.05s linear;
+    }
+
+    .player-time-disp {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--chrome);
+      min-width: 95px;
+      text-align: right;
+    }
+
+    /* Dock Controls Row */
+    .player-dock-row {
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .dock-left, .dock-center, .dock-right {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .dock-btn-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: var(--radius-sm);
+      background: rgba(14, 17, 18, 0.85);
+      border: 1px solid var(--line);
+      color: var(--white);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.05rem;
+      cursor: pointer;
+      transition: var(--transition);
+      backdrop-filter: blur(12px);
+    }
+
+    .dock-btn-icon:hover {
+      border-color: var(--lime-border);
+      color: var(--lime);
+      background: var(--lime-dim);
+    }
+
+    .dock-btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: var(--lime);
+      color: #050606;
+      border: none;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.65rem 1.25rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: var(--transition);
+      box-shadow: 0 0 20px rgba(168, 255, 0, 0.25);
+    }
+
+    .dock-btn-primary:hover {
+      background: #b6ff24;
+      transform: translateY(-1px);
+      box-shadow: 0 0 28px rgba(168, 255, 0, 0.45);
+    }
+
+    /* Accessibility reduced motion styling */
+    @media (prefers-reduced-motion: reduce) {
+      .demo-thumb-img, .thumb-play-badge, .demo-card {
+        transition: none !important;
+        transform: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       TOP NAVIGATION BAR
+       ============================================================ -->
+  <header class="demos-nav">
+    <div class="nav-inner">
+      <a href="/" class="nav-brand" title="TRIEYE Detailing Atelier">
+        <img src="/assets/trieye-logo-clean.png" alt="TRIEYE" class="nav-brand-logo">
+        <span class="nav-brand-tagline">DETAIL &bull; PRECISION &bull; PROTECTION</span>
+      </a>
+
+      <div class="nav-right-actions">
+        <div class="nav-badge">
+          <span class="nav-badge-dot"></span>
+          <span>10 Splash Demos</span>
+        </div>
+        <a href="/" class="nav-back-link" title="Return to Main Website">
+          <span>&larr;</span>
+          <span>Back to Studio</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       HERO HEADER SECTION
+       ============================================================ -->
+  <section class="demos-hero">
+    <div class="hero-content">
+      <div class="hero-eyebrow">
+        <span>&#x25C6;</span>
+        <span>Cinematic Automotive Gallery</span>
+      </div>
+      <h1 class="hero-title">Automotive Splash Screen <span>Demos</span></h1>
+      <div class="hero-tagline-bar">
+        <span>DETAIL</span> &bull; <span>PRECISION</span> &bull; <strong>PROTECTION</strong>
+      </div>
+      <p class="hero-desc">
+        A futuristic automotive showcase inspired by AAA racing simulators and luxury detailing craftsmanship. Each interactive demo explores an extreme macro perspective—projector optics, LED blade sweeps, tyre tread diagnostics, and volumetric laser reveals.
+      </p>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat-badge">
+        <div class="stat-badge-icon">&#x2605;</div>
+        <div class="stat-badge-texts">
+          <span class="stat-badge-title">100% MACRO</span>
+          <span class="stat-badge-sub">Strict Close-up Optics</span>
+        </div>
+      </div>
+      <div class="stat-badge">
+        <div class="stat-badge-icon">&#x25B6;</div>
+        <div class="stat-badge-texts">
+          <span class="stat-badge-title">60 FPS</span>
+          <span class="stat-badge-sub">Hardware Accelerated</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       THE 10 SPLASH DEMOS GALLERY GRID
+       Desktop: 3 cols | Tablet: 2 cols | Mobile: 1 col
+       ============================================================ -->
+  <main class="demos-grid-section">
+    <div class="demos-grid" id="demosGrid">
+      
+      <!-- 01: HEADLIGHT IGNITION -->
+      <article class="demo-card" data-demo="1" tabindex="0" onclick="launchDemo(1)" onkeydown="if(event.key==='Enter'||event.key===' ') launchDemo(1)">
+        <div class="demo-thumbnail-wrap">
+          <span class="thumb-num-badge">01</span>
+          <img src="/assets/splash-demos/thumb-01.jpg" alt="Headlight Ignition Macro Preview" class="demo-thumb-img" loading="lazy">
+          <div class="thumb-play-overlay">
+            <div class="thumb-play-badge">&#9658;</div>
+          </div>
+        </div>
+        <div class="demo-card-body">
+          <div class="card-top-row">
+            <div class="card-title-group">
+              <h2 class="card-title">Headlight Ignition</h2>
+            </div>
+            <span class="card-duration-pill">5.5s</span>
+          </div>
+          <p class="card-description">Extreme macro shot of a single projector headlight in darkness. Thin lime LED activates L to R, followed by a brilliant projector beam and floating particles.</p>
+          <div class="card-action-bar">
+            <button class="card-preview-btn" aria-label="Preview Headlight Ignition">
+              <span>Preview Demo</span>
+              <span class="btn-arrow">&rarr;</span>
+            </button>
+            <span class="card-macro-tag">Macro Optic</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- 02: DRL LIGHT SWEEP -->
+      <article class="demo-card" data-demo="2" tabindex="0" onclick="launchDemo(2)" onkeydown="if(event.key==='Enter'||event.key===' ') launchDemo(2)">
+        <div class="demo-thumbnail-wrap">
+          <span class="thumb-num-badge">02</span>
+          <img src="/assets/splash-demos/thumb-02.jpg" alt="DRL Light Sweep Macro Preview" class="demo-thumb-img" loading="lazy">
+          <div class="thumb-play-overlay">
+            <div class="thumb-play-badge">&#9658;</div>
+          </div>
+        </div>
+        <div class="demo-card-body">
+          <div class="card-top-row">
+            <div class="card-title-group">
+              <h2 class="card-title">DRL Light Sweep</h2>
+            </div>
+            <span class="card-duration-pill">5.0s</span>
+          </div>
+          <p class="card-description">Ultra-close view of a futuristic daytime running light strip. A sharp neon-green beam travels along the curved contour, igniting individual LED segments.</p>
+          <div class="card-action-bar">
+            <button class="card-preview-btn" aria-label="Preview DRL Light Sweep">
+              <span>Preview Demo</span>
+              <span class="btn-arrow">&rarr;</span>
+            </button>
+            <span class="card-macro-tag">LED Strip</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- 03: PROJECTOR BEAM REVEAL -->
+      <article class="demo-card" data-demo="3" tabindex="0" onclick="launchDemo(3)" onkeydown="if(event.key==='Enter'||event.key===' ') launchDemo(3)">
+        <div class="demo-thumbnail-wrap">
+          <span class="thumb-num-badge">03</span>
+          <img src="/assets/splash-demos/thumb-03.jpg" alt="Projector Beam Reveal Macro Preview" class="demo-thumb-img" loading="lazy">
+          <div class="thumb-play-overlay">
+            <div class="thumb-play-badge">&#9658;</div>
+          </div>
+        </div>
+        <div class="demo-card-body">
+          <div class="card-top-row">
+            <div class="card-title-group">
+              <h2 class="card-title">Projector Beam Reveal</h2>
+            </div>
+            <span class="card-duration-pill">5.5s</span>
+          </div>
+          <p class="card-description">Macro view of a circular projector lens. A faint internal glow intensifies, aperture opens through layered light, and a powerful white beam cuts through haze.</p>
+          <div class="card-action-bar">
+            <button class="card-preview-btn" aria-label="Preview Projector Beam Reveal">
+              <span>Preview Demo</span>
+              <span class="btn-arrow">&rarr;</span>
+            </button>
+            <span class="card-macro-tag">Aperture Iris</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- 04: TYRE SPIN REVEAL -->
+      <article class="demo-card" data-demo="4" tabindex="0" onclick="launchDemo(4)" onkeydown="if(event.key==='Enter'||event.key===' ') launchDemo(4)">
+        <div class="demo-thumbnail-wrap">
+          <span class="thumb-num-badge">04</span>
+          <img src="/assets/splash-demos/thumb-04.jpg" alt="Tyre Spin Reveal Macro Preview" class="demo-thumb-img" loading="lazy">
+          <div class="thumb-play-overlay">
+            <div class="thumb-play-badge">&#9658;</div>
+          </div>
+        </div>
+        <div class="demo-card-body">
+          <div class="card-top-row">
+            <div class="card-title-group">
+              <h2 class="card-title">Tyre Spin Reveal</h2>
+            </div>
+            <span class="card-duration-pill">5.5s</span>
+          </div>
+          <p class="card-description">Extreme close-up of a black performance tyre and alloy rim lip. The tyre rotates from darkness as water droplets scatter and a lime light ring traces the rim edge.</p>
+          <div class="card-action-bar">
+            <button class="card-preview-btn" aria-label="Preview Tyre Spin Reveal">
+              <span>Preview Demo</span>
+              <span class="btn-arrow">&rarr;</span>
+            </button>
+            <span class="card-macro-tag">Forged Rim</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- 05: TYRE TREAD SCAN -->
+      <article class="demo-card" data-demo="5" tabindex="0" onclick="launchDemo(5)" onkeydown="if(event.key==='Enter'||event.key===' ') launchDemo(5)">
+        <div class="demo-thumbnail-wrap">
+          <span class="thumb-num-badge">05</span>
+          <img src="/assets/splash-demos/thumb-05.jpg" alt="Tyre Tread Scan Macro Preview" class="demo-thumb-img" loading="lazy">
+          <div class="thumb-play-overlay">
+            <div class="thumb-play-badge">&#9658;</div>
+          </div>
+        </div>
+        <div class="demo-card-body">
+          <div class="card-top-row">
+            <div class="card-title-group">
+              <h2 class="card-title">Tyre Tread Scan</h2>
+            </div>
+            <span class="card-duration-pill">5.0s</span>
+          </div>
+          <p class="card-description">Front-facing macro view of deep tread filling the frame. A thin laser-green scanning line sweeps across rubber grooves with realistic shadows and telemetry particles.</p>
+          <div class="card-action-bar">
+            <button class="card-preview-btn" aria-label="Preview Tyre Tread Scan">
+              <span>Preview Demo</span>
+              <span class="btn-arrow">&rarr;</span>
+            </button>
+            <span class="card-macro-tag">Laser Sweep</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- 06: HEADLIGHT ENERGY PULSE -->
+      <article class="demo-card" data-demo="6" tabindex="0" onclick="launchDemo(6)" onkeydown="if(event.key==='Enter'||event.key===' ') launchDemo(6)">
+        <div class="demo-thumbnail-wrap">
+          <span class="thumb-num-badge">06</span>
+          <img src="/assets/splash-demos/thumb-06.jpg" alt="Headlight Energy Pulse Macro Preview" class="demo-thumb-img" loading="lazy">
+          <div class="thumb-play-overlay">
+            <div class="thumb-play-badge">&#9658;</div>
+          </div>
+        </div>
+        <div class="demo-card-body">
+          <div class="card-top-row">
+            <div class="card-title-group">
+              <h2 class="card-title">Headlight Energy Pulse</h2>
+            </div>
+            <span class="card-duration-pill">5.5s</span>
+          </div>
+          <p class="card-description">Headlight projector glows softly in darkness. Concentric lime-green energy rings expand from the lens, glass surface ripples, and a powerful white pulse flashes.</p>
+          <div class="card-action-bar">
+            <button class="card-preview-btn" aria-label="Preview Headlight Energy Pulse">
+              <span>Preview Demo</span>
+              <span class="btn-arrow">&rarr;</span>
+            </button>
+            <span class="card-macro-tag">Shockwave Ring</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- 07: INDICATOR SEQUENCE -->
+      <article class="demo-card" data-demo="7" tabindex="0" onclick="launchDemo(7)" onkeydown="if(event.key==='Enter'||event.key===' ') launchDemo(7)">
+        <div class="demo-thumbnail-wrap">
+          <span class="thumb-num-badge">07</span>
+          <img src="/assets/splash-demos/thumb-07.jpg" alt="Indicator Sequence Macro Preview" class="demo-thumb-img" loading="lazy">
+          <div class="thumb-play-overlay">
+            <div class="thumb-play-badge">&#9658;</div>
+          </div>
+        </div>
+        <div class="demo-card-body">
+          <div class="card-top-row">
+            <div class="card-title-group">
+              <h2 class="card-title">Indicator Sequence</h2>
+            </div>
+            <span class="card-duration-pill">5.0s</span>
+          </div>
+          <p class="card-description">Extreme macro of a premium amber automotive indicator. Individual LED segments illuminate sequentially from inner to outer edge with crisp lens reflections.</p>
+          <div class="card-action-bar">
+            <button class="card-preview-btn" aria-label="Preview Indicator Sequence">
+              <span>Preview Demo</span>
+              <span class="btn-arrow">&rarr;</span>
+            </button>
+            <span class="card-macro-tag">Amber Dynamic</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- 08: RAIN AND LIGHT REFLECTION -->
+      <article class="demo-card" data-demo="8" tabindex="0" onclick="launchDemo(8)" onkeydown="if(event.key==='Enter'||event.key===' ') launchDemo(8)">
+        <div class="demo-thumbnail-wrap">
+          <span class="thumb-num-badge">08</span>
+          <img src="/assets/splash-demos/thumb-08.jpg" alt="Rain and Light Reflection Macro Preview" class="demo-thumb-img" loading="lazy">
+          <div class="thumb-play-overlay">
+            <div class="thumb-play-badge">&#9658;</div>
+          </div>
+        </div>
+        <div class="demo-card-body">
+          <div class="card-top-row">
+            <div class="card-title-group">
+              <h2 class="card-title">Rain &amp; Light Reflection</h2>
+            </div>
+            <span class="card-duration-pill">5.5s</span>
+          </div>
+          <p class="card-description">Macro shot of a headlight lens covered in water droplets. Rain runs across glass as a brilliant white LED line switches on, refracting through droplets into cinematic highlights.</p>
+          <div class="card-action-bar">
+            <button class="card-preview-btn" aria-label="Preview Rain and Light Reflection">
+              <span>Preview Demo</span>
+              <span class="btn-arrow">&rarr;</span>
+            </button>
+            <span class="card-macro-tag">Water Caustics</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- 09: DUAL LIGHT AND TYRE REVEAL -->
+      <article class="demo-card" data-demo="9" tabindex="0" onclick="launchDemo(9)" onkeydown="if(event.key==='Enter'||event.key===' ') launchDemo(9)">
+        <div class="demo-thumbnail-wrap">
+          <span class="thumb-num-badge">09</span>
+          <img src="/assets/splash-demos/thumb-09.jpg" alt="Dual Light and Tyre Reveal Macro Preview" class="demo-thumb-img" loading="lazy">
+          <div class="thumb-play-overlay">
+            <div class="thumb-play-badge">&#9658;</div>
+          </div>
+        </div>
+        <div class="demo-card-body">
+          <div class="card-top-row">
+            <div class="card-title-group">
+              <h2 class="card-title">Dual Light &amp; Tyre Reveal</h2>
+            </div>
+            <span class="card-duration-pill">5.5s</span>
+          </div>
+          <p class="card-description">Framed split composition: illuminated headlight optic occupies one side, tyre tread and partial rim on the other. Lime light travels between both through particle trails.</p>
+          <div class="card-action-bar">
+            <button class="card-preview-btn" aria-label="Preview Dual Light and Tyre Reveal">
+              <span>Preview Demo</span>
+              <span class="btn-arrow">&rarr;</span>
+            </button>
+            <span class="card-macro-tag">Split Framing</span>
+          </div>
+        </div>
+      </article>
+
+      <!-- 10: TRIEYE FINAL LOGO REVEAL -->
+      <article class="demo-card" data-demo="10" tabindex="0" onclick="launchDemo(10)" onkeydown="if(event.key==='Enter'||event.key===' ') launchDemo(10)">
+        <div class="demo-thumbnail-wrap">
+          <span class="thumb-num-badge">10</span>
+          <img src="/assets/splash-demos/thumb-10.jpg" alt="TRIEYE Final Logo Reveal Macro Preview" class="demo-thumb-img" loading="lazy">
+          <div class="thumb-play-overlay">
+            <div class="thumb-play-badge">&#9658;</div>
+          </div>
+        </div>
+        <div class="demo-card-body">
+          <div class="card-top-row">
+            <div class="card-title-group">
+              <h2 class="card-title">TRIEYE Final Logo Reveal</h2>
+            </div>
+            <span class="card-duration-pill">6.0s</span>
+          </div>
+          <p class="card-description">Begins in total black. Two sharp lime-green light beams cross through drifting smoke. Metallic particles converge at center, revealing the TRIEYE wordmark and tagline.</p>
+          <div class="card-action-bar">
+            <button class="card-preview-btn" aria-label="Preview TRIEYE Final Logo Reveal">
+              <span>Preview Demo</span>
+              <span class="btn-arrow">&rarr;</span>
+            </button>
+            <span class="card-macro-tag">Brand Signature</span>
+          </div>
+        </div>
+      </article>
+
+    </div>
+  </main>
+
+  <!-- ============================================================
+       INTERACTIVE FULLSCREEN PREVIEW OVERLAY
+       ============================================================ -->
+  <div class="player-overlay" id="playerOverlay" role="dialog" aria-modal="true" aria-label="Automotive Splash Screen Demo Player">
+    
+    <!-- Top Header Controls -->
+    <div class="player-topbar">
+      <div class="player-info-badge">
+        <span class="player-num" id="playerNum">01</span>
+        <span style="color:var(--line-bright);">&bull;</span>
+        <span class="player-title" id="playerTitle">Headlight Ignition</span>
+      </div>
+
+      <div class="player-top-actions">
+        <button class="player-btn" id="soundToggleBtn" onclick="toggleSound()" title="Toggle Synthesized Audio Cues">
+          <span id="soundIcon">&#x1F507;</span>
+          <span id="soundText">Audio Off</span>
+        </button>
+
+        <button class="player-btn" id="reducedMotionBtn" onclick="toggleReducedMotion()" title="Reduced Motion Accessibility">
+          <span>&#x2699;</span>
+          <span id="motionText">Standard</span>
+        </button>
+
+        <button class="player-btn" id="fullscreenToggleBtn" onclick="toggleFullscreen()" title="Toggle Fullscreen Mode">
+          <span>&#x26F6;</span>
+          <span>Fullscreen</span>
+        </button>
+
+        <button class="player-close-btn" onclick="closePlayer()" title="Close Preview (Esc)" aria-label="Close Preview">
+          &#x2715;
+        </button>
+      </div>
+    </div>
+
+    <!-- Canvas Stage -->
+    <div class="animation-stage" id="animationStage">
+      <canvas class="stage-canvas" id="stageCanvas"></canvas>
+    </div>
+
+    <!-- Bottom Control Dock -->
+    <div class="player-bottombar" id="playerBottombar">
+      
+      <!-- Timeline Track -->
+      <div class="player-timeline-wrap">
+        <div class="player-timeline-track" id="timelineTrack" onclick="scrubTimeline(event)" title="Click to Scrub Animation Timeline">
+          <div class="player-timeline-fill" id="timelineFill"></div>
+        </div>
+        <div class="player-time-disp" id="timeDisplay">0.0s / 5.5s</div>
+      </div>
+
+      <!-- Dock Actions Row -->
+      <div class="player-dock-row">
+        <!-- Prev / Next Navigation -->
+        <div class="dock-left">
+          <button class="dock-btn-icon" onclick="navigateDemo(-1)" title="Previous Demo (Left Arrow)">&#8592;</button>
+          <button class="dock-btn-icon" onclick="navigateDemo(1)" title="Next Demo (Right Arrow)">&#8594;</button>
+          <span style="font-family:var(--font-mono); font-size:0.75rem; color:var(--text-muted); margin-left:0.35rem;">
+            Demo <strong id="dockDemoIdx" style="color:var(--lime);">01</strong> of 10
+          </span>
+        </div>
+
+        <!-- Play / Pause / Replay -->
+        <div class="dock-center">
+          <button class="dock-btn-icon" id="playPauseBtn" onclick="togglePlayPause()" title="Play / Pause (Spacebar)">
+            <span id="playPauseIcon">&#10074;&#10074;</span>
+          </button>
+          <button class="dock-btn-primary" onclick="replayActiveDemo()" title="Replay Animation">
+            <span>&#8635;</span>
+            <span>Replay</span>
+          </button>
+        </div>
+
+        <!-- Back to Grid Button -->
+        <div class="dock-right">
+          <button class="player-btn" onclick="closePlayer()" title="Return to Gallery Grid">
+            <span>&larr; Back to Grid</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ============================================================
+       SPLASH DEMOS JAVASCRIPT ENGINE
+       ============================================================ -->
+  <script>
+    /* -------------------------------------------------------------
+       THE 10 AUTOMOTIVE SPLASH DEMO METADATA
+       ------------------------------------------------------------- */
+    const DEMOS = [
+      {
+        id: 1,
+        title: "Headlight Ignition",
+        duration: 5.5,
+        desc: "Extreme macro shot of a single automotive projector headlight in near-total darkness. A thin lime-green LED line activates from left to right, followed by a brilliant white projector beam, realistic glass reflections, floating green particles, and a short cinematic lens flare. The camera never reveals the rest of the car."
+      },
+      {
+        id: 2,
+        title: "DRL Light Sweep",
+        duration: 5.0,
+        desc: "Ultra-close view of a futuristic daytime running light strip. A sharp neon-green beam travels along the curved LED contour, illuminating individual segments sequentially. Add controlled bloom, glossy black housing, subtle smoke, and precise light trails."
+      },
+      {
+        id: 3,
+        title: "Projector Beam Reveal",
+        duration: 5.5,
+        desc: "Macro view of a circular projector lens. A faint internal glow intensifies, the lens aperture opens visually through layered light, and a powerful white beam cuts through dark atmospheric haze. Add realistic optical reflections and a lime-green halo."
+      },
+      {
+        id: 4,
+        title: "Tyre Spin Reveal",
+        duration: 5.5,
+        desc: "Extreme close-up of a premium black performance tyre and a small portion of its alloy wheel. The tyre begins rotating from darkness, water droplets and green particles scatter outward, and a lime-green light ring traces the outer edge. Never show the complete vehicle."
+      },
+      {
+        id: 5,
+        title: "Tyre Tread Scan",
+        duration: 5.0,
+        desc: "Front-facing macro view of deep tyre tread filling almost the entire frame. A thin laser-green scanning line moves vertically across the rubber grooves, illuminating the tread texture with realistic shadows, tiny water droplets, and subtle technical particles."
+      },
+      {
+        id: 6,
+        title: "Headlight Energy Pulse",
+        duration: 5.5,
+        desc: "A single headlight projector glows softly in darkness. Concentric lime-green energy rings expand from the lens, reflections travel across the glass surface, and the light pulses once with a powerful white flash before settling into a controlled glow."
+      },
+      {
+        id: 7,
+        title: "Indicator Sequence",
+        duration: 5.0,
+        desc: "Extreme macro of a premium amber automotive indicator integrated into a black headlight housing. Individual LED segments illuminate sequentially from inner to outer edge. Add crisp amber reflections, realistic lens material, and a subtle green accent in the surrounding shadows."
+      },
+      {
+        id: 8,
+        title: "Rain and Light Reflection",
+        duration: 5.5,
+        desc: "Macro shot of a headlight lens covered in fine water droplets. Rain runs across the glass as a brilliant white LED line switches on. Light refracts through the droplets, creating cinematic highlights, dark reflections, and a small amount of atmospheric mist."
+      },
+      {
+        id: 9,
+        title: "Dual Light and Tyre Reveal",
+        duration: 5.5,
+        desc: "A carefully framed split composition: a single illuminated headlight detail occupies one side, while a close-up tyre tread and partial rim occupy the other. Lime-green light travels between both details, connecting them through a trail of particles. No complete car or wide shot."
+      },
+      {
+        id: 10,
+        title: "TRIEYE Final Logo Reveal",
+        duration: 6.0,
+        desc: "Begin with a completely black screen. Two sharp lime-green light beams cross through drifting smoke. Tiny metallic particles converge at the center, revealing the TRIEYE wordmark in white and lime green. Display “DETAIL • PRECISION • PROTECTION” underneath. Finish with a subtle glow and fade to black."
+      }
+    ];
+
+    let currentDemoIndex = 0; // 0..9
+    let isPlaying = false;
+    let animStartTime = 0;
+    let animElapsed = 0;
+    let animRafId = null;
+    let reducedMotion = false;
+    let soundEnabled = false;
+    let audioCtx = null;
+
+    // DOM Elements
+    const overlay = document.getElementById('playerOverlay');
+    const playerNum = document.getElementById('playerNum');
+    const playerTitle = document.getElementById('playerTitle');
+    const dockDemoIdx = document.getElementById('dockDemoIdx');
+    const timelineFill = document.getElementById('timelineFill');
+    const timeDisplay = document.getElementById('timeDisplay');
+    const playPauseIcon = document.getElementById('playPauseIcon');
+    const canvas = document.getElementById('stageCanvas');
+    const ctx = canvas.getContext('2d');
+
+    let canvasWidth = 0;
+    let canvasHeight = 0;
+
+    function resizeCanvas() {
+      const rect = canvas.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvasWidth = rect.width;
+      canvasHeight = rect.height;
+      canvas.width = Math.round(canvasWidth * dpr);
+      canvas.height = Math.round(canvasHeight * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    window.addEventListener('resize', () => {
+      if (overlay.classList.contains('active')) {
+        resizeCanvas();
+        renderDemoFrame(currentDemoIndex, animElapsed);
+      }
+    });
+
+    /* -------------------------------------------------------------
+       AUDIO SYNTHESIZER (Optional immersive SFX)
+       ------------------------------------------------------------- */
+    function initAudioContext() {
+      if (!audioCtx) {
+        const AudioClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioClass) audioCtx = new AudioClass();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playSfx(type) {
+      if (!soundEnabled || !audioCtx) return;
+      try {
+        const now = audioCtx.currentTime;
+        if (type === 'laser') {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(900, now);
+          osc.frequency.exponentialRampToValueAtTime(140, now + 0.45);
+          gain.gain.setValueAtTime(0.15, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.55);
+        } else if (type === 'flash') {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(60, now);
+          osc.frequency.linearRampToValueAtTime(30, now + 0.8);
+          gain.gain.setValueAtTime(0.25, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.9);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.95);
+        } else if (type === 'pulse') {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(440, now);
+          osc.frequency.exponentialRampToValueAtTime(880, now + 0.3);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.65);
+        }
+      } catch (e) {
+        console.warn('Audio error:', e);
+      }
+    }
+
+    function toggleSound() {
+      initAudioContext();
+      soundEnabled = !soundEnabled;
+      const btn = document.getElementById('soundToggleBtn');
+      const icon = document.getElementById('soundIcon');
+      const txt = document.getElementById('soundText');
+      if (soundEnabled) {
+        btn.classList.add('active-lime');
+        icon.innerHTML = '&#x1F50A;';
+        txt.textContent = 'Audio On';
+        playSfx('laser');
+      } else {
+        btn.classList.remove('active-lime');
+        icon.innerHTML = '&#x1F507;';
+        txt.textContent = 'Audio Off';
+      }
+    }
+
+    function toggleReducedMotion() {
+      reducedMotion = !reducedMotion;
+      const btn = document.getElementById('reducedMotionBtn');
+      const txt = document.getElementById('motionText');
+      if (reducedMotion) {
+        btn.classList.add('active-lime');
+        txt.textContent = 'Reduced';
+      } else {
+        btn.classList.remove('active-lime');
+        txt.textContent = 'Standard';
+      }
+    }
+
+    function toggleFullscreen() {
+      if (!document.fullscreenElement) {
+        overlay.requestFullscreen?.().catch(() => {});
+      } else {
+        document.exitFullscreen?.().catch(() => {});
+      }
+    }
+
+    /* -------------------------------------------------------------
+       PLAYER CONTROLS & TIMELINE
+       ------------------------------------------------------------- */
+    function launchDemo(demoNumber) {
+      currentDemoIndex = demoNumber - 1;
+      overlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      resizeCanvas();
+      startDemo(currentDemoIndex);
+    }
+
+    function closePlayer() {
+      stopAnimation();
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+      if (document.fullscreenElement) {
+        document.exitFullscreen?.().catch(() => {});
+      }
+    }
+
+    function navigateDemo(delta) {
+      stopAnimation();
+      currentDemoIndex = (currentDemoIndex + delta + DEMOS.length) % DEMOS.length;
+      startDemo(currentDemoIndex);
+    }
+
+    function updatePlayerHeader(demo) {
+      const numStr = String(demo.id).padStart(2, '0');
+      playerNum.textContent = numStr;
+      playerTitle.textContent = demo.title;
+      dockDemoIdx.textContent = numStr;
+    }
+
+    function togglePlayPause() {
+      if (isPlaying) {
+        pauseAnimation();
+      } else {
+        resumeAnimation();
+      }
+    }
+
+    function pauseAnimation() {
+      isPlaying = false;
+      playPauseIcon.textContent = '►';
+      cancelAnimationFrame(animRafId);
+    }
+
+    function resumeAnimation() {
+      const demo = DEMOS[currentDemoIndex];
+      if (animElapsed >= demo.duration) {
+        animElapsed = 0;
+      }
+      animStartTime = performance.now() - (animElapsed * 1000);
+      isPlaying = true;
+      playPauseIcon.textContent = '❚❚';
+      animLoop();
+    }
+
+    function replayActiveDemo() {
+      stopAnimation();
+      startDemo(currentDemoIndex);
+    }
+
+    function scrubTimeline(event) {
+      const track = document.getElementById('timelineTrack');
+      const rect = track.getBoundingClientRect();
+      const clickX = Math.max(0, Math.min(rect.width, event.clientX - rect.left));
+      const pct = clickX / rect.width;
+      const demo = DEMOS[currentDemoIndex];
+      animElapsed = pct * demo.duration;
+      animStartTime = performance.now() - (animElapsed * 1000);
+      updateTimelineUI(animElapsed, demo.duration);
+      renderDemoFrame(currentDemoIndex, animElapsed);
+    }
+
+    function updateTimelineUI(elapsed, duration) {
+      const pct = Math.min(100, (elapsed / duration) * 100);
+      timelineFill.style.width = pct + '%';
+      timeDisplay.textContent = `${elapsed.toFixed(1)}s / ${duration.toFixed(1)}s`;
+    }
+
+    function startDemo(index) {
+      stopAnimation();
+      const demo = DEMOS[index];
+      updatePlayerHeader(demo);
+
+      ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+      animElapsed = 0;
+      animStartTime = performance.now();
+      isPlaying = true;
+      playPauseIcon.textContent = '❚❚';
+
+      if (demo.id === 1) playSfx('laser');
+      else if (demo.id === 3 || demo.id === 6) playSfx('flash');
+      else playSfx('pulse');
+
+      animLoop();
+    }
+
+    function stopAnimation() {
+      isPlaying = false;
+      cancelAnimationFrame(animRafId);
+    }
+
+    function animLoop() {
+      if (!isPlaying) return;
+      const now = performance.now();
+      animElapsed = (now - animStartTime) / 1000;
+      const demo = DEMOS[currentDemoIndex];
+
+      if (animElapsed >= demo.duration) {
+        animElapsed = demo.duration;
+        updateTimelineUI(animElapsed, demo.duration);
+        renderDemoFrame(currentDemoIndex, animElapsed);
+        pauseAnimation();
+        return;
+      }
+
+      updateTimelineUI(animElapsed, demo.duration);
+      renderDemoFrame(currentDemoIndex, animElapsed);
+
+      animRafId = requestAnimationFrame(animLoop);
+    }
+
+    // Keyboard Shortcuts
+    document.addEventListener('keydown', (e) => {
+      if (!overlay.classList.contains('active')) return;
+      if (e.key === 'Escape') {
+        closePlayer();
+      } else if (e.key === ' ' || e.code === 'Space') {
+        e.preventDefault();
+        togglePlayPause();
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        navigateDemo(1);
+      } else if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        navigateDemo(-1);
+      }
+    });
+
+    /* -------------------------------------------------------------
+       VECTOR LOGO & TAGLINE CANVAS HELPER
+       "DETAIL • PRECISION • PROTECTION"
+       ------------------------------------------------------------- */
+    function drawTrieyeWordmark(ctx, cx, cy, scale = 1, alpha = 1, showTagline = true) {
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.scale(scale, scale);
+      ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
+
+      // TRI (Crisp Metallic White)
+      ctx.font = "900 64px 'Inter', sans-serif";
+      ctx.textAlign = "right";
+      ctx.textBaseline = "middle";
+      ctx.fillStyle = "#ffffff";
+      ctx.shadowColor = "rgba(255, 255, 255, 0.4)";
+      ctx.shadowBlur = 18;
+      ctx.fillText("TRI", -12, 0);
+
+      // EYE (TRIEYE Lime Green #A8FF00)
+      ctx.fillStyle = "#A8FF00";
+      ctx.textAlign = "left";
+      ctx.shadowColor = "rgba(168, 255, 0, 0.6)";
+      ctx.shadowBlur = 24;
+      ctx.fillText("EYE", 12, 0);
+
+      // Horizontal micro precision bars on EYE
+      ctx.shadowBlur = 0;
+      ctx.fillStyle = "#A8FF00";
+      ctx.fillRect(150, -20, 26, 4.5);
+      ctx.fillRect(150, -2, 26, 4.5);
+      ctx.fillRect(150, 16, 26, 4.5);
+
+      // Tagline: DETAIL • PRECISION • PROTECTION
+      if (showTagline) {
+        ctx.font = "600 12.5px 'IBM Plex Mono', monospace";
+        ctx.textAlign = "center";
+        ctx.fillStyle = "rgba(238, 242, 245, 0.85)";
+        ctx.letterSpacing = "0.28em";
+        ctx.fillText("DETAIL  •  PRECISION  •  PROTECTION", 12, 46);
+      }
+
+      ctx.restore();
+    }
+
+    /* -------------------------------------------------------------
+       THE 10 HIGH-FIDELITY MACRO ANIMATION ENGINES
+       Strict Rule: Extreme close-up / macro crop only. No wide cars.
+       ------------------------------------------------------------- */
+    function renderDemoFrame(demoIdx, t) {
+      const demo = DEMOS[demoIdx];
+      if (!demo) return;
+      const w = canvasWidth;
+      const h = canvasHeight;
+      const cx = w / 2;
+      const cy = h / 2;
+
+      ctx.clearRect(0, 0, w, h);
+
+      switch (demo.id) {
+        case 1: render01_HeadlightIgnition(t, w, h, cx, cy); break;
+        case 2: render02_DrlLightSweep(t, w, h, cx, cy); break;
+        case 3: render03_ProjectorBeamReveal(t, w, h, cx, cy); break;
+        case 4: render04_TyreSpinReveal(t, w, h, cx, cy); break;
+        case 5: render05_TyreTreadScan(t, w, h, cx, cy); break;
+        case 6: render06_HeadlightEnergyPulse(t, w, h, cx, cy); break;
+        case 7: render07_IndicatorSequence(t, w, h, cx, cy); break;
+        case 8: render08_RainAndLightReflection(t, w, h, cx, cy); break;
+        case 9: render09_DualLightAndTyre(t, w, h, cx, cy); break;
+        case 10: render10_TrieyeLogoReveal(t, w, h, cx, cy); break;
+      }
+    }
+
+    /* -------------------------------------------------------------
+       01 — HEADLIGHT IGNITION (Macro Projector Headlight)
+       ------------------------------------------------------------- */
+    function render01_HeadlightIgnition(t, w, h, cx, cy) {
+      // 1. Deep Black Studio Void (#050606)
+      ctx.fillStyle = '#050606';
+      ctx.fillRect(0, 0, w, h);
+
+      const lensX = cx - 40;
+      const lensY = cy;
+      const radius = Math.min(w, h) * 0.28;
+
+      // 2. Macro Projector Housing (Dark metallic bevels & optic concentric ridges)
+      ctx.save();
+      const housingGrad = ctx.createRadialGradient(lensX, lensY, radius * 0.7, lensX, lensY, radius * 1.35);
+      housingGrad.addColorStop(0, '#101416');
+      housingGrad.addColorStop(0.5, '#090b0c');
+      housingGrad.addColorStop(1, '#050606');
+      ctx.fillStyle = housingGrad;
+      ctx.beginPath();
+      ctx.arc(lensX, lensY, radius * 1.35, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Optical concentric glass rings
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+      ctx.lineWidth = 1.5;
+      for (let r = radius * 0.3; r < radius; r += 18) {
+        ctx.beginPath();
+        ctx.arc(lensX, lensY, r, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // 3. Thin Lime-Green LED Line Activates Left-to-Right (t: 0.3s -> 1.8s)
+      const ledProg = Math.max(0, Math.min(1, (t - 0.3) / 1.5));
+      if (ledProg > 0) {
+        ctx.save();
+        const startX = lensX - radius * 1.3;
+        const totalW = radius * 2.6;
+        const currentX = startX + totalW * ledProg;
+        const lineY = lensY - radius * 0.9;
+
+        // Glow trail
+        ctx.strokeStyle = '#A8FF00';
+        ctx.shadowColor = '#A8FF00';
+        ctx.shadowBlur = 18;
+        ctx.lineWidth = 3.5;
+        ctx.beginPath();
+        ctx.moveTo(startX, lineY);
+        ctx.lineTo(currentX, lineY);
+        ctx.stroke();
+
+        // White core head
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = '#ffffff';
+        ctx.shadowBlur = 12;
+        ctx.beginPath();
+        ctx.arc(currentX, lineY, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // 4. Brilliant White Projector Beam & Glass Reflections (t: 1.6s -> 5.5s)
+      const beamProg = Math.max(0, Math.min(1, (t - 1.6) / 1.2));
+      if (beamProg > 0) {
+        ctx.save();
+        // Inner glass internal glow
+        const glassGlow = ctx.createRadialGradient(lensX, lensY, 5, lensX, lensY, radius * 0.95);
+        glassGlow.addColorStop(0, `rgba(255, 255, 255, ${0.98 * beamProg})`);
+        glassGlow.addColorStop(0.3, `rgba(210, 245, 255, ${0.75 * beamProg})`);
+        glassGlow.addColorStop(0.7, `rgba(168, 255, 0, ${0.35 * beamProg})`);
+        glassGlow.addColorStop(1, 'transparent');
+        ctx.fillStyle = glassGlow;
+        ctx.beginPath();
+        ctx.arc(lensX, lensY, radius * 0.95, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Intense Xenon Projector Core
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = '#d0f0ff';
+        ctx.shadowBlur = 35 * beamProg;
+        ctx.beginPath();
+        ctx.arc(lensX, lensY, radius * 0.28 * beamProg, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Volumetric Cone Cutting Rightward
+        const coneGrad = ctx.createRadialGradient(lensX, lensY, radius * 0.3, lensX + radius * 2.5, lensY, radius * 3.5);
+        coneGrad.addColorStop(0, `rgba(255, 255, 255, ${0.45 * beamProg})`);
+        coneGrad.addColorStop(0.4, `rgba(168, 255, 0, ${0.18 * beamProg})`);
+        coneGrad.addColorStop(1, 'transparent');
+        ctx.fillStyle = coneGrad;
+        ctx.beginPath();
+        ctx.moveTo(lensX, lensY - radius * 0.3);
+        ctx.lineTo(w, lensY - radius * 1.4);
+        ctx.lineTo(w, lensY + radius * 1.4);
+        ctx.lineTo(lensX, lensY + radius * 0.3);
+        ctx.closePath();
+        ctx.fill();
+
+        // Anamorphic Cinematic Lens Flare Streak (horizontal)
+        const flareAlpha = Math.sin(Math.min(Math.PI, (t - 1.6) * 1.5)) * 0.85;
+        if (flareAlpha > 0) {
+          const flareGrad = ctx.createLinearGradient(lensX - radius * 2.5, lensY, lensX + radius * 2.5, lensY);
+          flareGrad.addColorStop(0, 'transparent');
+          flareGrad.addColorStop(0.5, `rgba(168, 255, 0, ${flareAlpha})`);
+          flareGrad.addColorStop(1, 'transparent');
+          ctx.fillStyle = flareGrad;
+          ctx.fillRect(lensX - radius * 2.5, lensY - 2, radius * 5, 4);
+        }
+        ctx.restore();
+      }
+
+      // 5. Floating Green Ambient Micro-Particles
+      ctx.save();
+      const particleCount = 28;
+      for (let i = 0; i < particleCount; i++) {
+        const seed = i * 47.19;
+        const px = (lensX + Math.sin(seed + t * 0.4) * radius * 1.6 + (i * 19)) % w;
+        const py = (lensY + Math.cos(seed + t * 0.5) * radius * 0.9 + (i * 13)) % h;
+        const pSize = 1.2 + (Math.sin(seed) + 1) * 1.2;
+        const pAlpha = (0.2 + (Math.sin(seed + t * 2) + 1) * 0.35) * Math.min(1, t / 1.5);
+        ctx.fillStyle = '#A8FF00';
+        ctx.shadowColor = '#A8FF00';
+        ctx.shadowBlur = 8;
+        ctx.globalAlpha = pAlpha;
+        ctx.beginPath();
+        ctx.arc(px, py, pSize, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.restore();
+
+      // Brand Wordmark Subtle Reveal at Bottom-Right
+      if (t > 2.8) {
+        const logoAlpha = Math.min(1, (t - 2.8) / 1.2);
+        drawTrieyeWordmark(ctx, w - 240, h - 80, 0.45, logoAlpha, true);
+      }
+    }
+
+    /* -------------------------------------------------------------
+       02 — DRL LIGHT SWEEP (Curved LED Contour & Carbon Housing)
+       ------------------------------------------------------------- */
+    function render02_DrlLightSweep(t, w, h, cx, cy) {
+      // 1. Charcoal Black (#050606) & Glossy Carbon Housing Pattern
+      ctx.fillStyle = '#050606';
+      ctx.fillRect(0, 0, w, h);
+
+      // Carbon fiber weave background effect in dark housing
+      ctx.save();
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.02)';
+      ctx.lineWidth = 1;
+      for (let y = 0; y < h; y += 8) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(w, y + 16);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // 2. Ultra-close curved DRL LED Strip Contour
+      const p0 = { x: cx - w * 0.38, y: cy + h * 0.22 };
+      const cp1 = { x: cx - w * 0.05, y: cy + h * 0.18 };
+      const cp2 = { x: cx + w * 0.15, y: cy - h * 0.15 };
+      const p1 = { x: cx + w * 0.42, y: cy - h * 0.22 };
+
+      // Dark unlit LED channel groove
+      ctx.save();
+      ctx.strokeStyle = '#0e1214';
+      ctx.lineWidth = 26;
+      ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(p0.x, p0.y);
+      ctx.bezierCurveTo(cp1.x, cp1.y, cp2.x, cp2.y, p1.x, p1.y);
+      ctx.stroke();
+
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.restore();
+
+      // 3. 16 Individual LED Segments Sequential Light Sweep (t: 0.4s -> 3.2s)
+      const segments = 16;
+      const sweepProg = Math.max(0, Math.min(1, (t - 0.4) / 2.6));
+
+      for (let i = 0; i < segments; i++) {
+        const segT = i / (segments - 1);
+        // Compute cubic bezier point
+        const u = 1 - segT;
+        const sx = u*u*u*p0.x + 3*u*u*segT*cp1.x + 3*u*segT*segT*cp2.x + segT*segT*segT*p1.x;
+        const sy = u*u*u*p0.y + 3*u*u*segT*cp1.y + 3*u*segT*segT*cp2.y + segT*segT*segT*p1.y;
+
+        const isLit = segT <= sweepProg;
+        const litDelay = Math.max(0, (sweepProg - segT) * 3);
+
+        ctx.save();
+        if (isLit) {
+          // Controlled bloom & glossy reflection
+          ctx.fillStyle = '#A8FF00';
+          ctx.shadowColor = '#A8FF00';
+          ctx.shadowBlur = 24;
+          ctx.beginPath();
+          ctx.arc(sx, sy, 8, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Intense white LED core
+          ctx.fillStyle = '#ffffff';
+          ctx.shadowColor = '#ffffff';
+          ctx.shadowBlur = 10;
+          ctx.beginPath();
+          ctx.arc(sx, sy, 4.5, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Light trail spillage onto carbon panel
+          const spillage = ctx.createRadialGradient(sx, sy, 4, sx, sy, 40);
+          spillage.addColorStop(0, 'rgba(168, 255, 0, 0.25)');
+          spillage.addColorStop(1, 'transparent');
+          ctx.fillStyle = spillage;
+          ctx.beginPath();
+          ctx.arc(sx, sy, 40, 0, Math.PI * 2);
+          ctx.fill();
+        } else {
+          // Off state: dark smoked optic block
+          ctx.fillStyle = '#14181a';
+          ctx.beginPath();
+          ctx.arc(sx, sy, 6, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      // 4. Subtle Volumetric Smoke Trails crossing the light path
+      ctx.save();
+      const smokeAlpha = Math.min(0.22, t * 0.05);
+      const smokeGrad = ctx.createLinearGradient(cx - 200, cy - 80, cx + 200, cy + 80);
+      smokeGrad.addColorStop(0, 'transparent');
+      smokeGrad.addColorStop(0.5, `rgba(168, 255, 0, ${smokeAlpha})`);
+      smokeGrad.addColorStop(1, 'transparent');
+      ctx.fillStyle = smokeGrad;
+      ctx.filter = 'blur(16px)';
+      ctx.fillRect(cx - 300, cy - 100, 600, 200);
+      ctx.filter = 'none';
+      ctx.restore();
+
+      // Brand Wordmark Overlay
+      if (t > 2.5) {
+        const logoAlpha = Math.min(1, (t - 2.5) / 1.2);
+        drawTrieyeWordmark(ctx, cx, cy + h * 0.28, 0.55, logoAlpha, true);
+      }
+    }
+
+    /* -------------------------------------------------------------
+       03 — PROJECTOR BEAM REVEAL (Macro Aperture Lens & Xenon Cone)
+       ------------------------------------------------------------- */
+    function render03_ProjectorBeamReveal(t, w, h, cx, cy) {
+      ctx.fillStyle = '#050606';
+      ctx.fillRect(0, 0, w, h);
+
+      const lensX = cx;
+      const lensY = cy - 20;
+      const maxR = Math.min(w, h) * 0.32;
+
+      // 1. Outer Titanium Bezel & Optical Barrel Teeth
+      ctx.save();
+      ctx.strokeStyle = '#1a1f22';
+      ctx.lineWidth = 14;
+      ctx.beginPath();
+      ctx.arc(lensX, lensY, maxR, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      ctx.restore();
+
+      // 2. Faint Internal Glow Intensifies (t: 0.2s -> 1.5s)
+      const glowT = Math.max(0, Math.min(1, t / 1.5));
+      ctx.save();
+      const internalGrad = ctx.createRadialGradient(lensX, lensY, 5, lensX, lensY, maxR * 0.85);
+      internalGrad.addColorStop(0, `rgba(255, 255, 255, ${0.4 * glowT})`);
+      internalGrad.addColorStop(0.5, `rgba(168, 255, 0, ${0.25 * glowT})`);
+      internalGrad.addColorStop(1, 'transparent');
+      ctx.fillStyle = internalGrad;
+      ctx.beginPath();
+      ctx.arc(lensX, lensY, maxR * 0.85, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // 3. Multi-Blade Mechanical Aperture Iris Opens Visually (t: 1.2s -> 3.2s)
+      const irisProg = Math.max(0, Math.min(1, (t - 1.2) / 2.0));
+      const openR = maxR * (0.2 + 0.65 * irisProg);
+      const blades = 8;
+
+      ctx.save();
+      ctx.translate(lensX, lensY);
+      for (let i = 0; i < blades; i++) {
+        ctx.rotate((Math.PI * 2) / blades);
+        ctx.fillStyle = '#0b0e10';
+        ctx.strokeStyle = 'rgba(168, 255, 0, 0.2)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.arc(0, openR, maxR * 0.65, 0, Math.PI * 0.6);
+        ctx.lineTo(maxR * 0.95, 0);
+        ctx.closePath();
+        ctx.fill();
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // 4. Powerful White Projector Beam Cuts Through Dark Atmospheric Haze
+      if (irisProg > 0.3) {
+        const beamAlpha = (irisProg - 0.3) / 0.7;
+        ctx.save();
+        // Lime-green halo corona ring
+        ctx.strokeStyle = '#A8FF00';
+        ctx.shadowColor = '#A8FF00';
+        ctx.shadowBlur = 35 * beamAlpha;
+        ctx.lineWidth = 4;
+        ctx.beginPath();
+        ctx.arc(lensX, lensY, openR, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Intense central beam bursting through
+        const beamLight = ctx.createRadialGradient(lensX, lensY, 0, lensX, lensY, openR * 1.5);
+        beamLight.addColorStop(0, `rgba(255, 255, 255, ${0.98 * beamAlpha})`);
+        beamLight.addColorStop(0.35, `rgba(220, 248, 255, ${0.75 * beamAlpha})`);
+        beamLight.addColorStop(0.7, `rgba(168, 255, 0, ${0.35 * beamAlpha})`);
+        beamLight.addColorStop(1, 'transparent');
+        ctx.fillStyle = beamLight;
+        ctx.beginPath();
+        ctx.arc(lensX, lensY, openR * 1.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Atmospheric haze forward beam
+        const haze = ctx.createRadialGradient(lensX, lensY, openR, lensX, lensY, Math.max(w, h));
+        haze.addColorStop(0, `rgba(255, 255, 255, ${0.15 * beamAlpha})`);
+        haze.addColorStop(0.5, `rgba(168, 255, 0, ${0.06 * beamAlpha})`);
+        haze.addColorStop(1, 'transparent');
+        ctx.fillStyle = haze;
+        ctx.fillRect(0, 0, w, h);
+        ctx.restore();
+      }
+
+      // Brand Wordmark
+      if (t > 2.8) {
+        const logoAlpha = Math.min(1, (t - 2.8) / 1.2);
+        drawTrieyeWordmark(ctx, cx, h - 85, 0.5, logoAlpha, true);
+      }
+    }
+
+    /* -------------------------------------------------------------
+       04 — TYRE SPIN REVEAL (Macro Tyre, Rim Lip & Water Droplets)
+       ------------------------------------------------------------- */
+    function render04_TyreSpinReveal(t, w, h, cx, cy) {
+      ctx.fillStyle = '#050606';
+      ctx.fillRect(0, 0, w, h);
+
+      // Wheel hub origin positioned off-left for extreme close-up crop
+      const hubX = cx - w * 0.28;
+      const hubY = cy + h * 0.15;
+      const rimR = Math.min(w, h) * 0.42;
+      const tyreR = rimR * 1.45;
+
+      // Spin rotation physics: starts at rest, accelerates then stabilizes
+      const spinSpeed = Math.min(t * 4.5, 9.5);
+      const angle = t * spinSpeed;
+
+      // 1. Deep Matte Black Rubber Tyre Wall
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(hubX, hubY, tyreR, 0, Math.PI * 2);
+      ctx.arc(hubX, hubY, rimR, 0, Math.PI * 2, true);
+      ctx.fillStyle = '#0a0d0e';
+      ctx.fill();
+
+      // Radial tread block incisions on outer sidewall
+      ctx.translate(hubX, hubY);
+      ctx.rotate(angle);
+      const treadSlices = 36;
+      ctx.strokeStyle = '#050606';
+      ctx.lineWidth = 3.5;
+      for (let i = 0; i < treadSlices; i++) {
+        ctx.rotate((Math.PI * 2) / treadSlices);
+        ctx.beginPath();
+        ctx.moveTo(rimR * 1.08, 0);
+        ctx.lineTo(tyreR, 0);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // 2. Premium Forged Alloy Wheel Rim Lip
+      ctx.save();
+      const rimGrad = ctx.createRadialGradient(hubX, hubY, rimR * 0.85, hubX, hubY, rimR);
+      rimGrad.addColorStop(0, '#1a1f22');
+      rimGrad.addColorStop(0.7, '#2a3136');
+      rimGrad.addColorStop(1, '#0e1112');
+      ctx.fillStyle = rimGrad;
+      ctx.beginPath();
+      ctx.arc(hubX, hubY, rimR, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Forged titanium spoke accents
+      ctx.save();
+      ctx.translate(hubX, hubY);
+      ctx.rotate(angle);
+      ctx.strokeStyle = '#3d464d';
+      ctx.lineWidth = 12;
+      for (let s = 0; s < 5; s++) {
+        ctx.rotate((Math.PI * 2) / 5);
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(rimR * 0.95, 0);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // 3. Lime-Green Light Ring Traces the Outer Rim Edge (t: 0.8s -> 5.5s)
+      const ringProg = Math.max(0, Math.min(1, (t - 0.8) / 1.5));
+      if (ringProg > 0) {
+        ctx.save();
+        ctx.strokeStyle = '#A8FF00';
+        ctx.shadowColor = '#A8FF00';
+        ctx.shadowBlur = 24;
+        ctx.lineWidth = 3.5;
+        ctx.beginPath();
+        ctx.arc(hubX, hubY, rimR, 0, Math.PI * 2 * ringProg);
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      // 4. Water Droplets & Green Particles Scatter Outward (Centrifugal Spray)
+      ctx.save();
+      const sprayCount = 42;
+      const sprayProg = Math.max(0, (t - 1.2));
+      for (let p = 0; p < sprayCount; p++) {
+        const seed = p * 83.21;
+        const pAngle = (seed + angle * 0.5) % (Math.PI * 2);
+        const distance = rimR + (sprayProg * 140 + (p * 7)) % (tyreR * 0.9);
+        const px = hubX + Math.cos(pAngle) * distance;
+        const py = hubY + Math.sin(pAngle) * distance;
+
+        if (px > 0 && px < w && py > 0 && py < h) {
+          ctx.fillStyle = (p % 2 === 0) ? '#ffffff' : '#A8FF00';
+          ctx.shadowColor = '#A8FF00';
+          ctx.shadowBlur = 6;
+          ctx.globalAlpha = Math.max(0, 1 - (distance - rimR) / (tyreR * 0.8));
+          ctx.beginPath();
+          ctx.arc(px, py, 1.8 + (p % 3), 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      ctx.restore();
+
+      // Brand Wordmark on Right Half
+      if (t > 2.5) {
+        const logoAlpha = Math.min(1, (t - 2.5) / 1.2);
+        drawTrieyeWordmark(ctx, cx + w * 0.22, cy, 0.52, logoAlpha, true);
+      }
+    }
+
+    /* -------------------------------------------------------------
+       05 — TYRE TREAD SCAN (Front Macro Tread Grooves & Laser HUD)
+       ------------------------------------------------------------- */
+    function render05_TyreTreadScan(t, w, h, cx, cy) {
+      ctx.fillStyle = '#050606';
+      ctx.fillRect(0, 0, w, h);
+
+      // 1. Front-Facing Deep Tyre Tread Filling Entire Frame
+      // Vertical directional tread channels and lateral sipes
+      const channelCount = 5;
+      const channelWidth = w / (channelCount + 1);
+
+      ctx.save();
+      // Base dark rubber texture
+      ctx.fillStyle = '#0b0e0f';
+      ctx.fillRect(0, 0, w, h);
+
+      // Deep longitudinal rain evacuation channels
+      for (let i = 1; i <= channelCount; i++) {
+        const chX = channelWidth * i;
+        ctx.fillStyle = '#030404';
+        ctx.fillRect(chX - 16, 0, 32, h);
+
+        // Highlight bevels on tread blocks
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(chX - 16, 0, 32, h);
+      }
+
+      // Chevron lateral sipes pattern across tread blocks
+      ctx.strokeStyle = '#050606';
+      ctx.lineWidth = 4;
+      for (let y = 0; y < h; y += 38) {
+        for (let i = 0; i <= channelCount; i++) {
+          const bx = channelWidth * i + 18;
+          ctx.beginPath();
+          ctx.moveTo(bx, y);
+          ctx.lineTo(bx + channelWidth - 36, y + 14);
+          ctx.stroke();
+        }
+      }
+      ctx.restore();
+
+      // 2. Vertical Laser-Green Scanning Line Moving Up & Down (t: 0.3s -> 5.0s)
+      const scanCycle = ((t - 0.3) * 0.7) % 2;
+      const scanY = (scanCycle < 1) ? h * scanCycle : h * (2 - scanCycle);
+
+      ctx.save();
+      // Volumetric beam glow strip
+      const beamGrad = ctx.createLinearGradient(0, scanY - 45, 0, scanY + 45);
+      beamGrad.addColorStop(0, 'transparent');
+      beamGrad.addColorStop(0.5, 'rgba(168, 255, 0, 0.32)');
+      beamGrad.addColorStop(1, 'transparent');
+      ctx.fillStyle = beamGrad;
+      ctx.fillRect(0, scanY - 45, w, 90);
+
+      // Razor-sharp laser line
+      ctx.strokeStyle = '#A8FF00';
+      ctx.shadowColor = '#A8FF00';
+      ctx.shadowBlur = 18;
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.moveTo(0, scanY);
+      ctx.lineTo(w, scanY);
+      ctx.stroke();
+
+      // White laser core
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Technical HUD scanning particles & metrics overlay
+      ctx.font = "11px 'IBM Plex Mono', monospace";
+      ctx.fillStyle = '#A8FF00';
+      ctx.fillText(`TREAD DEPTH: 8.4mm  |  SECTION: 305/30 ZR20  |  LASER: 532nm`, 32, scanY - 14);
+      ctx.fillText(`SURFACE SPECULARITY: 99.4% [CONCOURS READY]`, w - 340, scanY - 14);
+      ctx.restore();
+
+      // Droplet highlights glistening as laser crosses
+      ctx.save();
+      const dropletCount = 20;
+      for (let d = 0; d < dropletCount; d++) {
+        const dx = (d * 73) % w;
+        const dy = (d * 51) % h;
+        const dist = Math.abs(dy - scanY);
+        if (dist < 40) {
+          const glint = 1 - dist / 40;
+          ctx.fillStyle = '#ffffff';
+          ctx.shadowColor = '#A8FF00';
+          ctx.shadowBlur = 12;
+          ctx.beginPath();
+          ctx.arc(dx, dy, 2.5 * glint, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      ctx.restore();
+
+      // Centered Brand Wordmark
+      if (t > 2.2) {
+        const logoAlpha = Math.min(1, (t - 2.2) / 1.2);
+        drawTrieyeWordmark(ctx, cx, cy, 0.62, logoAlpha, true);
+      }
+    }
+
+    /* -------------------------------------------------------------
+       06 — HEADLIGHT ENERGY PULSE (Shockwave Rings & Flash)
+       ------------------------------------------------------------- */
+    function render06_HeadlightEnergyPulse(t, w, h, cx, cy) {
+      ctx.fillStyle = '#050606';
+      ctx.fillRect(0, 0, w, h);
+
+      const lensX = cx;
+      const lensY = cy - 25;
+      const lensR = Math.min(w, h) * 0.26;
+
+      // 1. Dark Projector Housing & Polycarbonate Lens Optics
+      ctx.save();
+      const housingGrad = ctx.createRadialGradient(lensX, lensY, lensR * 0.5, lensX, lensY, lensR * 1.3);
+      housingGrad.addColorStop(0, '#101416');
+      housingGrad.addColorStop(0.6, '#080a0b');
+      housingGrad.addColorStop(1, '#050606');
+      ctx.fillStyle = housingGrad;
+      ctx.beginPath();
+      ctx.arc(lensX, lensY, lensR * 1.3, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Optical concentric glass rings
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.06)';
+      ctx.lineWidth = 1.5;
+      for (let r = lensR * 0.25; r < lensR; r += 16) {
+        ctx.beginPath();
+        ctx.arc(lensX, lensY, r, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // 2. Soft Internal Standby Glow (t: 0.2s -> 1.8s)
+      ctx.save();
+      const softGlow = ctx.createRadialGradient(lensX, lensY, 2, lensX, lensY, lensR * 0.85);
+      softGlow.addColorStop(0, 'rgba(255, 255, 255, 0.6)');
+      softGlow.addColorStop(0.4, 'rgba(168, 255, 0, 0.35)');
+      softGlow.addColorStop(1, 'transparent');
+      ctx.fillStyle = softGlow;
+      ctx.beginPath();
+      ctx.arc(lensX, lensY, lensR * 0.85, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+
+      // 3. Concentric Lime-Green Energy Rings Expanding Outward (Shockwaves)
+      ctx.save();
+      const waveCount = 4;
+      for (let wIdx = 0; wIdx < waveCount; wIdx++) {
+        const waveT = (t * 0.9 + wIdx * 0.5) % 2.0;
+        const waveR = lensR * 0.8 + waveT * 260;
+        const waveAlpha = Math.max(0, 1 - waveT / 2.0) * 0.75;
+
+        ctx.strokeStyle = '#A8FF00';
+        ctx.shadowColor = '#A8FF00';
+        ctx.shadowBlur = 20;
+        ctx.lineWidth = Math.max(1, 3.5 * (1 - waveT / 2.0));
+        ctx.globalAlpha = waveAlpha;
+        ctx.beginPath();
+        ctx.arc(lensX, lensY, waveR, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // 4. Single Explosive High-Beam Flash (t: 2.2s -> 3.0s)
+      if (t >= 2.2 && t <= 3.2) {
+        const flashIntensity = Math.sin((t - 2.2) * Math.PI);
+        ctx.save();
+        ctx.fillStyle = `rgba(255, 255, 255, ${0.85 * flashIntensity})`;
+        ctx.fillRect(0, 0, w, h);
+        ctx.restore();
+      }
+
+      // Settled controlled brilliant glow
+      if (t > 3.0) {
+        ctx.save();
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = '#A8FF00';
+        ctx.shadowBlur = 40;
+        ctx.beginPath();
+        ctx.arc(lensX, lensY, lensR * 0.45, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
+      // Brand Wordmark
+      if (t > 3.0) {
+        const logoAlpha = Math.min(1, (t - 3.0) / 1.0);
+        drawTrieyeWordmark(ctx, cx, h - 85, 0.5, logoAlpha, true);
+      }
+    }
+
+    /* -------------------------------------------------------------
+       07 — INDICATOR SEQUENCE (Amber Dynamic LED Chevron Blade)
+       ------------------------------------------------------------- */
+    function render07_IndicatorSequence(t, w, h, cx, cy) {
+      ctx.fillStyle = '#050606';
+      ctx.fillRect(0, 0, w, h);
+
+      // Macro Black Headlight Housing with Carbon Fiber Bevels
+      ctx.save();
+      const houseGrad = ctx.createLinearGradient(0, cy - 120, 0, cy + 120);
+      houseGrad.addColorStop(0, '#0a0d0e');
+      houseGrad.addColorStop(0.5, '#101416');
+      houseGrad.addColorStop(1, '#060809');
+      ctx.fillStyle = houseGrad;
+      ctx.fillRect(cx - w * 0.42, cy - 110, w * 0.84, 220);
+
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(cx - w * 0.42, cy - 110, w * 0.84, 220);
+      ctx.restore();
+
+      // Sequential Amber LED Chevron Segments (Inner to Outer Edge)
+      const segCount = 9;
+      const segWidth = (w * 0.68) / segCount;
+      const startX = cx - (w * 0.34);
+
+      // Repeats dynamic sweep cycle
+      const cycleT = (t * 1.4) % 2.0;
+
+      for (let s = 0; s < segCount; s++) {
+        const segTriggerT = s * 0.12;
+        const isLit = cycleT >= segTriggerT && cycleT <= (segTriggerT + 0.95);
+        const segX = startX + s * segWidth;
+        const segY = cy;
+
+        ctx.save();
+        if (isLit) {
+          // Dynamic Amber Glow (#FF9E00 -> #FFC107)
+          ctx.fillStyle = '#ff9e00';
+          ctx.shadowColor = '#ff9e00';
+          ctx.shadowBlur = 28;
+
+          // Forward dynamic chevron polygon
+          ctx.beginPath();
+          ctx.moveTo(segX, segY - 32);
+          ctx.lineTo(segX + segWidth - 12, segY - 32);
+          ctx.lineTo(segX + segWidth + 14, segY);
+          ctx.lineTo(segX + segWidth - 12, segY + 32);
+          ctx.lineTo(segX, segY + 32);
+          ctx.lineTo(segX + 26, segY);
+          ctx.closePath();
+          ctx.fill();
+
+          // Intense core
+          ctx.fillStyle = '#fff4d4';
+          ctx.shadowColor = '#ffffff';
+          ctx.shadowBlur = 10;
+          ctx.fillRect(segX + 18, segY - 6, segWidth - 28, 12);
+        } else {
+          // Off state: smoked amber crystal
+          ctx.fillStyle = '#1e1408';
+          ctx.strokeStyle = 'rgba(255, 158, 0, 0.15)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(segX, segY - 32);
+          ctx.lineTo(segX + segWidth - 12, segY - 32);
+          ctx.lineTo(segX + segWidth + 14, segY);
+          ctx.lineTo(segX + segWidth - 12, segY + 32);
+          ctx.lineTo(segX, segY + 32);
+          ctx.lineTo(segX + 26, segY);
+          ctx.closePath();
+          ctx.fill();
+          ctx.stroke();
+        }
+        ctx.restore();
+      }
+
+      // Subtle lime-green brand reflection in surrounding shadows
+      ctx.save();
+      const limeAccent = ctx.createLinearGradient(0, cy + 90, 0, cy + 120);
+      limeAccent.addColorStop(0, 'rgba(168, 255, 0, 0.28)');
+      limeAccent.addColorStop(1, 'transparent');
+      ctx.fillStyle = limeAccent;
+      ctx.fillRect(cx - w * 0.42, cy + 85, w * 0.84, 25);
+      ctx.restore();
+
+      // Brand Wordmark
+      if (t > 2.2) {
+        const logoAlpha = Math.min(1, (t - 2.2) / 1.2);
+        drawTrieyeWordmark(ctx, cx, cy + 170, 0.52, logoAlpha, true);
+      }
+    }
+
+    /* -------------------------------------------------------------
+       08 — RAIN AND LIGHT REFLECTION (Water Beading & Refractions)
+       ------------------------------------------------------------- */
+    function render08_RainAndLightReflection(t, w, h, cx, cy) {
+      ctx.fillStyle = '#050606';
+      ctx.fillRect(0, 0, w, h);
+
+      // Macro Curved Polycarbonate Lens Surface
+      ctx.save();
+      const lensGrad = ctx.createLinearGradient(0, 0, w, h);
+      lensGrad.addColorStop(0, '#0c1012');
+      lensGrad.addColorStop(0.5, '#141a1d');
+      lensGrad.addColorStop(1, '#07090a');
+      ctx.fillStyle = lensGrad;
+      ctx.fillRect(0, 0, w, h);
+
+      // Rain running down the glass surface
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+      ctx.lineWidth = 1.2;
+      for (let r = 0; r < 24; r++) {
+        const rx = (r * 61) % w;
+        const ry = (t * 220 + r * 83) % (h + 100) - 50;
+        ctx.beginPath();
+        ctx.moveTo(rx, ry);
+        ctx.lineTo(rx - 2, ry + 28);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // Brilliant White LED Blade Switches On Across Lens (t: 0.8s -> 5.5s)
+      const ledProg = Math.max(0, Math.min(1, (t - 0.8) / 1.2));
+      const bladeY = cy - 20;
+
+      if (ledProg > 0) {
+        ctx.save();
+        // Massive horizontal light swath
+        const lightBloom = ctx.createLinearGradient(0, bladeY - 90, 0, bladeY + 90);
+        lightBloom.addColorStop(0, 'transparent');
+        lightBloom.addColorStop(0.5, `rgba(255, 255, 255, ${0.65 * ledProg})`);
+        lightBloom.addColorStop(1, 'transparent');
+        ctx.fillStyle = lightBloom;
+        ctx.fillRect(0, bladeY - 90, w, 180);
+
+        // Blinding white LED blade core
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = '#dcf4ff';
+        ctx.shadowBlur = 30 * ledProg;
+        ctx.fillRect(0, bladeY - 6, w, 12);
+        ctx.restore();
+      }
+
+      // Realistic Hydrophobic Water Droplets Refracting Light
+      ctx.save();
+      const dropCount = 55;
+      for (let i = 0; i < dropCount; i++) {
+        const dx = (i * 49.3) % (w - 60) + 30;
+        const dy = (i * 71.7) % (h - 60) + 30;
+        const dSize = 3.5 + (i % 5) * 2.2;
+        const distToBlade = Math.abs(dy - bladeY);
+
+        // Droplet sphere with 3D caustic highlight
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(dx, dy, dSize, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // If blade is on, droplet sparkles with intense caustics & lime fringe
+        if (ledProg > 0 && distToBlade < 140) {
+          const causticInt = (1 - distToBlade / 140) * ledProg;
+          ctx.fillStyle = '#ffffff';
+          ctx.shadowColor = (i % 3 === 0) ? '#A8FF00' : '#ffffff';
+          ctx.shadowBlur = 12 * causticInt;
+          ctx.beginPath();
+          ctx.arc(dx - dSize * 0.3, dy - dSize * 0.3, dSize * 0.45 * causticInt, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+      ctx.restore();
+
+      // Brand Wordmark
+      if (t > 2.5) {
+        const logoAlpha = Math.min(1, (t - 2.5) / 1.2);
+        drawTrieyeWordmark(ctx, cx, cy + 130, 0.54, logoAlpha, true);
+      }
+    }
+
+    /* -------------------------------------------------------------
+       09 — DUAL LIGHT AND TYRE REVEAL (Split Composition Macro)
+       ------------------------------------------------------------- */
+    function render09_DualLightAndTyre(t, w, h, cx, cy) {
+      ctx.fillStyle = '#050606';
+      ctx.fillRect(0, 0, w, h);
+
+      const splitX = cx;
+
+      // 1. Left Side: Extreme Macro Headlight Projector Optic
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(0, 0, splitX, h);
+      ctx.clip();
+
+      const hlX = splitX * 0.55;
+      const hlY = cy;
+      const hlR = Math.min(splitX, h) * 0.38;
+
+      // Dark housing & projector ring
+      const hlGrad = ctx.createRadialGradient(hlX, hlY, 10, hlX, hlY, hlR);
+      hlGrad.addColorStop(0, '#ffffff');
+      hlGrad.addColorStop(0.35, '#2aa6ff');
+      hlGrad.addColorStop(0.7, '#A8FF00');
+      hlGrad.addColorStop(1, '#050606');
+      ctx.fillStyle = hlGrad;
+      ctx.beginPath();
+      ctx.arc(hlX, hlY, hlR, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Optical concentric glass rings
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+      ctx.lineWidth = 2;
+      for (let r = 20; r < hlR; r += 24) {
+        ctx.beginPath();
+        ctx.arc(hlX, hlY, r, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+      ctx.restore();
+
+      // 2. Right Side: Macro Tyre Tread & Forged Wheel Rim Lip
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(splitX, 0, w - splitX, h);
+      ctx.clip();
+
+      const wheelX = splitX + (w - splitX) * 0.85;
+      const wheelY = cy + h * 0.2;
+      const rimR = Math.min(w - splitX, h) * 0.48;
+
+      // Dark rubber texture with lateral tread blocks
+      ctx.fillStyle = '#0d1113';
+      ctx.fillRect(splitX, 0, w - splitX, h);
+
+      ctx.strokeStyle = '#050606';
+      ctx.lineWidth = 10;
+      for (let y = 0; y < h; y += 45) {
+        ctx.beginPath();
+        ctx.moveTo(splitX, y);
+        ctx.lineTo(wheelX, y + 25);
+        ctx.stroke();
+      }
+
+      // Titanium rim lip
+      ctx.strokeStyle = '#323a3f';
+      ctx.lineWidth = 18;
+      ctx.beginPath();
+      ctx.arc(wheelX, wheelY, rimR, 0, Math.PI * 2);
+      ctx.stroke();
+
+      ctx.strokeStyle = '#A8FF00';
+      ctx.shadowColor = '#A8FF00';
+      ctx.shadowBlur = 20;
+      ctx.lineWidth = 3;
+      ctx.stroke();
+      ctx.restore();
+
+      // 3. Center Split Divider Line & Traveling Lime Conduit Particles
+      ctx.save();
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(splitX, 0);
+      ctx.lineTo(splitX, h);
+      ctx.stroke();
+
+      // Connecting Lime Light Energy Conduit (t: 0.8s -> 5.5s)
+      const conduitProg = Math.max(0, Math.min(1, (t - 0.8) / 1.5));
+      if (conduitProg > 0) {
+        // Horizontal laser bridge
+        ctx.strokeStyle = '#A8FF00';
+        ctx.shadowColor = '#A8FF00';
+        ctx.shadowBlur = 24;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(hlX, hlY);
+        ctx.bezierCurveTo(splitX, hlY - 60, splitX, cy + 60, wheelX - rimR * 0.6, cy);
+        ctx.stroke();
+
+        // Traveling stream of green particles
+        const particleCount = 24;
+        for (let p = 0; p < particleCount; p++) {
+          const pt = (t * 0.8 + p / particleCount) % 1;
+          const u = 1 - pt;
+          const px = u*u*hlX + 2*u*pt*splitX + pt*pt*(wheelX - rimR * 0.6);
+          const py = u*u*hlY + 2*u*pt*(cy) + pt*pt*(cy);
+          ctx.fillStyle = '#ffffff';
+          ctx.shadowColor = '#A8FF00';
+          ctx.shadowBlur = 10;
+          ctx.beginPath();
+          ctx.arc(px, py, 2.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      ctx.restore();
+
+      // Brand Wordmark
+      if (t > 2.5) {
+        const logoAlpha = Math.min(1, (t - 2.5) / 1.2);
+        drawTrieyeWordmark(ctx, cx, h - 85, 0.48, logoAlpha, true);
+      }
+    }
+
+    /* -------------------------------------------------------------
+       10 — TRIEYE FINAL LOGO REVEAL (Crossing Searchlights & Particles)
+       ------------------------------------------------------------- */
+    function render10_TrieyeLogoReveal(t, w, h, cx, cy) {
+      // 1. Begins with a completely black screen (#000000)
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, w, h);
+
+      // 2. Two Sharp Lime-Green Light Beams Crossing Through Drifting Smoke (t: 0.5s -> 3.2s)
+      const beamProg = Math.max(0, Math.min(1, (t - 0.5) / 1.8));
+      if (beamProg > 0) {
+        ctx.save();
+        // Beam A: Top-Left to Bottom-Right
+        const gradA = ctx.createLinearGradient(0, 0, cx + 180 * beamProg, cy + 180 * beamProg);
+        gradA.addColorStop(0, 'rgba(168, 255, 0, 0.75)');
+        gradA.addColorStop(0.5, 'rgba(168, 255, 0, 0.35)');
+        gradA.addColorStop(1, 'transparent');
+        ctx.strokeStyle = gradA;
+        ctx.shadowColor = '#A8FF00';
+        ctx.shadowBlur = 30;
+        ctx.lineWidth = 4 * beamProg;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.lineTo(w * beamProg, h * beamProg);
+        ctx.stroke();
+
+        // Beam B: Top-Right to Bottom-Left
+        const gradB = ctx.createLinearGradient(w, 0, cx - 180 * beamProg, cy + 180 * beamProg);
+        gradB.addColorStop(0, 'rgba(168, 255, 0, 0.75)');
+        gradB.addColorStop(0.5, 'rgba(168, 255, 0, 0.35)');
+        gradB.addColorStop(1, 'transparent');
+        ctx.strokeStyle = gradB;
+        ctx.shadowColor = '#A8FF00';
+        ctx.shadowBlur = 30;
+        ctx.lineWidth = 4 * beamProg;
+        ctx.beginPath();
+        ctx.moveTo(w, 0);
+        ctx.lineTo(w * (1 - beamProg), h * beamProg);
+        ctx.stroke();
+
+        // Intersection Convergence Flash at Center
+        if (beamProg > 0.8) {
+          const centerFlash = (beamProg - 0.8) / 0.2;
+          const flashGrad = ctx.createRadialGradient(cx, cy, 2, cx, cy, 180 * centerFlash);
+          flashGrad.addColorStop(0, 'rgba(255, 255, 255, 0.85)');
+          flashGrad.addColorStop(0.3, 'rgba(168, 255, 0, 0.45)');
+          flashGrad.addColorStop(1, 'transparent');
+          ctx.fillStyle = flashGrad;
+          ctx.beginPath();
+          ctx.arc(cx, cy, 180 * centerFlash, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      // 3. Tiny Metallic Particles Converge at Center (t: 1.2s -> 2.8s)
+      const particleProg = Math.max(0, Math.min(1, (t - 1.2) / 1.6));
+      if (particleProg > 0 && particleProg < 1) {
+        ctx.save();
+        const pCount = 90;
+        for (let i = 0; i < pCount; i++) {
+          const angle = (i / pCount) * Math.PI * 2;
+          const startDist = Math.max(w, h) * 0.45;
+          const curDist = startDist * (1 - particleProg);
+          const px = cx + Math.cos(angle) * curDist + Math.sin(t * 3 + i) * 15;
+          const py = cy + Math.sin(angle) * curDist + Math.cos(t * 3 + i) * 15;
+
+          ctx.fillStyle = (i % 2 === 0) ? '#ffffff' : '#A8FF00';
+          ctx.shadowColor = '#A8FF00';
+          ctx.shadowBlur = 8;
+          ctx.beginPath();
+          ctx.arc(px, py, 1.8, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+
+      // 4. Reveal TRIEYE Wordmark & Tagline: "DETAIL • PRECISION • PROTECTION" (t: 2.2s -> 5.2s)
+      const logoProg = Math.max(0, Math.min(1, (t - 2.2) / 1.4));
+      if (logoProg > 0) {
+        // Fade to black conclusion at t: 5.2s -> 6.0s
+        let endAlpha = 1;
+        if (t > 5.2) {
+          endAlpha = Math.max(0, 1 - (t - 5.2) / 0.8);
+        }
+        const totalAlpha = logoProg * endAlpha;
+        drawTrieyeWordmark(ctx, cx, cy, 0.95 + (1 - logoProg) * 0.1, totalAlpha, true);
+      }
+    }
+  </script>
+</body>
+</html>

@@ -86,6 +86,8 @@ const server = http.createServer((req, res) => {
   let filePath = path.join(__dirname, pathname === '/' ? 'index.html' : pathname);
   if (!fs.existsSync(filePath) && fs.existsSync(filePath + '.html')) {
     filePath = filePath + '.html';
+  } else if (!fs.existsSync(filePath) && fs.existsSync(path.join(__dirname, 'public', pathname))) {
+    filePath = path.join(__dirname, 'public', pathname);
   }
 
   if (fs.existsSync(filePath) && fs.statSync(filePath).isFile()) {

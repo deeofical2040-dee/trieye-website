@@ -1,0 +1,1549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, follow">
+<meta name="theme-color" content="#ffffff">
+<title>Track Your Booking | TRIEYE Detailing Studio Chennai</title>
+<meta name="description" content="Track your TRIEYE Detailing Studio booking using your booking reference and registered phone number. Check your car or bike detailing appointment status in Chennai.">
+<meta property="og:title" content="Track Your Booking | TRIEYE Detailing Studio Chennai">
+<meta property="og:description" content="Track your TRIEYE Detailing Studio booking using your booking reference and registered phone number. Check your car or bike detailing appointment status in Chennai.">
+<meta property="og:type" content="website">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preload" as="image" href="/images/trieye-logo-light.png">
+
+<script>
+  // Customer Public Website: Always enforce clean LIGHT theme
+  document.documentElement.removeAttribute('data-theme');
+</script>
+
+<link rel="stylesheet" href="/assets/service-page.css">
+
+<style>
+  /* ---------- TRACK BOOKING CUSTOM STYLES ---------- */
+  .track-hero-section {
+    width: 100%;
+    padding: 60px 24px 80px;
+    background: var(--bg);
+    min-height: calc(100vh - 350px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+  }
+
+  .track-container {
+    max-width: 680px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .track-header {
+    text-align: center;
+    margin-bottom: 36px;
+  }
+
+  .track-header .sec-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--pink);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .track-header h1 {
+    font-family: 'Oswald', sans-serif;
+    font-size: clamp(28px, 4vw, 40px);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: var(--white);
+    margin-bottom: 12px;
+    text-transform: uppercase;
+  }
+
+  .track-header p {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: var(--muted);
+    line-height: 1.6;
+    max-width: 540px;
+    margin: 0 auto;
+  }
+
+  /* Centered Lookup Card */
+  .track-card {
+    background: #ffffff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 36px 32px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+    margin-bottom: 32px;
+    transition: box-shadow 0.25s ease;
+  }
+
+  .track-form-group {
+    margin-bottom: 20px;
+  }
+
+  .track-form-group label {
+    display: block;
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--white);
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+
+  .track-input {
+    width: 100%;
+    height: 48px;
+    padding: 0 16px;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    color: var(--white);
+    background: #f8f9fa;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    outline: none;
+    box-sizing: border-box;
+    transition: all 0.2s ease;
+  }
+
+  .track-input:focus {
+    background: #ffffff;
+    border-color: var(--green);
+    box-shadow: 0 0 0 3px rgba(104, 159, 14, 0.15);
+  }
+
+  .track-btn-submit {
+    width: 100%;
+    height: 50px;
+    background: var(--green, #a6d331);
+    color: #000000;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 14px rgba(104, 159, 14, 0.3);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    margin-top: 24px;
+  }
+
+  .track-btn-submit:hover:not(:disabled) {
+    background: #5a8a0b;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(104, 159, 14, 0.45);
+    color: #ffffff;
+  }
+
+  .track-btn-submit:disabled {
+    opacity: 0.75;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  /* Inline Error Box */
+  .track-error-box {
+    display: none;
+    background: rgba(220, 38, 38, 0.08);
+    border: 1px solid rgba(220, 38, 38, 0.3);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin-top: 20px;
+    color: #dc2626;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .track-error-box svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* Result Display Card */
+  .result-card {
+    display: none;
+    background: #ffffff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 36px 32px;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.06);
+    animation: fadeInUp 0.35s ease forwards;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .result-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .result-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+
+  .result-status-badge.status-confirmed {
+    background: rgba(104, 159, 14, 0.15);
+    color: #4c750a;
+    border: 1px solid rgba(104, 159, 14, 0.3);
+  }
+
+  .result-status-badge.status-completed {
+    background: rgba(37, 99, 235, 0.12);
+    color: #1d4ed8;
+    border: 1px solid rgba(37, 99, 235, 0.3);
+  }
+
+  .result-status-badge.status-cancelled {
+    background: rgba(220, 38, 38, 0.12);
+    color: #b91c1c;
+    border: 1px solid rgba(220, 38, 38, 0.3);
+  }
+
+  .result-ref-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  .result-ref-title span {
+    color: var(--pink);
+    font-weight: 700;
+  }
+
+  .result-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px 24px;
+  }
+
+  .result-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .result-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .result-value {
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--white);
+    word-break: break-word;
+  }
+
+  .result-value.highlight-price {
+    color: var(--green);
+    font-size: 17px;
+    font-weight: 700;
+  }
+
+  /* Bill Action Area */
+  .result-bill-box {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .bill-action-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+
+  .bill-info-label {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .bill-info-title {
+    font-family: 'Oswald', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--white);
+  }
+
+  .bill-info-desc {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .btn-view-bill {
+    background: var(--pink, #ee2f76);
+    color: #ffffff;
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 14px rgba(238, 47, 118, 0.25);
+  }
+
+  .btn-view-bill:hover {
+    background: #d61f63;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(238, 47, 118, 0.35);
+    color: #ffffff;
+  }
+
+  .btn-request-bill {
+    background: var(--green, #a6d331);
+    color: #000000;
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 14px rgba(104, 159, 14, 0.25);
+  }
+
+  .btn-request-bill:hover {
+    background: #5a8a0b;
+    color: #ffffff;
+    transform: translateY(-2px);
+  }
+
+  .bill-badge-pending {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: #f1f5f9;
+    color: #64748b;
+    border-radius: 6px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .bill-security-note {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f8fafc;
+    border: 1px dashed var(--line);
+    padding: 9px 14px;
+    border-radius: 6px;
+    line-height: 1.45;
+  }
+
+  .bill-security-note svg {
+    flex-shrink: 0;
+    color: var(--pink);
+  }
+
+  /* History / Previous Visits Card */
+  .history-card {
+    display: none;
+    background: #ffffff;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 36px 32px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.04);
+    margin-top: 28px;
+    animation: fadeInUp 0.4s ease forwards;
+  }
+
+  .history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .history-sec-tag {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--pink);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: block;
+    line-height: 1.4;
+  }
+
+  .history-title-wrap h2 {
+    font-family: 'Oswald', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    color: var(--white);
+    text-transform: uppercase;
+    margin: 0;
+  }
+
+  .history-count-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--pink);
+    background: rgba(238, 47, 118, 0.08);
+    border: 1px solid rgba(238, 47, 118, 0.2);
+    padding: 5px 12px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .history-filters {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  .filter-pill {
+    background: #f8f9fa;
+    border: 1px solid var(--line);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .filter-pill:hover {
+    border-color: var(--pink);
+    color: var(--pink);
+  }
+
+  .filter-pill.active {
+    background: var(--pink);
+    border-color: var(--pink);
+    color: #ffffff;
+  }
+
+  .history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .history-item {
+    background: #fcfdfe;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transition: all 0.2s ease;
+  }
+
+  .history-item:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+    transform: translateY(-1px);
+  }
+
+  .history-item-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .history-service-name {
+    font-family: 'Oswald', sans-serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--white);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+  }
+
+  .history-date-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    color: var(--muted);
+    background: #f1f5f9;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  .history-item-mid {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    font-size: 13.5px;
+    color: var(--muted);
+  }
+
+  .history-ref {
+    font-family: 'IBM Plex Mono', monospace;
+    color: var(--muted);
+  }
+
+  .history-ref span {
+    color: var(--white);
+    font-weight: 600;
+  }
+
+  .history-price {
+    font-family: 'Inter', sans-serif;
+    font-weight: 700;
+    color: var(--green);
+    font-size: 15px;
+  }
+
+  .history-item-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #f1f5f9;
+  }
+
+  .history-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 12px;
+  }
+
+  .history-btn-bill {
+    font-family: 'Inter', sans-serif;
+    font-size: 12.5px;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 6px;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+
+  .history-btn-bill.view-btn {
+    background: rgba(238, 47, 118, 0.1);
+    color: var(--pink);
+    border: 1px solid rgba(238, 47, 118, 0.25);
+  }
+
+  .history-btn-bill.view-btn:hover {
+    background: var(--pink);
+    color: #ffffff;
+  }
+
+  .history-btn-bill.req-btn {
+    background: rgba(104, 159, 14, 0.1);
+    color: #4c750a;
+    border: 1px solid rgba(104, 159, 14, 0.25);
+  }
+
+  .history-btn-bill.req-btn:hover {
+    background: var(--green);
+    color: #000000;
+  }
+
+  .history-empty-note {
+    background: #f8fafc;
+    border: 1px dashed var(--line);
+    border-radius: 8px;
+    padding: 24px;
+    text-align: center;
+    color: var(--muted);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* Footer Navigation Links */
+  .footer-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 16px 24px;
+    padding: 24px 0 32px;
+    margin: 0 auto;
+    border-top: 1px solid var(--line);
+    max-width: 900px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .footer-nav a {
+    font-family: 'Inter', sans-serif;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.2s ease;
+  }
+
+  .footer-nav a:hover {
+    color: var(--green, #a6d331);
+  }
+
+  @media (max-width: 640px) {
+    .track-hero-section {
+      padding: 36px 16px 60px;
+    }
+    .track-card, .result-card, .history-card {
+      padding: 24px 18px;
+    }
+    .result-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    .bill-action-row {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    .btn-view-bill, .btn-request-bill {
+      justify-content: center;
+      width: 100%;
+    }
+    .history-header {
+      flex-direction: column;
+      gap: 10px;
+    }
+    .history-item-bottom {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 8px;
+    }
+    .history-btn-bill {
+      width: 100%;
+      justify-content: center;
+    }
+    .footer-nav {
+      gap: 12px 18px;
+      padding: 20px 10px 24px;
+    }
+  }
+</style>
+
+<!-- Official Supabase JavaScript Client -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Trieye Supabase Config & Database Adapter -->
+<script src="/assets/supabase-config.js?v=20261029_v3"></script>
+<script src="/assets/trieye-db.js?v=20261029_v3"></script>
+</head>
+<body>
+
+<header>
+  <nav>
+    <a href="/" class="nav-brand">
+      <img src="/images/trieye-logo-dark.png" alt="TRIEYE car detailing studio" class="nav-logo logo-dark" onerror="this.onerror=null;this.src='/assets/trieye-logo-dark.png';">
+      <img src="/images/trieye-logo-light.png" alt="TRIEYE car detailing studio" class="nav-logo logo-light" onerror="this.onerror=null;this.src='/assets/trieye-logo-light.png';">
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="/">Home</a></li>
+      <li><a href="/#about">About Us</a></li>
+      <li class="nav-item-dropdown">
+        <a href="/#services" class="nav-dropdown-toggle" aria-expanded="false" aria-haspopup="true">Services <span class="nav-caret">▾</span></a>
+        <div class="nav-dropdown-menu mega-menu-container">
+          <div class="mega-menu-grid">
+            <div class="mega-menu-col">
+              <div class="mega-col-header">// CLEAN &amp; DETAIL</div>
+              <a href="/car-wash" class="mega-menu-item">
+                <div class="mega-item-info">
+                  <div class="mega-item-title">CAR WASH <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Exterior wash &amp; maintenance care</div>
+                </div>
+              </a>
+              <a href="/interior-detailing" class="mega-menu-item">
+                <div class="mega-item-info">
+                  <div class="mega-item-title">INTERIOR DETAILING <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Deep cabin cleaning &amp; interior care</div>
+                </div>
+              </a>
+              <a href="/bike-detailing" class="mega-menu-item">
+                <div class="mega-item-info">
+                  <div class="mega-item-title">BIKE DETAILING <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Precision wash &amp; polishing for motorcycles</div>
+                </div>
+              </a>
+            </div>
+            <div class="mega-menu-col">
+              <div class="mega-col-header">// RESTORE &amp; PROTECT</div>
+              <a href="/paint-correction" class="mega-menu-item">
+                <div class="mega-item-info">
+                  <div class="mega-item-title">PAINT CORRECTION <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Swirl removal &amp; gloss restoration</div>
+                </div>
+              </a>
+              <a href="/ceramic-coating" class="mega-menu-item">
+                <div class="mega-item-info">
+                  <div class="mega-item-title">CERAMIC COATING <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Hydrophobic nanotech paint shield</div>
+                </div>
+              </a>
+              <a href="/graphene-coating" class="mega-menu-item">
+                <div class="mega-item-info">
+                  <div class="mega-item-title">GRAPHENE COATING <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Ultra-durable matrix heat protection</div>
+                </div>
+              </a>
+              <a href="/ppf" class="mega-menu-item">
+                <div class="mega-item-info">
+                  <div class="mega-item-title">PAINT PROTECTION FILM (PPF) <span class="mega-item-arrow">→</span></div>
+                  <div class="mega-item-desc">Self-healing TPU impact armor</div>
+                </div>
+              </a>
+            </div>
+          </div>
+        </div>
+      </li>
+      <li><a href="/#faq">FAQ</a></li>
+      <li><a href="/#contact">Contact Us</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="/#booking" class="nav-cta">Book Now <span class="nav-cta-arrow">→</span></a>
+      <button class="burger-btn" id="burgerBtn" aria-label="Toggle navigation menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+</header>
+
+<!-- MOBILE DRAWER -->
+<div class="mobile-drawer-backdrop" id="mobileDrawerBackdrop" aria-hidden="true"></div>
+<div class="mobile-nav-drawer" id="mobileNavDrawer" aria-hidden="true" role="dialog" aria-label="Mobile Navigation Menu">
+  <div class="mobile-drawer-header">
+    <div class="mobile-drawer-brand">
+      <a href="/" aria-label="TRIEYE Home">
+        <img src="/images/trieye-logo-dark.png" alt="TRIEYE car detailing studio" class="nav-logo logo-dark" onerror="this.onerror=null;this.src='/assets/trieye-logo-dark.png';">
+        <img src="/images/trieye-logo-light.png" alt="TRIEYE car detailing studio" class="nav-logo logo-light" onerror="this.onerror=null;this.src='/assets/trieye-logo-light.png';">
+      </a>
+    </div>
+    <button class="mobile-drawer-close" id="mobileDrawerClose" aria-label="Close navigation menu">&times;</button>
+  </div>
+  <div class="mobile-drawer-body">
+    <ul class="mobile-drawer-links">
+      <li><a href="/"><span class="m-num">01</span> Home</a></li>
+      <li><a href="/#about"><span class="m-num">02</span> About Us</a></li>
+      <li class="mobile-drawer-accordion reveal-up">
+        <button class="mobile-accordion-btn reveal-up" id="mobileAccordionBtn" type="button" aria-expanded="false">
+          <span><span class="m-num">03</span> Services</span>
+          <span class="mobile-accordion-icon reveal-up">+</span>
+        </button>
+        <ul class="mobile-accordion-content reveal-up" id="mobileAccordionContent">
+          <li><a href="/car-wash" class="m-sublink">Car Wash</a></li>
+          <li><a href="/ceramic-coating" class="m-sublink">Ceramic Coating</a></li>
+          <li><a href="/graphene-coating" class="m-sublink">Graphene Coating</a></li>
+          <li><a href="/paint-correction" class="m-sublink">Paint Correction</a></li>
+          <li><a href="/interior-detailing" class="m-sublink">Interior Detailing</a></li>
+          <li><a href="/ppf" class="m-sublink">Paint Protection Film (PPF)</a></li>
+          <li><a href="/bike-detailing" class="m-sublink">Bike Detailing</a></li>
+        </ul>
+      </li>
+      <li><a href="/#gallery"><span class="m-num">04</span> Gallery</a></li>
+      <li><a href="/track-booking"><span class="m-num">05</span> Track Booking</a></li>
+      <li><a href="/#contact"><span class="m-num">06</span> Contact Us</a></li>
+    </ul>
+    <div class="mobile-drawer-footer">
+      <a href="/#booking" class="mobile-drawer-book-btn" id="mobileDrawerBookBtn">
+        BOOK NOW &rarr;
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN TRACK BOOKING SECTION -->
+<main class="track-hero-section">
+  <div class="track-container">
+
+    <div class="track-header">
+      <div class="sec-tag reveal-element reveal-text">// TRACK YOUR BOOKING</div>
+      <h1>CHECK YOUR BOOKING STATUS</h1>
+      <p>Enter your vehicle number and registered phone number to view the latest status of your TRIEYE appointment.</p>
+    </div>
+
+    <!-- LOOKUP FORM CARD -->
+    <div class="track-card reveal-card">
+      <form id="trackForm" onsubmit="return false;">
+        <div class="track-form-group">
+          <label for="trackRef">Vehicle Number</label>
+          <input type="text" id="trackRef" class="track-input" placeholder="TN 01 AB 1234" maxlength="13" required autocomplete="off" spellcheck="false" style="text-transform:uppercase;">
+        </div>
+
+        <div class="track-form-group">
+          <label for="trackPhone">Registered Phone Number</label>
+          <input type="tel" id="trackPhone" class="track-input" placeholder="9876543210" maxlength="10" inputmode="numeric" required autocomplete="tel">
+        </div>
+
+        <button type="submit" id="btnTrackSubmit" class="track-btn-submit">
+          <span>CHECK BOOKING →</span>
+        </button>
+      </form>
+
+      <!-- Inline Error Message Box -->
+      <div id="trackError" class="track-error-box" style="display:none;">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="trackErrorText">We couldn't find a booking matching those details. Please check your vehicle number and phone number.</span>
+      </div>
+    </div>
+
+    <!-- BOOKING RESULT DISPLAY CARD -->
+    <div id="trackResultCard" class="result-card reveal-card">
+      <div class="result-header">
+        <div id="resultStatusBadge" class="result-status-badge status-confirmed">
+          ✓ BOOKING CONFIRMED
+        </div>
+        <div class="result-ref-title">
+          Booking Ref: <span id="resRef">TRI-01E8A992</span>
+        </div>
+      </div>
+
+      <div class="result-grid">
+        <div class="result-row">
+          <span class="result-label">Customer Name</span>
+          <span class="result-value" id="resName">--</span>
+        </div>
+
+        <div class="result-row">
+          <span class="result-label">Selected Service</span>
+          <span class="result-value" id="resService">--</span>
+        </div>
+
+        <div class="result-row">
+          <span class="result-label">Vehicle Type</span>
+          <span class="result-value" id="resVehicle">--</span>
+        </div>
+
+        <div class="result-row">
+          <span class="result-label">Registration Number</span>
+          <span class="result-value" id="resReg">--</span>
+        </div>
+
+        <div class="result-row">
+          <span class="result-label">Booking Date</span>
+          <span class="result-value" id="resDate">--</span>
+        </div>
+
+        <div class="result-row">
+          <span class="result-label">Booking Time / Slot</span>
+          <span class="result-value" id="resTime">--</span>
+        </div>
+
+        <div class="result-row">
+          <span class="result-label">Estimated Price</span>
+          <span class="result-value highlight-price" id="resPrice">₹0</span>
+        </div>
+
+        <div class="result-row">
+          <span class="result-label">Current Status</span>
+          <span class="result-value" id="resStatusText">CONFIRMED</span>
+        </div>
+      </div>
+
+      <!-- LATEST BILL ACTION CONTAINER -->
+      <div id="latestBillContainer" class="result-bill-box">
+        <!-- Injected dynamically by renderBookingResult -->
+      </div>
+    </div>
+
+    <!-- PREVIOUS VISITS / VEHICLE SERVICE HISTORY CARD -->
+    <div id="trackHistoryCard" class="history-card reveal-card">
+      <div class="history-header">
+        <div class="history-title-wrap">
+          <div class="history-sec-tag">// VEHICLE SERVICE HISTORY</div>
+          <h2>PREVIOUS VISITS (<span id="histRegNumber">--</span>)</h2>
+        </div>
+        <div id="histVisitsCount" class="history-count-badge">0 VISITS RECORDED</div>
+      </div>
+
+      <!-- Month Filter Pills Container -->
+      <div id="historyMonthFilters" class="history-filters" style="display:none;"></div>
+
+      <!-- Visits List Container -->
+      <div id="historyVisitsList" class="history-list"></div>
+    </div>
+
+  </div>
+</main>
+
+<!-- GLOBAL FOOTER -->
+
+<footer class="site-footer">
+  <div class="footer-wrap wrap">
+    <div class="footer-grid">
+      <!-- Col 1: Brand & Bio -->
+      <div class="footer-col footer-brand">
+        <a href="/" class="footer-logo-link" aria-label="TRIEYE Detailing Studio Home">
+          <img src="/images/trieye-logo-dark.png" alt="TRIEYE car detailing studio" class="footer-logo logo-dark" onerror="this.onerror=null;this.src='/assets/trieye-logo-dark.png';">
+          <img src="/images/trieye-logo-light.png" alt="TRIEYE car detailing studio" class="footer-logo logo-light" onerror="this.onerror=null;this.src='/assets/trieye-logo-light.png';">
+        </a>
+        <p class="footer-desc">Professional car &amp; bike detailing studio. Specialized in hydrophobic ceramic &amp; graphene coatings, paint correction, self-healing PPF, and deep interior care.</p>
+        <div class="footer-socials">
+          <a href="https://www.instagram.com/trieye_detailing" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="social-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+          </a>
+          <a href="https://wa.me/919940181934" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" class="social-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.762.459 3.48 1.332 5.001l-1.416 5.169 5.297-1.389c1.472.802 3.133 1.224 4.774 1.225h.004c5.505 0 9.988-4.478 9.989-9.985 0-2.668-1.039-5.176-2.927-7.063a9.927 9.927 0 0 0-7.063-2.942zm5.79 14.195c-.244.688-1.419 1.314-1.956 1.396-.51.077-1.163.116-3.701-.931-3.24-1.339-5.326-4.636-5.487-4.851-.161-.215-1.309-1.741-1.309-3.322 0-1.58.827-2.357 1.121-2.68.294-.323.644-.404.859-.404.215 0 .43.002.617.01.198.008.465-.075.728.556.27.646.918 2.241.998 2.403.08.162.134.35.027.565-.107.215-.161.35-.322.538-.161.188-.338.42-.483.564-.16.162-.328.338-.14.661.188.323.834 1.378 1.79 2.23 1.23 1.096 2.268 1.436 2.59 1.597.323.161.511.134.7-.08.188-.215.806-.941 1.021-1.263.215-.323.43-.269.725-.161.296.107 1.88.886 2.202 1.047.323.161.538.242.618.376.08.134.08.779-.164 1.467z"/></svg>
+          </a>
+          <a href="tel:+919940181934" aria-label="Call Us" class="social-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Col 2: Services Links -->
+      <div class="footer-col reveal-element">
+        <h4 class="footer-heading">Services</h4>
+        <ul class="footer-links reveal-element">
+          <li><a href="/car-wash">Car Wash</a></li>
+          <li><a href="/ceramic-coating">Ceramic Coating</a></li>
+          <li><a href="/graphene-coating">Graphene Coating</a></li>
+          <li><a href="/paint-correction">Paint Correction</a></li>
+          <li><a href="/interior-detailing">Interior Detailing</a></li>
+          <li><a href="/ppf">Paint Protection Film (PPF)</a></li>
+          <li><a href="/bike-detailing">Bike Detailing</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 3: Quick Links & Booking -->
+      <div class="footer-col reveal-element">
+        <h4 class="footer-heading">Quick Links</h4>
+        <ul class="footer-links reveal-element">
+          <li><a href="/">Home</a></li>
+          <li><a href="/#about">About Us</a></li>
+          <li><a href="/#gallery">Gallery</a></li>
+          <li><a href="/track-booking" class="footer-highlight-link">Track Booking &rarr;</a></li>
+          <li><a href="/#contact">Contact &amp; Location</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 4: Studio Location (Hidden on Desktop, Visible on Mobile) -->
+      <div class="footer-col footer-col-location">
+        <h4 class="footer-heading">Studio Location</h4>
+        <p class="footer-info-text">No. 19, 6th Street, 1st Main Road, Baba Nagar, Villivakkam, Chennai, Tamil Nadu 600049</p>
+        <div class="footer-contact-item">
+          <span class="info-label">Phone:</span>
+          <a href="tel:+919940181934" class="footer-tel">+91 99401 81934</a>
+        </div>
+        <div class="footer-contact-item">
+          <span class="info-label">Hours:</span>
+          <span>Mon – Sun: 8:00 AM – 8:00 PM</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Footer -->
+    <div class="footer-bottom">
+      <div class="footer-copy">&copy; <span class="current-year">2026</span> TRIEYE Detailing Studio. All Rights Reserved.</div>
+    </div>
+  </div>
+</footer>
+
+
+<script>
+  // Mobile drawer logic
+  const burgerBtn = document.getElementById('burgerBtn');
+  const mobileNavDrawer = document.getElementById('mobileNavDrawer');
+  const mobileDrawerBackdrop = document.getElementById('mobileDrawerBackdrop');
+  const mobileDrawerClose = document.getElementById('mobileDrawerClose');
+
+  function openDrawer() {
+    if (mobileNavDrawer) mobileNavDrawer.classList.add('active');
+    if (mobileDrawerBackdrop) mobileDrawerBackdrop.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+  function closeDrawer() {
+    if (mobileNavDrawer) mobileNavDrawer.classList.remove('active');
+    if (mobileDrawerBackdrop) mobileDrawerBackdrop.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  if (burgerBtn) burgerBtn.addEventListener('click', openDrawer);
+  if (mobileDrawerClose) mobileDrawerClose.addEventListener('click', closeDrawer);
+  if (mobileDrawerBackdrop) mobileDrawerBackdrop.addEventListener('click', closeDrawer);
+
+  // Strict formatting listeners for Vehicle Number and Registered Phone Number
+  document.addEventListener('DOMContentLoaded', () => {
+    const trackRefInput = document.getElementById('trackRef');
+    const trackPhoneInput = document.getElementById('trackPhone');
+
+    // Vehicle Number auto-formatter: 2 letters + 2 numbers + 2 letters + 4 numbers (e.g. TN 01 AB 1234)
+    if (trackRefInput) {
+      trackRefInput.addEventListener('input', function() {
+        const val = this.value.toUpperCase();
+        if (!val.startsWith('TRI-')) {
+          if (window.TrieyeDB && typeof window.TrieyeDB.formatVehicleNumber === 'function') {
+            this.value = window.TrieyeDB.formatVehicleNumber(val);
+          } else {
+            this.value = val;
+          }
+        }
+      });
+
+      trackRefInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Backspace' && this.selectionStart === this.selectionEnd && !this.value.startsWith('TRI-')) {
+          const pos = this.selectionStart;
+          if (pos > 0 && this.value[pos - 1] === ' ') {
+            e.preventDefault();
+            const before = this.value.slice(0, pos - 2);
+            const after = this.value.slice(pos);
+            const formatted = window.TrieyeDB && typeof window.TrieyeDB.formatVehicleNumber === 'function'
+              ? window.TrieyeDB.formatVehicleNumber(before + after)
+              : (before + after);
+            this.value = formatted;
+            const newPos = Math.max(0, pos - 2);
+            this.setSelectionRange(newPos, newPos);
+          }
+        }
+      });
+    }
+
+    // Phone Number filter: Numbers ONLY, maximum 10 digits
+    if (trackPhoneInput) {
+      trackPhoneInput.addEventListener('input', function() {
+        this.value = this.value.replace(/\D/g, '').slice(0, 10);
+      });
+    }
+
+    // Auto-prefill reference from URL query parameter (e.g. ?ref=TRI-01E8A992)
+    const params = new URLSearchParams(window.location.search);
+    const refParam = params.get('ref');
+    if (refParam && trackRefInput) {
+      trackRefInput.value = refParam.trim().toUpperCase();
+      if (trackPhoneInput) trackPhoneInput.focus();
+    }
+  });
+
+  // Track Booking Lookup Execution Handler
+  const trackForm = document.getElementById('trackForm');
+  const btnTrackSubmit = document.getElementById('btnTrackSubmit');
+  const trackError = document.getElementById('trackError');
+  const trackErrorText = document.getElementById('trackErrorText');
+  const trackResultCard = document.getElementById('trackResultCard');
+
+  if (trackForm) {
+    trackForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const rawRef = document.getElementById('trackRef').value.trim();
+      const phoneVal = document.getElementById('trackPhone').value.trim();
+
+      if (!rawRef || !phoneVal) {
+        showError("Please enter both your Vehicle Number and registered Phone Number.");
+        return;
+      }
+
+      let refVal = rawRef;
+      if (!rawRef.toUpperCase().startsWith('TRI-')) {
+        refVal = window.TrieyeDB && typeof window.TrieyeDB.formatVehicleNumber === 'function'
+          ? window.TrieyeDB.formatVehicleNumber(rawRef)
+          : rawRef.toUpperCase();
+        document.getElementById('trackRef').value = refVal;
+        const isValidVeh = window.TrieyeDB && typeof window.TrieyeDB.validateVehicleNumber === 'function'
+          ? window.TrieyeDB.validateVehicleNumber(refVal)
+          : /^[A-Z]{2}\s[0-9]{2}\s[A-Z]{2}\s[0-9]{4}$/.test(refVal);
+        if (!isValidVeh) {
+          showError("Enter vehicle number in TN 01 AB 1234 format");
+          return;
+        }
+      }
+
+      if (phoneVal.replace(/\D/g, '').length < 10) {
+        showError("Registered Phone Number must contain exactly 10 digits.");
+        return;
+      }
+
+      // Set loading state
+      setLoading(true);
+      hideError();
+      hideResult();
+
+      try {
+        if (!window.TrieyeDB || typeof window.TrieyeDB.trackBooking !== 'function') {
+          showError("Database adapter loading... Please wait a moment and try again.");
+          return;
+        }
+
+        const res = await window.TrieyeDB.trackBooking(refVal, phoneVal);
+
+        if (res && res.success && res.booking) {
+          const historyData = Array.isArray(res.history) && res.history.length > 0 ? res.history : [res.booking];
+          renderBookingResult(res.booking);
+          renderHistory(historyData, res.reg_number || refVal);
+        } else {
+          showError((res && res.error) || "We couldn't find a booking matching those details. Please check your vehicle number and registered phone number.");
+        }
+      } catch (err) {
+        console.error('🚨 [Track Booking Exception]:', err);
+        showError("An unexpected error occurred while looking up your booking. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    });
+  }
+
+  function setLoading(isLoading) {
+    if (!btnTrackSubmit) return;
+    if (isLoading) {
+      btnTrackSubmit.disabled = true;
+      btnTrackSubmit.innerHTML = `
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="animation: spin 1s linear infinite;"><path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/></svg>
+        <span>CHECKING STATUS...</span>
+      `;
+    } else {
+      btnTrackSubmit.disabled = false;
+      btnTrackSubmit.innerHTML = `<span>CHECK BOOKING →</span>`;
+    }
+  }
+
+  function showError(msg) {
+    if (trackErrorText) trackErrorText.textContent = msg;
+    if (trackError) trackError.style.display = 'flex';
+  }
+
+  function hideError() {
+    if (trackError) trackError.style.display = 'none';
+  }
+
+  const trackHistoryCard = document.getElementById('trackHistoryCard');
+  function hideResult() {
+    if (trackResultCard) trackResultCard.style.display = 'none';
+    if (trackHistoryCard) trackHistoryCard.style.display = 'none';
+  }
+
+  function formatDisplayDate(dateStr) {
+    if (!dateStr) return 'Standard Date';
+    try {
+      const clean = String(dateStr).split('T')[0];
+      const parts = clean.split('-');
+      if (parts.length === 3) {
+        const d = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+        if (!isNaN(d.getTime())) {
+          return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+      }
+    } catch (e) {}
+    return dateStr;
+  }
+
+  function renderBookingResult(b) {
+    // Populate card details
+    document.getElementById('resRef').textContent = b.booking_ref || 'TRI-BOOKING';
+    document.getElementById('resName').textContent = b.customer_name || 'Valued Customer';
+    document.getElementById('resService').textContent = b.service || 'Detailing Service';
+    document.getElementById('resVehicle').textContent = b.vehicleType || 'Car';
+    document.getElementById('resReg').textContent = b.reg || 'N/A';
+    
+    // Format Date
+    const formattedDate = formatDisplayDate(b.booking_date);
+    document.getElementById('resDate').textContent = formattedDate;
+
+    // Slot/Time: Never invent booking times if no slot was assigned
+    document.getElementById('resTime').textContent = b.booking_time ? b.booking_time : 'Scheduled Day (Slot Not Assigned)';
+
+    const priceNum = Number(b.price || 0);
+    document.getElementById('resPrice').textContent = priceNum > 0 ? `₹${priceNum.toLocaleString()}` : '₹---';
+    document.getElementById('resStatusText').textContent = b.status || 'CONFIRMED';
+
+    // Status Badge Styling
+    const badge = document.getElementById('resultStatusBadge');
+    if (badge) {
+      badge.className = 'result-status-badge';
+      const st = String(b.status || 'CONFIRMED').toUpperCase();
+
+      if (st === 'CONFIRMED') {
+        badge.classList.add('status-confirmed');
+        badge.innerHTML = `✓ BOOKING CONFIRMED`;
+      } else if (st === 'COMPLETED' || st === 'FINISHED' || st === 'DONE') {
+        badge.classList.add('status-completed');
+        badge.innerHTML = `✓ BOOKING COMPLETED`;
+      } else if (st === 'CANCELLED' || st === 'CANCELED') {
+        badge.classList.add('status-cancelled');
+        badge.innerHTML = `✕ BOOKING CANCELLED`;
+      } else {
+        badge.classList.add('status-confirmed');
+        badge.innerHTML = `✓ BOOKING ${st}`;
+      }
+    }
+
+    // Secure View Bill / Request Bill Button Handling
+    const billContainer = document.getElementById('latestBillContainer');
+    if (billContainer) {
+      if (b.has_invoice && b.share_token) {
+        billContainer.innerHTML = `
+          <div class="bill-action-row">
+            <div class="bill-info-label">
+              <span class="bill-info-title">OFFICIAL INVOICE ISSUED</span>
+              <span class="bill-info-desc">Verified single-use invoice access link is ready for viewing.</span>
+            </div>
+            <a href="/invoice?token=${encodeURIComponent(b.share_token)}" target="_blank" rel="noopener noreferrer" class="btn-view-bill">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+              <span>VIEW BILL →</span>
+            </a>
+          </div>
+          <div class="bill-security-note">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span>Single-purpose encrypted token issued. Only authorized holders of this link may view detailed pricing.</span>
+          </div>
+        `;
+      } else if (b.has_invoice) {
+        const waMsg = encodeURIComponent(`Hi TRIEYE Detailing Studio, I would like to request the official invoice for my vehicle ${b.reg} (Booking Ref: ${b.booking_ref}, Visit Date: ${formattedDate}).`);
+        const waUrl = `https://wa.me/919940181934?text=${waMsg}`;
+        billContainer.innerHTML = `
+          <div class="bill-action-row">
+            <div class="bill-info-label">
+              <span class="bill-info-title">OFFICIAL BILL ISSUED</span>
+              <span class="bill-info-desc">Direct invoice access requires staff security verification.</span>
+            </div>
+            <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="btn-request-bill">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12.012 2c-5.506 0-9.989 4.478-9.99 9.984 0 1.762.459 3.48 1.332 5.001l-1.416 5.169 5.297-1.389c1.472.802 3.133 1.224 4.774 1.225h.004c5.505 0 9.988-4.478 9.989-9.985 0-2.668-1.039-5.176-2.927-7.063a9.927 9.927 0 0 0-7.063-2.942zm5.79 14.195c-.244.688-1.419 1.314-1.956 1.396-.51.077-1.163.116-3.701-.931-3.24-1.339-5.326-4.636-5.487-4.851-.161-.215-1.309-1.741-1.309-3.322 0-1.58.827-2.357 1.121-2.68.294-.323.644-.404.859-.404.215 0 .43.002.617.01.198.008.465-.075.728.556.27.646.918 2.241.998 2.403.08.162.134.35.027.565-.107.215-.161.35-.322.538-.161.188-.338.42-.483.564-.16.162-.328.338-.14.661.188.323.834 1.378 1.79 2.23 1.23 1.096 2.268 1.436 2.59 1.597.323.161.511.134.7-.08.188-.215.806-.941 1.021-1.263.215-.323.43-.269.725-.161.296.107 1.88.886 2.202 1.047.323.161.538.242.618.376.08.134.08.779-.164 1.467z"/></svg>
+              <span>REQUEST BILL ON WHATSAPP →</span>
+            </a>
+          </div>
+          <div class="bill-security-note">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            <span>Security Protected: To prevent unauthorized viewing of invoices, tap above to receive your verified access link on WhatsApp.</span>
+          </div>
+        `;
+      } else {
+        const waMsg = encodeURIComponent(`Hi TRIEYE Detailing Studio, I am following up on booking ${b.booking_ref} for vehicle ${b.reg}.`);
+        const waUrl = `https://wa.me/919940181934?text=${waMsg}`;
+        billContainer.innerHTML = `
+          <div class="bill-action-row">
+            <div class="bill-info-label">
+              <span class="bill-info-title">BILLING STATUS</span>
+              <span class="bill-info-desc">Invoice is generated upon service completion and studio checkout.</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+              <span class="bill-badge-pending">⏳ PENDING</span>
+              <a href="${waUrl}" target="_blank" rel="noopener noreferrer" class="btn-request-bill" style="padding: 8px 16px; font-size: 13px;">
+                <span>Inquire on WhatsApp</span>
+              </a>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    if (trackResultCard) {
+      trackResultCard.style.display = 'block';
+      trackResultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+  }
+
+  // Multi-Visit History Manager
+  let currentHistoryData = [];
+  let currentActiveMonth = 'ALL';
+
+  function renderHistory(history, reg) {
+    currentHistoryData = Array.isArray(history) ? history : [];
+    currentActiveMonth = 'ALL';
+
+    const regSpan = document.getElementById('histRegNumber');
+    if (regSpan) regSpan.textContent = reg || 'VEHICLE';
+
+    const countBadge = document.getElementById('histVisitsCount');
+    if (countBadge) countBadge.textContent = `${currentHistoryData.length} ${currentHistoryData.length === 1 ? 'VISIT' : 'VISITS'} RECORDED`;
+
+    const filtersContainer = document.getElementById('historyMonthFilters');
+    const visitsList = document.getElementById('historyVisitsList');
+
+    if (!visitsList) return;
+
+    if (currentHistoryData.length <= 1) {
+      if (filtersContainer) filtersContainer.style.display = 'none';
+      visitsList.innerHTML = `
+        <div class="history-empty-note">
+          <strong>First Recorded Visit</strong><br>
+          This is the current registered visit for this vehicle at TRIEYE Detailing Studio. Any future detailing appointments, ceramic maintenance, or washes will be logged chronologically right here.
+        </div>
+      `;
+      if (trackHistoryCard) trackHistoryCard.style.display = 'block';
+      return;
+    }
+
+    // Extract unique year-months from dates
+    const monthMap = {};
+    currentHistoryData.forEach(item => {
+      const dStr = item.booking_date || '';
+      if (dStr && dStr.includes('-')) {
+        const parts = dStr.split('T')[0].split('-');
+        if (parts.length >= 2) {
+          const ymKey = `${parts[0]}-${parts[1]}`;
+          const d = new Date(Number(parts[0]), Number(parts[1]) - 1, 1);
+          const label = d.toLocaleDateString('en-GB', { month: 'short', year: 'numeric' });
+          monthMap[ymKey] = { label, count: (monthMap[ymKey] ? monthMap[ymKey].count : 0) + 1 };
+        }
+      }
+    });
+
+    const monthKeys = Object.keys(monthMap);
+
+    if (monthKeys.length > 1 && filtersContainer) {
+      filtersContainer.style.display = 'flex';
+      let html = `<button type="button" class="filter-pill active" data-month="ALL">All Visits (${currentHistoryData.length})</button>`;
+      monthKeys.forEach(k => {
+        html += `<button type="button" class="filter-pill" data-month="${k}">${monthMap[k].label} (${monthMap[k].count})</button>`;
+      });
+      filtersContainer.innerHTML = html;
+
+      filtersContainer.querySelectorAll('.filter-pill').forEach(btn => {
+        btn.addEventListener('click', () => {
+          filtersContainer.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+          btn.classList.add('active');
+          currentActiveMonth = btn.getAttribute('data-month');
+          renderFilteredVisits();
+        });
+      });
+    } else if (filtersContainer) {
+      filtersContainer.style.display = 'none';
+    }
+
+    renderFilteredVisits();
+
+    if (trackHistoryCard) trackHistoryCard.style.display = 'block';
+  }
+
+  function renderFilteredVisits() {
+    const visitsList = document.getElementById('historyVisitsList');
+    if (!visitsList) return;
+
+    let filtered = currentHistoryData;
+    if (currentActiveMonth !== 'ALL') {
+      filtered = currentHistoryData.filter(item => {
+        const dStr = item.booking_date || '';
+        return dStr.startsWith(currentActiveMonth);
+      });
+    }
+
+    if (filtered.length === 0) {
+      visitsList.innerHTML = `<div class="history-empty-note">No visits found for the selected time filter.</div>`;
+      return;
+    }
+
+    let html = '';
+    filtered.forEach((v, idx) => {
+      const fDate = formatDisplayDate(v.booking_date);
+      const isLatest = idx === 0 && currentActiveMonth === 'ALL';
+      const st = String(v.status || 'CONFIRMED').toUpperCase();
+      let stClass = 'status-confirmed';
+      let stLabel = `✓ ${st}`;
+      if (st === 'COMPLETED' || st === 'FINISHED' || st === 'DONE') {
+        stClass = 'status-completed';
+      } else if (st === 'CANCELLED' || st === 'CANCELED') {
+        stClass = 'status-cancelled';
+        stLabel = `✕ ${st}`;
+      }
+
+      const priceVal = Number(v.price || 0);
+      const priceFormatted = priceVal > 0 ? `₹${priceVal.toLocaleString()}` : '₹---';
+      const timeStr = v.booking_time ? v.booking_time : '';
+
+      // Action button
+      let actionHtml = '';
+      if (v.has_invoice && v.share_token) {
+        actionHtml = `
+          <a href="/invoice?token=${encodeURIComponent(v.share_token)}" target="_blank" rel="noopener noreferrer" class="history-btn-bill view-btn">
+            📄 View Bill →
+          </a>
+        `;
+      } else if (v.has_invoice) {
+        const waMsg = encodeURIComponent(`Hi TRIEYE Studio, please share the verified invoice for vehicle ${v.reg} for visit on ${fDate} (Ref: ${v.booking_ref}).`);
+        actionHtml = `
+          <a href="https://wa.me/919940181934?text=${waMsg}" target="_blank" rel="noopener noreferrer" class="history-btn-bill req-btn">
+            💬 Request Bill
+          </a>
+        `;
+      } else {
+        actionHtml = `<span class="bill-badge-pending" style="font-size:11px; padding:3px 8px;">⏳ Bill Pending</span>`;
+      }
+
+      html += `
+        <div class="history-item">
+          <div class="history-item-top">
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+              <span class="history-service-name">${v.service || 'Detailing Service'}</span>
+              ${isLatest ? '<span style="font-family:\'IBM Plex Mono\',monospace; font-size:10.5px; background:rgba(238,47,118,0.1); color:var(--pink); padding:2px 7px; border-radius:4px; font-weight:600;">LATEST</span>' : ''}
+            </div>
+            <span class="history-date-badge">${fDate}</span>
+          </div>
+
+          <div class="history-item-mid">
+            <div class="history-ref">Ref: <span>${v.booking_ref || '--'}</span></div>
+            ${timeStr ? `<div>Slot: <strong style="color:var(--white);">${timeStr}</strong></div>` : ''}
+            <div class="history-price">${priceFormatted}</div>
+          </div>
+
+          <div class="history-item-bottom">
+            <span class="history-status-badge ${stClass}">${stLabel}</span>
+            <div>${actionHtml}</div>
+          </div>
+        </div>
+      `;
+    });
+
+    visitsList.innerHTML = html;
+  }
+</script>
+
+<style>
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+</style>
+
+
+<script>
+(function initMobileDrawer() {
+  const burgerBtn = document.getElementById('burgerBtn') || document.querySelector('.mobile-nav-toggle');
+  const mobileNavDrawer = document.getElementById('mobileNavDrawer');
+  const mobileDrawerBackdrop = document.getElementById('mobileDrawerBackdrop');
+  const mobileDrawerClose = document.getElementById('mobileDrawerClose');
+  const mobileAccordionBtn = document.getElementById('mobileAccordionBtn');
+  const accordionContainer = document.querySelector('.mobile-drawer-accordion');
+
+  function openMobileNav() {
+    if (mobileNavDrawer && mobileDrawerBackdrop) {
+      mobileNavDrawer.classList.add('open');
+      mobileDrawerBackdrop.classList.add('open');
+      mobileNavDrawer.setAttribute('aria-hidden', 'false');
+      mobileDrawerBackdrop.setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      if (burgerBtn) burgerBtn.setAttribute('aria-expanded', 'true');
+    }
+  }
+
+  function closeMobileNav() {
+    if (mobileNavDrawer && mobileDrawerBackdrop) {
+      mobileNavDrawer.classList.remove('open');
+      mobileDrawerBackdrop.classList.remove('open');
+      mobileNavDrawer.setAttribute('aria-hidden', 'true');
+      mobileDrawerBackdrop.setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+      if (burgerBtn) burgerBtn.setAttribute('aria-expanded', 'false');
+    }
+  }
+
+  if (burgerBtn) burgerBtn.addEventListener('click', openMobileNav);
+  if (mobileDrawerClose) mobileDrawerClose.addEventListener('click', closeMobileNav);
+  if (mobileDrawerBackdrop) mobileDrawerBackdrop.addEventListener('click', closeMobileNav);
+
+  if (mobileAccordionBtn && accordionContainer) {
+    mobileAccordionBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isOpen = accordionContainer.classList.contains('open');
+      if (isOpen) {
+        accordionContainer.classList.remove('open');
+        mobileAccordionBtn.setAttribute('aria-expanded', 'false');
+        const icon = mobileAccordionBtn.querySelector('.mobile-accordion-icon');
+        if (icon) icon.textContent = '+';
+      } else {
+        accordionContainer.classList.add('open');
+        mobileAccordionBtn.setAttribute('aria-expanded', 'true');
+        const icon = mobileAccordionBtn.querySelector('.mobile-accordion-icon');
+        if (icon) icon.textContent = '−';
+      }
+    });
+  }
+
+  document.querySelectorAll('.mobile-drawer-links a:not(.mobile-accordion-btn), .mobile-drawer-book-btn').forEach(link => {
+    link.addEventListener('click', closeMobileNav);
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && mobileNavDrawer && mobileNavDrawer.classList.contains('open')) {
+      closeMobileNav();
+    }
+  });
+})();
+</script>
+
+  <script src="/assets/animations.js" defer></script>
+  <script src="/assets/scroll-reveal.js" defer></script>
+</body>
+</html>

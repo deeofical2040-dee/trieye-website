@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: https://ogp.me/ns#">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Primary Meta Tags -->
+  <title>TRIEYE DETAILING</title>
+  <meta name="title" content="TRIEYE DETAILING">
+  <meta name="description" content="Digital Invoice | Detail • Precision • Protection">
+
+  <!-- Open Graph / Facebook / WhatsApp Rich Link Preview -->
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="TRIEYE DETAILING">
+  <meta property="og:title" content="TRIEYE DETAILING">
+  <meta property="og:description" content="Digital Invoice | Detail • Precision • Protection">
+  <meta property="og:url" content="https://trieye-website.vercel.app/invoice">
+  <meta property="og:image" content="https://trieye-website.vercel.app/assets/trieye-logo-dark.png">
+  <meta property="og:image:secure_url" content="https://trieye-website.vercel.app/assets/trieye-logo-dark.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="961">
+  <meta property="og:image:height" content="220">
+  <meta property="og:image:alt" content="TRIEYE Detailing Studio">
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="https://trieye-website.vercel.app/invoice">
+  <meta name="twitter:title" content="TRIEYE DETAILING">
+  <meta name="twitter:description" content="Digital Invoice | Detail • Precision • Protection">
+  <meta name="twitter:image" content="https://trieye-website.vercel.app/assets/trieye-logo-dark.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f8f9fa;
+      --bg-card: #ffffff;
+      --bg-card-subtle: #f1f3f5;
+      --line: #dee2e6;
+      --line-subtle: #e9ecef;
+      --text: #111827;
+      --muted: #64748b;
+      --pink: #ee2f76;
+      --green: #689f0e;
+      --red: #dc2626;
+      --shadow: 0 12px 36px rgba(0, 0, 0, 0.08);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.5;
+      min-height: 100vh;
+      padding-bottom: 48px;
+    }
+
+    .mono { font-family: 'IBM Plex Mono', monospace; }
+    .display { font-family: 'Oswald', sans-serif; text-transform: uppercase; }
+
+    /* Top Action Bar (hidden in print) */
+    .top-actions-bar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--line);
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .top-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text);
+    }
+    .top-brand img {
+      height: 28px;
+      width: auto;
+    }
+    .top-actions-group {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .btn {
+      font-family: 'Oswald', sans-serif;
+      font-size: 13px;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 8px 16px;
+      font-weight: 600;
+      border-radius: 4px;
+      border: 1px solid var(--line);
+      background: var(--bg-card-subtle);
+      color: var(--text);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      text-decoration: none;
+    }
+    .btn:hover {
+      border-color: var(--pink);
+      color: var(--pink);
+      transform: translateY(-1px);
+    }
+    .btn-primary {
+      background: var(--pink);
+      border-color: var(--pink);
+      color: #ffffff;
+    }
+    .btn-primary:hover {
+      background: #d61f63;
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(238, 47, 118, 0.35);
+    }
+    .btn-green {
+      background: var(--green);
+      border-color: var(--green);
+      color: #ffffff;
+    }
+    .btn-green:hover {
+      background: #58870c;
+      color: #ffffff;
+      box-shadow: 0 4px 14px rgba(104, 159, 14, 0.35);
+    }
+
+    /* Invoice Container */
+    .invoice-wrapper {
+      max-width: 780px;
+      margin: 32px auto 0;
+      padding: 0 20px;
+    }
+    .invoice-card {
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 36px 40px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 28px;
+    }
+    @media (max-width: 640px) {
+      .invoice-card {
+        padding: 24px 20px;
+        gap: 22px;
+      }
+    }
+
+    /* Header Section */
+    .invoice-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 24px;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+    .studio-logo-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .studio-logo {
+      height: 38px;
+      width: auto;
+      object-fit: contain;
+    }
+    .studio-name {
+      font-family: 'Oswald', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--text);
+    }
+    .studio-address {
+      font-size: 12.5px;
+      color: var(--muted);
+      line-height: 1.5;
+      font-family: 'IBM Plex Mono', monospace;
+    }
+    .invoice-meta-badge {
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    @media (max-width: 600px) {
+      .invoice-meta-badge { text-align: left; }
+    }
+    .invoice-title-tag {
+      font-family: 'Oswald', sans-serif;
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: var(--pink);
+      text-transform: uppercase;
+    }
+    .invoice-meta-row {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .invoice-meta-row strong {
+      color: var(--text);
+    }
+
+    /* Info Grid (Bill To & Vehicle) */
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 600px) {
+      .info-grid { grid-template-columns: 1fr; }
+    }
+    .info-box {
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--line-subtle);
+      border-radius: 8px;
+      padding: 16px 18px;
+    }
+    .info-box-title {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--pink);
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    .info-box-line {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13.5px;
+      margin-bottom: 6px;
+    }
+    .info-box-line:last-child { margin-bottom: 0; }
+    .info-box-lbl { color: var(--muted); }
+    .info-box-val { font-weight: 600; color: var(--text); }
+    .info-box-val.highlight { color: var(--green); font-family: 'IBM Plex Mono', monospace; }
+
+    /* Service Table */
+    .table-wrap {
+      overflow-x: auto;
+    }
+    .invoice-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+    }
+    .invoice-table th {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-bottom: 1px solid var(--line);
+      padding: 10px 14px;
+      background: var(--bg-card-subtle);
+    }
+    .invoice-table th:last-child, .invoice-table td:last-child {
+      text-align: right;
+    }
+    .invoice-table td {
+      padding: 14px 14px;
+      border-bottom: 1px solid var(--line-subtle);
+      font-size: 14px;
+    }
+    .item-service-name {
+      font-weight: 600;
+      color: var(--text);
+    }
+    .item-service-desc {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* Calculation & Summary */
+    .summary-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 20px;
+      flex-wrap: wrap;
+      padding-top: 8px;
+    }
+    .payment-badge-box {
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--line-subtle);
+      border-radius: 8px;
+      padding: 14px 18px;
+      min-width: 220px;
+    }
+    .badge-status {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+    .status-paid {
+      background: rgba(166, 211, 49, 0.18);
+      color: var(--green);
+      border: 1px solid rgba(166, 211, 49, 0.4);
+    }
+    .status-partial {
+      background: rgba(245, 158, 11, 0.18);
+      color: #b45309;
+      border: 1px solid rgba(245, 158, 11, 0.4);
+    }
+    .status-unpaid {
+      background: rgba(239, 68, 68, 0.18);
+      color: var(--red);
+      border: 1px solid rgba(239, 68, 68, 0.4);
+    }
+
+    .totals-box {
+      min-width: 240px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13.5px;
+      color: var(--muted);
+    }
+    .total-row.grand-total {
+      border-top: 1px solid var(--line);
+      padding-top: 10px;
+      margin-top: 4px;
+      color: var(--text);
+      font-size: 16px;
+      font-weight: 700;
+    }
+    .grand-total-num {
+      font-family: 'Oswald', sans-serif;
+      font-size: 32px;
+      color: var(--green);
+      letter-spacing: 0.02em;
+    }
+
+    /* Action Buttons in Card (Mobile Friendly) */
+    .card-actions {
+      display: flex;
+      gap: 12px;
+      border-top: 1px solid var(--line);
+      padding-top: 20px;
+      flex-wrap: wrap;
+    }
+    .card-actions .btn {
+      flex: 1;
+      min-width: 160px;
+      min-height: 44px;
+      justify-content: center;
+      padding: 12px 18px;
+      font-size: 14px;
+      letter-spacing: 0.06em;
+    }
+    .card-actions .btn-download {
+      flex: 1.4;
+      font-weight: 700;
+    }
+    .card-actions .btn-call {
+      flex: 1;
+    }
+    @media (max-width: 520px) {
+      .card-actions {
+        flex-direction: column;
+        gap: 10px;
+      }
+      .card-actions .btn {
+        width: 100%;
+        min-width: 100%;
+      }
+    }
+
+    /* Footer Note */
+    .invoice-footer {
+      border-top: 1px dashed var(--line);
+      padding-top: 20px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .invoice-footer-thanks {
+      font-family: 'Oswald', sans-serif;
+      font-size: 15px;
+      letter-spacing: 0.06em;
+      color: var(--text);
+    }
+    .invoice-footer-meta {
+      font-size: 12px;
+      color: var(--muted);
+      font-family: 'IBM Plex Mono', monospace;
+    }
+
+    /* Loading / Error States */
+    .state-container {
+      max-width: 500px;
+      margin: 80px auto;
+      text-align: center;
+      background: var(--bg-card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 48px 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      box-shadow: var(--shadow);
+    }
+    .state-icon { font-size: 42px; }
+    .state-title { font-family: 'Oswald', sans-serif; font-size: 22px; color: var(--text); }
+    .state-msg { font-size: 14px; color: var(--muted); line-height: 1.6; }
+
+    /* =========================================================================
+       PRINT STYLESHEET (A4 Optimized)
+       ========================================================================= */
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 10mm;
+      }
+      html, body {
+        background: #ffffff !important;
+        color: #000000 !important;
+        height: auto !important;
+        min-height: 100% !important;
+        overflow: visible !important;
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      .top-actions-bar, .card-actions, .auth-overlay {
+        display: none !important;
+      }
+      .invoice-wrapper {
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+      .invoice-card {
+        background: #ffffff !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        color: #000000 !important;
+        max-height: none !important;
+        height: auto !important;
+        overflow: visible !important;
+      }
+      .invoice-header, .info-box, .invoice-table th, .invoice-table td, .payment-badge-box, .invoice-footer {
+        border-color: #d1d5db !important;
+        color: #000000 !important;
+        background: transparent !important;
+      }
+      .studio-name, .invoice-title-tag, .info-box-val, .item-service-name, .total-row.grand-total, .invoice-footer-thanks {
+        color: #000000 !important;
+      }
+      .studio-address, .invoice-meta-row, .info-box-lbl, .item-service-desc, .total-row, .invoice-footer-meta {
+        color: #4b5563 !important;
+      }
+      .info-box-val.highlight, .grand-total-num {
+        color: #111827 !important;
+      }
+      .badge-status {
+        border: 1px solid #000000 !important;
+        color: #000000 !important;
+        background: transparent !important;
+      }
+      tr, .info-grid, .totals-section, table, thead, tbody {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="/assets/supabase-config.js?v=20261029_v3"></script>
+  <script src="/assets/trieye-db.js?v=20261029_v3"></script>
+  <script>
+    document.documentElement.removeAttribute('data-theme');
+  </script>
+</head>
+<body>
+
+  <!-- Top Action Bar -->
+  <header class="top-actions-bar">
+    <a href="/" class="top-brand" title="Back to Trieye Studio">
+      <img src="/images/trieye-logo-light.png" alt="Trieye Studio" onerror="this.onerror=null; this.src='/assets/trieye-logo-light.png';">
+      <span class="display" style="font-size:16px; font-weight:700;">TRIEYE</span>
+    </a>
+    <div class="top-actions-group">
+      <button class="btn" onclick="window.print()">🖨 Print / Save PDF</button>
+      <a href="https://wa.me/919940181934?text=Hi%20TRIEYE%20Studio,%20I%20have%20a%20query%20about%20my%20invoice" target="_blank" class="btn btn-green">💬 WhatsApp</a>
+      <a href="tel:+919940181934" class="btn">📞 Call Studio</a>
+      <a href="/" class="btn">← Home</a>
+    </div>
+  </header>
+
+  <!-- Loading State -->
+  <div id="invoice-loading" class="state-container">
+    <div class="state-icon">⏳</div>
+    <div class="state-title">Loading Invoice...</div>
+    <div class="state-msg">Verifying secure invoice token and fetching details from Trieye Studio.</div>
+  </div>
+
+  <!-- Error State (Invoice unavailable / link invalid) -->
+  <div id="invoice-error" class="state-container" style="display:none;">
+    <div class="state-icon">🔒</div>
+    <div class="state-title" id="error-title">Invoice unavailable</div>
+    <div class="state-msg" id="error-message">This invoice link is invalid or no longer available.</div>
+    <a href="/" class="btn btn-primary" style="margin-top:12px;">Go to Trieye Homepage</a>
+  </div>
+
+  <!-- Main Invoice Presentation -->
+  <main class="invoice-wrapper" id="invoice-container" style="display:none;">
+    <div class="invoice-card">
+      
+      <!-- Header / Branding -->
+      <div class="invoice-header">
+        <div class="studio-logo-group">
+          <img src="/images/trieye-logo-light.png" alt="Trieye Studio" class="studio-logo" onerror="this.onerror=null; this.src='/assets/trieye-logo-light.png';">
+          <div class="studio-name" id="biz-name">TRIEYE DETAILING</div>
+          <div class="studio-address" id="biz-address">
+            1st, 19, 6th Street, Main Rd<br>
+            Baba Nagar, Villivakkam<br>
+            Chennai, Tamil Nadu 600049<br>
+            Phone: +91 99401 81934 / +91 93630 68836 · GSTIN: 33CKMPB5885L1ZO
+          </div>
+        </div>
+        <div class="invoice-meta-badge">
+          <div class="invoice-title-tag">TAX INVOICE</div>
+          <div class="invoice-meta-row">INVOICE / REF: <strong id="inv-ref">TRI-XXXXXX</strong></div>
+          <div class="invoice-meta-row">DATE: <strong id="inv-date">YYYY-MM-DD</strong></div>
+        </div>
+      </div>
+
+      <!-- Customer & Vehicle Details Grid -->
+      <div class="info-grid">
+        <div class="info-box">
+          <div class="info-box-title">👤 Customer Information</div>
+          <div class="info-box-line">
+            <span class="info-box-lbl">Customer Name:</span>
+            <span class="info-box-val" id="cust-name">Customer</span>
+          </div>
+          <div class="info-box-line">
+            <span class="info-box-lbl">Mobile Number:</span>
+            <span class="info-box-val mono" id="cust-phone">+91 XXXXXXXXXX</span>
+          </div>
+        </div>
+
+        <div class="info-box">
+          <div class="info-box-title">🚗 Vehicle Details</div>
+          <div class="info-box-line">
+            <span class="info-box-lbl">Vehicle Type:</span>
+            <span class="info-box-val" id="veh-type">Car</span>
+          </div>
+          <div class="info-box-line">
+            <span class="info-box-lbl">Registration Number:</span>
+            <span class="info-box-val highlight" id="veh-reg">TN 01 AB 1234</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Itemized Service Table -->
+      <div class="table-wrap">
+        <table class="invoice-table">
+          <thead>
+            <tr>
+              <th style="width:45px;">#</th>
+              <th>Service Name &amp; Description</th>
+              <th style="width:70px; text-align:center;">Qty</th>
+              <th style="width:120px; text-align:right;">Rate (₹)</th>
+              <th style="width:130px;">Total (₹)</th>
+            </tr>
+          </thead>
+          <tbody id="invoice-items-tbody">
+            <tr>
+              <td>1</td>
+              <td>
+                <div class="item-service-name" id="item-title">Foam Wash &amp; Detailing</div>
+                <div class="item-service-desc" id="item-desc">Precision wash and detailing package</div>
+              </td>
+              <td style="text-align:center;">1</td>
+              <td style="text-align:right;" class="mono" id="item-rate">₹0</td>
+              <td class="mono" style="font-weight:600; color:var(--text);" id="item-total">₹0</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Summary & Payment Badge -->
+      <div class="summary-section">
+        <div class="payment-badge-box">
+          <div style="font-size:11px; color:var(--muted); font-family:'IBM Plex Mono'; text-transform:uppercase;">PAYMENT METHOD</div>
+          <div style="font-weight:600; font-size:14px; margin-top:2px;" id="pay-method">UPI / QR Code</div>
+          <div style="font-size:11px; color:var(--muted); font-family:'IBM Plex Mono'; margin-top:10px; text-transform:uppercase;">PAYMENT STATUS</div>
+          <span class="badge-status status-paid" id="pay-status">PAID</span>
+        </div>
+
+        <div class="totals-box">
+          <div class="total-row">
+            <span>Service Price</span>
+            <span class="mono" id="subtotal-amount" style="font-weight:600; color:var(--text);">₹0</span>
+          </div>
+          <div class="total-row" id="row-less-amount" style="color:var(--text-muted);">
+            <span>Less Amount</span>
+            <span class="mono" id="less-amount" style="font-weight:600; color:#38bdf8;">₹0</span>
+          </div>
+          <div class="total-row" id="row-final-bill" style="border-top:1px dashed var(--line-subtle); padding-top:4px;">
+            <span style="font-weight:600;">Final Bill Amount</span>
+            <span class="mono" id="final-bill-amount" style="font-weight:700; color:var(--text);">₹0</span>
+          </div>
+          <div class="total-row">
+            <span>GST / Taxes</span>
+            <span class="mono">Inclusive</span>
+          </div>
+          <div class="total-row" id="row-amount-collected">
+            <span>Amount Collected</span>
+            <span class="mono" id="amount-collected" style="font-weight:600; color:var(--text);">₹0</span>
+          </div>
+          <div class="total-row" id="row-balance-due">
+            <span style="font-weight:600;">Balance Due</span>
+            <span class="mono" id="balance-due" style="font-weight:700; color:#ef4444;">₹0</span>
+          </div>
+          <div class="total-row grand-total" id="row-final-paid">
+            <span id="final-amount-label">Paid Amount</span>
+            <span class="grand-total-num mono" id="grand-total">₹0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Action Buttons on Card -->
+      <div class="card-actions">
+        <button class="btn btn-green btn-download" onclick="downloadInvoice()">⬇ DOWNLOAD INVOICE</button>
+        <a href="tel:+919940181934" class="btn btn-call">☎ CALL STUDIO</a>
+      </div>
+
+      <!-- Footer & Terms -->
+      <div class="invoice-footer">
+        <div class="invoice-footer-thanks">Thank you for choosing TRIEYE DETAILING!</div>
+        <div class="invoice-footer-meta">
+          For any questions or queries, call <strong>+91 99401 81934 / +91 93630 68836</strong> or visit <strong>trieyestudio.com</strong>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      const loadingEl = document.getElementById('invoice-loading');
+      const errorEl = document.getElementById('invoice-error');
+      const containerEl = document.getElementById('invoice-container');
+      const errorTitle = document.getElementById('error-title');
+      const errorMsg = document.getElementById('error-message');
+
+      const params = new URLSearchParams(window.location.search);
+      const token = params.get('token');
+
+      if (!token || token.trim().length < 10) {
+        loadingEl.style.display = 'none';
+        errorTitle.innerText = 'Invoice unavailable';
+        errorMsg.innerText = 'This invoice link is invalid or no longer available.';
+        errorEl.style.display = 'flex';
+        return;
+      }
+
+      try {
+        for (let i = 0; i < 40 && (!window.TrieyeDB || typeof window.TrieyeDB.getPublicInvoiceByToken !== 'function'); i++) {
+          await new Promise(r => setTimeout(r, 50));
+        }
+
+        let res = null;
+        if (window.TrieyeDB && typeof window.TrieyeDB.getPublicInvoiceByToken === 'function') {
+          res = await window.TrieyeDB.getPublicInvoiceByToken(token);
+        }
+
+        if (!res || !res.success || !res.invoice) {
+          loadingEl.style.display = 'none';
+          errorTitle.innerText = 'Invoice unavailable';
+          errorMsg.innerText = 'This invoice link is invalid or no longer available.';
+          errorEl.style.display = 'flex';
+          return;
+        }
+
+        const inv = res.invoice;
+
+        // Check for verified payment params passed from dashboard
+        const paramPayStatus = (params.get('payStatus') || '').toUpperCase();
+        const paramAmtCollected = Number(params.get('amtCollected') || 0);
+        const paramBalanceDue = params.has('balanceDue') ? Number(params.get('balanceDue')) : null;
+        const paramPayMethod = params.get('payMethod');
+        if (paramPayStatus === 'PAID') {
+          inv.payment_status = 'PAID';
+          inv.status = 'PAID';
+          if (paramAmtCollected > 0 || !inv.amount_collected) {
+            inv.amount_collected = paramAmtCollected > 0 ? paramAmtCollected : (inv.final_bill_amount || inv.grand_total || inv.total_amount || 0);
+          }
+          inv.paid_amount = inv.amount_collected;
+          inv.balance_due = 0;
+          if (paramPayMethod) inv.payment_method = paramPayMethod;
+        } else if (paramPayStatus === 'PARTIAL') {
+          inv.payment_status = 'PARTIAL';
+          inv.status = 'PARTIAL';
+          inv.amount_collected = paramAmtCollected;
+          inv.paid_amount = inv.amount_collected;
+          const fin = Number(inv.final_bill_amount || inv.grand_total || inv.total_amount || 0);
+          inv.balance_due = paramBalanceDue !== null ? paramBalanceDue : Math.max(0, fin - inv.amount_collected);
+          if (paramPayMethod) inv.payment_method = paramPayMethod;
+        } else if (paramPayStatus === 'UNPAID') {
+          inv.payment_status = 'UNPAID';
+          inv.status = 'UNPAID';
+          inv.amount_collected = 0;
+          inv.paid_amount = 0;
+          const fin = Number(inv.final_bill_amount || inv.grand_total || inv.total_amount || 0);
+          inv.balance_due = paramBalanceDue !== null ? paramBalanceDue : fin;
+          if (paramPayMethod) inv.payment_method = paramPayMethod;
+        }
+
+        const biz = inv.business || {};
+
+        // Populate business details
+        if (biz.name) document.getElementById('biz-name').innerText = biz.name;
+        if (biz.address) {
+          document.getElementById('biz-address').innerHTML = `
+            ${escapeHtml(biz.address)}<br>
+            Phone: ${escapeHtml(biz.phone || '+91 99401 81934 / +91 93630 68836')} ${biz.gstin ? `· GSTIN: ${escapeHtml(biz.gstin)}` : ''}
+          `;
+        }
+
+        // Meta
+        document.getElementById('inv-ref').innerText = inv.invoice_ref || 'TRI-INVOICE';
+        document.getElementById('inv-date').innerText = inv.invoice_date || new Date().toISOString().split('T')[0];
+
+        // Customer & Vehicle
+        document.getElementById('cust-name').innerText = inv.customer_name || 'Valued Customer';
+        document.getElementById('cust-phone').innerText = inv.customer_phone || 'N/A';
+        document.getElementById('veh-type').innerText = inv.vehicle_type || 'Car';
+        document.getElementById('veh-reg').innerText = window.TrieyeDB && typeof window.TrieyeDB.formatVehicleNumber === 'function' ? (window.TrieyeDB.formatVehicleNumber(inv.reg_number || '') || inv.reg_number || 'N/A') : (inv.reg_number || 'N/A').toUpperCase();
+
+        // Service Table & Item Details
+        const itemsTbody = document.getElementById('invoice-items-tbody');
+        const metrics = window.TrieyeDB && typeof window.TrieyeDB.calculateBillMetrics === 'function'
+          ? window.TrieyeDB.calculateBillMetrics(inv)
+          : {
+              originalBillAmount: Number(inv.total_bill_amount || inv.subtotal || inv.total_amount || 0),
+              finalBillAmount: Number(inv.final_bill_amount || inv.total_amount || 0),
+              amountCollected: Number(inv.amount_collected || 0),
+              balanceDue: Number(inv.balance_due || 0),
+              paymentStatus: (inv.payment_status || 'UNPAID').toUpperCase(),
+              paymentMethod: inv.payment_method || 'Cash',
+              isFullyPaid: (inv.payment_status || '').toUpperCase() === 'PAID',
+              isPartial: (inv.payment_status || '').toUpperCase() === 'PARTIAL' || (inv.payment_status || '').toUpperCase() === 'PARTIALLY PAID',
+              isUnpaid: (inv.payment_status || '').toUpperCase() === 'UNPAID'
+            };
+
+        // Render item table
+        const invItems = (Array.isArray(inv.invoice_items) && inv.invoice_items.length > 0)
+          ? inv.invoice_items
+          : (Array.isArray(inv.items) && inv.items.length > 0 ? inv.items : []);
+
+        if (invItems.length > 0 && itemsTbody) {
+          itemsTbody.innerHTML = invItems.map((item, idx) => {
+            const itemRate = Number(item.unit_price !== undefined ? item.unit_price : (item.rate !== undefined ? item.rate : (item.price || 0)));
+            const itemQty = Number(item.quantity !== undefined ? item.quantity : (item.qty || 1));
+            const itemTot = Number(item.total_price !== undefined ? item.total_price : (itemRate * itemQty));
+            return `
+              <tr>
+                <td>${idx + 1}</td>
+                <td>
+                  <div class="item-service-name">${escapeHtml(item.service_name || item.name || 'Service Item')}</div>
+                  ${item.description ? `<div class="item-service-desc">${escapeHtml(item.description)}</div>` : ''}
+                </td>
+                <td style="text-align:center;">${itemQty}</td>
+                <td style="text-align:right;" class="mono">₹${itemRate.toLocaleString('en-IN')}</td>
+                <td class="mono" style="font-weight:600; color:var(--text); text-align:right;">₹${itemTot.toLocaleString('en-IN')}</td>
+              </tr>
+            `;
+          }).join('');
+        } else {
+          document.getElementById('item-title').innerText = inv.service_name || 'Detailing & Foam Wash';
+          document.getElementById('item-desc').innerText = inv.service_description || (inv.bay_name ? `Serviced at ${inv.bay_name}` : 'Precision vehicle detailing package');
+          const formattedOriginal = '₹' + metrics.originalBillAmount.toLocaleString('en-IN');
+          document.getElementById('item-rate').innerText = formattedOriginal;
+          document.getElementById('item-total').innerText = formattedOriginal;
+        }
+
+        // Customer-facing Bill Presentation
+        // 1. Service Price
+        document.getElementById('subtotal-amount').innerText = '₹' + metrics.originalBillAmount.toLocaleString('en-IN');
+        
+        // 2. Less Amount (Authorized Adjustment)
+        const rowLessAmount = document.getElementById('row-less-amount');
+        const lessAmountEl = document.getElementById('less-amount');
+        if (rowLessAmount && lessAmountEl) {
+          rowLessAmount.style.display = 'flex';
+          lessAmountEl.innerText = metrics.lessAmount > 0 ? '-₹' + metrics.lessAmount.toLocaleString('en-IN') : '₹0';
+          lessAmountEl.style.color = metrics.lessAmount > 0 ? '#38bdf8' : 'var(--text)';
+        }
+
+        // 3. Final Bill Amount
+        const finalBillEl = document.getElementById('final-bill-amount');
+        if (finalBillEl) {
+          finalBillEl.innerText = '₹' + metrics.finalBillAmount.toLocaleString('en-IN');
+        }
+
+        // 4. Amount Collected
+        document.getElementById('amount-collected').innerText = '₹' + metrics.amountCollected.toLocaleString('en-IN');
+
+        // 5. Balance Due
+        const balDueEl = document.getElementById('balance-due');
+        if (balDueEl) {
+          balDueEl.innerText = '₹' + metrics.balanceDue.toLocaleString('en-IN');
+          balDueEl.style.color = metrics.balanceDue === 0 ? '#15803d' : '#ef4444';
+        }
+
+        // 6. Paid Amount / Final Payable
+        const finalLabelEl = document.getElementById('final-amount-label');
+        const grandTotalEl = document.getElementById('grand-total');
+        const payStatusEl = document.getElementById('pay-status');
+
+        if (metrics.isFullyPaid) {
+          finalLabelEl.innerText = 'Paid Amount';
+          grandTotalEl.innerText = '₹' + metrics.amountCollected.toLocaleString('en-IN');
+          payStatusEl.innerText = 'PAID';
+          payStatusEl.className = 'badge-status status-paid';
+        } else if (metrics.amountCollected > 0) {
+          finalLabelEl.innerText = 'Amount Collected';
+          grandTotalEl.innerText = '₹' + metrics.amountCollected.toLocaleString('en-IN');
+          payStatusEl.innerText = 'PARTIAL';
+          payStatusEl.className = 'badge-status status-partial';
+        } else {
+          finalLabelEl.innerText = 'Final Bill Amount';
+          grandTotalEl.innerText = '₹' + metrics.finalBillAmount.toLocaleString('en-IN');
+          payStatusEl.innerText = 'UNPAID';
+          payStatusEl.className = 'badge-status status-unpaid';
+        }
+
+        // Payment Method Display
+        const rawMethod = metrics.paymentMethod || inv.payment_method;
+        const displayMethod = metrics.isFullyPaid
+          ? (rawMethod ? formatPaymentMethod(rawMethod) : 'Cash')
+          : (rawMethod && rawMethod.toUpperCase() !== 'PENDING' ? formatPaymentMethod(rawMethod) : 'Pending');
+        document.getElementById('pay-method').innerText = displayMethod;
+
+        // Set document title
+        document.title = `Invoice #${inv.invoice_ref || 'TRI-INVOICE'} — Trieye Studio`;
+
+        loadingEl.style.display = 'none';
+        containerEl.style.display = 'block';
+      } catch (err) {
+        console.error('Invoice load error:', err);
+        loadingEl.style.display = 'none';
+        errorTitle.innerText = 'Invoice unavailable';
+        errorMsg.innerText = 'This invoice link is invalid or no longer available.';
+        errorEl.style.display = 'flex';
+      }
+    });
+
+    async function downloadInvoice() {
+      const invoiceElement = document.querySelector('.invoice-card');
+      if (!invoiceElement) {
+        alert('Unable to generate invoice PDF. Please try again.');
+        return;
+      }
+
+      if (typeof html2pdf === 'undefined') {
+        // Fallback to window.print if CDN fails to load
+        window.print();
+        return;
+      }
+
+      const invRefEl = document.getElementById('inv-ref');
+      const invoiceRef = (invRefEl ? invRefEl.innerText.trim() : '') || 'TRI-INVOICE';
+      const cleanFilename = `TRIEYE-Invoice-${invoiceRef}.pdf`;
+
+      const downloadBtn = document.querySelector('.btn-download');
+      const cardActions = document.querySelector('.card-actions');
+      const originalBtnText = downloadBtn ? downloadBtn.innerHTML : '⬇ DOWNLOAD INVOICE';
+
+      try {
+        if (downloadBtn) {
+          downloadBtn.disabled = true;
+          downloadBtn.innerText = 'Generating PDF...';
+        }
+        if (cardActions) {
+          cardActions.style.display = 'none';
+        }
+        const opt = {
+          margin: [10, 10, 10, 10],
+          filename: cleanFilename,
+          image: { type: 'jpeg', quality: 0.98 },
+          html2canvas: {
+            scale: 2,
+            useCORS: true,
+            logging: false,
+            backgroundColor: '#ffffff',
+            scrollY: 0
+          },
+          jsPDF: {
+            unit: 'mm',
+            format: 'a4',
+            orientation: 'portrait'
+          },
+          pagebreak: { mode: ['avoid-all', 'css', 'legacy'] }
+        };
+
+        await html2pdf().set(opt).from(invoiceElement).save();
+      } catch (err) {
+        console.error('Invoice PDF download error:', err);
+        alert('Unable to generate invoice PDF. Please try again.');
+      } finally {
+        if (cardActions) {
+          cardActions.style.display = '';
+        }
+        if (downloadBtn) {
+          downloadBtn.disabled = false;
+          downloadBtn.innerHTML = originalBtnText;
+        }
+      }
+    }
+
+    function formatPaymentMethod(m) {
+      if (!m || m.toUpperCase() === 'PENDING') return 'Pending';
+      const upper = m.toUpperCase().trim();
+      if (upper === 'CASH') return 'Cash';
+      if (upper === 'UPI' || upper.includes('UPI') || upper.includes('QR')) return 'UPI';
+      if (upper === 'CARD' || upper.includes('CARD') || upper.includes('POS')) return 'Card';
+      if (upper === 'BANK TRANSFER' || upper.includes('BANK') || upper.includes('TRANSFER')) return 'Bank Transfer';
+      return m;
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+  </script>
+</body>
+</html>
