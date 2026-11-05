@@ -4135,51 +4135,67 @@
 
   <!-- ADD / EDIT SERVICE MODAL -->
   <div class="dash-modal-backdrop" id="modalService">
-    <div class="dash-modal">
+    <div class="dash-modal" style="max-width:560px;">
       <div class="dash-modal-header">
-        <div class="dash-modal-title"><span>🏷️</span> Configure Service Package</div>
+        <div class="dash-modal-title"><span id="svc-modal-header-icon">🏷️</span> <span id="svc-modal-title-text">Configure Service</span></div>
         <button class="dash-modal-close" onclick="closeModal('modalService')">&times;</button>
       </div>
       <div class="dash-modal-body">
         <input type="hidden" id="svc-modal-orig-name">
+        <input type="hidden" id="svc-modal-id">
         <div class="form-group">
-          <label class="form-label">Service Package Name</label>
-          <input type="text" id="svc-modal-name" class="form-input" placeholder="e.g. Snow Foam Deep Exterior Wash" required>
+          <label class="form-label">Service Name</label>
+          <input type="text" id="svc-modal-name" class="form-input" placeholder="e.g. Foam Wash" required>
         </div>
         <div class="form-group">
           <label class="form-label">Description</label>
-          <input type="text" id="svc-modal-desc" class="form-input" placeholder="Brief service details for invoice">
+          <textarea id="svc-modal-desc" class="form-textarea" rows="2" placeholder="Brief service details shown in invoices and customer website"></textarea>
         </div>
-        <div class="form-group">
-          <label class="form-label">Duration (Minutes)</label>
-          <input type="number" id="svc-modal-duration" class="form-input" placeholder="e.g. 45">
+        <div class="form-grid" style="grid-template-columns:1fr 1fr; gap:0.75rem;">
+          <div class="form-group">
+            <label class="form-label">Duration (Minutes)</label>
+            <input type="number" id="svc-modal-duration" class="form-input" placeholder="e.g. 45" min="5" step="5">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <select id="svc-modal-active" class="form-select">
+              <option value="true">Active (Available for billing)</option>
+              <option value="false">Inactive (Hidden from billing)</option>
+            </select>
+          </div>
         </div>
-        <div class="form-grid">
+
+        <div style="margin:1rem 0 0.5rem 0;">
+          <div style="font-size:0.82rem; font-weight:600; color:var(--white); margin-bottom:0.25rem;">Vehicle Category Pricing (₹ INR)</div>
+          <div style="font-size:0.74rem; color:var(--muted); margin-bottom:0.75rem;">Enter price for applicable categories. Leave blank or 0 if this service is unavailable for that vehicle type.</div>
+        </div>
+
+        <div class="form-grid" style="grid-template-columns:1fr 1fr; gap:0.75rem;">
           <div class="form-group">
             <label class="form-label">Hatchback (₹)</label>
-            <input type="number" id="svc-modal-price-hatch" class="form-input" required>
+            <input type="number" id="svc-modal-price-hatch" class="form-input" placeholder="e.g. 566 or leave blank for N/A" min="0">
           </div>
           <div class="form-group">
             <label class="form-label">Sedan (₹)</label>
-            <input type="number" id="svc-modal-price-sedan" class="form-input" required>
+            <input type="number" id="svc-modal-price-sedan" class="form-input" placeholder="e.g. 699 or leave blank for N/A" min="0">
           </div>
         </div>
-        <div class="form-grid">
+        <div class="form-grid" style="grid-template-columns:1fr 1fr; gap:0.75rem;">
           <div class="form-group">
             <label class="form-label">SUV (₹)</label>
-            <input type="number" id="svc-modal-price-suv" class="form-input" required>
+            <input type="number" id="svc-modal-price-suv" class="form-input" placeholder="e.g. 874 or leave blank for N/A" min="0">
           </div>
           <div class="form-group">
             <label class="form-label">Superbike (₹)</label>
-            <input type="number" id="svc-modal-price-bike" class="form-input" required>
+            <input type="number" id="svc-modal-price-bike" class="form-input" placeholder="e.g. 350 or leave blank for N/A" min="0">
           </div>
         </div>
       </div>
       <div class="dash-modal-footer" style="display:flex; justify-content:space-between; align-items:center; width:100%;">
-        <button class="btn" id="btn-delete-service" onclick="deleteServiceModal()" style="color:var(--red); border-color:rgba(220,38,38,0.4); background:rgba(220,38,38,0.08); display:none;">🗑️ Delete Package</button>
+        <button class="btn" id="btn-delete-service" onclick="deleteServiceModal()" style="color:var(--red); border-color:rgba(220,38,38,0.4); background:rgba(220,38,38,0.08); display:none;">🗑️ Deactivate / Delete</button>
         <div style="display:flex; gap:0.5rem; margin-left:auto;">
           <button class="btn" onclick="closeModal('modalService')">Cancel</button>
-          <button class="btn btn-primary" onclick="saveServiceModal()">Save Package</button>
+          <button class="btn btn-primary" onclick="saveServiceModal()">Save Service</button>
         </div>
       </div>
     </div>
@@ -4814,20 +4830,37 @@
 
     // Default Seed Data Matrix matching live catalog schema (Prices synced from Supabase)
     const defaultServices = {
-      'Foam Wash': {
-        name: 'Foam Wash',
-        desc: 'Snow Foam Pre-Wash & Decontamination detailing',
-        duration_minutes: 45,
-        base_price: 699,
-        hatchback_price: 566,
-        sedan_price: 699,
-        suv_price: 874,
-        bike_price: 350,
+      'Rubbing Polish': {
+        name: 'Rubbing Polish',
+        desc: 'Dual-Action Rubbing Polish & Paint Correction',
+        duration_minutes: 120,
+        base_price: 4499,
+        hatchback_price: 3999,
+        sedan_price: 4499,
+        suv_price: 5299,
+        bike_price: 1499,
         pricing: {
-          'Hatchback': 566,
-          'Sedan': 699,
-          'SUV / 4x4': 874,
-          'Superbike': 350
+          'Hatchback': 3999,
+          'Sedan': 4499,
+          'SUV': 5299,
+          'Superbike': 1499
+        },
+        active: true
+      },
+      'Interior Deep Cleaning': {
+        name: 'Interior Deep Cleaning',
+        desc: 'Steam extraction & interior upholstery deep clean',
+        duration_minutes: 90,
+        base_price: 2299,
+        hatchback_price: 1839,
+        sedan_price: 2299,
+        suv_price: 2874,
+        bike_price: null,
+        pricing: {
+          'Hatchback': 1839,
+          'Sedan': 2299,
+          'SUV': 2874,
+          'Superbike': null
         },
         active: true
       },
@@ -4843,42 +4876,76 @@
         pricing: {
           'Hatchback': 3999,
           'Sedan': 4999,
-          'SUV / 4x4': 6249,
+          'SUV': 6249,
           'Superbike': 2500
         },
         active: true
       },
-      'Interior Deep Cleaning': {
-        name: 'Interior Deep Cleaning',
-        desc: 'Steam extraction & interior upholstery deep clean',
-        duration_minutes: 90,
-        base_price: 2299,
-        hatchback_price: 1839,
-        sedan_price: 2299,
-        suv_price: 2874,
-        bike_price: 1150,
+      'Foam Wash': {
+        name: 'Foam Wash',
+        desc: 'Snow Foam Pre-Wash & Decontamination detailing',
+        duration_minutes: 45,
+        base_price: 699,
+        hatchback_price: 566,
+        sedan_price: 699,
+        suv_price: 874,
+        bike_price: 350,
         pricing: {
-          'Hatchback': 1839,
-          'Sedan': 2299,
-          'SUV / 4x4': 2874,
-          'Superbike': 1150
+          'Hatchback': 566,
+          'Sedan': 699,
+          'SUV': 874,
+          'Superbike': 350
         },
         active: true
       },
-      'Rubbing Polish': {
-        name: 'Rubbing Polish',
-        desc: 'Dual-Action Rubbing Polish & Paint Correction',
+      'Rubbing Polish + Wax': {
+        name: 'Rubbing Polish + Wax',
+        desc: 'Dual-action rubbing compound followed by carnauba wax seal & protective gloss',
         duration_minutes: 120,
-        base_price: 97,
-        hatchback_price: 69,
-        sedan_price: 97,
-        suv_price: 84,
-        bike_price: 60,
+        base_price: 4999,
+        hatchback_price: 4499,
+        sedan_price: 4999,
+        suv_price: 5999,
+        bike_price: 1799,
         pricing: {
-          'Hatchback': 69,
-          'Sedan': 97,
-          'SUV / 4x4': 84,
-          'Superbike': 60
+          'Hatchback': 4499,
+          'Sedan': 4999,
+          'SUV': 5999,
+          'Superbike': 1799
+        },
+        active: true
+      },
+      'Complete Wash': {
+        name: 'Complete Wash',
+        desc: 'Interior clean & polish, dashboard clean & polish, door clean & polish, basic seat cleaning, foam wash & degreaser',
+        duration_minutes: 45,
+        base_price: 899,
+        hatchback_price: 799,
+        sedan_price: 899,
+        suv_price: 899,
+        bike_price: 249,
+        pricing: {
+          'Hatchback': 799,
+          'Sedan': 899,
+          'SUV': 899,
+          'Superbike': 249
+        },
+        active: true
+      },
+      'Bike Wash': {
+        name: 'Bike Wash',
+        desc: 'Foam wash, deep wheel cleaning, chain clean & lube, and blow dry',
+        duration_minutes: 30,
+        base_price: 250,
+        hatchback_price: null,
+        sedan_price: null,
+        suv_price: null,
+        bike_price: 250,
+        pricing: {
+          'Hatchback': null,
+          'Sedan': null,
+          'SUV': null,
+          'Superbike': 250
         },
         active: true
       },
@@ -6986,7 +7053,23 @@
       const payMethod = document.getElementById('walkin-pay-method').value;
 
       const svcs = getServices();
-      const price = (svcs[service] && svcs[service].pricing && svcs[service].pricing[vehicleType]) || 2499;
+      const s = svcs[service] || Object.values(svcs).find(x => x && (x.name === service || x.id === service));
+      let price = 0;
+      if (s) {
+        const p = s.pricing || {};
+        if (vehicleType === 'Hatchback') {
+          price = (s.hatchback_price !== null && s.hatchback_price !== undefined) ? s.hatchback_price : (p['Hatchback'] !== undefined ? p['Hatchback'] : s.base_price);
+        } else if (vehicleType === 'Sedan') {
+          price = (s.sedan_price !== null && s.sedan_price !== undefined) ? s.sedan_price : (p['Sedan'] !== undefined ? p['Sedan'] : s.base_price);
+        } else if (vehicleType === 'SUV' || vehicleType === 'SUV / 4x4') {
+          price = (s.suv_price !== null && s.suv_price !== undefined) ? s.suv_price : (p['SUV'] !== undefined ? p['SUV'] : (p['SUV / 4x4'] !== undefined ? p['SUV / 4x4'] : s.base_price));
+        } else if (vehicleType === 'Bike' || vehicleType === 'Superbike') {
+          price = (s.bike_price !== null && s.bike_price !== undefined) ? s.bike_price : (p['Superbike'] !== undefined ? p['Superbike'] : (p['Bike'] !== undefined ? p['Bike'] : s.base_price));
+        } else {
+          price = (p && p[vehicleType] !== undefined) ? p[vehicleType] : (s.base_price || 0);
+        }
+      }
+      price = Number(price) || 0;
 
       // Auto-save Customer CRM record
       const phoneKey = cleanPhone(phone);
@@ -8332,41 +8415,98 @@ TRIEYE DETAILING
     }
 
     // 8. SERVICES & PRICING TABLE & MODAL
+    function getServiceIcon(name) {
+      const n = (name || '').toLowerCase();
+      if (n.includes('bike')) return '🏍️';
+      if (n.includes('rubbing') && n.includes('wax')) return '✨';
+      if (n.includes('rubbing') || n.includes('polish')) return '🪞';
+      if (n.includes('interior')) return '🧼';
+      if (n.includes('detail') || n.includes('combo')) return '💎';
+      if (n.includes('foam')) return '🚿';
+      if (n.includes('complete')) return '🚗';
+      return '🏷️';
+    }
+
+    function formatSvcPriceCell(price) {
+      if (price === null || price === undefined || price === '' || isNaN(Number(price)) || Number(price) <= 0) {
+        return `<span style="color:var(--muted); font-size:0.95rem; font-weight:500;">—</span>`;
+      }
+      return `<strong style="color:var(--green); font-family:'IBM Plex Mono',monospace; font-size:0.88rem;">₹${Number(price).toLocaleString('en-IN')}</strong>`;
+    }
+
     function renderServicesTable() {
       const svcs = getServices();
       const tbody = document.getElementById('services-tbody');
       if (!tbody) return;
       tbody.innerHTML = '';
 
-      const serviceKeys = Object.keys(svcs);
+      const serviceKeys = Object.keys(svcs).filter(k => {
+        const s = svcs[k];
+        return s && !s.is_package && !s.package_type && !(k.includes('Monthly') && k.includes('Pack'));
+      });
+
       if (serviceKeys.length === 0) {
         tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:2rem; color:var(--muted);">No services configured yet. Click "+ Add New Service" to create one.</td></tr>`;
         return;
       }
 
+      const priorityOrder = [
+        'Rubbing Polish',
+        'Interior Deep Cleaning',
+        'Full Detail Combo',
+        'Foam Wash',
+        'Rubbing Polish + Wax',
+        'Complete Wash',
+        'Bike Wash'
+      ];
+
+      serviceKeys.sort((a, b) => {
+        const idxA = priorityOrder.indexOf(a);
+        const idxB = priorityOrder.indexOf(b);
+        if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+        if (idxA !== -1) return -1;
+        if (idxB !== -1) return 1;
+        return a.localeCompare(b);
+      });
+
       serviceKeys.forEach(k => {
         const s = svcs[k];
-        const basePrice = Number(s.base_price || (s.pricing && s.pricing['Sedan']) || 0);
-        const hatchPrice = s.pricing && s.pricing['Hatchback'] !== undefined ? s.pricing['Hatchback'] : basePrice;
-        const sedanPrice = s.pricing && s.pricing['Sedan'] !== undefined ? s.pricing['Sedan'] : basePrice;
-        const suvPrice = s.pricing && (s.pricing['SUV'] !== undefined ? s.pricing['SUV'] : s.pricing['SUV / 4x4']) !== undefined ? (s.pricing['SUV'] !== undefined ? s.pricing['SUV'] : s.pricing['SUV / 4x4']) : (s.suv_price !== undefined ? s.suv_price : basePrice);
-        const bikePrice = s.pricing && s.pricing['Superbike'] !== undefined ? s.pricing['Superbike'] : basePrice;
+        const p = s.pricing || {};
+        const hatchPrice = (s.hatchback_price !== null && s.hatchback_price !== undefined) ? s.hatchback_price : (p['Hatchback'] !== undefined ? p['Hatchback'] : null);
+        const sedanPrice = (s.sedan_price !== null && s.sedan_price !== undefined) ? s.sedan_price : (p['Sedan'] !== undefined ? p['Sedan'] : null);
+        const suvPrice = (s.suv_price !== null && s.suv_price !== undefined) ? s.suv_price : (p['SUV'] !== undefined ? p['SUV'] : (p['SUV / 4x4'] !== undefined ? p['SUV / 4x4'] : null));
+        const bikePrice = (s.bike_price !== null && s.bike_price !== undefined) ? s.bike_price : (p['Superbike'] !== undefined ? p['Superbike'] : (p['Bike'] !== undefined ? p['Bike'] : null));
+
+        const isActive = s.active !== false;
+        const icon = getServiceIcon(k);
 
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td>
-            <strong style="color:var(--white);">${escapeHtml(k)}</strong>
+          <td style="white-space:nowrap;">
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+              <span style="font-size:1.15rem; line-height:1;">${icon}</span>
+              <strong style="color:var(--white); font-size:0.9rem;">${escapeHtml(k)}</strong>
+            </div>
           </td>
-          <td><span style="font-size:0.75rem; color:var(--muted);">${escapeHtml(s.desc || 'Standard Studio Service')}</span></td>
-          <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${hatchPrice.toLocaleString()}</strong></td>
-          <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${sedanPrice.toLocaleString()}</strong></td>
-          <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${suvPrice.toLocaleString()}</strong></td>
-          <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${bikePrice.toLocaleString()}</strong></td>
-          <td><span class="status-badge ${s.active !== false ? 'status-done' : 'status-cancelled'}">${s.active !== false ? 'ACTIVE' : 'INACTIVE'}</span></td>
+          <td><span style="font-size:0.78rem; color:var(--muted); line-height:1.4; display:block; max-width:280px;">${escapeHtml(s.desc || s.description || 'Standard Studio Service')}</span></td>
+          <td>${formatSvcPriceCell(hatchPrice)}</td>
+          <td>${formatSvcPriceCell(sedanPrice)}</td>
+          <td>${formatSvcPriceCell(suvPrice)}</td>
+          <td>${formatSvcPriceCell(bikePrice)}</td>
           <td>
-            <div style="display:flex; gap:0.35rem;">
-              <button class="btn-icon-sm" onclick="editServiceModal('${escapeHtml(k)}')">✏️ Edit</button>
-              <button class="btn-icon-sm" onclick="deleteServiceDirect('${escapeHtml(k)}')" style="color:var(--red);" title="Delete service package">🗑️</button>
+            <span class="status-badge" style="background:${isActive ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.12)'}; color:${isActive ? '#22c55e' : '#ef4444'}; border:1px solid ${isActive ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}; font-size:0.72rem; padding:0.22rem 0.55rem; border-radius:20px; font-weight:600; display:inline-flex; align-items:center; gap:0.35rem;">
+              <span style="width:6px; height:6px; border-radius:50%; background:${isActive ? '#22c55e' : '#ef4444'};"></span>
+              ${isActive ? 'Active' : 'Inactive'}
+            </span>
+          </td>
+          <td>
+            <div style="display:flex; gap:0.4rem; align-items:center;">
+              <button class="btn-icon-sm" onclick="editServiceModal('${escapeHtml(k)}')" style="display:inline-flex; align-items:center; gap:0.25rem; padding:0.35rem 0.65rem; font-size:0.75rem; border-radius:6px; background:rgba(255,255,255,0.05); border:1px solid var(--border); color:var(--white); cursor:pointer;">
+                <span>✏️</span> Edit
+              </button>
+              <button class="btn-icon-sm" onclick="deleteServiceDirect('${escapeHtml(k)}')" style="display:inline-flex; align-items:center; justify-content:center; padding:0.35rem 0.55rem; font-size:0.75rem; border-radius:6px; background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.25); color:#ef4444; cursor:pointer;" title="${isActive ? 'Mark Inactive (Preserves History)' : 'Delete Service'}">
+                🗑️
+              </button>
             </div>
           </td>
         `;
@@ -8381,6 +8521,9 @@ TRIEYE DETAILING
       walkinSelect.innerHTML = '';
 
       Object.keys(svcs).forEach(k => {
+        const s = svcs[k];
+        if (s && s.active === false) return;
+        if (s && (s.is_package || s.package_type || (k.includes('Monthly') && k.includes('Pack')))) return;
         const opt = document.createElement('option');
         opt.value = k;
         opt.innerText = k;
@@ -8390,16 +8533,22 @@ TRIEYE DETAILING
 
     function openAddServiceModal() {
       document.getElementById('svc-modal-orig-name').value = '';
+      const idEl = document.getElementById('svc-modal-id');
+      if (idEl) idEl.value = '';
       document.getElementById('svc-modal-name').value = '';
       document.getElementById('svc-modal-desc').value = '';
       const durEl = document.getElementById('svc-modal-duration');
       if (durEl) durEl.value = 45;
-      document.getElementById('svc-modal-price-hatch').value = 499;
-      document.getElementById('svc-modal-price-sedan').value = 699;
-      document.getElementById('svc-modal-price-suv').value = 799;
-      document.getElementById('svc-modal-price-bike').value = 299;
+      const actEl = document.getElementById('svc-modal-active');
+      if (actEl) actEl.value = 'true';
+      document.getElementById('svc-modal-price-hatch').value = '';
+      document.getElementById('svc-modal-price-sedan').value = '';
+      document.getElementById('svc-modal-price-suv').value = '';
+      document.getElementById('svc-modal-price-bike').value = '';
       const delBtn = document.getElementById('btn-delete-service');
       if (delBtn) delBtn.style.display = 'none';
+      const titleEl = document.getElementById('svc-modal-title-text');
+      if (titleEl) titleEl.innerText = 'Add New Service';
       openModal('modalService');
     }
 
@@ -8409,96 +8558,135 @@ TRIEYE DETAILING
       if (!s) return;
 
       const p = s.pricing || {};
-      const hatch = s.hatchback_price !== undefined ? s.hatchback_price : (p['Hatchback'] !== undefined ? p['Hatchback'] : s.base_price);
-      const sedan = s.sedan_price !== undefined ? s.sedan_price : (p['Sedan'] !== undefined ? p['Sedan'] : s.base_price);
-      const suv = s.suv_price !== undefined ? s.suv_price : (p['SUV'] !== undefined ? p['SUV'] : (p['SUV / 4x4'] !== undefined ? p['SUV / 4x4'] : s.base_price));
-      const bike = s.bike_price !== undefined ? s.bike_price : (p['Superbike'] !== undefined ? p['Superbike'] : s.base_price);
+      const hatch = (s.hatchback_price !== null && s.hatchback_price !== undefined) ? s.hatchback_price : (p['Hatchback'] !== undefined ? p['Hatchback'] : null);
+      const sedan = (s.sedan_price !== null && s.sedan_price !== undefined) ? s.sedan_price : (p['Sedan'] !== undefined ? p['Sedan'] : null);
+      const suv = (s.suv_price !== null && s.suv_price !== undefined) ? s.suv_price : (p['SUV'] !== undefined ? p['SUV'] : (p['SUV / 4x4'] !== undefined ? p['SUV / 4x4'] : null));
+      const bike = (s.bike_price !== null && s.bike_price !== undefined) ? s.bike_price : (p['Superbike'] !== undefined ? p['Superbike'] : (p['Bike'] !== undefined ? p['Bike'] : null));
 
       document.getElementById('svc-modal-orig-name').value = name;
+      const idEl = document.getElementById('svc-modal-id');
+      if (idEl) idEl.value = s.id || '';
       document.getElementById('svc-modal-name').value = name;
-      document.getElementById('svc-modal-desc').value = s.desc || '';
+      document.getElementById('svc-modal-desc').value = s.desc || s.description || '';
       const durEl = document.getElementById('svc-modal-duration');
       if (durEl) durEl.value = s.duration_minutes || '';
-      document.getElementById('svc-modal-price-hatch').value = hatch;
-      document.getElementById('svc-modal-price-sedan').value = sedan;
-      document.getElementById('svc-modal-price-suv').value = suv;
-      document.getElementById('svc-modal-price-bike').value = bike;
+      const actEl = document.getElementById('svc-modal-active');
+      if (actEl) actEl.value = s.active !== false ? 'true' : 'false';
+
+      document.getElementById('svc-modal-price-hatch').value = (hatch !== null && hatch !== undefined && Number(hatch) > 0) ? hatch : '';
+      document.getElementById('svc-modal-price-sedan').value = (sedan !== null && sedan !== undefined && Number(sedan) > 0) ? sedan : '';
+      document.getElementById('svc-modal-price-suv').value = (suv !== null && suv !== undefined && Number(suv) > 0) ? suv : '';
+      document.getElementById('svc-modal-price-bike').value = (bike !== null && bike !== undefined && Number(bike) > 0) ? bike : '';
+
       const delBtn = document.getElementById('btn-delete-service');
       if (delBtn) delBtn.style.display = 'inline-flex';
+      const titleEl = document.getElementById('svc-modal-title-text');
+      if (titleEl) titleEl.innerText = 'Edit Service — ' + name;
       openModal('modalService');
-    }
-
-    function deleteServiceModal() {
-      const orig = document.getElementById('svc-modal-orig-name').value;
-      const name = document.getElementById('svc-modal-name').value.trim() || orig;
-      if (!orig && !name) {
-        closeModal('modalService');
-        return;
-      }
-      const targetName = orig || name;
-      if (!confirm(`Are you sure you want to permanently delete the service package "${targetName}"?`)) {
-        return;
-      }
-
-      const svcs = getServices();
-      if (svcs[targetName]) {
-        delete svcs[targetName];
-      }
-      if (orig && svcs[orig]) {
-        delete svcs[orig];
-      }
-
-      saveServices(svcs);
-      closeModal('modalService');
-      showToast(`Service package "${targetName}" deleted successfully`);
     }
 
     async function deleteServiceDirect(targetName) {
       if (!targetName) return;
-      if (!confirm(`Are you sure you want to permanently delete the service package "${targetName}"?`)) {
+      const svcs = getServices();
+      const s = svcs[targetName];
+      if (!s) return;
+
+      const bookings = typeof getBookings === 'function' ? getBookings() : [];
+      const isUsedInBookings = bookings.some(b => b.service === targetName || (b.items && b.items.some(i => i.name === targetName)));
+
+      if (isUsedInBookings || s.active !== false) {
+        const confirmMsg = isUsedInBookings
+          ? `Service "${targetName}" is referenced in historical bookings/invoices.\n\nTo preserve historical invoices and reporting integrity, it will be marked INACTIVE (hidden from new billing). Proceed?`
+          : `Do you want to deactivate service "${targetName}"? (It will be hidden from new billing)`;
+        if (!confirm(confirmMsg)) return;
+
+        s.active = false;
+        await saveServices(svcs);
+        showToast(`Service "${targetName}" marked inactive to preserve history`);
         return;
       }
-      const svcs = getServices();
-      if (svcs[targetName]) {
-        delete svcs[targetName];
-        await saveServices(svcs);
-        showToast(`Service package "${targetName}" deleted and synced to Supabase`);
+
+      if (!confirm(`Permanently remove service "${targetName}"?`)) return;
+      delete svcs[targetName];
+      await saveServices(svcs);
+      showToast(`Service "${targetName}" removed`);
+    }
+
+    async function deleteServiceModal() {
+      const orig = document.getElementById('svc-modal-orig-name').value;
+      const name = document.getElementById('svc-modal-name').value.trim() || orig;
+      const targetName = orig || name;
+      if (!targetName) {
+        closeModal('modalService');
+        return;
       }
+      closeModal('modalService');
+      await deleteServiceDirect(targetName);
     }
 
     async function saveServiceModal() {
       const orig = document.getElementById('svc-modal-orig-name').value;
+      const idEl = document.getElementById('svc-modal-id');
+      const serviceId = idEl ? idEl.value : null;
       const name = document.getElementById('svc-modal-name').value.trim();
       const desc = document.getElementById('svc-modal-desc').value.trim();
       const durEl = document.getElementById('svc-modal-duration');
-      const duration = durEl && durEl.value ? Number(durEl.value) : null;
-      const h = Number(document.getElementById('svc-modal-price-hatch').value) || 0;
-      const sed = Number(document.getElementById('svc-modal-price-sedan').value) || 0;
-      const suv = Number(document.getElementById('svc-modal-price-suv').value) || 0;
-      const bike = Number(document.getElementById('svc-modal-price-bike').value) || 0;
+      const duration = durEl && durEl.value ? Number(durEl.value) : 45;
+      const actEl = document.getElementById('svc-modal-active');
+      const isActive = actEl ? actEl.value === 'true' : true;
 
-      if (!name) return;
+      const parseField = (val) => {
+        if (val === '' || val === null || val === undefined) return null;
+        const n = Number(val);
+        return (!isNaN(n) && n > 0) ? n : null;
+      };
+
+      const h = parseField(document.getElementById('svc-modal-price-hatch').value);
+      const sed = parseField(document.getElementById('svc-modal-price-sedan').value);
+      const suv = parseField(document.getElementById('svc-modal-price-suv').value);
+      const bike = parseField(document.getElementById('svc-modal-price-bike').value);
+
+      if (!name) {
+        alert('Please enter a service name.');
+        return;
+      }
+      if (h === null && sed === null && suv === null && bike === null) {
+        alert('Please provide a price for at least one vehicle category.');
+        return;
+      }
+
       const svcs = getServices();
       const existing = svcs[orig] || svcs[name] || {};
-      if (orig && orig !== name) delete svcs[orig];
+      if (orig && orig !== name) {
+        delete svcs[orig];
+      }
+
+      const base = sed || h || suv || bike || 0;
 
       svcs[name] = {
-        id: existing.id || null,
+        id: serviceId || existing.id || null,
         name: name,
         desc: desc,
-        base_price: sed,
+        description: desc,
+        base_price: base,
         hatchback_price: h,
         sedan_price: sed,
         suv_price: suv,
         bike_price: bike,
-        duration_minutes: duration || existing.duration_minutes || null,
-        pricing: { 'Hatchback': h, 'Sedan': sed, 'SUV': suv, 'SUV / 4x4': suv, 'Superbike': bike },
-        active: existing.active !== false
+        duration_minutes: duration || existing.duration_minutes || 45,
+        pricing: {
+          'Hatchback': h,
+          'Sedan': sed,
+          'SUV': suv,
+          'SUV / 4x4': suv,
+          'Superbike': bike
+        },
+        active: isActive
       };
 
       await saveServices(svcs);
       closeModal('modalService');
-      showToast(`Service "${name}" updated and synced to Supabase`);
+      showToast(`Service "${name}" saved and synced to Supabase`);
     }
 
     // 9. PAYMENTS LEDGER & RECEIPT

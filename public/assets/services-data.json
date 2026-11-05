@@ -3,17 +3,17 @@
     "id": "5dab226d-1044-40d3-a95a-f12b0aaa6cbb",
     "name": "Rubbing Polish",
     "desc": "Dual-Action Rubbing Polish & Paint Correction",
-    "base_price": 97,
-    "hatchback_price": 9,
-    "sedan_price": 97,
-    "suv_price": 84,
-    "bike_price": 60,
+    "base_price": 4499,
+    "hatchback_price": 3999,
+    "sedan_price": 4499,
+    "suv_price": 5299,
+    "bike_price": 1499,
     "duration_minutes": 120,
     "pricing": {
-      "Hatchback": 9,
-      "Sedan": 97,
-      "SUV / 4x4": 84,
-      "Superbike": 60
+      "Hatchback": 3999,
+      "Sedan": 4499,
+      "SUV": 5299,
+      "Superbike": 1499
     },
     "active": true
   },
@@ -25,13 +25,13 @@
     "hatchback_price": 1839,
     "sedan_price": 2299,
     "suv_price": 2874,
-    "bike_price": 1150,
+    "bike_price": null,
     "duration_minutes": 90,
     "pricing": {
       "Hatchback": 1839,
       "Sedan": 2299,
-      "SUV / 4x4": 2874,
-      "Superbike": 1150
+      "SUV": 2874,
+      "Superbike": null
     },
     "active": true
   },
@@ -48,7 +48,7 @@
     "pricing": {
       "Hatchback": 3999,
       "Sedan": 4999,
-      "SUV / 4x4": 6249,
+      "SUV": 6249,
       "Superbike": 2500
     },
     "active": true
@@ -66,8 +66,62 @@
     "pricing": {
       "Hatchback": 566,
       "Sedan": 699,
-      "SUV / 4x4": 874,
+      "SUV": 874,
       "Superbike": 350
+    },
+    "active": true
+  },
+  "Rubbing Polish + Wax": {
+    "id": "adb93e83-9c58-4fe9-b029-b4197fceb12c",
+    "name": "Rubbing Polish + Wax",
+    "desc": "Dual-action rubbing compound followed by carnauba wax seal & protective gloss",
+    "base_price": 4999,
+    "hatchback_price": 4499,
+    "sedan_price": 4999,
+    "suv_price": 5999,
+    "bike_price": 1799,
+    "duration_minutes": 120,
+    "pricing": {
+      "Hatchback": 4499,
+      "Sedan": 4999,
+      "SUV": 5999,
+      "Superbike": 1799
+    },
+    "active": true
+  },
+  "Complete Wash": {
+    "id": "c6101883-2c5a-4895-8910-11486456d9d7",
+    "name": "Complete Wash",
+    "desc": "Interior clean & polish, dashboard clean & polish, door clean & polish, basic seat cleaning, foam wash & degreaser",
+    "base_price": 899,
+    "hatchback_price": 799,
+    "sedan_price": 899,
+    "suv_price": 899,
+    "bike_price": 249,
+    "duration_minutes": 45,
+    "pricing": {
+      "Hatchback": 799,
+      "Sedan": 899,
+      "SUV": 899,
+      "Superbike": 249
+    },
+    "active": true
+  },
+  "Bike Wash": {
+    "id": "bdc438b8-747c-4121-ae43-096e6b27df5f",
+    "name": "Bike Wash",
+    "desc": "Foam wash, deep wheel cleaning, chain clean & lube, and blow dry",
+    "base_price": 250,
+    "hatchback_price": null,
+    "sedan_price": null,
+    "suv_price": null,
+    "bike_price": 250,
+    "duration_minutes": 30,
+    "pricing": {
+      "Hatchback": null,
+      "Sedan": null,
+      "SUV": null,
+      "Superbike": 250
     },
     "active": true
   },
@@ -89,7 +143,6 @@
       "SUV": 2799,
       "Hatchback": 2499,
       "Sedan": 2699,
-      "SUV / 4x4": 2799,
       "Superbike": 999
     },
     "is_package": true,
@@ -119,7 +172,6 @@
       "SUV": 2799,
       "Hatchback": 2499,
       "Sedan": 2699,
-      "SUV / 4x4": 2799,
       "Superbike": 999
     },
     "is_package": true,

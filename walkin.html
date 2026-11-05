@@ -1324,20 +1324,20 @@
     // ==========================================
 
     const defaultServices = {
-      'Foam Wash': {
-        name: 'Foam Wash',
-        desc: 'Snow Foam Pre-Wash & Decontamination detailing',
-        duration_minutes: 45,
-        base_price: 699,
-        hatchback_price: 566,
-        sedan_price: 699,
-        suv_price: 874,
-        bike_price: 350,
+      'Rubbing Polish': {
+        name: 'Rubbing Polish',
+        desc: 'Dual-Action Rubbing Polish & Paint Correction',
+        duration_minutes: 120,
+        base_price: 4499,
+        hatchback_price: 3999,
+        sedan_price: 4499,
+        suv_price: 5299,
+        bike_price: 1499,
         pricing: {
-          'Hatchback': 566,
-          'Sedan': 699,
-          'SUV / 4x4': 874,
-          'Superbike': 350
+          'Hatchback': 3999,
+          'Sedan': 4499,
+          'SUV': 5299,
+          'Superbike': 1499
         },
         active: true
       },
@@ -1349,12 +1349,12 @@
         hatchback_price: 1839,
         sedan_price: 2299,
         suv_price: 2874,
-        bike_price: 1150,
+        bike_price: null,
         pricing: {
           'Hatchback': 1839,
           'Sedan': 2299,
-          'SUV / 4x4': 2874,
-          'Superbike': 1150
+          'SUV': 2874,
+          'Superbike': null
         },
         active: true
       },
@@ -1370,25 +1370,76 @@
         pricing: {
           'Hatchback': 3999,
           'Sedan': 4999,
-          'SUV / 4x4': 6249,
+          'SUV': 6249,
           'Superbike': 2500
         },
         active: true
       },
-      'Rubbing Polish': {
-        name: 'Rubbing Polish',
-        desc: 'Dual-Action Rubbing Polish & Paint Correction',
-        duration_minutes: 120,
-        base_price: 97,
-        hatchback_price: 69,
-        sedan_price: 97,
-        suv_price: 84,
-        bike_price: 60,
+      'Foam Wash': {
+        name: 'Foam Wash',
+        desc: 'Snow Foam Pre-Wash & Decontamination detailing',
+        duration_minutes: 45,
+        base_price: 699,
+        hatchback_price: 566,
+        sedan_price: 699,
+        suv_price: 874,
+        bike_price: 350,
         pricing: {
-          'Hatchback': 69,
-          'Sedan': 97,
-          'SUV / 4x4': 84,
-          'Superbike': 60
+          'Hatchback': 566,
+          'Sedan': 699,
+          'SUV': 874,
+          'Superbike': 350
+        },
+        active: true
+      },
+      'Rubbing Polish + Wax': {
+        name: 'Rubbing Polish + Wax',
+        desc: 'Dual-action rubbing compound followed by carnauba wax seal & protective gloss',
+        duration_minutes: 120,
+        base_price: 4999,
+        hatchback_price: 4499,
+        sedan_price: 4999,
+        suv_price: 5999,
+        bike_price: 1799,
+        pricing: {
+          'Hatchback': 4499,
+          'Sedan': 4999,
+          'SUV': 5999,
+          'Superbike': 1799
+        },
+        active: true
+      },
+      'Complete Wash': {
+        name: 'Complete Wash',
+        desc: 'Interior clean & polish, dashboard clean & polish, door clean & polish, basic seat cleaning, foam wash & degreaser',
+        duration_minutes: 45,
+        base_price: 899,
+        hatchback_price: 799,
+        sedan_price: 899,
+        suv_price: 899,
+        bike_price: 249,
+        pricing: {
+          'Hatchback': 799,
+          'Sedan': 899,
+          'SUV': 899,
+          'Superbike': 249
+        },
+        active: true
+      },
+      'Bike Wash': {
+        name: 'Bike Wash',
+        desc: 'Foam wash, deep wheel cleaning, chain clean & lube, and blow dry',
+        duration_minutes: 30,
+        base_price: 250,
+        hatchback_price: null,
+        sedan_price: null,
+        suv_price: null,
+        bike_price: 250,
+        pricing: {
+          'Hatchback': null,
+          'Sedan': null,
+          'SUV': null,
+          'Superbike': 250
         },
         active: true
       },
@@ -1546,15 +1597,15 @@
       if (s) {
         const p = s.pricing || {};
         if (vType === 'Hatchback') {
-          price = (s.hatchback_price !== null && s.hatchback_price !== undefined && s.hatchback_price !== '') ? s.hatchback_price : (p['Hatchback'] !== undefined ? p['Hatchback'] : s.base_price);
+          price = (s.hatchback_price !== null && s.hatchback_price !== undefined) ? s.hatchback_price : (p['Hatchback'] !== undefined ? p['Hatchback'] : 0);
         } else if (vType === 'Sedan') {
-          price = (s.sedan_price !== null && s.sedan_price !== undefined && s.sedan_price !== '') ? s.sedan_price : (p['Sedan'] !== undefined ? p['Sedan'] : s.base_price);
+          price = (s.sedan_price !== null && s.sedan_price !== undefined) ? s.sedan_price : (p['Sedan'] !== undefined ? p['Sedan'] : 0);
         } else if (vType === 'SUV / 4x4' || vType === 'SUV') {
-          price = (s.suv_price !== null && s.suv_price !== undefined && s.suv_price !== '') ? s.suv_price : (p['SUV / 4x4'] !== undefined ? p['SUV / 4x4'] : (p['SUV'] !== undefined ? p['SUV'] : s.base_price));
-        } else if (vType === 'Bike' || vType === 'Superbike') {
-          price = (s.bike_price !== null && s.bike_price !== undefined && s.bike_price !== '') ? s.bike_price : (p['Superbike'] !== undefined ? p['Superbike'] : (p['Bike'] !== undefined ? p['Bike'] : s.base_price));
+          price = (s.suv_price !== null && s.suv_price !== undefined) ? s.suv_price : (p['SUV'] !== undefined ? p['SUV'] : (p['SUV / 4x4'] !== undefined ? p['SUV / 4x4'] : 0));
+        } else if (vType === 'Bike' || vType === 'Superbike' || vType === 'Scooter' || vType === 'Commuter Bike' || vType === 'Tourer Bike') {
+          price = (s.bike_price !== null && s.bike_price !== undefined) ? s.bike_price : (p['Superbike'] !== undefined ? p['Superbike'] : (p['Bike'] !== undefined ? p['Bike'] : 0));
         } else {
-          price = s.base_price !== undefined ? s.base_price : s.sedan_price;
+          price = (p && p[vType] !== undefined) ? p[vType] : (s.base_price || 0);
         }
       } else {
         if (vType === 'Hatchback') price = opt.dataset.hatch || opt.dataset.base;

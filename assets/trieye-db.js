@@ -1137,19 +1137,19 @@ const TrieyeDB = {
       const name = String(s.name).trim();
       const p = s.pricing || {};
 
-      const parsePrice = (v1, v2, v3) => {
+      const parsePrice = (v1, v2) => {
         const val = (v1 !== null && v1 !== undefined && v1 !== '') ? v1 :
-                    (v2 !== null && v2 !== undefined && v2 !== '') ? v2 : v3;
+                    (v2 !== null && v2 !== undefined && v2 !== '') ? v2 : null;
         if (val === null || val === undefined || val === '' || isNaN(Number(val))) return null;
         const num = Number(val);
         return num > 0 ? num : null;
       };
 
-      const hatch = parsePrice(s.hatchback_price, p['Hatchback'], null);
-      const sedan = parsePrice(s.sedan_price, p['Sedan'], s.base_price);
-      const suv = parsePrice(s.suv_price, p['SUV / 4x4'] || p['SUV'], s.base_price);
-      const bike = parsePrice(s.bike_price, p['Superbike'] || p['Bike'] || p['Superbike / Bike'], s.base_price);
-      const base = parsePrice(s.base_price, sedan, null);
+      const hatch = parsePrice(s.hatchback_price, p['Hatchback']);
+      const sedan = parsePrice(s.sedan_price, p['Sedan']);
+      const suv = parsePrice(s.suv_price, p['SUV'] !== undefined ? p['SUV'] : p['SUV / 4x4']);
+      const bike = parsePrice(s.bike_price, p['Superbike'] !== undefined ? p['Superbike'] : (p['Bike'] !== undefined ? p['Bike'] : p['Superbike / Bike']));
+      const base = parsePrice(s.base_price, sedan || hatch || suv || bike);
 
       normalizedMap[name] = {
         id: s.id || null,
@@ -1298,16 +1298,25 @@ const TrieyeDB = {
       try {
         for (const k of Object.keys(servicesMap)) {
           const s = servicesMap[k];
-          const hatch = Number(s.hatchback_price !== undefined ? s.hatchback_price : (s.pricing ? s.pricing['Hatchback'] : 0));
-          const sedan = Number(s.sedan_price !== undefined ? s.sedan_price : (s.pricing ? s.pricing['Sedan'] : 0));
-          const suv = Number(s.suv_price !== undefined ? s.suv_price : (s.pricing ? (s.pricing['SUV'] !== undefined ? s.pricing['SUV'] : s.pricing['SUV / 4x4']) : 0));
-          const bike = Number(s.bike_price !== undefined ? s.bike_price : (s.pricing ? s.pricing['Superbike'] : 0));
-          const base = Number(s.base_price !== undefined ? s.base_price : sedan);
+          if (!s || s.is_package || s.package_type) continue;
+
+          const toPriceOrNull = (val) => {
+            if (val === null || val === undefined || val === '' || isNaN(Number(val))) return null;
+            const n = Number(val);
+            return n > 0 ? n : null;
+          };
+
+          const p = s.pricing || {};
+          const hatch = toPriceOrNull(s.hatchback_price !== undefined ? s.hatchback_price : p['Hatchback']);
+          const sedan = toPriceOrNull(s.sedan_price !== undefined ? s.sedan_price : p['Sedan']);
+          const suv = toPriceOrNull(s.suv_price !== undefined ? s.suv_price : (p['SUV'] !== undefined ? p['SUV'] : p['SUV / 4x4']));
+          const bike = toPriceOrNull(s.bike_price !== undefined ? s.bike_price : (p['Superbike'] !== undefined ? p['Superbike'] : p['Bike']));
+          const base = toPriceOrNull(s.base_price) || sedan || hatch || suv || bike || 0;
 
           const payload = {
             name: s.name || k,
             description: s.desc || s.description || '',
-            duration_minutes: s.duration_minutes || null,
+            duration_minutes: s.duration_minutes ? Number(s.duration_minutes) : null,
             base_price: base,
             hatchback_price: hatch,
             sedan_price: sedan,
