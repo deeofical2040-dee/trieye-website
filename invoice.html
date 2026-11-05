@@ -496,7 +496,12 @@
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="/assets/html2pdf.bundle.min.js"></script>
+  <script>
+    if (typeof html2pdf === 'undefined') {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"><\/script>');
+    }
+  </script>
   <script src="/assets/supabase-config.js?v=20261029_v3"></script>
   <script src="/assets/trieye-db.js?v=20261029_v3"></script>
   <script>
@@ -512,7 +517,7 @@
       <span class="display" style="font-size:16px; font-weight:700;">TRIEYE</span>
     </a>
     <div class="top-actions-group">
-      <button class="btn" onclick="window.print()">🖨 Print / Save PDF</button>
+      <button class="btn btn-primary" onclick="downloadInvoice()">⬇ Download PDF</button>
       <a href="https://wa.me/919940181934?text=Hi%20TRIEYE%20Studio,%20I%20have%20a%20query%20about%20my%20invoice" target="_blank" class="btn btn-green">💬 WhatsApp</a>
       <a href="tel:+919940181934" class="btn">📞 Call Studio</a>
       <a href="/" class="btn">← Home</a>
