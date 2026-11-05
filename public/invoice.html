@@ -763,7 +763,7 @@
         // Customer & Vehicle
         document.getElementById('cust-name').innerText = inv.customer_name || 'Valued Customer';
         document.getElementById('cust-phone').innerText = inv.customer_phone || 'N/A';
-        document.getElementById('veh-type').innerText = inv.vehicle_type || 'Car';
+        document.getElementById('veh-type').innerText = window.TrieyeDB && typeof window.TrieyeDB.formatVehicleCategory === 'function' ? window.TrieyeDB.formatVehicleCategory(inv.vehicle_type || 'Car') : (inv.vehicle_type ? String(inv.vehicle_type).replace(/\s*\/?\s*4[xX×*]4/gi, '').trim() : 'Car');
         document.getElementById('veh-reg').innerText = window.TrieyeDB && typeof window.TrieyeDB.formatVehicleNumber === 'function' ? (window.TrieyeDB.formatVehicleNumber(inv.reg_number || '') || inv.reg_number || 'N/A') : (inv.reg_number || 'N/A').toUpperCase();
 
         // Service Table & Item Details

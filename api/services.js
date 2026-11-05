@@ -38,6 +38,7 @@ function normalizePricingFromRows(data) {
       pricing: {
         'Hatchback': hatch,
         'Sedan': sedan,
+        'SUV': suv,
         'SUV / 4x4': suv,
         'Superbike': bike
       },
@@ -106,7 +107,7 @@ function validateServicesPayload(body) {
     const prices = [
       s.hatchback_price !== undefined ? s.hatchback_price : (s.pricing ? s.pricing['Hatchback'] : 0),
       s.sedan_price !== undefined ? s.sedan_price : (s.pricing ? s.pricing['Sedan'] : 0),
-      s.suv_price !== undefined ? s.suv_price : (s.pricing ? s.pricing['SUV / 4x4'] : 0),
+      s.suv_price !== undefined ? s.suv_price : (s.pricing ? (s.pricing['SUV'] !== undefined ? s.pricing['SUV'] : s.pricing['SUV / 4x4']) : 0),
       s.bike_price !== undefined ? s.bike_price : (s.pricing ? s.pricing['Superbike'] : 0)
     ];
     for (const p of prices) {

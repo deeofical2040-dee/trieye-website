@@ -3860,7 +3860,7 @@
                   <th>Description</th>
                   <th>Hatchback</th>
                   <th>Sedan</th>
-                  <th>SUV / 4x4</th>
+                  <th>SUV</th>
                   <th>Superbike</th>
                   <th>Status</th>
                   <th>Actions</th>
@@ -4166,7 +4166,7 @@
         </div>
         <div class="form-grid">
           <div class="form-group">
-            <label class="form-label">SUV / 4x4 (₹)</label>
+            <label class="form-label">SUV (₹)</label>
             <input type="number" id="svc-modal-price-suv" class="form-input" required>
           </div>
           <div class="form-group">
@@ -4328,7 +4328,7 @@
               <select class="form-select" id="npkg-vtype" onchange="updateNewPackagePrice()">
                 <option value="Small Car">Small Car (Hatchback) — ₹2,499</option>
                 <option value="Medium Car" selected>Medium Car (Sedan) — ₹2,699</option>
-                <option value="SUV">SUV / 4x4 — ₹2,799</option>
+                <option value="SUV">SUV — ₹2,799</option>
               </select>
             </div>
           </div>
@@ -5418,6 +5418,14 @@
       if (!str) return '';
       return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
     }
+    function formatVehicleCategory(cat) {
+      if (window.TrieyeDB && typeof window.TrieyeDB.formatVehicleCategory === 'function') {
+        return window.TrieyeDB.formatVehicleCategory(cat);
+      }
+      if (!cat) return '';
+      const s = String(cat).trim();
+      return s.replace(/\s*\/?\s*4[xX×*]4/gi, '').replace(/\s*4[xX×*]4/gi, '').trim() || s;
+    }
     function cleanPhone(p) {
       return (p || '').replace(/\D/g, '').slice(-10);
     }
@@ -6145,7 +6153,7 @@
             div.style = 'display:flex; align-items:center; justify-content:space-between; background:var(--bg-panel-2); padding:0.6rem 0.85rem; border-radius:6px; border:1px solid var(--line); font-size:0.8rem;';
             div.innerHTML = `
               <div>
-                <strong style="color:var(--white);">${escapeHtml(b.vehicleModel || b.vehicleType)}</strong> 
+                <strong style="color:var(--white);">${escapeHtml(formatVehicleCategory(b.vehicleModel || b.vehicleType))}</strong> 
                 <span style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--pink);">(${escapeHtml(b.reg || 'NO REG')})</span>
                 <div style="font-size:0.75rem; color:var(--muted);">${escapeHtml(b.service)} · ${escapeHtml(b.name)}</div>
               </div>
@@ -6187,7 +6195,7 @@
 
         tr.innerHTML = `
           <td>
-            <div style="font-weight:600; color:var(--white);">${escapeHtml(b.vehicleModel || b.vehicleType)}</div>
+            <div style="font-weight:600; color:var(--white);">${escapeHtml(formatVehicleCategory(b.vehicleModel || b.vehicleType))}</div>
             <div style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--pink);">${escapeHtml(b.reg || 'NO REG')}</div>
           </td>
           <td>
@@ -7065,7 +7073,7 @@
             <div style="font-family:'IBM Plex Mono'; font-size:0.72rem; color:var(--muted);">${escapeHtml(bay.type)}</div>
             ${isOcc ? `
               <div style="background:var(--bg-panel-2); padding:0.5rem 0.65rem; border-radius:6px; border:1px solid var(--line); font-size:0.75rem;">
-                <div style="font-weight:600; color:var(--white);">${escapeHtml(activeJob.vehicleModel || activeJob.vehicleType)}</div>
+                <div style="font-weight:600; color:var(--white);">${escapeHtml(formatVehicleCategory(activeJob.vehicleModel || activeJob.vehicleType))}</div>
                 <div style="font-family:'IBM Plex Mono'; color:var(--pink); font-size:0.7rem;">${escapeHtml(activeJob.reg || activeJob.name)}</div>
                 <div style="font-size:0.7rem; color:var(--green); margin-top:2px;">${escapeHtml(activeJob.service)}</div>
               </div>
@@ -7167,7 +7175,7 @@
             <div class="slot-time-display">${escapeHtml(slot.time)}</div>
             <span class="status-badge status-${state==='available'?'done':(state==='booked'?'waiting':'cancelled')}">${escapeHtml(state)}</span>
           </div>
-          <div style="font-size:0.72rem; color:var(--muted);">${activeBooking ? `<b>${escapeHtml(activeBooking.name)}</b> (${escapeHtml(activeBooking.vehicleType)})` : (state==='blocked'?'Manually Blocked':'Open for Online Slot')}</div>
+          <div style="font-size:0.72rem; color:var(--muted);">${activeBooking ? `<b>${escapeHtml(activeBooking.name)}</b> (${escapeHtml(formatVehicleCategory(activeBooking.vehicleType))})` : (state==='blocked'?'Manually Blocked':'Open for Online Slot')}</div>
           <div style="display:flex; gap:0.35rem; margin-top:0.35rem; border-top:1px solid var(--line-subtle); padding-top:0.35rem;">
             <button class="btn-icon-sm" style="flex:1; justify-content:center;" onclick="toggleSlotState('${escapeHtml(slot.time)}')">${slot.status==='blocked'?'Unblock':'Block'}</button>
             <button class="btn-icon-sm" onclick="openEditSlotModal('${escapeHtml(slot.time)}')">✏️</button>
@@ -7562,7 +7570,7 @@
           <td><strong class="booking-id-tag">${escapeHtml(displayRef)}</strong></td>
           <td><span style="font-family:'IBM Plex Mono'; font-size:0.8rem; color:var(--muted);">${escapeHtml(b.date || b.booking_date || 'Today')}</span></td>
           <td>
-            <div style="font-weight:600;">${escapeHtml(b.vehicleModel || b.vehicleType || 'Car')}</div>
+            <div style="font-weight:600;">${escapeHtml(formatVehicleCategory(b.vehicleModel || b.vehicleType || 'Car'))}</div>
             <div style="font-family:'IBM Plex Mono'; font-size:0.72rem; color:var(--pink);">${escapeHtml(b.reg || 'NO REG')}</div>
           </td>
           <td><strong>${escapeHtml(b.service || 'Foam Wash')}</strong></td>
@@ -7622,7 +7630,7 @@
 
         const visits = customerBookings.length || c.visits || 0;
         const totalSpent = customerBookings.reduce((sum, b) => sum + (Number(b.price) || 0), 0) || c.spent || 0;
-        const vehDisplay = c.reg ? `${c.vehicleType || 'Car'} (${c.reg})` : (c.model || c.vehicleType || 'Car');
+        const vehDisplay = c.reg ? `${formatVehicleCategory(c.vehicleType || 'Car')} (${c.reg})` : formatVehicleCategory(c.model || c.vehicleType || 'Car');
 
         return {
           key: k,
@@ -7969,7 +7977,7 @@
             </div>
             <div style="display:flex; justify-content:space-between; margin-bottom:4px;">
               <span style="color:var(--muted);">Vehicle Type:</span>
-              <span>${escapeHtml(b.vehicleType || b.vehicleModel || 'Car')}</span>
+              <span>${escapeHtml(formatVehicleCategory(b.vehicleType || b.vehicleModel || 'Car'))}</span>
             </div>
             <div style="display:flex; justify-content:space-between;">
               <span style="color:var(--muted);">Registration Number:</span>
@@ -8285,7 +8293,7 @@ TRIEYE DETAILING
       document.getElementById('cust-modal-name').value = c.name || '';
       document.getElementById('cust-modal-phone').value = phoneKey;
       document.getElementById('cust-modal-email').value = c.email || '';
-      document.getElementById('cust-modal-veh').value = c.reg ? `${c.vehicleType || 'Car'} (${c.reg})` : (c.model || '');
+      document.getElementById('cust-modal-veh').value = c.reg ? `${formatVehicleCategory(c.vehicleType || 'Car')} (${c.reg})` : formatVehicleCategory(c.model || '');
       document.getElementById('cust-modal-notes').value = c.notes || '';
       document.getElementById('modal-cust-title').innerText = 'Edit Customer Profile';
       openModal('modalCustomer');
@@ -8341,7 +8349,7 @@ TRIEYE DETAILING
         const basePrice = Number(s.base_price || (s.pricing && s.pricing['Sedan']) || 0);
         const hatchPrice = s.pricing && s.pricing['Hatchback'] !== undefined ? s.pricing['Hatchback'] : basePrice;
         const sedanPrice = s.pricing && s.pricing['Sedan'] !== undefined ? s.pricing['Sedan'] : basePrice;
-        const suvPrice = s.pricing && s.pricing['SUV / 4x4'] !== undefined ? s.pricing['SUV / 4x4'] : basePrice;
+        const suvPrice = s.pricing && (s.pricing['SUV'] !== undefined ? s.pricing['SUV'] : s.pricing['SUV / 4x4']) !== undefined ? (s.pricing['SUV'] !== undefined ? s.pricing['SUV'] : s.pricing['SUV / 4x4']) : (s.suv_price !== undefined ? s.suv_price : basePrice);
         const bikePrice = s.pricing && s.pricing['Superbike'] !== undefined ? s.pricing['Superbike'] : basePrice;
 
         const tr = document.createElement('tr');
@@ -8403,7 +8411,7 @@ TRIEYE DETAILING
       const p = s.pricing || {};
       const hatch = s.hatchback_price !== undefined ? s.hatchback_price : (p['Hatchback'] !== undefined ? p['Hatchback'] : s.base_price);
       const sedan = s.sedan_price !== undefined ? s.sedan_price : (p['Sedan'] !== undefined ? p['Sedan'] : s.base_price);
-      const suv = s.suv_price !== undefined ? s.suv_price : (p['SUV / 4x4'] !== undefined ? p['SUV / 4x4'] : s.base_price);
+      const suv = s.suv_price !== undefined ? s.suv_price : (p['SUV'] !== undefined ? p['SUV'] : (p['SUV / 4x4'] !== undefined ? p['SUV / 4x4'] : s.base_price));
       const bike = s.bike_price !== undefined ? s.bike_price : (p['Superbike'] !== undefined ? p['Superbike'] : s.base_price);
 
       document.getElementById('svc-modal-orig-name').value = name;
@@ -8484,7 +8492,7 @@ TRIEYE DETAILING
         suv_price: suv,
         bike_price: bike,
         duration_minutes: duration || existing.duration_minutes || null,
-        pricing: { 'Hatchback': h, 'Sedan': sed, 'SUV / 4x4': suv, 'Superbike': bike },
+        pricing: { 'Hatchback': h, 'Sedan': sed, 'SUV': suv, 'SUV / 4x4': suv, 'Superbike': bike },
         active: existing.active !== false
       };
 
@@ -8519,7 +8527,7 @@ TRIEYE DETAILING
           <td><strong style="font-family:'IBM Plex Mono'; color:var(--pink);">${escapeHtml(displayRef)}</strong></td>
           <td>
             <div style="font-weight:600;">${escapeHtml(b.name || 'Valued Customer')}</div>
-            <div style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--muted);">${escapeHtml(b.reg || b.vehicleModel || b.vehicleType || 'Car')}</div>
+            <div style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--muted);">${escapeHtml(b.reg || formatVehicleCategory(b.vehicleModel || b.vehicleType || 'Car'))}</div>
           </td>
           <td>${escapeHtml(b.service || 'Foam Wash')}</td>
           <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${bookingPrice.toLocaleString()}</strong></td>
@@ -8546,7 +8554,7 @@ TRIEYE DETAILING
           const opt = document.createElement('option');
           opt.value = b.id;
           const shortId = b.id && b.id.length > 8 ? b.id.slice(0, 8) : b.id;
-          opt.innerText = `${shortId} — ${b.name} (${b.reg || b.vehicleType}) - ₹${b.price || b.total_amount || 0}`;
+          opt.innerText = `${shortId} — ${b.name} (${b.reg || formatVehicleCategory(b.vehicleType)}) - ₹${b.price || b.total_amount || 0}`;
           select.appendChild(opt);
         });
       }
@@ -8708,7 +8716,7 @@ TRIEYE DETAILING
           const opt = document.createElement('option');
           opt.value = b.id;
           const shortId = b.id && b.id.length > 8 ? b.id.slice(0, 8) : b.id;
-          opt.innerText = `${shortId} — ${b.name || 'Customer'} (${b.reg || b.vehicleType || 'Vehicle'}) - ₹${b.price || b.total_amount || 0}`;
+          opt.innerText = `${shortId} — ${b.name || 'Customer'} (${b.reg || formatVehicleCategory(b.vehicleType || 'Vehicle')}) - ₹${b.price || b.total_amount || 0}`;
           opt.selected = true;
           select.appendChild(opt);
           hasSelected = true;
@@ -8718,7 +8726,7 @@ TRIEYE DETAILING
           const opt = document.createElement('option');
           opt.value = item.id;
           const shortId = item.id && item.id.length > 8 ? item.id.slice(0, 8) : item.id;
-          opt.innerText = `${shortId} — ${item.name} (${item.reg || item.vehicleType}) - ₹${item.price || item.total_amount || 0}`;
+          opt.innerText = `${shortId} — ${item.name} (${item.reg || formatVehicleCategory(item.vehicleType)}) - ₹${item.price || item.total_amount || 0}`;
           if (!hasSelected && (item.id === b.id || (b.invoice_number && item.invoice_number === b.invoice_number))) {
             opt.selected = true;
             hasSelected = true;
@@ -9281,7 +9289,7 @@ TRIEYE DETAILING
         tr.innerHTML = `
           <td><strong style="color:var(--green); font-family:'IBM Plex Mono';">${escapeHtml(displayRef)}</strong></td>
           <td>
-            <div style="font-weight:600;">${escapeHtml(b.vehicleModel || b.vehicleType)}</div>
+            <div style="font-weight:600;">${escapeHtml(formatVehicleCategory(b.vehicleModel || b.vehicleType))}</div>
             <div style="font-family:'IBM Plex Mono'; font-size:0.72rem; color:var(--pink);">${escapeHtml(b.reg || 'NO REG')}</div>
           </td>
           <td>${escapeHtml(b.name)}</td>
@@ -9506,7 +9514,7 @@ TRIEYE DETAILING
       const vehRegEl = document.getElementById('pkg-view-veh-reg');
       if (vehRegEl) vehRegEl.innerText = pkg.reg_number || '-';
       const vehTypeEl = document.getElementById('pkg-view-veh-type');
-      if (vehTypeEl) vehTypeEl.innerText = `${pkg.vehicle_category || pkg.vehicle_type || 'Medium Car'}`;
+      if (vehTypeEl) vehTypeEl.innerText = `${formatVehicleCategory(pkg.vehicle_category || pkg.vehicle_type || 'Medium Car')}`;
 
       const expDateEl = document.getElementById('pkg-view-exp-date');
       if (expDateEl) expDateEl.innerText = `Expires: ${pkg.expiry_date || '-'}`;
@@ -9725,7 +9733,7 @@ TRIEYE DETAILING
 
         // Vehicle details
         const vehReg = escapeHtml(pkg.reg_number || '-');
-        const vehCat = escapeHtml(pkg.vehicle_category || pkg.vehicle_type || 'Small Car');
+        const vehCat = escapeHtml(formatVehicleCategory(pkg.vehicle_category || pkg.vehicle_type || 'Small Car'));
 
         // Status badge: Active, Expired, or Exhausted
         const isExpired = (pkg.status === 'EXPIRED') || (pkg.expiry_date && new Date(pkg.expiry_date) < new Date());
@@ -9955,7 +9963,7 @@ TRIEYE DETAILING
       if (vehRegEl) vehRegEl.innerText = redemption.reg_number || '-';
 
       const vehTypeEl = document.getElementById('rcpt-veh-type');
-      if (vehTypeEl) vehTypeEl.innerText = redemption.vehicle_type || (isBike ? 'Bike' : 'Car');
+      if (vehTypeEl) vehTypeEl.innerText = formatVehicleCategory(redemption.vehicle_type || (isBike ? 'Bike' : 'Car'));
 
       const washRedeemedEl = document.getElementById('rcpt-wash-redeemed');
       if (washRedeemedEl) washRedeemedEl.innerText = redemption.wash_type_name || (isBike ? 'Bike Wash' : 'Wash');
@@ -10133,7 +10141,7 @@ TRIEYE DETAILING
         `Your wash redemption has been recorded successfully.\n\n` +
         `*Receipt #:* ${r.redemption_number || r.id}\n` +
         `*Package ID:* ${r.package_code || r.package_id || '-'}\n` +
-        `*Vehicle:* ${r.reg_number || 'N/A'} (${r.vehicle_type || (isBike ? 'Bike' : 'Car')})\n\n` +
+        `*Vehicle:* ${r.reg_number || 'N/A'} (${formatVehicleCategory(r.vehicle_type || (isBike ? 'Bike' : 'Car'))})\n\n` +
         `*Today\'s Wash Redeemed:* ${r.wash_type_name || (isBike ? 'Bike Wash' : 'Wash')}\n` +
         `*Today\'s Payable Amount:* ${payableText}\n\n` +
         balanceSection +
@@ -10469,7 +10477,7 @@ TRIEYE DETAILING
         vehicle_id: pkg.vehicle_id,
         vehicles: {
           reg_number: pkg.reg_number,
-          vehicle_type: pkg.vehicle_category || pkg.vehicle_type || 'Medium Car'
+          vehicle_type: formatVehicleCategory(pkg.vehicle_category || pkg.vehicle_type || 'Medium Car')
         },
         subtotal: price,
         discount: 0,
@@ -10664,7 +10672,7 @@ TRIEYE DETAILING
       const vehRegEl = document.getElementById('bpkg-view-veh-reg');
       if (vehRegEl) vehRegEl.innerText = pkg.reg_number || '-';
       const vehTypeEl = document.getElementById('bpkg-view-veh-type');
-      if (vehTypeEl) vehTypeEl.innerText = `${pkg.vehicle_category || pkg.vehicle_type || 'Commuter Bike'}`;
+      if (vehTypeEl) vehTypeEl.innerText = `${formatVehicleCategory(pkg.vehicle_category || pkg.vehicle_type || 'Commuter Bike')}`;
 
       const expDateEl = document.getElementById('bpkg-view-exp-date');
       if (expDateEl) expDateEl.innerText = `Expires: ${pkg.expiry_date || '-'}`;
@@ -10881,7 +10889,7 @@ TRIEYE DETAILING
             <span style="font-family:'IBM Plex Mono'; font-weight:700; color:var(--white); background:var(--bg-panel-2); border:1px solid var(--line); padding:2px 6px; border-radius:4px; font-size:0.8rem;">${escapeHtml(pkg.reg_number || '-')}</span>
           </td>
           <td style="padding:7px 10px;">
-            <span style="font-size:0.75rem; color:#a3e635; font-weight:600;">${escapeHtml(pkg.vehicle_category || pkg.vehicle_type || 'Commuter Bike')}</span>
+            <span style="font-size:0.75rem; color:#a3e635; font-weight:600;">${escapeHtml(formatVehicleCategory(pkg.vehicle_category || pkg.vehicle_type || 'Commuter Bike'))}</span>
           </td>
           <td style="font-family:'IBM Plex Mono'; font-weight:800; color:${bikeVal > 0 ? '#a3e635' : 'var(--muted)'}; font-size:0.85rem; padding:7px 10px;">${bikeVal} / 3</td>
           <td style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--muted); padding:7px 10px;">${escapeHtml(pkg.expiry_date || '-')}</td>
@@ -11285,7 +11293,7 @@ TRIEYE DETAILING
         vehicle_id: pkg.vehicle_id,
         vehicles: {
           reg_number: pkg.reg_number,
-          vehicle_type: planCategory
+          vehicle_type: formatVehicleCategory(planCategory)
         },
         subtotal: price,
         discount: 0,
@@ -11608,7 +11616,7 @@ TRIEYE DETAILING
             tr.innerHTML = `
               <td><strong style="color:var(--pink); font-family:'IBM Plex Mono';">${escapeHtml(displayRef)}</strong></td>
               <td>
-                <div style="font-weight:600;">${escapeHtml(b.vehicleModel || b.vehicleType || 'Car')}</div>
+                <div style="font-weight:600;">${escapeHtml(formatVehicleCategory(b.vehicleModel || b.vehicleType || 'Car'))}</div>
                 <div style="font-family:'IBM Plex Mono'; font-size:0.72rem; color:var(--muted);">${escapeHtml(b.reg || 'NO REG')}</div>
               </td>
               <td>${escapeHtml(b.name || 'Walk-In')}</td>
@@ -12610,7 +12618,7 @@ async function openInvoiceModal(invoiceId) {
   }
   
   document.getElementById('inv-veh-reg').innerText = veh.reg_number || 'N/A';
-  document.getElementById('inv-veh-model').innerText = veh.vehicle_type || 'Car';
+  document.getElementById('inv-veh-model').innerText = formatVehicleCategory(veh.vehicle_type || 'Car');
   
   // Separate services and add-on products
   const serviceItems = [];
@@ -12938,7 +12946,7 @@ function shareInvoiceWhatsApp() {
     `Hi ${cust.name || 'Valued Customer'},\n\n` +
     `Thank you for choosing TRIEYE DETAILING.\nYour invoice is ready.\n\n` +
     `*Invoice:* ${currentPrintInvoice.invoice_number}\n` +
-    `*Vehicle:* ${veh.reg_number || 'N/A'} (${veh.vehicle_type || 'Car'})\n` +
+    `*Vehicle:* ${veh.reg_number || 'N/A'} (${formatVehicleCategory(veh.vehicle_type || 'Car')})\n` +
     itemsText + '\n' +
     paymentLines + '\n' +
     invoiceLinkLine + '\n' +

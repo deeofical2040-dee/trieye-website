@@ -825,7 +825,7 @@
                 <select class="form-select" id="mb-vtype" onchange="mbUpdateAllPrices()">
                   <option value="Hatchback">Hatchback</option>
                   <option value="Sedan">Sedan</option>
-                  <option value="SUV / 4x4" selected>SUV</option>
+                  <option value="SUV" selected>SUV</option>
                   <option value="Bike">Bike</option>
                 </select>
               </div>
@@ -2062,6 +2062,15 @@
       return m;
     }
 
+    function formatVehicleCategory(cat) {
+      if (window.TrieyeDB && typeof window.TrieyeDB.formatVehicleCategory === 'function') {
+        return window.TrieyeDB.formatVehicleCategory(cat);
+      }
+      if (!cat) return '';
+      const s = String(cat).trim();
+      return s.replace(/\s*\/?\s*4[xX×*]4/gi, '').replace(/\s*4[xX×*]4/gi, '').trim() || s;
+    }
+
     async function openInvoiceModal(invoiceId) {
       currentPrintInvoice = null;
       if (!window.TrieyeDB) return;
@@ -2083,7 +2092,7 @@
       document.getElementById('inv-cust-phone').innerText = cust.phone ? `+91 ${cust.phone}` : 'N/A';
       
       document.getElementById('inv-veh-reg').innerText = veh.reg_number || 'N/A';
-      document.getElementById('inv-veh-type').innerText = veh.vehicle_type || 'Car';
+      document.getElementById('inv-veh-type').innerText = formatVehicleCategory(veh.vehicle_type || 'Car');
       
       const serviceItems = [];
       const productItems = [];
@@ -2397,7 +2406,7 @@ Thank you for choosing TRIEYE DETAILING.
 Your invoice is ready.
 
 *Invoice:* ${inv.invoice_number || 'TRI-INVOICE'}
-*Vehicle:* ${veh.reg_number || 'N/A'} (${veh.vehicle_type || 'Car'})
+*Vehicle:* ${veh.reg_number || 'N/A'} (${formatVehicleCategory(veh.vehicle_type || 'Car')})
 *Service:* ${metrics.serviceName}
 
 ${paymentDetailsText}

@@ -1215,7 +1215,7 @@
     document.getElementById('resRef').textContent = b.booking_ref || 'TRI-BOOKING';
     document.getElementById('resName').textContent = b.customer_name || 'Valued Customer';
     document.getElementById('resService').textContent = b.service || 'Detailing Service';
-    document.getElementById('resVehicle').textContent = b.vehicleType || 'Car';
+    document.getElementById('resVehicle').textContent = window.TrieyeDB && typeof window.TrieyeDB.formatVehicleCategory === 'function' ? window.TrieyeDB.formatVehicleCategory(b.vehicleType || 'Car') : (b.vehicleType ? String(b.vehicleType).replace(/\s*\/?\s*4[xX×*]4/gi, '').trim() : 'Car');
     document.getElementById('resReg').textContent = b.reg || 'N/A';
     
     // Format Date

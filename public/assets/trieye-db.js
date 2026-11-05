@@ -1164,6 +1164,7 @@ const TrieyeDB = {
         pricing: {
           'Hatchback': hatch,
           'Sedan': sedan,
+          'SUV': suv,
           'SUV / 4x4': suv,
           'Superbike': bike
         },
@@ -1299,7 +1300,7 @@ const TrieyeDB = {
           const s = servicesMap[k];
           const hatch = Number(s.hatchback_price !== undefined ? s.hatchback_price : (s.pricing ? s.pricing['Hatchback'] : 0));
           const sedan = Number(s.sedan_price !== undefined ? s.sedan_price : (s.pricing ? s.pricing['Sedan'] : 0));
-          const suv = Number(s.suv_price !== undefined ? s.suv_price : (s.pricing ? s.pricing['SUV / 4x4'] : 0));
+          const suv = Number(s.suv_price !== undefined ? s.suv_price : (s.pricing ? (s.pricing['SUV'] !== undefined ? s.pricing['SUV'] : s.pricing['SUV / 4x4']) : 0));
           const bike = Number(s.bike_price !== undefined ? s.bike_price : (s.pricing ? s.pricing['Superbike'] : 0));
           const base = Number(s.base_price !== undefined ? s.base_price : sedan);
 
@@ -2634,6 +2635,12 @@ const TrieyeDB = {
     return this.normalizeVehicleNumber(raw);
   },
 
+  formatVehicleCategory(cat) {
+    if (!cat) return '';
+    const s = String(cat).trim();
+    return s.replace(/\s*\/?\s*4[xX×*]4/gi, '').replace(/\s*4[xX×*]4/gi, '').trim() || s;
+  },
+
   attachVehicleInput(inputEl, errorEl) {
     if (!inputEl) return;
     inputEl.setAttribute('maxlength', '13');
@@ -3074,7 +3081,7 @@ const TrieyeDB = {
               const expObj = new Date(pDate);
               expObj.setDate(expObj.getDate() + 30);
               const eDate = this.getLocalDateIso(expObj);
-              const vCategory = veh.vehicle_type || inv.vehicle_type || (isBikePkgInv ? 'Commuter Bike' : 'Medium Car');
+              const vCategory = this.formatVehicleCategory(veh.vehicle_type || inv.vehicle_type || (isBikePkgInv ? 'Commuter Bike' : 'Medium Car'));
 
               if (!existing) {
                 const synPkg = {
@@ -3362,7 +3369,7 @@ const TrieyeDB = {
     const name = String(payload.customer_name || payload.name || '').trim();
     const phone = String(payload.customer_phone || payload.phone || '').replace(/\D/g, '').slice(-10);
     const rawReg = String(payload.reg_number || payload.reg || '').trim();
-    const vCategory = payload.vehicle_category || payload.vehicle_type || 'Medium Car';
+    const vCategory = this.formatVehicleCategory(payload.vehicle_category || payload.vehicle_type || 'Medium Car');
 
     if (!name) return { success: false, error: 'Customer name is required.' };
     if (!phone || phone.length < 10) return { success: false, error: 'A valid 10-digit mobile number is required.' };
@@ -3903,7 +3910,7 @@ const TrieyeDB = {
         customer_name: pkg.customer_name,
         customer_phone: pkg.customer_phone,
         reg_number: pkg.reg_number,
-        vehicle_type: pkg.vehicle_type || pkg.vehicle_category || 'Bike',
+        vehicle_type: this.formatVehicleCategory(pkg.vehicle_type || pkg.vehicle_category || 'Bike'),
         wash_category: 'bike_wash',
         wash_type_name: catName,
         redeemed_at: new Date().toISOString(),
@@ -4032,7 +4039,7 @@ const TrieyeDB = {
       customer_name: pkg.customer_name,
       customer_phone: pkg.customer_phone,
       reg_number: pkg.reg_number,
-      vehicle_type: pkg.vehicle_type || pkg.vehicle_category || 'Car',
+      vehicle_type: this.formatVehicleCategory(pkg.vehicle_type || pkg.vehicle_category || 'Car'),
       wash_category: washCategory,
       wash_type_name: catName,
       redeemed_at: new Date().toISOString(),
@@ -4156,6 +4163,7 @@ if (typeof window !== 'undefined') {
   window.formatVehicleReg = TrieyeDB.formatVehicleReg.bind(TrieyeDB);
   window.validateVehicleReg = TrieyeDB.validateVehicleReg.bind(TrieyeDB);
   window.normalizeVehicleReg = TrieyeDB.normalizeVehicleReg.bind(TrieyeDB);
+  window.formatVehicleCategory = TrieyeDB.formatVehicleCategory.bind(TrieyeDB);
 }
 
 if (typeof globalThis !== 'undefined') {
