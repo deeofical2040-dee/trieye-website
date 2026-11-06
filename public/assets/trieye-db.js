@@ -4164,8 +4164,438 @@ const TrieyeDB = {
   }
 };
 
+// Authoritative TRIEYE WhatsApp Integration Engine
+// =======================================================
+const TrieyeWhatsApp = {
+  // 1. Phone number normalization & validation
+  normalizePhone(raw) {
+    if (!raw) return null;
+    let digits = String(raw).replace(/\D/g, '');
+    if (!digits) return null;
+    // Strip leading 0 if 11 digits
+    if (digits.length === 11 && digits.startsWith('0')) {
+      digits = digits.slice(1);
+    }
+    // 10-digit Indian number -> prepend 91
+    if (digits.length === 10) {
+      return '91' + digits;
+    }
+    // 12-digit already starting with 91
+    if (digits.length === 12 && digits.startsWith('91')) {
+      return digits;
+    }
+    // International numbers with country code: 11-14 digits
+    if (digits.length >= 11 && digits.length <= 14) {
+      return digits;
+    }
+    return null;
+  },
+
+  isValidPhone(raw) {
+    const norm = this.normalizePhone(raw);
+    if (!norm) return false;
+    // Standard Indian mobile: 91 followed by 10 digits starting with 6, 7, 8, or 9
+    return /^91[6-9]\d{9}$/.test(norm) || (norm.length >= 11 && norm.length <= 14);
+  },
+
+  buildUrl(rawPhone, text) {
+    const norm = this.normalizePhone(rawPhone);
+    if (!norm) return null;
+    return `https://wa.me/${norm}${text ? `?text=${encodeURIComponent(text)}` : ''}`;
+  },
+
+  // 2. Safe popup launcher with blocked-popup fallback modal
+  openChat(rawPhone, text, options = {}) {
+    const norm = this.normalizePhone(rawPhone);
+    if (!norm) {
+      const err = `Customer phone number is missing or invalid: "${rawPhone || 'N/A'}". Please provide a valid 10-digit mobile number.`;
+      if (typeof window !== 'undefined' && typeof window.showToast === 'function') {
+        window.showToast('❌ ' + err, true);
+      } else if (typeof alert === 'function') {
+        alert(err);
+      }
+      return false;
+    }
+
+    const url = this.buildUrl(norm, text);
+    if (!url) return false;
+
+    let popup = options.popup || null;
+    let opened = false;
+
+    try {
+      if (popup && !popup.closed) {
+        popup.location.href = url;
+        opened = true;
+      } else if (typeof window !== 'undefined') {
+        // Direct synchronous window.open
+        popup = window.open(url, '_blank', 'noopener,noreferrer');
+        if (popup && !popup.closed && typeof popup.closed !== 'undefined') {
+          opened = true;
+        }
+      }
+    } catch (e) {
+      console.warn('TrieyeWhatsApp: window.open failed:', e);
+      opened = false;
+    }
+
+    if (opened) {
+      if (typeof window !== 'undefined' && typeof window.showToast === 'function') {
+        window.showToast('💬 Opening WhatsApp...', false);
+      }
+      return true;
+    }
+
+    // Popup blocked: surface accessible fallback modal
+    this.showFallbackModal(norm, text, url);
+    return false;
+  },
+
+  showFallbackModal(phone, text, url) {
+    if (typeof document === 'undefined') return;
+    let modal = document.getElementById('trieye-whatsapp-fallback-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'trieye-whatsapp-fallback-modal';
+      modal.className = 'dash-modal-backdrop';
+      modal.style.zIndex = '9999999';
+      modal.style.display = 'none';
+      modal.style.position = 'fixed';
+      modal.style.top = '0';
+      modal.style.left = '0';
+      modal.style.width = '100vw';
+      modal.style.height = '100vh';
+      modal.style.background = 'rgba(0,0,0,0.75)';
+      modal.style.backdropFilter = 'blur(4px)';
+      modal.style.alignItems = 'center';
+      modal.style.justifyContent = 'center';
+      modal.style.padding = '1rem';
+      modal.style.boxSizing = 'border-box';
+      document.body.appendChild(modal);
+    }
+
+    const cleanDisplayPhone = phone.startsWith('91') ? `+91 ${phone.slice(2)}` : phone;
+
+    modal.innerHTML = `
+      <div class="dash-modal" style="max-width:480px; width:100%; background:#0f172a; border:1px solid #334155; border-radius:12px; box-shadow:0 20px 40px rgba(0,0,0,0.6); overflow:hidden; font-family:'Inter',sans-serif; color:#fff;" onclick="event.stopPropagation();">
+        <div style="background:linear-gradient(90deg, #166534 0%, #1e293b 100%); padding:1rem 1.25rem; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #334155;">
+          <div style="display:flex; align-items:center; gap:0.5rem; font-weight:700; font-size:1.05rem;">
+            <span>💬</span> <span>Open WhatsApp</span>
+          </div>
+          <button type="button" onclick="document.getElementById('trieye-whatsapp-fallback-modal').style.display='none'" style="background:none; border:none; color:#94a3b8; font-size:1.35rem; cursor:pointer; line-height:1;">&times;</button>
+        </div>
+        <div style="padding:1.25rem;">
+          <p style="font-size:0.9rem; color:#cbd5e1; margin:0 0 1rem 0; line-height:1.5;">
+            Your browser prevented opening WhatsApp in a new tab automatically. Click the button below to open WhatsApp directly:
+          </p>
+          <div style="background:#1e293b; border:1px solid #334155; border-radius:8px; padding:0.75rem 1rem; margin-bottom:1.25rem;">
+            <div style="font-size:0.75rem; color:#94a3b8; margin-bottom:3px;">Recipient Number</div>
+            <div style="font-family:'IBM Plex Mono',monospace; font-size:1.05rem; font-weight:700; color:#38bdf8;">${cleanDisplayPhone}</div>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:0.65rem;">
+            <a href="${url}" target="_blank" rel="noopener noreferrer" id="trieye-wa-open-link" style="display:flex; align-items:center; justify-content:center; gap:8px; background:#22c55e; color:#ffffff; font-weight:700; font-size:0.95rem; text-decoration:none; padding:0.75rem 1rem; border-radius:8px; box-shadow:0 4px 12px rgba(34,197,94,0.3); text-align:center;">
+              <span>💬</span> <span>Open WhatsApp Now</span>
+            </a>
+            <button type="button" id="trieye-wa-copy-btn" style="background:#334155; color:#f1f5f9; border:1px solid #475569; font-weight:600; font-size:0.85rem; padding:0.65rem 1rem; border-radius:8px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;">
+              <span>📋</span> <span>Copy Message Text</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const copyBtn = modal.querySelector('#trieye-wa-copy-btn');
+    if (copyBtn) {
+      copyBtn.onclick = () => {
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(text);
+          }
+          copyBtn.innerHTML = '<span>✅</span> <span>Message Copied!</span>';
+          setTimeout(() => {
+            copyBtn.innerHTML = '<span>📋</span> <span>Copy Message Text</span>';
+          }, 2000);
+        } catch (e) {
+          alert('Unable to copy message automatically.');
+        }
+      };
+    }
+
+    modal.style.display = 'flex';
+  },
+
+  // 3. Message Formatters for all sections
+  formatBookingMessage(b) {
+    if (!b) return '';
+    const custName = b.name || b.customer_name || 'Valued Customer';
+    const bookingRef = b.invoice_ref || (b.id && b.id.length > 8 ? `TRI-${b.id.substring(0, 8).toUpperCase()}` : (b.id || 'N/A'));
+    const bDate = b.booking_date || b.date || 'Immediate';
+    const slot = b.slot || b.time_slot || b.slot_time || '';
+    const dateSlotDisplay = slot ? `${bDate} (${slot})` : bDate;
+    const vType = b.vehicle_type || b.vehicleModel || b.vehicleType || '';
+    const vReg = b.reg || b.reg_number || '';
+    const vehDisplay = vReg ? `${vReg}${vType ? ` (${vType})` : ''}` : (vType || 'Vehicle');
+    const serviceName = b.service || b.service_name || 'Detailing Service';
+    const amt = Number(b.price !== undefined ? b.price : (b.total_amount || 0));
+    const payStatus = (b.payStatus || b.status || 'CONFIRMED').toUpperCase();
+
+    return `*TRIEYE STUDIO — BOOKING CONFIRMATION*\n\n` +
+      `Hi ${custName},\n\n` +
+      `Thank you for booking with TRIEYE DETAILING!\nHere are your booking details:\n\n` +
+      `*Booking Ref:* ${bookingRef}\n` +
+      `*Date & Time:* ${dateSlotDisplay}\n` +
+      `*Vehicle:* ${vehDisplay}\n` +
+      `*Service:* ${serviceName}\n` +
+      `*Estimated Amount:* ₹${amt.toLocaleString('en-IN')}\n` +
+      `*Status:* ${payStatus}\n\n` +
+      `*Studio Location:*\n` +
+      `1st, 19, 6th Street, Main Rd, Baba Nagar, Villivakkam, Chennai 600049\n` +
+      `*Contact:* +91 99401 81934 / +91 93630 68836\n\n` +
+      `We look forward to serving you!\n` +
+      `*TRIEYE DETAILING*\n` +
+      `*Detail • Precision • Protection*`;
+  },
+
+  formatInvoiceMessage(inv) {
+    if (!inv) return '';
+    const cust = inv.customers || {
+      name: inv.customer_name || inv.name,
+      phone: inv.customer_phone || inv.phone
+    };
+    const veh = inv.vehicles || {
+      reg_number: inv.reg_number || inv.reg,
+      vehicle_type: inv.vehicle_type || inv.vehicleType || inv.vehicleModel
+    };
+    const items = inv.invoice_items || inv.items || [];
+    const serviceItems = [];
+    const productItems = [];
+    items.forEach(it => {
+      const isProd = it.item_type === 'PRODUCT' || it.is_product || 
+        ['Chain Loop', 'Perfume', 'Fabric Cloth'].includes(it.service_name) ||
+        (!it.service_id && !['Foam Wash', 'Ceramic Coating', 'Interior Deep Cleaning', 'Full Detail Combo', 'PPF', 'Paint Protection Film', 'Underbody Anti-Rust Coating', 'Bike Detailing'].some(s => (it.service_name||'').toLowerCase().includes(s.toLowerCase())));
+      if (isProd) productItems.push(it);
+      else serviceItems.push(it);
+    });
+
+    let itemsText = '';
+    if (serviceItems.length > 0) {
+      itemsText += '\n*Detailing Services:*\n' + serviceItems.map(s => `• ${s.service_name || s.name} (x${s.quantity || 1}) - ₹${Number(s.total_price !== undefined ? s.total_price : s.price || 0).toLocaleString('en-IN')}`).join('\n') + '\n';
+    }
+    if (productItems.length > 0) {
+      itemsText += '\n*Add-on Products & Accessories:*\n' + productItems.map(p => `• ${p.service_name || p.name} (x${p.quantity || 1}) - ₹${Number(p.total_price !== undefined ? p.total_price : p.price || 0).toLocaleString('en-IN')}`).join('\n') + '\n';
+    }
+    if (!itemsText && (inv.service || inv.service_name)) {
+      itemsText = `\n*Service:* ${inv.service || inv.service_name}\n`;
+    }
+
+    const metrics = (typeof window !== 'undefined' && window.TrieyeDB && typeof window.TrieyeDB.calculateBillMetrics === 'function')
+      ? window.TrieyeDB.calculateBillMetrics(inv)
+      : (TrieyeDB && typeof TrieyeDB.calculateBillMetrics === 'function' ? TrieyeDB.calculateBillMetrics(inv) : {
+          originalBillAmount: Number(inv.subtotal || inv.grand_total || inv.price || 0),
+          finalBillAmount: Number(inv.grand_total || inv.total_amount || inv.price || 0),
+          amountCollected: Number(inv.amount_collected || (inv.payments && inv.payments[0]?.amount) || (inv.status === 'PAID' ? (inv.grand_total || inv.price) : 0)),
+          balanceDue: Number(inv.balance_due || 0),
+          paymentStatus: (inv.status || 'UNPAID').toUpperCase(),
+          paymentMethod: inv.payment_method || (inv.payments && inv.payments[0]?.method) || 'Cash',
+          isFullyPaid: (inv.status || '').toUpperCase() === 'PAID',
+          isPartial: (inv.status || '').toUpperCase() === 'PARTIAL' || (inv.status || '').toUpperCase() === 'PARTIALLY PAID'
+        });
+
+    const lessAmt = Number(metrics.lessAmount || metrics.discountAmount || inv.discount || 0);
+    const lessText = lessAmt > 0 ? `₹${lessAmt.toLocaleString('en-IN')}` : '₹0';
+    const balText = `₹${Number(metrics.balanceDue || 0).toLocaleString('en-IN')}`;
+    const pMethod = metrics.paymentMethod ? (typeof formatPaymentMethod === 'function' ? formatPaymentMethod(metrics.paymentMethod) : metrics.paymentMethod) : 'Cash';
+    
+    let paymentLines = 
+`*Service Price:* ₹${Number(metrics.originalBillAmount || 0).toLocaleString('en-IN')}
+*Less Amount:* ${lessText}
+*Final Bill Amount:* ₹${Number(metrics.finalBillAmount || 0).toLocaleString('en-IN')}
+*Amount Collected:* ₹${Number(metrics.amountCollected || 0).toLocaleString('en-IN')}
+*Balance Due:* ${balText}
+*Payment Status:* ${metrics.isFullyPaid ? `PAID (${pMethod})` : (metrics.isPartial ? `PARTIAL (${pMethod})` : 'UNPAID')}`;
+
+    const invRef = inv.invoice_number || inv.invoice_ref || ((inv.id && inv.id.length > 8) ? `TR-${inv.id.substring(0, 8).toUpperCase()}` : (inv.id || 'TR-INVOICE'));
+    const shareToken = inv.share_token || (inv.bookings && inv.bookings.share_token) || '';
+    let invoiceUrl = '';
+    if (shareToken) {
+      if (typeof getPublicInvoiceUrl === 'function') {
+        invoiceUrl = getPublicInvoiceUrl(shareToken);
+      } else {
+        const isLocalHost = typeof window !== 'undefined' && (!window.location.origin || 
+                            window.location.hostname === 'localhost' || 
+                            window.location.hostname === '127.0.0.1' || 
+                            window.location.protocol === 'file:');
+        const baseOrigin = isLocalHost ? 'https://trieye-website.vercel.app' : (typeof window !== 'undefined' ? window.location.origin : 'https://trieye-website.vercel.app');
+        invoiceUrl = `${baseOrigin}/invoice?token=${encodeURIComponent(shareToken)}`;
+      }
+    }
+    const invoiceLinkLine = invoiceUrl ? `\n*View Digital Invoice:*\n${invoiceUrl}\n` : '';
+
+    const vCat = typeof formatVehicleCategory === 'function' ? formatVehicleCategory(veh.vehicle_type || 'Car') : (veh.vehicle_type || 'Car');
+    const vDisplay = veh.reg_number ? `${veh.reg_number}${vCat ? ` (${vCat})` : ''}` : (vCat || 'N/A');
+
+    return `*TRIEYE STUDIO — INVOICE*\n\n` +
+      `Hi ${cust.name || 'Valued Customer'},\n\n` +
+      `Thank you for choosing TRIEYE DETAILING.\nYour invoice is ready.\n\n` +
+      `*Invoice:* ${invRef}\n` +
+      `*Vehicle:* ${vDisplay}\n` +
+      itemsText + '\n' +
+      paymentLines + '\n' +
+      invoiceLinkLine + '\n' +
+      `Thank you,\n` +
+      `*TRIEYE DETAILING*\n` +
+      `*Detail • Precision • Protection*`;
+  },
+
+  formatCompletedJobMessage(b) {
+    if (!b) return '';
+    const custName = b.name || b.customer_name || 'Valued Customer';
+    const ref = b.invoice_ref || (b.id && b.id.length > 8 ? `TRI-${b.id.substring(0, 8).toUpperCase()}` : (b.id || 'N/A'));
+    const vType = typeof formatVehicleCategory === 'function' ? formatVehicleCategory(b.vehicleModel || b.vehicleType || 'Car') : (b.vehicleModel || b.vehicleType || 'Car');
+    const vReg = b.reg || b.reg_number || 'Vehicle';
+    const vehDisplay = `${vReg} (${vType})`;
+    const serviceName = b.service || b.service_name || 'Detailing Service';
+    const metrics = (typeof window !== 'undefined' && window.TrieyeDB && typeof window.TrieyeDB.calculateBillMetrics === 'function')
+      ? window.TrieyeDB.calculateBillMetrics(b)
+      : (TrieyeDB && typeof TrieyeDB.calculateBillMetrics === 'function' ? TrieyeDB.calculateBillMetrics(b) : {
+          finalBillAmount: Number(b.price || b.total_amount || 0),
+          amountCollected: Number((b.payStatus || '').toUpperCase() === 'PAID' ? (b.price || b.total_amount || 0) : (b.paid_amount || 0)),
+          balanceDue: 0,
+          paymentStatus: (b.payStatus || 'PAID').toUpperCase(),
+          paymentMethod: b.payMethod || 'UPI'
+        });
+    const pMethod = metrics.paymentMethod ? (typeof formatPaymentMethod === 'function' ? formatPaymentMethod(metrics.paymentMethod) : metrics.paymentMethod) : 'UPI';
+    const shareToken = b.share_token || '';
+    const invoiceUrl = shareToken && typeof getPublicInvoiceUrl === 'function' ? getPublicInvoiceUrl(shareToken) : (shareToken ? `https://trieye-website.vercel.app/invoice?token=${encodeURIComponent(shareToken)}` : '');
+    const invoiceLinkLine = invoiceUrl ? `\n*View Invoice Receipt:*\n${invoiceUrl}\n` : '';
+
+    return `*TRIEYE STUDIO — JOB COMPLETED & READY FOR PICKUP*\n\n` +
+      `Hi ${custName},\n\n` +
+      `Your vehicle service has been completed with precision at TRIEYE DETAILING and is ready for pickup! 🚗✨\n\n` +
+      `*Job Ref:* ${ref}\n` +
+      `*Vehicle:* ${vehDisplay}\n` +
+      `*Completed Service:* ${serviceName}\n\n` +
+      `*Final Bill Amount:* ₹${Number(metrics.finalBillAmount || 0).toLocaleString('en-IN')}\n` +
+      `*Amount Collected:* ₹${Number(metrics.amountCollected || 0).toLocaleString('en-IN')}\n` +
+      `*Balance Due:* ₹${Number(metrics.balanceDue || 0).toLocaleString('en-IN')}\n` +
+      `*Payment Status:* ${metrics.paymentStatus} (${pMethod})\n` +
+      invoiceLinkLine + '\n' +
+      `*Studio Location:*\n` +
+      `1st, 19, 6th Street, Main Rd, Baba Nagar, Villivakkam, Chennai 600049\n` +
+      `*Contact:* +91 99401 81934 / +91 93630 68836\n\n` +
+      `Thank you for trusting TRIEYE DETAILING!\n` +
+      `*Detail • Precision • Protection*`;
+  },
+
+  formatPackagePurchaseMessage(pkg) {
+    if (!pkg) return '';
+    const isBike = pkg.package_type === 'BIKE' || String(pkg.package_id || pkg.package_code || '').includes('BPKG');
+    const custName = pkg.customer_name || 'Valued Customer';
+    const pkgId = pkg.package_code || pkg.package_id || 'TRI-PKG';
+    const planName = pkg.package_name || (isBike ? 'TRIEYE Monthly Bike Wash Pack' : 'TRIEYE Monthly Car Care Pack');
+    const vCat = typeof formatVehicleCategory === 'function' ? formatVehicleCategory(pkg.vehicle_category || pkg.vehicle_type || (isBike ? 'Bike' : 'Car')) : (pkg.vehicle_category || pkg.vehicle_type);
+    const vReg = pkg.reg_number || 'N/A';
+    const vehDisplay = `${vReg} (${vCat})`;
+    const price = Number(pkg.price || 0);
+    const pStatus = (pkg.payment_status || 'PAID').toUpperCase();
+    const expDate = pkg.expiry_date || '-';
+
+    let washAllocationText = '';
+    if (isBike) {
+      washAllocationText = `• 3 Included Bike Washes (Valid for 30 days)`;
+    } else {
+      const rem = pkg.remaining_washes || {};
+      const comp = rem.complete !== undefined ? rem.complete : 1;
+      const basic = rem.basic !== undefined ? rem.basic : 1;
+      const outer = rem.outer_foam !== undefined ? rem.outer_foam : 4;
+      washAllocationText = 
+`• Complete Wash: ${comp}
+• Basic Wash: ${basic}
+• Outer Foam Wash: ${outer}
+*Total Included Washes:* 6 Washes`;
+    }
+
+    return `*TRIEYE STUDIO — ${isBike ? 'BIKE' : 'CAR'} CARE PACKAGE ACTIVATED*\n\n` +
+      `Hi ${custName},\n\n` +
+      `Thank you for subscribing to the *${planName}*! Your package is now active. 🎉\n\n` +
+      `*Package ID:* ${pkgId}\n` +
+      `*Vehicle:* ${vehDisplay}\n` +
+      `*Package Price:* ₹${price.toLocaleString('en-IN')}\n` +
+      `*Payment Status:* ${pStatus}\n` +
+      `*Validity:* 30 Days (Valid until ${expDate})\n\n` +
+      `*Included Wash Allocation:*\n` +
+      `${washAllocationText}\n\n` +
+      `Please present your vehicle registration number or Package ID upon arrival at the studio to redeem your washes.\n\n` +
+      `*Studio Location:*\n` +
+      `1st, 19, 6th Street, Main Rd, Baba Nagar, Villivakkam, Chennai 600049\n` +
+      `*Contact:* +91 99401 81934 / +91 93630 68836\n\n` +
+      `Thank you,\n` +
+      `*TRIEYE DETAILING*\n` +
+      `*Detail • Precision • Protection*`;
+  },
+
+  formatPackageRedemptionMessage(r) {
+    if (!r) return '';
+    const snap = r.balance_snapshot || {};
+    const isBike = r.package_type === 'BIKE' || 
+                   r.wash_category === 'bike_wash' || 
+                   String(r.package_code || r.package_id || '').includes('BPKG');
+
+    const payableText = Number(r.payable_amount || 0) > 0 ? `₹${Number(r.payable_amount).toLocaleString('en-IN')}` : '₹0 (Included in Package)';
+
+    let balanceSection = '';
+    if (isBike) {
+      const bikeLeft = snap.bike_wash !== undefined ? snap.bike_wash : (snap.total !== undefined ? snap.total : 0);
+      balanceSection = `*Updated Remaining Wash Balance:*\n` +
+        `• Included Bike Washes: ${bikeLeft} remaining (out of 3)\n` +
+        `*Total Washes Left:* ${bikeLeft} / 3\n`;
+    } else {
+      const compLeft = snap.complete ?? 0;
+      const basicLeft = snap.basic ?? 0;
+      const outerLeft = snap.outer_foam ?? 0;
+      const totalLeft = snap.total !== undefined ? snap.total : (compLeft + basicLeft + outerLeft);
+      balanceSection = `*Updated Remaining Wash Balance:*\n` +
+        `• Complete Wash: ${compLeft} remaining\n` +
+        `• Basic Wash: ${basicLeft} remaining\n` +
+        `• Outer Foam Wash: ${outerLeft} remaining\n` +
+        `*Total Washes Left:* ${totalLeft}\n`;
+    }
+
+    const vCat = typeof formatVehicleCategory === 'function' ? formatVehicleCategory(r.vehicle_type || (isBike ? 'Bike' : 'Car')) : (r.vehicle_type || (isBike ? 'Bike' : 'Car'));
+
+    return `*TRIEYE DETAILING — ${isBike ? 'BIKE PACKAGE' : 'CAR PACKAGE'} REDEMPTION RECEIPT*\n\n` +
+      `Hi ${r.customer_name || 'Valued Customer'},\n\n` +
+      `Your wash redemption has been recorded successfully.\n\n` +
+      `*Receipt #:* ${r.redemption_number || r.id}\n` +
+      `*Package ID:* ${r.package_code || r.package_id || '-'}\n` +
+      `*Vehicle:* ${r.reg_number || 'N/A'} (${vCat})\n\n` +
+      `*Today's Wash Redeemed:* ${r.wash_type_name || (isBike ? 'Bike Wash' : 'Wash')}\n` +
+      `*Today's Payable Amount:* ${payableText}\n\n` +
+      balanceSection + '\n' +
+      `*Package Valid Until:* ${r.expiry_date || '-'}\n\n` +
+      `Thank you for choosing TRIEYE DETAILING!\n` +
+      `*Detail • Precision • Protection*`;
+  },
+
+  formatCustomerChatMessage(c, phone) {
+    const custName = (c && c.name) ? c.name : 'Valued Customer';
+    const veh = c && (c.reg || c.vehicleType) ? `${c.reg || ''}${c.vehicleType ? ` (${c.vehicleType})` : ''}`.trim() : '';
+    const vehLine = veh ? ` for your vehicle ${veh}` : '';
+
+    return `Hi ${custName},\n\n` +
+      `Greetings from TRIEYE DETAILING Studio!\n` +
+      `How may we assist you today${vehLine}?\n\n` +
+      `*TRIEYE DETAILING*\n` +
+      `*Detail • Precision • Protection*\n` +
+      `Contact: +91 99401 81934 / +91 93630 68836`;
+  }
+};
+
+TrieyeDB.WhatsApp = TrieyeWhatsApp;
+
 if (typeof window !== 'undefined') {
   window.TrieyeDB = TrieyeDB;
+  window.TrieyeWhatsApp = TrieyeWhatsApp;
   window.formatVehicleNumber = TrieyeDB.formatVehicleNumber.bind(TrieyeDB);
   window.validateVehicleNumber = TrieyeDB.validateVehicleNumber.bind(TrieyeDB);
   window.normalizeVehicleNumber = TrieyeDB.normalizeVehicleNumber.bind(TrieyeDB);
@@ -4177,6 +4607,8 @@ if (typeof window !== 'undefined') {
 
 if (typeof globalThis !== 'undefined') {
   globalThis.TrieyeDB = TrieyeDB;
+  globalThis.TrieyeWhatsApp = TrieyeWhatsApp;
 }
+
 
 

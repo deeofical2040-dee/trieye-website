@@ -3066,6 +3066,7 @@
 
                 <!-- Header Actions -->
                 <div style="display:flex; align-items:center; gap:0.5rem;">
+                  <button class="btn btn-green" id="btn-wa-pkg" onclick="sharePackageDetailsWhatsApp(currentSelectedPackageId)" style="padding:0.35rem 0.75rem; font-size:0.75rem; background:#22c55e; border-color:#22c55e; color:#fff; display:inline-flex; align-items:center; gap:4px;"><span>💬</span> <span>WhatsApp</span></button>
                   <button class="btn btn-outline" id="btn-view-pkg-invoice" onclick="viewPackageInvoice(currentSelectedPackageId)" style="padding:0.35rem 0.75rem; font-size:0.75rem; border-color:#38bdf8; color:#38bdf8;">🧾 View Invoice</button>
                   <button class="btn btn-outline" onclick="closeActivePackageView()" style="padding:0.35rem 0.65rem; font-size:0.75rem;">✕ Close View</button>
                 </div>
@@ -3313,6 +3314,7 @@
 
                 <!-- Header Actions -->
                 <div style="display:flex; align-items:center; gap:0.5rem;">
+                  <button class="btn btn-green" id="btn-wa-bpkg" onclick="sharePackageDetailsWhatsApp(currentSelectedBikePackageId)" style="padding:0.35rem 0.75rem; font-size:0.75rem; background:#22c55e; border-color:#22c55e; color:#fff; display:inline-flex; align-items:center; gap:4px;"><span>💬</span> <span>WhatsApp</span></button>
                   <button class="btn btn-outline" id="btn-view-bpkg-invoice" onclick="viewBikePackageInvoice(currentSelectedBikePackageId)" style="padding:0.35rem 0.75rem; font-size:0.75rem; border-color:#38bdf8; color:#38bdf8;">🧾 View Invoice</button>
                   <button class="btn btn-outline" onclick="closeActiveBikePackageView()" style="padding:0.35rem 0.65rem; font-size:0.75rem;">✕ Close View</button>
                 </div>
@@ -3756,6 +3758,7 @@
               <div style="font-family:'IBM Plex Mono', monospace; font-size:0.85rem; color:var(--muted); margin-top:3px;" id="cust-prof-phone">+91 0000000000</div>
             </div>
             <div style="display:flex; gap:0.5rem; align-items:center;">
+              <button class="btn btn-sm btn-green" onclick="chatWithCustomerWhatsApp(selectedCustomerPhone)" style="background:#22c55e; color:#fff; border-color:#22c55e; display:inline-flex; align-items:center; gap:4px;"><span>💬</span> <span>WhatsApp</span></button>
               <button class="btn btn-sm" id="cust-prof-edit-btn" onclick="editSelectedCustomer()">✏️ Edit Profile</button>
               <button class="btn btn-sm" onclick="clearSelectedCustomer()" style="background:var(--bg-panel-3); color:var(--muted);">✕ Close Profile</button>
             </div>
@@ -5517,8 +5520,8 @@
       }
 
       if (!isUuid(booking.id)) {
-        console.error('BUG: display invoice_ref used as booking UUID', booking);
-        throw new Error('Invalid booking UUID');
+        console.warn('Booking ID is not a UUID (walk-in / legacy format):', booking.id);
+        return null;
       }
 
       // Safe diagnostic logging as requested (do NOT print the token itself)
@@ -6506,7 +6509,7 @@
               ${!isWalkIn && (normStatus === 'CONFIRMED' || normStatus === 'PENDING') ? `<button class="action-btn arrive" onclick="markBookingArrived('${escapeHtml(b.id)}')" title="Mark Vehicle Arrived">🚗 Arrived</button>` : ''}
               ${normStatus !== 'CANCELLED' && normStatus !== 'COMPLETED' ? `<button class="action-btn" style="background:rgba(239,68,68,0.12); color:var(--red); border-color:var(--red);" onclick="changeJobStatus('${escapeHtml(b.id)}', 'CANCELLED')" title="Cancel Booking">🚫 Cancel</button>` : ''}
               <button class="action-btn" title="View & Print Bill Invoice" onclick="openBillInvoiceModal('${escapeHtml(b.id || b.invoice_number || '')}')">🧾 Bill</button>
-              <button class="action-btn wa" title="Share Bill on WhatsApp" onclick="shareBillWhatsApp('${escapeHtml(b.id || b.invoice_number || '')}')">💬 WA Bill</button>
+              <button class="action-btn wa" title="Share Booking Confirmation on WhatsApp" onclick="shareBookingWhatsApp('${escapeHtml(b.id || b.invoice_number || '')}')">💬 WhatsApp</button>
               ${b.phone ? `<a href="tel:${cleanPhone(b.phone)}" class="action-btn call" title="Call Customer">📞 Call</a>` : ''}
             </div>
           </td>
@@ -7765,7 +7768,12 @@
             <strong style="color:var(--white);">${escapeHtml(c.name || 'Valued Customer')}</strong>
             <div style="font-size:0.72rem; color:var(--muted);">Click to view history &amp; bills</div>
           </td>
-          <td onclick="showCustomerProfile('${k}')"><span style="font-family:'IBM Plex Mono'; font-weight:600;">+91 ${escapeHtml(k)}</span></td>
+          <td onclick="showCustomerProfile('${k}')">
+            <div style="display:flex; align-items:center; gap:6px;">
+              <span style="font-family:'IBM Plex Mono'; font-weight:600;">+91 ${escapeHtml(k)}</span>
+              <button type="button" class="action-btn-sm wa" style="padding:1px 6px; font-size:0.7rem; background:rgba(34,197,94,0.15); color:#22c55e; border:1px solid rgba(34,197,94,0.3); border-radius:4px; cursor:pointer;" title="Chat on WhatsApp" onclick="event.stopPropagation(); chatWithCustomerWhatsApp('${escapeHtml(k)}')">💬 Chat</button>
+            </div>
+          </td>
           <td onclick="showCustomerProfile('${k}')">${escapeHtml(vehDisplay)}</td>
           <td onclick="showCustomerProfile('${k}')"><span class="status-badge status-confirmed">${visits} ${visits === 1 ? 'Visit' : 'Visits'}</span></td>
           <td onclick="showCustomerProfile('${k}')"><strong style="color:var(--green); font-family:'IBM Plex Mono';">₹${totalSpent.toLocaleString()}</strong></td>
@@ -7773,6 +7781,7 @@
           <td>
             <div class="action-btn-group">
               <button class="action-btn" onclick="event.stopPropagation(); showCustomerProfile('${k}')">📜 History &amp; Bills</button>
+              <button class="action-btn wa" title="Chat on WhatsApp" onclick="event.stopPropagation(); chatWithCustomerWhatsApp('${escapeHtml(k)}')">💬 WhatsApp</button>
               <button class="action-btn-sm" onclick="event.stopPropagation(); editCustomerModal('${k}')">✏️ Edit</button>
             </div>
           </td>
@@ -8127,7 +8136,7 @@
       openModal('modalReceipt');
     }
 
-    async function shareCurrentInvoiceWhatsApp() {
+    function shareCurrentInvoiceWhatsApp() {
       const b = window.currentInvoiceBooking;
       if (!b) {
         console.error('Invoice share failed: window.currentInvoiceBooking is null');
@@ -8139,111 +8148,67 @@
       console.log('History action invoice ref:', b.invoice_ref);
 
       const rawPhone = (b.phone || b.customer_phone || '').trim();
-      const digits = rawPhone.replace(/\D/g, '');
-
-      if (!digits || digits.length < 10) {
-        alert('Customer phone number is unavailable or invalid.');
+      if (!TrieyeWhatsApp.isValidPhone(rawPhone)) {
+        alert('Customer phone number is unavailable or invalid: ' + (rawPhone || 'None'));
         return;
       }
 
-      let normalizedPhone = digits;
-      if (digits.length === 10) {
-        normalizedPhone = '91' + digits;
-      } else if (digits.length === 11 && digits.startsWith('0')) {
-        normalizedPhone = '91' + digits.slice(1);
-      } else if (digits.length === 12 && digits.startsWith('91')) {
-        normalizedPhone = digits;
+      // Check for share token in memory or cache
+      const shareToken = b.share_token || (b.bookings && b.bookings.share_token) || '';
+      let invoiceUrl = '';
+      if (shareToken && typeof getPublicInvoiceUrl === 'function') {
+        invoiceUrl = getPublicInvoiceUrl(shareToken);
+      } else if (shareToken) {
+        invoiceUrl = `https://trieye-website.vercel.app/invoice?token=${encodeURIComponent(shareToken)}`;
       }
 
-      let bookingRef = b.invoice_ref;
-      if (!bookingRef) {
-        bookingRef = (b.id && b.id.length > 8) ? `TRI-${b.id.substring(0, 8).toUpperCase()}` : (b.id || 'N/A');
-      } else if (!bookingRef.startsWith('TRI-')) {
-        bookingRef = `TRI-${bookingRef.toUpperCase()}`;
-      }
-
-      const customerName = b.name || b.customer_name || 'Valued Customer';
+      // Construct message
       const billSource = (window._invoicesCache || []).find(i => i.id === b.invoice_id || i.invoice_number === b.invoice_ref || i.invoice_number === b.invoice_number) || b;
-      const metrics = window.TrieyeDB && typeof window.TrieyeDB.calculateBillMetrics === 'function'
-        ? window.TrieyeDB.calculateBillMetrics(billSource)
-        : {
-            originalBillAmount: Number(b.price !== undefined && b.price !== null ? b.price : (b.total_amount || 0)),
-            finalBillAmount: Number(b.total_amount || b.price || 0),
-            amountCollected: Number((b.payStatus || '').toUpperCase() === 'PAID' ? (b.total_amount || b.price || 0) : (b.paid_amount || 0)),
-            balanceDue: 0,
-            paymentStatus: (b.payStatus || 'UNPAID').toUpperCase(),
-            paymentMethod: b.payMethod || 'Cash',
-            isFullyPaid: (b.payStatus || '').toUpperCase() === 'PAID',
-            isPartial: (b.payStatus || '').toUpperCase() === 'PARTIAL' || (b.payStatus || '').toUpperCase() === 'PARTIALLY PAID'
-          };
-
-      const serviceName = b.service || (Array.isArray(b.services) && b.services[0]?.name) || b.service_name || 'Detailing & Foam Wash';
-      const vehType = b.vehicle_type || b.vehicleType || b.vehicleModel || (b.vehicles && b.vehicles.vehicle_type) || '';
-      const vehDisplay = (b.reg || b.reg_number || 'Vehicle') + (vehType ? ` (${vehType})` : '');
-
-      // Retrieve existing secure share token from Supabase
-      const token = await getOrFetchShareToken(b);
-      if (!token) {
-        console.error('Invoice share token could not be resolved for booking UUID:', b.id);
-        alert('Invoice share token is unavailable from database. Please check the browser console for details.');
-        return;
-      }
-
-      const secureInvoiceUrl = getPublicInvoiceUrl(token);
-
-      const lessText = metrics.lessAmount > 0 ? `₹${metrics.lessAmount.toLocaleString('en-IN')}` : '₹0';
-      const balText = `₹${metrics.balanceDue.toLocaleString('en-IN')}`;
-      let paymentLines = '';
-      if (metrics.isFullyPaid) {
-        paymentLines = 
-`*Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
-*Less Amount:* ${lessText}
-*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
-*Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
-*Balance Due:* ${balText}
-*Payment Status:* PAID (${formatPaymentMethod(metrics.paymentMethod)})`;
-      } else if (metrics.isPartial) {
-        paymentLines = 
-`*Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
-*Less Amount:* ${lessText}
-*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
-*Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
-*Balance Due:* ${balText}
-*Payment Status:* PARTIAL (${formatPaymentMethod(metrics.paymentMethod)})`;
+      let msg = '';
+      if (window.TrieyeWhatsApp && typeof window.TrieyeWhatsApp.formatInvoiceMessage === 'function') {
+        if (!billSource.share_token && shareToken) billSource.share_token = shareToken;
+        msg = window.TrieyeWhatsApp.formatInvoiceMessage(billSource);
       } else {
-        paymentLines = 
-`*Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
-*Less Amount:* ${lessText}
-*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
-*Amount Collected:* ₹0
-*Balance Due:* ${balText}
-*Payment Status:* UNPAID`;
+        const customerName = b.name || b.customer_name || 'Valued Customer';
+        const bookingRef = b.invoice_ref || ((b.id && b.id.length > 8) ? `TRI-${b.id.substring(0, 8).toUpperCase()}` : (b.id || 'N/A'));
+        const metrics = (window.TrieyeDB && typeof window.TrieyeDB.calculateBillMetrics === 'function')
+          ? window.TrieyeDB.calculateBillMetrics(billSource)
+          : {
+              originalBillAmount: Number(b.price || b.total_amount || 0),
+              finalBillAmount: Number(b.total_amount || b.price || 0),
+              amountCollected: Number((b.payStatus || '').toUpperCase() === 'PAID' ? (b.total_amount || b.price || 0) : (b.paid_amount || 0)),
+              balanceDue: 0,
+              paymentStatus: (b.payStatus || 'UNPAID').toUpperCase(),
+              paymentMethod: b.payMethod || 'Cash'
+            };
+        const vType = b.vehicle_type || b.vehicleType || b.vehicleModel || '';
+        const vehDisplay = (b.reg || b.reg_number || 'Vehicle') + (vType ? ` (${formatVehicleCategory(vType)})` : '');
+        const serviceName = b.service || b.service_name || 'Detailing Service';
+        const lessText = (metrics.lessAmount || metrics.discountAmount || 0) > 0 ? `₹${Number(metrics.lessAmount || metrics.discountAmount).toLocaleString('en-IN')}` : '₹0';
+        const balText = `₹${Number(metrics.balanceDue || 0).toLocaleString('en-IN')}`;
+        const pMethod = metrics.paymentMethod ? (typeof formatPaymentMethod === 'function' ? formatPaymentMethod(metrics.paymentMethod) : metrics.paymentMethod) : 'Cash';
+        const invLinkLine = invoiceUrl ? `\n*View Digital Invoice:*\n${invoiceUrl}\n` : '';
+
+        msg = `*TRIEYE STUDIO — INVOICE*\n\n` +
+          `Hi ${customerName},\n\n` +
+          `Thank you for choosing TRIEYE DETAILING.\nYour invoice is ready.\n\n` +
+          `*Invoice:* ${bookingRef}\n` +
+          `*Vehicle:* ${vehDisplay}\n` +
+          `*Service:* ${serviceName}\n\n` +
+          `*Service Price:* ₹${Number(metrics.originalBillAmount || 0).toLocaleString('en-IN')}\n` +
+          `*Less Amount:* ${lessText}\n` +
+          `*Final Bill Amount:* ₹${Number(metrics.finalBillAmount || 0).toLocaleString('en-IN')}\n` +
+          `*Amount Collected:* ₹${Number(metrics.amountCollected || 0).toLocaleString('en-IN')}\n` +
+          `*Balance Due:* ${balText}\n` +
+          `*Payment Status:* ${metrics.paymentStatus} (${pMethod})\n` +
+          invLinkLine + '\n' +
+          `Thank you,\n` +
+          `*TRIEYE DETAILING*\n` +
+          `*Detail • Precision • Protection*`;
       }
 
-      const msg = 
-`*TRIEYE STUDIO — INVOICE*
-
-Hi ${customerName},
-
-Thank you for choosing TRIEYE DETAILING.
-Your invoice is ready.
-
-*Invoice:* ${bookingRef}
-*Vehicle:* ${vehDisplay}
-*Service:* ${serviceName}
-
-${paymentLines}
-
-*View Digital Invoice:*
-${secureInvoiceUrl}
-
-Thank you,
-TRIEYE DETAILING
-*Detail • Precision • Protection*`;
-
-      const encoded = encodeURIComponent(msg);
-      window.open(`https://wa.me/${normalizedPhone}?text=${encoded}`, '_blank');
-      showToast('Opening WhatsApp...');
+      TrieyeWhatsApp.openChat(rawPhone, msg);
+    }
     }
 
     async function openCurrentInvoicePage() {
@@ -8336,11 +8301,103 @@ TRIEYE DETAILING
     function shareBillWhatsApp(bookingOrId) {
       const originalBooking = resolveOriginalBooking(bookingOrId);
       if (!originalBooking) {
-        showToast('Booking details not found');
+        showToast('Booking details not found', true);
         return;
       }
       window.currentInvoiceBooking = originalBooking;
       shareCurrentInvoiceWhatsApp();
+    }
+
+    function shareBookingWhatsApp(bookingOrId) {
+      const originalBooking = resolveOriginalBooking(bookingOrId);
+      if (!originalBooking) {
+        showToast('Booking details not found', true);
+        return;
+      }
+      const rawPhone = originalBooking.phone || originalBooking.customer_phone;
+      if (!rawPhone || (window.TrieyeWhatsApp && !window.TrieyeWhatsApp.isValidPhone(rawPhone))) {
+        showToast(`❌ Customer phone number is missing or invalid: "${rawPhone || 'N/A'}"`, true);
+        return;
+      }
+      const msg = window.TrieyeWhatsApp ? window.TrieyeWhatsApp.formatBookingMessage(originalBooking) : `Hi ${originalBooking.name}, thank you for booking with TRIEYE DETAILING! Ref: ${originalBooking.id}`;
+      if (window.TrieyeWhatsApp) {
+        window.TrieyeWhatsApp.openChat(rawPhone, msg);
+      } else {
+        const clean = String(rawPhone).replace(/\D/g, '').slice(-10);
+        window.open(`https://wa.me/91${clean}?text=${encodeURIComponent(msg)}`, '_blank');
+      }
+    }
+
+    function shareCompletedJobWhatsApp(jobOrId) {
+      const originalBooking = resolveOriginalBooking(jobOrId);
+      if (!originalBooking) {
+        showToast('Job details not found', true);
+        return;
+      }
+      const rawPhone = originalBooking.phone || originalBooking.customer_phone;
+      if (!rawPhone || (window.TrieyeWhatsApp && !window.TrieyeWhatsApp.isValidPhone(rawPhone))) {
+        showToast(`❌ Customer phone number is missing or invalid: "${rawPhone || 'N/A'}"`, true);
+        return;
+      }
+      const msg = window.TrieyeWhatsApp ? window.TrieyeWhatsApp.formatCompletedJobMessage(originalBooking) : `Hi ${originalBooking.name}, your vehicle service has been completed at TRIEYE DETAILING!`;
+      if (window.TrieyeWhatsApp) {
+        window.TrieyeWhatsApp.openChat(rawPhone, msg);
+      } else {
+        const clean = String(rawPhone).replace(/\D/g, '').slice(-10);
+        window.open(`https://wa.me/91${clean}?text=${encodeURIComponent(msg)}`, '_blank');
+      }
+    }
+
+    function chatWithCustomerWhatsApp(phoneKey) {
+      if (!phoneKey) {
+        showToast('❌ Customer phone number is missing', true);
+        return;
+      }
+      const custs = typeof getCustomers === 'function' ? getCustomers() : {};
+      const clean = typeof cleanPhone === 'function' ? cleanPhone(phoneKey) : String(phoneKey).replace(/\D/g, '').slice(-10);
+      const c = custs[clean] || custs[phoneKey] || { name: 'Valued Customer', phone: phoneKey };
+      const msg = window.TrieyeWhatsApp ? window.TrieyeWhatsApp.formatCustomerChatMessage(c, phoneKey) : `Hi ${c.name || 'Valued Customer'}, greetings from TRIEYE DETAILING!`;
+      if (window.TrieyeWhatsApp) {
+        window.TrieyeWhatsApp.openChat(phoneKey, msg);
+      } else {
+        window.open(`https://wa.me/91${clean}?text=${encodeURIComponent(msg)}`, '_blank');
+      }
+    }
+
+    async function sharePackageDetailsWhatsApp(packageId) {
+      if (!packageId) {
+        showToast('No package selected to share', true);
+        return;
+      }
+      let packages = [];
+      if (window.TrieyeDB && typeof window.TrieyeDB.getPackages === 'function') {
+        try { packages = await window.TrieyeDB.getPackages(); } catch (e) {}
+      }
+      if (!packages || packages.length === 0) {
+        try { packages = JSON.parse(localStorage.getItem('trieye_packages')) || []; } catch (e) {}
+      }
+      const clean = String(packageId).trim().toUpperCase();
+      const pkg = packages.find(p => 
+        (p.package_id && String(p.package_id).toUpperCase() === clean) ||
+        (p.id && String(p.id).toUpperCase() === clean) ||
+        (p.package_code && String(p.package_code).toUpperCase() === clean)
+      );
+      if (!pkg) {
+        showToast('Package details not found', true);
+        return;
+      }
+      const rawPhone = pkg.customer_phone || (pkg.customers && pkg.customers.phone);
+      if (!rawPhone || (window.TrieyeWhatsApp && !window.TrieyeWhatsApp.isValidPhone(rawPhone))) {
+        showToast(`❌ Customer phone number is missing or invalid: "${rawPhone || 'N/A'}"`, true);
+        return;
+      }
+      const msg = window.TrieyeWhatsApp ? window.TrieyeWhatsApp.formatPackagePurchaseMessage(pkg) : `TRIEYE DETAILING Package: ${pkg.package_id || pkg.package_code}`;
+      if (window.TrieyeWhatsApp) {
+        window.TrieyeWhatsApp.openChat(rawPhone, msg);
+      } else {
+        const cleanP = String(rawPhone).replace(/\D/g, '').slice(-10);
+        window.open(`https://wa.me/91${cleanP}?text=${encodeURIComponent(msg)}`, '_blank');
+      }
     }
 
     function printBillDirect(bookingOrId) {
@@ -9488,7 +9545,7 @@ TRIEYE DETAILING
           <td>
             <div class="action-btn-group">
               <button class="action-btn" title="View & Print Bill Invoice" onclick="openBillInvoiceModal('${b.id}')">🧾 Receipt</button>
-              <button class="action-btn wa" title="Share Bill on WhatsApp" onclick="shareBillWhatsApp('${b.id}')">💬 WA Bill</button>
+              <button class="action-btn wa" title="Share Job Completed Details on WhatsApp" onclick="shareCompletedJobWhatsApp('${b.id}')">💬 WhatsApp</button>
             </div>
           </td>
         `;
@@ -10289,55 +10346,28 @@ TRIEYE DETAILING
 
     function shareRedemptionReceiptWhatsApp() {
       if (!currentRedemptionReceiptData) {
-        alert('No receipt data available.');
+        if (typeof showToast === 'function') showToast('No receipt data available.', true);
+        else alert('No receipt data available.');
         return;
       }
       const r = currentRedemptionReceiptData;
-      const cleanPhone = String(r.customer_phone || '').replace(/\D/g, '').slice(-10);
-      if (!cleanPhone) {
-        alert('No customer phone number available to share via WhatsApp.');
+      const rawPhone = r.customer_phone || (r.customers && r.customers.phone) || '';
+      if (!rawPhone || (window.TrieyeWhatsApp && !window.TrieyeWhatsApp.isValidPhone(rawPhone))) {
+        if (typeof showToast === 'function') showToast(`❌ Customer phone number is unavailable or invalid: "${rawPhone || 'N/A'}"`, true);
+        else alert('No customer phone number available to share via WhatsApp.');
         return;
       }
 
-      const snap = r.balance_snapshot || {};
-      const isBike = r.package_type === 'BIKE' || 
-                     r.wash_category === 'bike_wash' || 
-                     String(r.package_code || r.package_id || '').includes('BPKG');
+      const msg = window.TrieyeWhatsApp
+        ? window.TrieyeWhatsApp.formatPackageRedemptionMessage(r)
+        : `TRIEYE DETAILING — Package Redemption Receipt #${r.redemption_number || r.id}`;
 
-      const payableText = Number(r.payable_amount || 0) > 0 ? `₹${Number(r.payable_amount).toLocaleString('en-IN')}` : '₹0 (Included in Package)';
-
-      let balanceSection = '';
-      if (isBike) {
-        const bikeLeft = snap.bike_wash !== undefined ? snap.bike_wash : (snap.total !== undefined ? snap.total : 0);
-        balanceSection = `*Updated Remaining Wash Balance:*\n` +
-          `• Included Bike Washes: ${bikeLeft} remaining (out of 3)\n` +
-          `*Total Washes Left:* ${bikeLeft} / 3\n`;
+      if (window.TrieyeWhatsApp) {
+        window.TrieyeWhatsApp.openChat(rawPhone, msg);
       } else {
-        const compLeft = snap.complete ?? 0;
-        const basicLeft = snap.basic ?? 0;
-        const outerLeft = snap.outer_foam ?? 0;
-        const totalLeft = snap.total !== undefined ? snap.total : (compLeft + basicLeft + outerLeft);
-        balanceSection = `*Updated Remaining Wash Balance:*\n` +
-          `• Complete Wash: ${compLeft} remaining\n` +
-          `• Basic Wash: ${basicLeft} remaining\n` +
-          `• Outer Foam Wash: ${outerLeft} remaining\n` +
-          `*Total Washes Left:* ${totalLeft}\n`;
+        const cleanPhone = String(rawPhone).replace(/\D/g, '').slice(-10);
+        window.open(`https://wa.me/91${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
       }
-
-      const text = `*TRIEYE DETAILING — ${isBike ? 'BIKE PACKAGE' : 'CAR PACKAGE'} REDEMPTION RECEIPT*\n\n` +
-        `Hi ${r.customer_name || 'Valued Customer'},\n\n` +
-        `Your wash redemption has been recorded successfully.\n\n` +
-        `*Receipt #:* ${r.redemption_number || r.id}\n` +
-        `*Package ID:* ${r.package_code || r.package_id || '-'}\n` +
-        `*Vehicle:* ${r.reg_number || 'N/A'} (${formatVehicleCategory(r.vehicle_type || (isBike ? 'Bike' : 'Car'))})\n\n` +
-        `*Today\'s Wash Redeemed:* ${r.wash_type_name || (isBike ? 'Bike Wash' : 'Wash')}\n` +
-        `*Today\'s Payable Amount:* ${payableText}\n\n` +
-        balanceSection +
-        `*Package Valid Until:* ${r.expiry_date || '-'}\n\n` +
-        `Thank you for choosing TRIEYE DETAILING!\n*Detail • Precision • Protection*`;
-
-      const url = `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(text)}`;
-      window.open(url, '_blank');
     }
 
     async function openNewPackageModal() {
@@ -13058,91 +13088,27 @@ async function downloadInvoice() {
 
 function shareInvoiceWhatsApp() {
   if (!currentPrintInvoice) return;
-  const cust = currentPrintInvoice.customers || {};
-  if (!cust.phone) {
-    alert("No customer phone number available.");
+  const cust = currentPrintInvoice.customers || {
+    name: currentPrintInvoice.customer_name || currentPrintInvoice.name,
+    phone: currentPrintInvoice.customer_phone || currentPrintInvoice.phone
+  };
+  const rawPhone = (cust.phone || '').trim();
+  if (!rawPhone || (window.TrieyeWhatsApp && !window.TrieyeWhatsApp.isValidPhone(rawPhone))) {
+    if (typeof showToast === 'function') showToast(`❌ Customer phone number is unavailable or invalid: "${rawPhone || 'N/A'}"`, true);
+    else alert("No customer phone number available.");
     return;
   }
-  const veh = currentPrintInvoice.vehicles || {};
-  const items = currentPrintInvoice.invoice_items || [];
-  
-  const serviceItems = [];
-  const productItems = [];
-  items.forEach(it => {
-    const isProd = it.item_type === 'PRODUCT' || it.is_product || 
-      ['Chain Loop', 'Perfume', 'Fabric Cloth'].includes(it.service_name) ||
-      (!it.service_id && !['Foam Wash', 'Ceramic Coating', 'Interior Deep Cleaning', 'Full Detail Combo', 'PPF', 'Paint Protection Film', 'Underbody Anti-Rust Coating', 'Bike Detailing'].some(s => (it.service_name||'').toLowerCase().includes(s.toLowerCase())));
-    if (isProd) productItems.push(it);
-    else serviceItems.push(it);
-  });
 
-  let itemsText = '';
-  if (serviceItems.length > 0) {
-    itemsText += '\n*Detailing Services:*\n' + serviceItems.map(s => `• ${s.service_name} (x${s.quantity}) - ₹${Number(s.total_price).toLocaleString()}`).join('\n') + '\n';
-  }
-  if (productItems.length > 0) {
-    itemsText += '\n*Add-on Products & Accessories:*\n' + productItems.map(p => `• ${p.service_name} (x${p.quantity}) - ₹${Number(p.total_price).toLocaleString()}`).join('\n') + '\n';
-  }
+  const msg = window.TrieyeWhatsApp 
+    ? window.TrieyeWhatsApp.formatInvoiceMessage(currentPrintInvoice)
+    : `*TRIEYE STUDIO — INVOICE*\nInvoice: ${currentPrintInvoice.invoice_number || 'TR-INVOICE'}`;
 
-  const metrics = window.TrieyeDB && typeof window.TrieyeDB.calculateBillMetrics === 'function'
-    ? window.TrieyeDB.calculateBillMetrics(currentPrintInvoice)
-    : {
-        originalBillAmount: Number(currentPrintInvoice.subtotal || currentPrintInvoice.grand_total || 0),
-        finalBillAmount: Number(currentPrintInvoice.grand_total || 0),
-        amountCollected: Number(currentPrintInvoice.amount_collected || 0),
-        balanceDue: Number(currentPrintInvoice.balance_due || 0),
-        paymentStatus: (currentPrintInvoice.status || 'UNPAID').toUpperCase(),
-        paymentMethod: currentPrintInvoice.payment_method || 'Cash',
-        isFullyPaid: (currentPrintInvoice.status || '').toUpperCase() === 'PAID',
-        isPartial: (currentPrintInvoice.status || '').toUpperCase() === 'PARTIAL' || (currentPrintInvoice.status || '').toUpperCase() === 'PARTIALLY PAID'
-      };
-
-  const lessText = metrics.lessAmount > 0 ? `₹${metrics.lessAmount.toLocaleString('en-IN')}` : '₹0';
-  const balText = `₹${metrics.balanceDue.toLocaleString('en-IN')}`;
-  let paymentLines = '';
-  if (metrics.isFullyPaid) {
-    paymentLines = 
-`*Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
-*Less Amount:* ${lessText}
-*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
-*Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
-*Balance Due:* ${balText}
-*Payment Status:* PAID (${formatPaymentMethod(metrics.paymentMethod)})`;
-  } else if (metrics.isPartial) {
-    paymentLines = 
-`*Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
-*Less Amount:* ${lessText}
-*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
-*Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
-*Balance Due:* ${balText}
-*Payment Status:* PARTIAL (${formatPaymentMethod(metrics.paymentMethod)})`;
+  if (window.TrieyeWhatsApp) {
+    window.TrieyeWhatsApp.openChat(rawPhone, msg);
   } else {
-    paymentLines = 
-`*Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
-*Less Amount:* ${lessText}
-*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
-*Amount Collected:* ₹0
-*Balance Due:* ${balText}
-*Payment Status:* UNPAID`;
+    const cleanPhone = String(rawPhone).replace(/\D/g, '').slice(-10);
+    window.open(`https://wa.me/91${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
   }
-
-  const shareToken = currentPrintInvoice.share_token || (currentPrintInvoice.bookings && currentPrintInvoice.bookings.share_token) || '';
-  const secureInvoiceUrl = shareToken ? getPublicInvoiceUrl(shareToken) : '';
-  const invoiceLinkLine = secureInvoiceUrl ? `\n*View Digital Invoice:*\n${secureInvoiceUrl}\n` : '';
-
-  const text = `*TRIEYE STUDIO — INVOICE*\n\n` +
-    `Hi ${cust.name || 'Valued Customer'},\n\n` +
-    `Thank you for choosing TRIEYE DETAILING.\nYour invoice is ready.\n\n` +
-    `*Invoice:* ${currentPrintInvoice.invoice_number}\n` +
-    `*Vehicle:* ${veh.reg_number || 'N/A'} (${formatVehicleCategory(veh.vehicle_type || 'Car')})\n` +
-    itemsText + '\n' +
-    paymentLines + '\n' +
-    invoiceLinkLine + '\n' +
-    `Thank you,\nTRIEYE DETAILING\n*Detail • Precision • Protection*`;
-
-  const cleanPhone = cust.phone.replace(/\D/g, '').slice(-10);
-  const url = `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(text)}`;
-  window.open(url, '_blank');
 }
 
 </script>

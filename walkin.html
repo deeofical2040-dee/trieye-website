@@ -2389,86 +2389,24 @@
         name: inv.customer_name || inv.name,
         phone: inv.customer_phone || inv.phone
       };
-      if (!cust.phone) {
-        alert("No customer phone number available.");
+      const rawPhone = (cust.phone || '').trim();
+      if (!rawPhone || (window.TrieyeWhatsApp && !window.TrieyeWhatsApp.isValidPhone(rawPhone))) {
+        if (typeof showToast === 'function') showToast('❌ Customer phone number is unavailable or invalid: "' + (rawPhone || 'N/A') + '"', true);
+        else alert('No customer phone number available.');
         return;
       }
-      const veh = inv.vehicles || {
-        vehicle_type: inv.vehicle_type || inv.vehicleType,
-        reg_number: inv.reg_number || inv.reg
-      };
-      const metrics = (window.TrieyeDB && typeof window.TrieyeDB.calculateBillMetrics === 'function')
-        ? window.TrieyeDB.calculateBillMetrics(inv)
-        : {
-            serviceName: 'Detailing Service',
-            originalBillAmount: Number(inv.subtotal || inv.grand_total || 0),
-            amountCollected: Number((inv.payments && inv.payments[0]?.amount) || inv.grand_total || 0),
-            finalBillAmount: Number(inv.grand_total || 0),
-            balanceDue: 0,
-            paymentStatus: 'PAID',
-            paymentMethod: 'CASH',
-            isPaid: true
-          };
 
-      const shareToken = inv.share_token || (inv.bookings && inv.bookings.share_token) || '';
-      const isLocalHost = !window.location.origin || 
-                          window.location.hostname === 'localhost' || 
-                          window.location.hostname === '127.0.0.1' || 
-                          window.location.hostname.startsWith('192.168.') ||
-                          window.location.protocol === 'file:';
-      const baseOrigin = isLocalHost ? 'https://trieye-website.vercel.app' : window.location.origin;
-      const invoiceUrl = shareToken ? `${baseOrigin}/invoice?token=${encodeURIComponent(shareToken)}` : '';
+      const msg = window.TrieyeWhatsApp 
+        ? window.TrieyeWhatsApp.formatInvoiceMessage(inv)
+        : ('*TRIEYE STUDIO — INVOICE*
+Invoice: ' + (inv.invoice_number || 'TRI-INVOICE'));
 
-      const lessText = metrics.lessAmount > 0 ? `₹${metrics.lessAmount.toLocaleString('en-IN')}` : '₹0';
-      const balText = `₹${metrics.balanceDue.toLocaleString('en-IN')}`;
-      let paymentDetailsText = '';
-      if (metrics.isPaid) {
-        paymentDetailsText = 
-`*Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
-*Less Amount:* ${lessText}
-*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
-*Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
-*Balance Due:* ${balText}
-*Payment Status:* ✅ PAID (${formatPaymentMethod(metrics.paymentMethod)})`;
-      } else if (metrics.isPartial) {
-        paymentDetailsText = 
-`*Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
-*Less Amount:* ${lessText}
-*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
-*Amount Collected:* ₹${metrics.amountCollected.toLocaleString('en-IN')}
-*Balance Due:* ${balText}
-*Payment Status:* ⚠️ PARTIAL (${formatPaymentMethod(metrics.paymentMethod)})`;
+      if (window.TrieyeWhatsApp) {
+        window.TrieyeWhatsApp.openChat(rawPhone, msg);
       } else {
-        paymentDetailsText = 
-`*Service Price:* ₹${metrics.originalBillAmount.toLocaleString('en-IN')}
-*Less Amount:* ${lessText}
-*Final Bill Amount:* ₹${metrics.finalBillAmount.toLocaleString('en-IN')}
-*Amount Collected:* ₹0
-*Balance Due:* ${balText}
-*Payment Status:* ❌ UNPAID`;
+        const cleanPhone = String(rawPhone).replace(/\D/g, '').slice(-10);
+        window.open('https://wa.me/91' + cleanPhone + '?text=' + encodeURIComponent(msg), '_blank');
       }
-
-      const text = 
-`*TRIEYE STUDIO — INVOICE*
-
-Hi ${cust.name || 'Valued Customer'},
-
-Thank you for choosing TRIEYE DETAILING.
-Your invoice is ready.
-
-*Invoice:* ${inv.invoice_number || 'TRI-INVOICE'}
-*Vehicle:* ${veh.reg_number || 'N/A'} (${formatVehicleCategory(veh.vehicle_type || 'Car')})
-*Service:* ${metrics.serviceName}
-
-${paymentDetailsText}
-
-${invoiceUrl ? `*View Digital Invoice:*\n${invoiceUrl}\n\n` : ''}Thank you,
-TRIEYE DETAILING
-*Detail • Precision • Protection*`;
-
-      const cleanPhone = cust.phone.replace(/\D/g, '').slice(-10);
-      const url = `https://wa.me/91${cleanPhone}?text=${encodeURIComponent(text)}`;
-      window.open(url, '_blank');
     }
 
     // INITIALIZATION
