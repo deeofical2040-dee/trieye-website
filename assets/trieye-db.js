@@ -415,7 +415,15 @@ const TrieyeDB = {
 
         if (error) {
           TrieyeDB.logError('bookings', 'SELECT', error);
-          // Return array with error tag so failures are not silently converted to 0
+          let cached = [];
+          try {
+            cached = JSON.parse(localStorage.getItem('trieye_bookings')) || [];
+          } catch (e) { cached = []; }
+          if (Array.isArray(cached) && cached.length > 0) {
+            cached._hasError = true;
+            cached._error = error;
+            return cached;
+          }
           const errArr = [];
           errArr._hasError = true;
           errArr._error = error;
@@ -559,6 +567,15 @@ const TrieyeDB = {
         }
       } catch (err) {
         console.error('🚨 [Supabase Network Error on bookings SELECT]:', err);
+        let cached = [];
+        try {
+          cached = JSON.parse(localStorage.getItem('trieye_bookings')) || [];
+        } catch (e) { cached = []; }
+        if (Array.isArray(cached) && cached.length > 0) {
+          cached._hasError = true;
+          cached._error = err;
+          return cached;
+        }
         const errArr = [];
         errArr._hasError = true;
         errArr._error = err;
@@ -1013,7 +1030,9 @@ const TrieyeDB = {
 
         if (error) {
           TrieyeDB.logError('customers', 'SELECT', error);
-          return {};
+          try {
+            return JSON.parse(localStorage.getItem('trieye_customers')) || {};
+          } catch (e) { return {}; }
         }
 
         if (Array.isArray(data)) {
@@ -1047,7 +1066,9 @@ const TrieyeDB = {
         }
       } catch (err) {
         console.error('🚨 [Supabase Network Error on getCustomers]:', err);
-        return {};
+        try {
+          return JSON.parse(localStorage.getItem('trieye_customers')) || {};
+        } catch (e) { return {}; }
       }
     }
     try {

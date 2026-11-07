@@ -40,11 +40,9 @@ if (typeof supabase !== 'undefined') {
   });
 }
 
-// Purge old local storage cache once
+// Preserve existing local storage cache safely (never blanket clear)
 if (!localStorage.getItem('trieye_fresh_start_25')) {
-  localStorage.clear();
   localStorage.setItem('trieye_fresh_start_25', 'true');
-  console.log('⚡ [Trieye] Local cache cleared for fresh start.');
 }
 
 // Global accessor
