@@ -2381,8 +2381,7 @@
 
       const msg = window.TrieyeWhatsApp 
         ? window.TrieyeWhatsApp.formatInvoiceMessage(inv)
-        : ('*TRIEYE STUDIO — INVOICE*
-Invoice: ' + (inv.invoice_number || 'TRI-INVOICE'));
+        : `*TRIEYE STUDIO — INVOICE*\nInvoice: ${inv.invoice_number || 'TRI-INVOICE'}`;
 
       if (window.TrieyeWhatsApp) {
         window.TrieyeWhatsApp.openChat(rawPhone, msg);
