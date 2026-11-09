@@ -71,24 +71,6 @@
     },
     "active": true
   },
-  "Rubbing Polish + Wax": {
-    "id": "adb93e83-9c58-4fe9-b029-b4197fceb12c",
-    "name": "Rubbing Polish + Wax",
-    "desc": "Dual-action rubbing compound followed by carnauba wax seal & protective gloss",
-    "base_price": 4999,
-    "hatchback_price": 4499,
-    "sedan_price": 4999,
-    "suv_price": 5999,
-    "bike_price": 1799,
-    "duration_minutes": 120,
-    "pricing": {
-      "Hatchback": 4499,
-      "Sedan": 4999,
-      "SUV": 5999,
-      "Superbike": 1799
-    },
-    "active": true
-  },
   "Complete Wash": {
     "id": "c6101883-2c5a-4895-8910-11486456d9d7",
     "name": "Complete Wash",

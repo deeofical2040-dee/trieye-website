@@ -4901,23 +4901,6 @@
         },
         active: true
       },
-      'Rubbing Polish + Wax': {
-        name: 'Rubbing Polish + Wax',
-        desc: 'Dual-action rubbing compound followed by carnauba wax seal & protective gloss',
-        duration_minutes: 120,
-        base_price: 4999,
-        hatchback_price: 4499,
-        sedan_price: 4999,
-        suv_price: 5999,
-        bike_price: 1799,
-        pricing: {
-          'Hatchback': 4499,
-          'Sedan': 4999,
-          'SUV': 5999,
-          'Superbike': 1799
-        },
-        active: true
-      },
       'Complete Wash': {
         name: 'Complete Wash',
         desc: 'Interior clean & polish, dashboard clean & polish, door clean & polish, basic seat cleaning, foam wash & degreaser',
@@ -6123,6 +6106,15 @@
     function initializeData() {
       if (!localStorage.getItem(SERVICES_KEY)) {
         localStorage.setItem(SERVICES_KEY, JSON.stringify(defaultServices));
+      } else {
+        // Clean up removed services from local cache
+        try {
+          const cachedSvcs = JSON.parse(localStorage.getItem(SERVICES_KEY) || '{}');
+          if (cachedSvcs && cachedSvcs['Rubbing Polish + Wax']) {
+            delete cachedSvcs['Rubbing Polish + Wax'];
+            localStorage.setItem(SERVICES_KEY, JSON.stringify(cachedSvcs));
+          }
+        } catch (e) {}
       }
       if (!localStorage.getItem(BAYS_KEY)) {
         localStorage.setItem(BAYS_KEY, JSON.stringify(defaultBays));
@@ -8852,7 +8844,6 @@
         'Interior Deep Cleaning',
         'Full Detail Combo',
         'Foam Wash',
-        'Rubbing Polish + Wax',
         'Complete Wash',
         'Bike Wash'
       ];
@@ -8901,7 +8892,7 @@
               <button class="btn-icon-sm" onclick="editServiceModal('${escapeHtml(k)}')" style="display:inline-flex; align-items:center; gap:0.25rem; padding:0.35rem 0.65rem; font-size:0.75rem; border-radius:6px; background:rgba(255,255,255,0.05); border:1px solid var(--border); color:var(--white); cursor:pointer;">
                 <span>✏️</span> Edit
               </button>
-              <button class="btn-icon-sm" onclick="deleteServiceDirect('${escapeHtml(k)}')" style="display:inline-flex; align-items:center; justify-content:center; padding:0.35rem 0.55rem; font-size:0.75rem; border-radius:6px; background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.25); color:#ef4444; cursor:pointer;" title="${isActive ? 'Mark Inactive (Preserves History)' : 'Delete Service'}">
+              <button class="btn-icon-sm" onclick="deleteServiceDirect('${escapeHtml(k)}')" style="display:inline-flex; align-items:center; justify-content:center; padding:0.35rem 0.55rem; font-size:0.75rem; border-radius:6px; background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.25); color:#ef4444; cursor:pointer;" title="Remove Service">
                 🗑️
               </button>
             </div>
@@ -8988,25 +8979,22 @@
       const s = svcs[targetName];
       if (!s) return;
 
-      const bookings = typeof getBookings === 'function' ? getBookings() : [];
-      const isUsedInBookings = bookings.some(b => b.service === targetName || (b.items && b.items.some(i => i.name === targetName)));
+      if (!confirm(`Are you sure you want to remove service "${targetName}"?\n\nThis will permanently remove the service from both the admin dashboard and customer website.`)) return;
 
-      if (isUsedInBookings || s.active !== false) {
-        const confirmMsg = isUsedInBookings
-          ? `Service "${targetName}" is referenced in historical bookings/invoices.\n\nTo preserve historical invoices and reporting integrity, it will be marked INACTIVE (hidden from new billing). Proceed?`
-          : `Do you want to deactivate service "${targetName}"? (It will be hidden from new billing)`;
-        if (!confirm(confirmMsg)) return;
+      // Delete locally
+      delete svcs[targetName];
+      localStorage.setItem(SERVICES_KEY, JSON.stringify(svcs));
 
-        s.active = false;
+      // Delete via TrieyeDB from Supabase and cache
+      if (window.TrieyeDB && typeof window.TrieyeDB.deleteService === 'function') {
+        await window.TrieyeDB.deleteService(targetName);
+      } else {
         await saveServices(svcs);
-        showToast(`Service "${targetName}" marked inactive to preserve history`);
-        return;
       }
 
-      if (!confirm(`Permanently remove service "${targetName}"?`)) return;
-      delete svcs[targetName];
-      await saveServices(svcs);
-      showToast(`Service "${targetName}" removed`);
+      renderServicesTable();
+      populateServiceSelects();
+      showToast(`Service "${targetName}" removed from dashboard and website`);
     }
 
     async function deleteServiceModal() {

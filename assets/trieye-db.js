@@ -1317,6 +1317,26 @@ const TrieyeDB = {
     const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
     if (sb) {
       try {
+        // Sync deletions: remove any services from Supabase that are no longer in servicesMap
+        try {
+          const { data: existingRows } = await sb.from('services').select('id, name');
+          if (Array.isArray(existingRows)) {
+            const keptNames = new Set(Object.keys(servicesMap).map(k => (servicesMap[k]?.name || k).trim().toLowerCase()));
+            for (const row of existingRows) {
+              const rowNameLower = (row.name || '').trim().toLowerCase();
+              if (!keptNames.has(rowNameLower)) {
+                console.log('🗑️ [Supabase Sync Deleting Removed Service]:', row.name);
+                const { error: syncDelErr } = await sb.from('services').delete().eq('id', row.id);
+                if (syncDelErr) {
+                  await sb.from('services').update({ active: false }).eq('id', row.id);
+                }
+              }
+            }
+          }
+        } catch (syncErr) {
+          console.warn('⚠️ [TrieyeDB Error syncing removed services]:', syncErr);
+        }
+
         for (const k of Object.keys(servicesMap)) {
           const s = servicesMap[k];
           if (!s || s.is_package || s.package_type) continue;
@@ -1376,6 +1396,73 @@ const TrieyeDB = {
     await this.loadAuthoritativePricing();
 
     return { success: true, matrix: this._currentPricing || servicesMap };
+  },
+
+  async deleteService(serviceName) {
+    if (!serviceName) return { success: false };
+    const trimmed = String(serviceName).trim();
+    const timestamp = Date.now();
+    console.log('🗑️ [TrieyeDB] Removing service:', trimmed);
+
+    // 1. Remove from local matrix and cache
+    try {
+      const current = JSON.parse(localStorage.getItem('trieye_services_matrix') || '{}');
+      delete current[trimmed];
+      localStorage.setItem('trieye_services_matrix', JSON.stringify(current));
+      localStorage.setItem('trieye_services_last_updated', String(timestamp));
+    } catch (e) {}
+
+    if (this._currentPricing && this._currentPricing[trimmed]) {
+      delete this._currentPricing[trimmed];
+    }
+
+    // 2. Broadcast across tabs instantly
+    try {
+      if (typeof BroadcastChannel !== 'undefined') {
+        const channel = new BroadcastChannel('trieye_pricing_sync');
+        channel.postMessage({ type: 'PRICING_UPDATED', matrix: this._currentPricing, timestamp: timestamp });
+      }
+    } catch (e) {}
+
+    // 3. Delete from Supabase Database (Single Source of Truth)
+    const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
+    if (sb) {
+      try {
+        const { error: delErr } = await sb.from('services').delete().eq('name', trimmed);
+        if (delErr) {
+          console.warn('⚠️ [Supabase delete error, attempting update active:false]:', delErr.message);
+          await sb.from('services').update({ active: false }).eq('name', trimmed);
+        } else {
+          console.log('✅ [Supabase Service Deleted from DB]', trimmed);
+        }
+      } catch (err) {
+        console.error('🚨 [Supabase Network Error on deleteService]:', err);
+      }
+    }
+
+    // 4. Notify REST Backend API if running
+    try {
+      const apiHeaders = { 'Content-Type': 'application/json' };
+      const sbSession = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
+      if (sbSession && sbSession.auth) {
+        try {
+          const { data: sessionData } = await sbSession.auth.getSession();
+          if (sessionData && sessionData.session && sessionData.session.access_token) {
+            apiHeaders['Authorization'] = `Bearer ${sessionData.session.access_token}`;
+          }
+        } catch (authErr) {}
+      }
+      await fetch('/api/services', {
+        method: 'POST',
+        headers: apiHeaders,
+        body: JSON.stringify(this._currentPricing || {})
+      });
+    } catch (e) {}
+
+    // 5. Reload authoritative pricing to ensure sync
+    await this.loadAuthoritativePricing();
+
+    return { success: true, matrix: this._currentPricing };
   },
 
   // 4. DETAILING BAYS
