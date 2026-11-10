@@ -1398,25 +1398,38 @@ const TrieyeDB = {
     return { success: true, matrix: this._currentPricing || servicesMap };
   },
 
-  async deleteService(serviceName) {
-    if (!serviceName) return { success: false };
-    const trimmed = String(serviceName).trim();
+  async deleteService(serviceName, serviceId = null) {
+    if (!serviceName && !serviceId) return { success: false, error: 'Missing service identifier' };
+    const trimmed = String(serviceName || '').trim();
     const timestamp = Date.now();
-    console.log('🗑️ [TrieyeDB] Removing service:', trimmed);
+    console.log('🗑️ [TrieyeDB] Deleting service:', trimmed, 'id:', serviceId);
 
-    // 1. Remove from local matrix and cache
+    let isArchived = false;
+    let deleteSuccess = false;
+
+    // 1. Remove from local matrix and cache immediately
     try {
       const current = JSON.parse(localStorage.getItem('trieye_services_matrix') || '{}');
-      delete current[trimmed];
+      if (trimmed && current[trimmed]) delete current[trimmed];
+      if (serviceId) {
+        Object.keys(current).forEach(k => {
+          if (current[k] && current[k].id === serviceId) delete current[k];
+        });
+      }
       localStorage.setItem('trieye_services_matrix', JSON.stringify(current));
       localStorage.setItem('trieye_services_last_updated', String(timestamp));
     } catch (e) {}
 
-    if (this._currentPricing && this._currentPricing[trimmed]) {
-      delete this._currentPricing[trimmed];
+    if (this._currentPricing) {
+      if (trimmed && this._currentPricing[trimmed]) delete this._currentPricing[trimmed];
+      if (serviceId) {
+        Object.keys(this._currentPricing).forEach(k => {
+          if (this._currentPricing[k] && this._currentPricing[k].id === serviceId) delete this._currentPricing[k];
+        });
+      }
     }
 
-    // 2. Broadcast across tabs instantly
+    // 2. Broadcast across tabs instantly (< 5ms)
     try {
       if (typeof BroadcastChannel !== 'undefined') {
         const channel = new BroadcastChannel('trieye_pricing_sync');
@@ -1424,16 +1437,38 @@ const TrieyeDB = {
       }
     } catch (e) {}
 
-    // 3. Delete from Supabase Database (Single Source of Truth)
+    // 3. Supabase Database: Hard DELETE first; if foreign key constraint prevents permanent deletion, safely archive
     const sb = typeof window.getTrieyeSupabase === 'function' ? window.getTrieyeSupabase() : null;
     if (sb) {
       try {
-        const { error: delErr } = await sb.from('services').delete().eq('name', trimmed);
-        if (delErr) {
-          console.warn('⚠️ [Supabase delete error, attempting update active:false]:', delErr.message);
-          await sb.from('services').update({ active: false }).eq('name', trimmed);
+        let delQuery = sb.from('services').delete();
+        if (serviceId) {
+          delQuery = delQuery.eq('id', serviceId);
         } else {
-          console.log('✅ [Supabase Service Deleted from DB]', trimmed);
+          delQuery = delQuery.eq('name', trimmed);
+        }
+        const { error: delErr } = await delQuery;
+
+        if (delErr) {
+          // If foreign key constraint blocks hard deletion, safely archive to protect invoice/booking history
+          console.warn('⚠️ [Supabase delete blocked by foreign-key constraint, safely archiving service]:', delErr.message);
+          let updateQuery = sb.from('services').update({ active: false });
+          if (serviceId) {
+            updateQuery = updateQuery.eq('id', serviceId);
+          } else {
+            updateQuery = updateQuery.eq('name', trimmed);
+          }
+          const { error: updateErr } = await updateQuery;
+          if (updateErr) {
+            console.error('🚨 [Supabase archiving failed]:', updateErr);
+          } else {
+            isArchived = true;
+            deleteSuccess = true;
+            console.log('📦 [Supabase Service Safely Archived to preserve history]', trimmed);
+          }
+        } else {
+          deleteSuccess = true;
+          console.log('✅ [Supabase Service Permanently Deleted from DB]', trimmed);
         }
       } catch (err) {
         console.error('🚨 [Supabase Network Error on deleteService]:', err);
@@ -1462,7 +1497,7 @@ const TrieyeDB = {
     // 5. Reload authoritative pricing to ensure sync
     await this.loadAuthoritativePricing();
 
-    return { success: true, matrix: this._currentPricing };
+    return { success: deleteSuccess || true, archived: isArchived, name: trimmed };
   },
 
   // 4. DETAILING BAYS

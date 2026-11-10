@@ -3854,6 +3854,17 @@
           </div>
         </div>
 
+        <div class="panel" style="margin-bottom:0.85rem; padding:0.65rem 1rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+            <div style="display:flex; gap:0.4rem; align-items:center; flex-wrap:wrap;">
+              <span style="font-size:0.75rem; font-weight:700; color:var(--muted); text-transform:uppercase; letter-spacing:0.06em; margin-right:0.25rem;">FILTER:</span>
+              <button type="button" class="btn btn-filter-pkg active" id="svc-filter-active" onclick="filterServicesView('ACTIVE', this)">Active Services (<span id="svc-count-active">6</span>)</button>
+              <button type="button" class="btn btn-filter-pkg" id="svc-filter-archived" onclick="filterServicesView('ARCHIVED', this)">Archived (<span id="svc-count-archived">0</span>)</button>
+            </div>
+            <div id="svc-view-hint" style="font-size:0.74rem; color:var(--muted);">Showing active services configured for live studio billing &amp; customer website</div>
+          </div>
+        </div>
+
         <div class="panel">
           <div class="table-container">
             <table class="data-table">
@@ -4195,7 +4206,7 @@
         </div>
       </div>
       <div class="dash-modal-footer" style="display:flex; justify-content:space-between; align-items:center; width:100%;">
-        <button class="btn" id="btn-delete-service" onclick="deleteServiceModal()" style="color:var(--red); border-color:rgba(220,38,38,0.4); background:rgba(220,38,38,0.08); display:none;">🗑️ Deactivate / Delete</button>
+        <button class="btn" id="btn-delete-service" onclick="deleteServiceModal()" style="color:var(--red); border-color:rgba(220,38,38,0.4); background:rgba(220,38,38,0.08); display:none;">🗑️ Delete Service</button>
         <div style="display:flex; gap:0.5rem; margin-left:auto;">
           <button class="btn" onclick="closeModal('modalService')">Cancel</button>
           <button class="btn btn-primary" onclick="saveServiceModal()">Save Service</button>
@@ -8823,19 +8834,69 @@
       return `<strong style="color:var(--green); font-family:'IBM Plex Mono',monospace; font-size:0.88rem;">₹${Number(price).toLocaleString('en-IN')}</strong>`;
     }
 
+    let currentSvcView = 'ACTIVE';
+
+    function filterServicesView(view, btn) {
+      currentSvcView = view || 'ACTIVE';
+      document.querySelectorAll('.btn-filter-pkg').forEach(b => {
+        if (b.id === 'svc-filter-active' || b.id === 'svc-filter-archived') {
+          b.classList.remove('active');
+        }
+      });
+      if (btn) btn.classList.add('active');
+      const hintEl = document.getElementById('svc-view-hint');
+      if (hintEl) {
+        hintEl.innerText = currentSvcView === 'ARCHIVED'
+          ? 'Showing safely archived services preserved for historical invoices and bookings'
+          : 'Showing active services configured for live studio billing & customer website';
+      }
+      renderServicesTable();
+    }
+
+    async function restoreService(targetName) {
+      if (!targetName) return;
+      const svcs = getServices();
+      const s = svcs[targetName];
+      if (!s) return;
+      s.active = true;
+      delete s.archived;
+      await saveServices(svcs);
+      showToast(`Service "${targetName}" restored to active services list`);
+      currentSvcView = 'ACTIVE';
+      const actBtn = document.getElementById('svc-filter-active');
+      const archBtn = document.getElementById('svc-filter-archived');
+      if (actBtn) actBtn.classList.add('active');
+      if (archBtn) archBtn.classList.remove('active');
+      renderServicesTable();
+    }
+
     function renderServicesTable() {
       const svcs = getServices();
       const tbody = document.getElementById('services-tbody');
       if (!tbody) return;
       tbody.innerHTML = '';
 
-      const serviceKeys = Object.keys(svcs).filter(k => {
+      const allServiceKeys = Object.keys(svcs).filter(k => {
         const s = svcs[k];
         return s && !s.is_package && !s.package_type && !(k.includes('Monthly') && k.includes('Pack'));
       });
 
+      const activeKeys = allServiceKeys.filter(k => svcs[k] && svcs[k].active !== false);
+      const archivedKeys = allServiceKeys.filter(k => svcs[k] && svcs[k].active === false);
+
+      const activeCountEl = document.getElementById('svc-count-active');
+      if (activeCountEl) activeCountEl.innerText = activeKeys.length;
+      const archCountEl = document.getElementById('svc-count-archived');
+      if (archCountEl) archCountEl.innerText = archivedKeys.length;
+
+      const serviceKeys = currentSvcView === 'ARCHIVED' ? archivedKeys : activeKeys;
+
       if (serviceKeys.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:2rem; color:var(--muted);">No services configured yet. Click "+ Add New Service" to create one.</td></tr>`;
+        if (currentSvcView === 'ARCHIVED') {
+          tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:2rem; color:var(--muted);">No archived services. All configured services are active.</td></tr>`;
+        } else {
+          tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:2rem; color:var(--muted);">No active services configured yet. Click "+ Add New Service" to create one.</td></tr>`;
+        }
         return;
       }
 
@@ -8876,25 +8937,34 @@
               <strong style="color:var(--white); font-size:0.9rem;">${escapeHtml(k)}</strong>
             </div>
           </td>
-          <td><span style="font-size:0.78rem; color:var(--muted); line-height:1.4; display:block; max-width:280px;">${escapeHtml(s.desc || s.description || 'Standard Studio Service')}</span></td>
+          <td><span style="font-size:0.78rem; color:var(--muted); line-height:1.4; display:block; max-width:280px;">${escapeHtml(s.desc || s.description || (isActive ? 'Standard Studio Service' : 'Safely archived to preserve historical records'))}</span></td>
           <td>${formatSvcPriceCell(hatchPrice)}</td>
           <td>${formatSvcPriceCell(sedanPrice)}</td>
           <td>${formatSvcPriceCell(suvPrice)}</td>
           <td>${formatSvcPriceCell(bikePrice)}</td>
           <td>
-            <span class="status-badge" style="background:${isActive ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.12)'}; color:${isActive ? '#22c55e' : '#ef4444'}; border:1px solid ${isActive ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}; font-size:0.72rem; padding:0.22rem 0.55rem; border-radius:20px; font-weight:600; display:inline-flex; align-items:center; gap:0.35rem;">
-              <span style="width:6px; height:6px; border-radius:50%; background:${isActive ? '#22c55e' : '#ef4444'};"></span>
-              ${isActive ? 'Active' : 'Inactive'}
+            <span class="status-badge" style="background:${isActive ? 'rgba(34,197,94,0.12)' : 'rgba(234,179,8,0.12)'}; color:${isActive ? '#22c55e' : '#eab308'}; border:1px solid ${isActive ? 'rgba(34,197,94,0.3)' : 'rgba(234,179,8,0.3)'}; font-size:0.72rem; padding:0.22rem 0.55rem; border-radius:20px; font-weight:600; display:inline-flex; align-items:center; gap:0.35rem;" title="${isActive ? 'Active service' : 'Safely archived to preserve past invoice & booking records'}">
+              <span style="width:6px; height:6px; border-radius:50%; background:${isActive ? '#22c55e' : '#eab308'};"></span>
+              ${isActive ? 'Active' : 'Archived'}
             </span>
           </td>
           <td>
             <div style="display:flex; gap:0.4rem; align-items:center;">
-              <button class="btn-icon-sm" onclick="editServiceModal('${escapeHtml(k)}')" style="display:inline-flex; align-items:center; gap:0.25rem; padding:0.35rem 0.65rem; font-size:0.75rem; border-radius:6px; background:rgba(255,255,255,0.05); border:1px solid var(--border); color:var(--white); cursor:pointer;">
-                <span>✏️</span> Edit
-              </button>
-              <button class="btn-icon-sm" onclick="deleteServiceDirect('${escapeHtml(k)}')" style="display:inline-flex; align-items:center; justify-content:center; padding:0.35rem 0.55rem; font-size:0.75rem; border-radius:6px; background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.25); color:#ef4444; cursor:pointer;" title="Remove Service">
-                🗑️
-              </button>
+              ${isActive ? `
+                <button class="btn-icon-sm" onclick="editServiceModal('${escapeHtml(k)}')" style="display:inline-flex; align-items:center; gap:0.25rem; padding:0.35rem 0.65rem; font-size:0.75rem; border-radius:6px; background:rgba(255,255,255,0.05); border:1px solid var(--border); color:var(--white); cursor:pointer;">
+                  <span>✏️</span> Edit
+                </button>
+                <button class="btn-icon-sm" onclick="deleteServiceDirect('${escapeHtml(k)}')" style="display:inline-flex; align-items:center; justify-content:center; padding:0.35rem 0.55rem; font-size:0.75rem; border-radius:6px; background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.25); color:#ef4444; cursor:pointer;" title="Delete Service">
+                  🗑️
+                </button>
+              ` : `
+                <button class="btn-icon-sm" onclick="restoreService('${escapeHtml(k)}')" style="display:inline-flex; align-items:center; gap:0.25rem; padding:0.35rem 0.65rem; font-size:0.75rem; border-radius:6px; background:rgba(34,197,94,0.08); border:1px solid rgba(34,197,94,0.25); color:#22c55e; cursor:pointer;" title="Restore to Active Services">
+                  <span>🔄</span> Restore
+                </button>
+                <button class="btn-icon-sm" onclick="deleteServiceDirect('${escapeHtml(k)}', true)" style="display:inline-flex; align-items:center; justify-content:center; padding:0.35rem 0.55rem; font-size:0.75rem; border-radius:6px; background:rgba(239,68,68,0.08); border:1px solid rgba(239,68,68,0.25); color:#ef4444; cursor:pointer;" title="Permanently Delete">
+                  🗑️
+                </button>
+              `}
             </div>
           </td>
         `;
@@ -8973,28 +9043,42 @@
       openModal('modalService');
     }
 
-    async function deleteServiceDirect(targetName) {
+    async function deleteServiceDirect(targetName, isPermanentAttempt = false) {
       if (!targetName) return;
       const svcs = getServices();
-      const s = svcs[targetName];
-      if (!s) return;
+      const s = svcs[targetName] || {};
+      const serviceId = s.id || null;
 
-      if (!confirm(`Are you sure you want to remove service "${targetName}"?\n\nThis will permanently remove the service from both the admin dashboard and customer website.`)) return;
+      const confirmMsg = isPermanentAttempt
+        ? `Permanently delete service "${targetName}" from the database?`
+        : `Are you sure you want to delete service "${targetName}"?\n\nThis will remove it from the active services list, admin dashboard, and customer website.`;
 
-      // Delete locally
+      if (!confirm(confirmMsg)) return;
+
+      // 1. Immediately remove from local state for instant UI update
       delete svcs[targetName];
       localStorage.setItem(SERVICES_KEY, JSON.stringify(svcs));
+      renderServicesTable();
+      populateServiceSelects();
 
-      // Delete via TrieyeDB from Supabase and cache
+      // 2. Perform deletion via TrieyeDB
+      let result = { success: true };
       if (window.TrieyeDB && typeof window.TrieyeDB.deleteService === 'function') {
-        await window.TrieyeDB.deleteService(targetName);
+        result = await window.TrieyeDB.deleteService(targetName, serviceId);
       } else {
         await saveServices(svcs);
       }
 
+      // 3. Re-render table and selects with fresh authoritative state
       renderServicesTable();
       populateServiceSelects();
-      showToast(`Service "${targetName}" removed from dashboard and website`);
+
+      // 4. User feedback
+      if (result && result.archived) {
+        showToast(`Service "${targetName}" is referenced in past records and was safely archived (hidden from all active service lists)`);
+      } else {
+        showToast(`Service "${targetName}" deleted successfully`);
+      }
     }
 
     async function deleteServiceModal() {
