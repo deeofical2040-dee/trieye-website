@@ -82,13 +82,26 @@
 
     if (cards.length === 0) return;
 
-    // Preload all gallery images in background to eliminate slide transition delays
-    galleryItemsData.forEach(function(item) {
-      if (item && item.src) {
-        var img = new Image();
-        img.src = item.src;
-      }
-    });
+    // Preload remaining gallery images in idle time to eliminate slide transition delays without competing with LCP
+    if ("requestIdleCallback" in window) {
+      window.requestIdleCallback(function() {
+        galleryItemsData.forEach(function(item) {
+          if (item && item.src) {
+            var img = new Image();
+            img.src = item.src;
+          }
+        });
+      }, { timeout: 2500 });
+    } else {
+      setTimeout(function() {
+        galleryItemsData.forEach(function(item) {
+          if (item && item.src) {
+            var img = new Image();
+            img.src = item.src;
+          }
+        });
+      }, 1500);
+    }
 
     var currentIndex = 0;
     var totalCards = cards.length;
