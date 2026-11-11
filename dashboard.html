@@ -11348,9 +11348,17 @@
       const bikeVal = Number(rem.bike_wash !== undefined ? rem.bike_wash : (rem.total !== undefined ? rem.total : 0));
 
       const washesEl = document.getElementById('bpkg-bal-washes');
-      if (washesEl) washesEl.innerText = bikeVal;
+      if (washesEl) {
+        washesEl.innerText = bikeVal;
+        if (washesEl.parentElement) {
+          washesEl.parentElement.style.color = bikeVal > 0 ? '#a3e635' : '#ef4444';
+        }
+      }
       const totEl = document.getElementById('bpkg-bal-total');
-      if (totEl) totEl.innerText = `${bikeVal} / 3`;
+      if (totEl) {
+        totEl.innerText = `${bikeVal} / 3`;
+        totEl.style.color = bikeVal > 0 ? 'var(--white)' : '#ef4444';
+      }
 
       // Card dimming
       const washesCard = document.getElementById('card-bal-bike-washes');
@@ -11482,6 +11490,7 @@
         const tr = document.createElement('tr');
         const rem = pkg.remaining_washes || pkg.washes_remaining || { bike_wash: 0, total: 0 };
         const bikeVal = Number(rem.bike_wash !== undefined ? rem.bike_wash : (rem.total !== undefined ? rem.total : 0));
+        const isExhausted = (bikeVal <= 0);
 
         const pStatus = (pkg.payment_status || (pkg.balance_due > 0 ? 'PARTIAL' : 'PAID')).toUpperCase();
         const payStatusClass = (pStatus === 'PAID') ? 'conf' : (pStatus === 'PARTIAL' || pStatus === 'PARTIALLY PAID' ? 'prog' : 'can');
@@ -11521,13 +11530,32 @@
           <td style="padding:7px 10px;">
             <span style="font-size:0.75rem; color:#a3e635; font-weight:600;">${escapeHtml(formatVehicleCategory(pkg.vehicle_category || pkg.vehicle_type || 'Commuter Bike'))}</span>
           </td>
-          <td style="font-family:'IBM Plex Mono'; font-weight:800; color:${bikeVal > 0 ? '#a3e635' : 'var(--muted)'}; font-size:0.85rem; padding:7px 10px;">${bikeVal} / 3</td>
+          <td style="padding:7px 10px;">
+            ${isExhausted ? `
+              <div style="line-height:1.2;">
+                <span style="font-family:'IBM Plex Mono', monospace; font-weight:800; color:#ef4444; font-size:0.88rem;">0/3</span>
+                <div style="margin-top:4px;">
+                  <span style="display:inline-block; font-family:'IBM Plex Mono', monospace; font-size:0.65rem; font-weight:800; letter-spacing:0.04em; color:#ffffff; background:#ef4444; border:1px solid #dc2626; padding:2px 7px; border-radius:4px; text-transform:uppercase; white-space:nowrap; box-shadow:0 1px 3px rgba(239,68,68,0.3);">
+                    ALL WASHES COMPLETED
+                  </span>
+                </div>
+              </div>
+            ` : `
+              <span style="font-family:'IBM Plex Mono', monospace; font-weight:800; color:#a3e635; font-size:0.88rem;">${bikeVal} / 3</span>
+            `}
+          </td>
           <td style="font-family:'IBM Plex Mono'; font-size:0.75rem; color:var(--muted); padding:7px 10px;">${escapeHtml(pkg.expiry_date || '-')}</td>
           <td style="padding:7px 10px;"><span class="status-badge ${payStatusClass}" style="font-size:0.68rem; padding:2px 6px;">${escapeHtml(payStatusLabel)}</span></td>
           <td style="white-space:nowrap; text-align:right; padding:7px 10px;">
-            <button class="btn btn-primary" style="padding:0.25rem 0.55rem; font-size:0.74rem; margin-right:4px; background:#a3e635; color:#0f172a; border-color:#a3e635;" onclick="selectActiveBikePackage('${escapeHtml(pkg.id)}')">
-              🧼 Redeem
-            </button>
+            ${isExhausted ? `
+              <button class="btn" disabled title="All 3 washes have been used." style="padding:0.25rem 0.55rem; font-size:0.74rem; margin-right:4px; background:#334155; color:#94a3b8; border:1px solid #475569; opacity:0.55; cursor:not-allowed;">
+                🧼 Redeem
+              </button>
+            ` : `
+              <button class="btn btn-primary" style="padding:0.25rem 0.55rem; font-size:0.74rem; margin-right:4px; background:#a3e635; color:#0f172a; border-color:#a3e635;" onclick="selectActiveBikePackage('${escapeHtml(pkg.id)}')">
+                🧼 Redeem
+              </button>
+            `}
             <button class="btn btn-outline" style="padding:0.25rem 0.55rem; font-size:0.74rem; border-color:#38bdf8; color:#38bdf8;" onclick="viewBikePackageInvoice('${escapeHtml(pkg.id)}')">
               🧾 Invoice
             </button>
@@ -11578,6 +11606,14 @@
 
         // Refresh views
         await selectActiveBikePackage(currentSelectedBikePackageId, false);
+        if (currentBikePackageFilter === 'ACTIVE') {
+          // Switch filter to ALL so the newly completed package stays visible in the directory
+          currentBikePackageFilter = 'ALL';
+          document.querySelectorAll('.btn-filter-bpkg').forEach(b => {
+            if (b.getAttribute('data-filter') === 'ALL') b.classList.add('active');
+            else b.classList.remove('active');
+          });
+        }
         await applyBikePackagesFilter();
 
         showToast(`✓ Bike Wash redeemed successfully!`);
