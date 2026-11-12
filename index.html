@@ -2581,28 +2581,39 @@
   .explore-card {
     display: flex;
     flex-direction: column;
+    height: 100%;
     background: var(--bg-panel, #ffffff);
     border: 1px solid var(--line, #e2e8f0);
-    border-radius: 10px;
+    border-radius: 12px;
     overflow: hidden;
     text-decoration: none !important;
     color: inherit !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
     cursor: pointer;
     transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease;
   }
+  .explore-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--pink, #ee2f76);
+    box-shadow: 0 12px 28px rgba(238, 47, 118, 0.12);
+  }
   .explore-card-img-wrap {
     width: 100%;
-    height: 150px;
+    aspect-ratio: 16 / 9;
     overflow: hidden;
     position: relative;
-    background: #f1f5f9;
+    background: #e2e8f0;
   }
   .explore-card-img-wrap img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    object-position: center;
+    display: block;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .explore-card:hover .explore-card-img-wrap img {
+    transform: scale(1.04);
   }
   .explore-card-overlay {
     position: absolute;
@@ -2749,63 +2760,121 @@
 
   /* ---------- RELATED SERVICES SECTION ---------- */
   .related-services-sec {
-    padding: 56px 0;
+    padding: 64px 0;
     background: var(--bg-panel-2, #f8f9fa);
     border-top: 1px solid var(--line, #e2e8f0);
+  }
+  .related-services-sec .sec-head {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto 36px;
+  }
+  .related-services-sec .sec-tag {
+    color: var(--pink, #ee2f76);
+    font-size: 13.5px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .related-services-sec h2 {
+    font-size: clamp(26px, 3.5vw, 36px);
+    font-weight: 800;
+    text-transform: uppercase;
+    color: var(--white, #111827);
+    line-height: 1.2;
+    margin: 0;
   }
   .related-cards-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    margin-top: 24px;
+    gap: 24px;
+    margin-top: 28px;
   }
-  @media (max-width: 768px) {
+  @media (min-width: 641px) and (max-width: 991px) {
+    .related-cards-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+  }
+  @media (max-width: 640px) {
     .related-cards-grid {
       grid-template-columns: 1fr;
-      gap: 14px;
+      gap: 18px;
     }
   }
   .related-card {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    height: 100%;
     background: var(--bg-panel, #ffffff);
     border: 1px solid var(--line, #e2e8f0);
-    border-radius: 10px;
-    padding: 22px;
+    border-radius: 12px;
+    overflow: hidden;
     text-decoration: none !important;
     color: inherit !important;
-    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease, box-shadow 0.25s ease;
   }
   .related-card:hover {
-    transform: translateY(-3px);
+    transform: translateY(-4px);
     border-color: var(--pink, #ee2f76);
-    box-shadow: 0 8px 24px rgba(238, 47, 118, 0.12);
+    box-shadow: 0 12px 28px rgba(238, 47, 118, 0.12);
+  }
+  .related-card-img-wrap {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    position: relative;
+    background: #e2e8f0;
+  }
+  .related-card-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .related-card:hover .related-card-img-wrap img {
+    transform: scale(1.04);
+  }
+  .related-card-body {
+    padding: 20px 22px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    justify-content: space-between;
+    background: var(--bg-panel, #ffffff);
   }
   .related-card-title {
     font-family: 'Oswald', sans-serif;
-    font-size: 18px;
-    font-weight: 600;
+    font-size: 19px;
+    font-weight: 700;
     text-transform: uppercase;
     color: var(--white, #111827);
-    margin-bottom: 6px;
+    margin: 0 0 8px 0;
+    line-height: 1.25;
+    letter-spacing: 0.02em;
   }
   .related-card-desc {
-    font-size: 13.5px;
+    font-size: 14px;
     color: var(--muted, #64748b);
-    line-height: 1.45;
-    margin-bottom: 16px;
+    line-height: 1.55;
+    margin: 0 0 18px 0;
+    flex-grow: 1;
   }
   .related-card-cta {
     font-family: 'Oswald', sans-serif;
-    font-size: 13px;
+    font-size: 13.5px;
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--pink, #ee2f76);
     display: inline-flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
+    margin-top: auto;
   }
   .related-card:hover .related-card-cta span {
     transform: translateX(4px);
@@ -3462,7 +3531,7 @@
       <!-- 01 CAR WASH -->
       <a href="/car-wash" class="explore-card reveal-element reveal-card">
         <div class="explore-card-img-wrap reveal-card">
-          <img src="/images/car-wash.webp" alt="Car Wash foam wash detailing at TRIEYE" width="400" height="267" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/assets/car-wash/snow-foam-prewash.webp';">
+          <img src="/images/car-wash.webp" alt="Car Wash foam wash detailing at TRIEYE" width="640" height="360" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/assets/car-wash/snow-foam-prewash.webp';">
           <div class="explore-card-overlay reveal-card">
             <span class="overlay-title">EXPLORE FULL SERVICE <span class="arrow">&rarr;</span></span>
             <span class="overlay-sub">View process, benefits &amp; complete details</span>
@@ -3478,7 +3547,7 @@
       <!-- 02 CERAMIC COATING -->
       <a href="/ceramic-coating" class="explore-card reveal-element reveal-card">
         <div class="explore-card-img-wrap reveal-card">
-          <img src="/images/ceramic-coating.webp" alt="Ceramic Coating hydrophobic protection at TRIEYE" width="400" height="267" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/assets/ceramic-coating/ceramic-coating-hero.webp';">
+          <img src="/images/ceramic-coating.webp" alt="Ceramic Coating hydrophobic protection at TRIEYE" width="640" height="360" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/assets/ceramic-coating/ceramic-coating-hero.webp';">
           <div class="explore-card-overlay reveal-card">
             <span class="overlay-title">EXPLORE FULL SERVICE <span class="arrow">&rarr;</span></span>
             <span class="overlay-sub">View process, benefits &amp; complete details</span>
@@ -3494,7 +3563,7 @@
       <!-- 03 GRAPHENE COATING -->
       <a href="/graphene-coating" class="explore-card reveal-element reveal-card">
         <div class="explore-card-img-wrap reveal-card">
-          <img src="/images/graphene-coating.webp" alt="Graphene Coating application at TRIEYE" width="400" height="267" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/assets/graphene/graphene-hero.webp';">
+          <img src="/images/graphene-coating.webp" alt="Graphene Coating application at TRIEYE" width="640" height="360" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/assets/graphene/graphene-hero.webp';">
           <div class="explore-card-overlay reveal-card">
             <span class="overlay-title">EXPLORE FULL SERVICE <span class="arrow">&rarr;</span></span>
             <span class="overlay-sub">View process, benefits &amp; complete details</span>
@@ -3510,7 +3579,7 @@
       <!-- 04 PAINT CORRECTION -->
       <a href="/paint-correction" class="explore-card reveal-element reveal-card">
         <div class="explore-card-img-wrap reveal-card">
-          <img src="/images/paint-correction.webp" alt="Paint Correction machine polishing at TRIEYE" width="400" height="267" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/assets/paint-correction/paint-correction-hero.webp';">
+          <img src="/images/paint-correction.webp" alt="Paint Correction machine polishing at TRIEYE" width="640" height="360" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/assets/paint-correction/paint-correction-hero.webp';">
           <div class="explore-card-overlay reveal-card">
             <span class="overlay-title">EXPLORE FULL SERVICE <span class="arrow">&rarr;</span></span>
             <span class="overlay-sub">View process, benefits &amp; complete details</span>
@@ -3526,7 +3595,7 @@
       <!-- 05 INTERIOR DETAILING -->
       <a href="/interior-detailing" class="explore-card reveal-element reveal-card">
         <div class="explore-card-img-wrap reveal-card">
-          <img src="/images/interior-detailing.webp" alt="Interior Detailing deep cabin cleaning at TRIEYE" width="400" height="267" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/assets/interior-detailing/interior-hero.webp';">
+          <img src="/images/interior-detailing.webp" alt="Interior Detailing deep cabin cleaning at TRIEYE" width="640" height="360" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/assets/interior-detailing/interior-hero.webp';">
           <div class="explore-card-overlay reveal-card">
             <span class="overlay-title">EXPLORE FULL SERVICE <span class="arrow">&rarr;</span></span>
             <span class="overlay-sub">View process, benefits &amp; complete details</span>
@@ -3542,7 +3611,7 @@
       <!-- 06 PAINT PROTECTION FILM (PPF) -->
       <a href="/ppf" class="explore-card reveal-element reveal-card">
         <div class="explore-card-img-wrap reveal-card">
-          <img src="/images/ppf.webp" alt="Paint Protection Film PPF installation at TRIEYE" width="400" height="267" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/assets/ppf/ppf-hero.webp';">
+          <img src="/images/ppf.webp" alt="Paint Protection Film PPF installation at TRIEYE" width="640" height="360" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/assets/ppf/ppf-hero.webp';">
           <div class="explore-card-overlay reveal-card">
             <span class="overlay-title">EXPLORE FULL SERVICE <span class="arrow">&rarr;</span></span>
             <span class="overlay-sub">View process, benefits &amp; complete details</span>
@@ -3558,7 +3627,7 @@
       <!-- 07 BIKE DETAILING -->
       <a href="/bike-detailing" class="explore-card reveal-element reveal-card">
         <div class="explore-card-img-wrap reveal-card">
-          <img src="/images/bike-detailing.webp" alt="Professional motorcycle detailing at TRIEYE" width="400" height="267" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/assets/bike/bike-hero.webp';">
+          <img src="/images/bike-detailing.webp" alt="Professional motorcycle detailing at TRIEYE" width="640" height="360" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/assets/bike/bike-hero.webp';">
           <div class="explore-card-overlay reveal-card">
             <span class="overlay-title">EXPLORE FULL SERVICE <span class="arrow">&rarr;</span></span>
             <span class="overlay-sub">View process, benefits &amp; complete details</span>
@@ -3740,7 +3809,7 @@
           <!-- CARD 1 -->
           <div class="gallery-card is-active" data-index="0">
             <div class="gallery-card-inner">
-              <img src="/images/gallery-foam-wash.webp" alt="Snow Foam Pre-Wash and Decon at TRIEYE Detailing Studio" width="400" height="267" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/images/car-wash.webp';">
+              <img src="/images/gallery-foam-wash.webp" alt="Snow Foam Pre-Wash and Decon at TRIEYE Detailing Studio" width="640" height="360" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/images/car-wash.webp';">
               <div class="gallery-card-bottom">
                 <div class="gallery-item-tag">01 / FOAM WASH</div>
                 <h3 class="gallery-item-title">HIGH-DENSITY SNOW FOAM &amp; DECON</h3>
@@ -3751,7 +3820,7 @@
           <!-- CARD 2 -->
           <div class="gallery-card is-next" data-index="1">
             <div class="gallery-card-inner">
-              <img src="/images/gallery-paint-correction.webp" alt="Dual-Action Paint Correction Rubbing Polish" width="400" height="267" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/images/paint-correction.webp';">
+              <img src="/images/gallery-paint-correction.webp" alt="Dual-Action Paint Correction Rubbing Polish" width="640" height="360" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/images/paint-correction.webp';">
               <div class="gallery-card-bottom">
                 <div class="gallery-item-tag">02 / PAINT CORRECTION</div>
                 <h3 class="gallery-item-title">DUAL-ACTION MACHINE POLISHING</h3>
@@ -3762,7 +3831,7 @@
           <!-- CARD 3 -->
           <div class="gallery-card is-hidden-right" data-index="2">
             <div class="gallery-card-inner">
-              <img src="/images/gallery-interior-clean.webp" alt="Interior Detailing Steam Extraction and Leather Spa" width="400" height="267" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/images/interior-detailing.webp';">
+              <img src="/images/gallery-interior-clean.webp" alt="Interior Detailing Steam Extraction and Leather Spa" width="640" height="360" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/images/interior-detailing.webp';">
               <div class="gallery-card-bottom">
                 <div class="gallery-item-tag">03 / INTERIOR DETAILING</div>
                 <h3 class="gallery-item-title">DEEP STEAM EXTRACTION &amp; LEATHER SPA</h3>
@@ -3773,7 +3842,7 @@
           <!-- CARD 4 -->
           <div class="gallery-card is-hidden-right" data-index="3">
             <div class="gallery-card-inner">
-              <img src="/images/gallery-ceramic-coating.webp" alt="Hydrophobic 9H Ceramic Coating Protection" width="400" height="267" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/images/ceramic-coating.webp';">
+              <img src="/images/gallery-ceramic-coating.webp" alt="Hydrophobic 9H Ceramic Coating Protection" width="640" height="360" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/images/ceramic-coating.webp';">
               <div class="gallery-card-bottom">
                 <div class="gallery-item-tag">04 / CERAMIC COATING</div>
                 <h3 class="gallery-item-title">9H HYDROPHOBIC SURFACE SHIELD</h3>
@@ -3784,7 +3853,7 @@
           <!-- CARD 5 -->
           <div class="gallery-card is-hidden-right" data-index="4">
             <div class="gallery-card-inner">
-              <img src="/images/gallery-ppf-installation.webp" alt="Paint Protection Film Installation at TRIEYE Studio" width="400" height="267" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/images/ppf.webp';">
+              <img src="/images/gallery-ppf-installation.webp" alt="Paint Protection Film Installation at TRIEYE Studio" width="640" height="360" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/images/ppf.webp';">
               <div class="gallery-card-bottom">
                 <div class="gallery-item-tag">05 / PPF INSTALLATION</div>
                 <h3 class="gallery-item-title">PRECISION PAINT PROTECTION FILM</h3>
@@ -3795,7 +3864,7 @@
           <!-- CARD 6 -->
           <div class="gallery-card is-hidden-right" data-index="5">
             <div class="gallery-card-inner">
-              <img src="/images/gallery-graphene-matrix.webp" alt="Precision Graphene Matrix Coating Application and Inspection" width="400" height="267" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/images/graphene-coating.webp';">
+              <img src="/images/gallery-graphene-matrix.webp" alt="Precision Graphene Matrix Coating Application and Inspection" width="640" height="360" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/images/graphene-coating.webp';">
               <div class="gallery-card-bottom">
                 <div class="gallery-item-tag">06 / GRAPHENE MATRIX</div>
                 <h3 class="gallery-item-title">PRECISION APPLICATION &amp; FINISH</h3>
@@ -3806,7 +3875,7 @@
           <!-- CARD 7 -->
           <div class="gallery-card is-prev" data-index="6">
             <div class="gallery-card-inner">
-              <img src="/images/gallery-superbike-detailing.webp" alt="Superbike Detailing and Hand Polishing at TRIEYE Studio" width="400" height="267" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/images/bike-detailing.webp';">
+              <img src="/images/gallery-superbike-detailing.webp" alt="Superbike Detailing and Hand Polishing at TRIEYE Studio" width="640" height="360" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='/images/bike-detailing.webp';">
               <div class="gallery-card-bottom">
                 <div class="gallery-item-tag">07 / SUPERBIKE DETAILING</div>
                 <h3 class="gallery-item-title">FULL MOTORCYCLE RESTORATION</h3>
